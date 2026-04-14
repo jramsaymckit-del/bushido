@@ -2438,9 +2438,11 @@ function initGridSwipe(){
 // ============ INIT ============
 loadState();
 // If no saved state, load the default pre-populated state
+// Use direct localStorage write (not saveState) to avoid stamping a fresh
+// timestamp — keeps lastModified:0 so cloud data always wins on new devices
 if(!state.onboarded && !localStorage.getItem(STORAGE_KEY)){
   Object.assign(state, DEFAULT_STATE);
-  saveState();
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
 }
 if(state.onboarded){
   document.getElementById('onboard').classList.remove('active');
