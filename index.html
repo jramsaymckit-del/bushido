@@ -1,0 +1,2436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUSHIDO</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --scroll:#F5F0E8;--edge:#E8DFD0;--ink:#1A1A1A;--ink-light:#3A3A3A;
+  --ink-faint:#8A8578;--red:#CC3529;--red-light:#D94A3E;--white:#FEFCF8;
+  --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100vh;color:var(--ink);
+  transition:background-color .5s,color .5s}
+
+/* Scroll */
+.scroll{max-width:800px;margin:0 auto;min-height:100vh;background:var(--scroll);
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,.018) 39px,rgba(0,0,0,.018) 40px);
+  box-shadow:-4px 0 20px var(--shadow),4px 0 20px var(--shadow);position:relative;padding:60px 48px 100px;
+  animation:scrollUnroll 1s cubic-bezier(0.22,1,0.36,1) forwards}
+@keyframes scrollUnroll{
+  0%  {clip-path:inset(0 0 99% 0);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  20% {clip-path:inset(0 0 88% 0)}
+  100%{clip-path:inset(0 0 0% 0);box-shadow:-4px 0 20px var(--shadow),4px 0 20px var(--shadow)}
+}
+.scroll::before,.scroll::after{content:'';position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.05)}
+.scroll::before{left:32px}.scroll::after{right:32px}
+
+/* Typography */
+.serif{font-family:'Noto Serif JP',serif}
+.divider{height:2px;background:linear-gradient(90deg,transparent 0%,var(--ink) 20%,var(--ink) 80%,transparent 100%);margin:40px 0;opacity:.12}
+.divider-thin{height:1px;background:linear-gradient(90deg,transparent 0%,var(--ink) 30%,var(--ink) 70%,transparent 100%);margin:20px 0;opacity:.06}
+
+/* Header */
+.header{text-align:center;margin-bottom:56px}
+.header-kanji{font-family:'Noto Serif JP',serif;font-size:14px;letter-spacing:12px;color:var(--ink-faint);margin-bottom:16px}
+.title{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:900;letter-spacing:18px;color:var(--ink);margin-bottom:8px}
+.subtitle{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:24px}
+.hanko{width:72px;height:72px;border:3px solid var(--red);border-radius:5px;display:flex;align-items:center;justify-content:center;margin:0 auto;transform:rotate(-3deg)}
+.hanko span{font-family:'Noto Serif JP',serif;font-size:40px;font-weight:900;color:var(--red)}
+
+/* Onboarding */
+.onboard{display:none;text-align:center}
+.onboard.active{display:block}
+.onboard-step{display:none;animation:fadeUp .6s ease}
+.onboard-step.active{display:block}
+.ob-kanji{font-family:'Noto Serif JP',serif;font-size:64px;color:var(--ink);opacity:.15;margin-bottom:16px}
+.ob-question{font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink-light);line-height:1.8;margin-bottom:8px;font-style:italic}
+.ob-sub{font-size:11px;color:var(--ink-faint);letter-spacing:2px;margin-bottom:28px}
+.ob-textarea{width:100%;min-height:80px;font-family:'Noto Serif JP',serif;font-size:16px;background:none;border:none;
+  border-bottom:1px solid rgba(0,0,0,.1);padding:12px 0;color:var(--ink);outline:none;resize:vertical;line-height:1.7}
+.ob-textarea:focus{border-bottom-color:var(--ink)}
+.ob-textarea::placeholder{color:var(--ink-faint);opacity:.4}
+.ob-input{width:100%;font-family:'Noto Serif JP',serif;font-size:16px;background:none;border:none;
+  border-bottom:1px solid rgba(0,0,0,.1);padding:12px 0;color:var(--ink);outline:none}
+.ob-input:focus{border-bottom-color:var(--ink)}
+.ob-input::placeholder{color:var(--ink-faint);opacity:.4}
+.ob-strand{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.ob-strand-num{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--red);opacity:.5;min-width:24px}
+.ob-strand input{flex:1}
+.ob-add-strand{font-size:11px;color:var(--ink-faint);cursor:pointer;letter-spacing:2px;padding:8px 0;opacity:.5;transition:opacity .3s}
+.ob-add-strand:hover{opacity:.8}
+.ob-nav{display:flex;justify-content:space-between;align-items:center;margin-top:36px}
+.btn{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  padding:10px 24px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--ink);color:var(--scroll)}
+.btn-red{border-color:var(--red);color:var(--red)}
+.btn-red:hover{background:var(--red);color:var(--white)}
+.btn-ghost{border:none;color:var(--ink-faint);padding:10px 16px}
+.btn-ghost:hover{background:none;color:var(--ink)}
+.ob-progress{display:flex;gap:8px;justify-content:center;margin-top:24px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--ink);opacity:.1;transition:all .3s}
+.ob-dot.done{opacity:.4}.ob-dot.current{opacity:1;background:var(--red)}
+
+/* Linking prompts during onboarding */
+.ob-link-section{margin-top:16px;text-align:left}
+.ob-link-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.ob-link-select{width:100%;font-family:'Noto Sans JP',sans-serif;font-size:13px;background:none;border:none;
+  border-bottom:1px solid rgba(0,0,0,.08);padding:8px 0;color:var(--ink);outline:none;cursor:pointer}
+
+/* Dashboard */
+.dashboard{display:none}
+.dashboard.active{display:block}
+
+/* Ryughi display */
+.ryughi-section{text-align:center;margin-bottom:48px;padding:24px}
+.ryughi-label{font-size:10px;letter-spacing:8px;text-transform:uppercase;color:var(--red);margin-bottom:8px;font-weight:700}
+.ryughi-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:var(--ink-faint);opacity:.25;margin-bottom:8px}
+.ryughi-braid{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-faint);line-height:2;letter-spacing:1px}
+.ryughi-strand{cursor:pointer;transition:color .3s;display:inline-block;padding:2px 8px}
+.ryughi-strand:hover{color:var(--red)}
+.ryughi-strand::before{content:'— ';opacity:.3}
+
+/* Date & streak */
+.date-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}
+.date-text{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-faint);letter-spacing:2px}
+.streak-badge{font-size:11px;color:var(--red);letter-spacing:1px;font-weight:700}
+
+/* Pillar tabs */
+.tabs{display:flex;margin-bottom:36px;border-bottom:1px solid rgba(0,0,0,.06)}
+.tab{flex:1;text-align:center;padding:16px 8px 14px;cursor:pointer;transition:all .3s;position:relative;background:none;border:none;font-family:'Noto Sans JP',sans-serif}
+.tab::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--red);transform:scaleX(0);transition:transform .3s}
+.tab.active::after{transform:scaleX(1)}
+.tab-kanji{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--ink-faint);transition:color .3s;display:block;margin-bottom:4px}
+.tab.active .tab-kanji{color:var(--ink)}
+.tab-name{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);transition:color .3s}
+.tab.active .tab-name{color:var(--red)}
+.tab-sub{font-size:8px;color:var(--ink-faint);opacity:.6;margin-top:2px;display:block}
+
+/* Pillar header */
+.pillar-tf{display:inline-block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);
+  border:1px solid var(--red);padding:3px 12px;border-radius:2px;opacity:.7}
+.pillar-head{text-align:center;margin-bottom:12px}
+.meditation{text-align:center;padding:0 32px;margin-bottom:28px}
+.meditation p{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.8}
+
+/* Daily reset */
+.daily-reset{text-align:center;margin-bottom:16px;padding:6px;font-size:10px;letter-spacing:2px;color:var(--ink-faint);opacity:.5}
+
+/* Goal cards */
+.goals{list-style:none}
+.goal{padding:20px 0;border-bottom:1px solid rgba(0,0,0,.04);display:flex;align-items:flex-start;gap:16px;
+  transition:all .3s;animation:fadeUp .4s ease}
+.goal:hover{background:rgba(0,0,0,.01);margin:0 -16px;padding:20px 16px;border-radius:4px}
+.goal.done .goal-title{opacity:.3;text-decoration:line-through;text-decoration-thickness:1.5px}
+
+/* Checkbox */
+.check{width:28px;height:28px;border:2px solid var(--ink);border-radius:50%;flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .3s;margin-top:2px;opacity:.4}
+.check:hover{opacity:.7;border-color:var(--red)}
+.check.done{background:var(--ink);border-color:var(--ink);opacity:.8}
+.check.done::after{content:'';width:8px;height:8px;background:var(--scroll);border-radius:50%}
+
+.goal-content{flex:1}
+.goal-title{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;color:var(--ink);line-height:1.5}
+.goal-meta{font-size:11px;color:var(--ink-faint);margin-top:4px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.goal-streak{color:var(--red);font-weight:700}
+.goal-tf{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:rgba(0,0,0,.03);padding:2px 8px;border-radius:2px}
+.goal-parent{font-size:9px;color:var(--ink-faint);opacity:.6;font-style:italic}
+
+/* Shu-Ha-Ri */
+.shr{display:flex;gap:2px;margin-top:10px;align-items:center}
+.shr-s{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:1px;color:var(--ink-faint);opacity:.35;transition:all .3s}
+.shr-s.active{opacity:1;color:var(--ink)}.shr-s.past{opacity:.6;color:var(--red)}
+.shr-k{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:700}
+.shr-l{font-size:8px;letter-spacing:2px;text-transform:uppercase}
+.shr-c{width:20px;height:1px;background:var(--ink);opacity:.15;margin:0 4px}
+
+/* Progress */
+.pbar{margin-top:8px;height:6px;background:rgba(0,0,0,.05);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:var(--ink-light);border-radius:3px;transition:width .5s}
+.pfill.red{background:var(--red)}
+.plabel{font-size:9px;color:var(--ink-faint);margin-top:4px;text-align:right;letter-spacing:1px}
+.pctrl{display:flex;align-items:center;gap:8px;margin-top:6px}
+.pbtn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink);background:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--ink);opacity:.3;transition:all .2s}
+.pbtn:hover{opacity:.7}
+
+/* Add goal */
+.add-trigger{display:flex;align-items:center;gap:16px;padding:20px 0;cursor:pointer;opacity:.3;transition:opacity .3s}
+.add-trigger:hover{opacity:.6}
+.add-icon{width:28px;height:28px;border:1.5px dashed var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink)}
+.add-text{font-size:13px;color:var(--ink-faint);letter-spacing:2px}
+
+.add-form{display:none;padding:20px 0;gap:12px;flex-direction:column}
+.add-form.visible{display:flex}
+.add-form input,.add-form select{font-family:'Noto Serif JP',serif;font-size:15px;background:none;border:none;
+  border-bottom:1px solid rgba(0,0,0,.1);padding:8px 0;color:var(--ink);outline:none;width:100%}
+.add-form select{font-size:13px;cursor:pointer}
+.add-form input::placeholder{color:var(--ink-faint);opacity:.4}
+.add-form input:focus,.add-form select:focus{border-bottom-color:var(--ink)}
+.form-row{display:flex;gap:16px}.form-row>*{flex:1}
+.form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:8px}
+
+/* Reflection modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:100;
+  align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:var(--scroll);max-width:560px;width:90%;max-height:85vh;overflow-y:auto;padding:48px;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-kanji{font-family:'Noto Serif JP',serif;font-size:48px;color:var(--ink);opacity:.08;text-align:center;margin-bottom:16px}
+.modal-title{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:8px}
+.modal-sub{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);text-align:center;letter-spacing:2px;margin-bottom:32px}
+
+.reflect-q{margin-bottom:24px}
+.reflect-label{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;letter-spacing:2px;text-transform:uppercase;color:var(--ink-light);margin-bottom:8px}
+.reflect-opts{display:flex;gap:8px;flex-wrap:wrap}
+.reflect-opt{padding:8px 16px;border:1.5px solid var(--red);background:none;font-family:'Noto Sans JP',sans-serif;
+  font-size:12px;letter-spacing:1px;color:var(--red);cursor:pointer;transition:all .2s}
+.reflect-opt:hover{background:var(--red);color:var(--white)}
+.reflect-opt.selected{background:var(--red);color:var(--white)}
+.reflect-textarea{width:100%;min-height:60px;font-family:'Noto Serif JP',serif;font-size:14px;font-style:italic;background:none;border:none;
+  border-bottom:1.5px solid var(--red);padding:8px 0;color:var(--ink);outline:none;resize:vertical;line-height:1.7}
+.reflect-textarea::placeholder{color:var(--ink-faint);opacity:.4}
+.reflect-textarea:focus{border-bottom-color:var(--red-light)}
+
+
+/* ===== STATS BOX ===== */
+.stats-panel{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.stats-panel.open{max-height:4000px;transition:max-height 1.2s ease-in-out}
+.stats-content{padding:8px 0 32px}
+.stats-section{margin-bottom:4px}
+.stats-section-name{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;
+  color:var(--ink-faint);opacity:.45;padding:18px 0 6px;letter-spacing:.5px}
+.stats-cols{display:grid;grid-template-columns:1fr 88px 52px 56px;
+  gap:0 8px;padding:0 0 6px;border-bottom:1px solid rgba(0,0,0,.05)}
+.stats-col-h{font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink-faint);opacity:.3;text-align:right}
+.stats-col-h:first-child{text-align:left}
+.stats-row{display:grid;grid-template-columns:1fr 88px 52px 56px;
+  gap:0 8px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.025);align-items:baseline}
+.stats-row-name{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink-faint);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.65}
+.stats-num{font-size:11px;color:var(--ink-faint);opacity:.5;text-align:right;white-space:nowrap;
+  font-family:'Noto Sans JP',sans-serif}
+.stats-num.at-pb{color:var(--red);opacity:1;font-weight:700}
+
+/* ===== REFLECTION PROMPTS ===== */
+.reflect-prompt-overlay{display:none;position:fixed;inset:0;z-index:150;
+  background:rgba(232,223,208,.7);backdrop-filter:blur(3px);
+  align-items:center;justify-content:center}
+.reflect-prompt-overlay.active{display:flex}
+.reflect-prompt-card{background:var(--scroll);max-width:400px;width:90%;padding:48px 40px;
+  text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.12);animation:fadeUp .4s ease;position:relative}
+.rpc-kanji{font-family:'Noto Serif JP',serif;font-size:48px;color:var(--red);opacity:.18;margin-bottom:16px}
+.rpc-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--ink);
+  margin-bottom:10px;letter-spacing:1px}
+.rpc-sub{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);
+  margin-bottom:36px;letter-spacing:.5px;line-height:1.8}
+.rpc-actions{display:flex;gap:16px;justify-content:center}
+
+.reflect-nudge{margin-top:28px;padding:16px 20px;border:1px solid rgba(204,53,41,.15);
+  border-left:2px solid var(--red);display:flex;align-items:center;
+  justify-content:space-between;gap:16px;animation:fadeUp .4s ease}
+.reflect-nudge-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
+  color:var(--ink-faint);line-height:1.7}
+.reflect-nudge-btn{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--red);border:1px solid var(--red);background:none;
+  padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.reflect-nudge-btn:hover{background:var(--red);color:var(--white)}
+
+/* ===== HABIT GRID (Kaizen week view) ===== */
+.hg-wrap{margin-bottom:8px}
+.hg-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hg-nav-btn{background:none;border:none;cursor:pointer;font-size:22px;color:var(--ink-faint);padding:4px 8px;line-height:1;transition:color .2s}
+.hg-nav-btn:hover{color:var(--ink)}.hg-nav-btn:disabled{opacity:.2;cursor:default}
+.hg-week-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.hg-grid{background:var(--grid-bg);border-radius:6px;overflow:hidden}
+.hg-row{display:grid;grid-template-columns:minmax(88px,120px) repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,.04)}
+.hg-row:last-child{border-bottom:none}
+.hg-header{background:rgba(0,0,0,.25)}
+.hg-label-cell{padding:8px 10px}
+.hg-day-head{text-align:center;padding:8px 2px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);line-height:1.7}
+.hg-day-head.is-today{color:var(--red)}
+.hg-date-num{font-size:10px;font-weight:700;display:block}
+.hg-label{padding:8px 10px;font-size:10px;color:rgba(255,255,255,.55);line-height:1.4;display:flex;align-items:center}
+.hg-cell{height:32px;display:flex;align-items:center;justify-content:center;position:relative}
+.hg-cell.hg-today-col:not(.hg-off){background:rgba(255,255,255,.03)}
+.hg-cell.hg-off{background:rgba(0,0,0,.15)}
+.hg-cell.hg-miss{cursor:pointer}
+.hg-cell.hg-miss::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.18);display:block;transition:border-color .2s}
+.hg-cell.hg-miss:hover::after{border-color:rgba(245,240,232,.45)}
+.hg-cell.hg-done{cursor:pointer}
+.hg-cell.hg-done::after{content:'';width:13px;height:13px;border-radius:50%;background:var(--red);display:block;transition:background .2s}
+.hg-cell.hg-done:hover::after{background:var(--red-light)}
+.hg-cell.hg-future::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.07);display:block}
+
+/* ===== MONTH CALENDAR (Shokunin) ===== */
+.mcal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.mcal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mcal-nav-btn{background:none;border:none;cursor:pointer;font-size:20px;color:rgba(255,255,255,.35);padding:2px 6px;line-height:1;transition:color .2s}
+.mcal-nav-btn:hover{color:rgba(255,255,255,.7)}
+.mcal-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcal-dh{text-align:center;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.22);padding:2px 0 6px}
+.mcal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,.03)}
+.mcal-cell.mcal-empty{background:transparent}
+.mcal-cell.mcal-today{background:rgba(204,53,41,.15);outline:1.5px solid var(--red);outline-offset:-1px}
+.mcal-cell.mcal-future{opacity:.25}
+.mcal-num{font-size:9px;color:rgba(255,255,255,.35);line-height:1}
+.mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
+.mcal-dot{width:4px;height:4px;border-radius:50%;margin-top:2px}
+.mcal-dot.mcal-full{background:var(--red)}
+.mcal-dot.mcal-partial{background:rgba(204,53,41,.55)}
+.mcal-dot.mcal-none{background:rgba(255,255,255,.12)}
+
+/* ===== YEAR VIEW (Ikigai) ===== */
+.ycal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.ycal-year-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.3);text-align:center;margin-bottom:16px}
+.ycal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:640px){.ycal-months{grid-template-columns:repeat(3,1fr)}}
+.ycal-month{}
+.ycal-mname{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px;text-align:center}
+.ycal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.ycal-cell{aspect-ratio:1;border-radius:1px}
+.ycal-cell.ycal-empty{background:transparent}
+.ycal-cell.ycal-future{background:rgba(255,255,255,.04)}
+.ycal-cell.ycal-noscheduled{background:rgba(255,255,255,.04)}
+.ycal-cell.ycal-full{background:var(--red)}
+.ycal-cell.ycal-partial{background:rgba(204,53,41,.5)}
+.ycal-cell.ycal-miss{background:rgba(245,240,232,.1)}
+.ycal-cell.ycal-today{outline:1.5px solid var(--red);outline-offset:0}
+
+/* Habit grid tooltip */
+#hg-tooltip{display:none;position:fixed;z-index:300;background:var(--grid-bg);
+  color:rgba(255,255,255,.85);font-family:'Noto Serif JP',serif;font-size:11px;
+  letter-spacing:.5px;padding:6px 12px;white-space:nowrap;border-radius:2px;
+  pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.22);line-height:1.5}
+
+/* Daily note field */
+.daily-note-wrap{margin-top:32px;padding:0 2px}
+.daily-note{width:100%;font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  color:var(--ink-faint);background:none;border:none;border-bottom:1px solid rgba(0,0,0,.06);
+  padding:8px 0 10px;outline:none;resize:none;min-height:36px;line-height:1.8;
+  transition:border-color .2s,color .2s;display:block}
+.daily-note:focus{border-bottom-color:rgba(0,0,0,.12);color:var(--ink-light)}
+.daily-note::placeholder{color:var(--ink-faint);opacity:.3}
+
+/* Option C — momentum card in weekly reflection */
+.momentum-card{background:var(--grid-bg);border-radius:4px;padding:20px 22px 18px;margin-bottom:28px}
+.momentum-craft-lbl{font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-bottom:8px;font-family:'Noto Sans JP',sans-serif}
+.momentum-stmt{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;
+  color:rgba(255,255,255,.82);line-height:1.5;margin-bottom:14px}
+.momentum-bar-wrap{display:flex;align-items:center;gap:12px}
+.momentum-bar{flex:1;height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden}
+.momentum-fill{height:100%;background:var(--red);border-radius:1px;transition:width .6s ease}
+.momentum-pct{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.28);white-space:nowrap}
+.opt-c-switch{margin-top:10px;font-size:10px;color:var(--ink-faint);opacity:.5;text-align:right}
+.opt-c-switch select{font-family:'Noto Sans JP',sans-serif;font-size:10px;background:none;border:none;
+  border-bottom:1px solid rgba(0,0,0,.1);color:var(--ink-faint);outline:none;cursor:pointer}
+body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
+
+/* Cascade context in reflections */
+.cascade-block{margin-bottom:28px}
+.cascade-entry{display:flex;gap:14px;margin-bottom:10px;align-items:flex-start}
+.cascade-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);
+  opacity:.45;min-width:32px;padding-top:3px;flex-shrink:0}
+.cascade-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
+  color:var(--ink-faint);line-height:1.7;opacity:.65}
+.cascade-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.07),transparent);margin:16px 0 28px}
+
+/* Ryughi strand rows with hover milestone */
+.strand-row{margin-bottom:2px}
+.strand-ms{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);
+  max-height:0;overflow:hidden;opacity:0;padding-left:20px;letter-spacing:.3px;line-height:1.7;
+  transition:max-height .35s ease,opacity .35s ease}
+.strand-row:hover .strand-ms{max-height:48px;opacity:.65}
+
+/* Time-of-day greeting */
+.greeting-bar{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
+  color:var(--ink-faint);margin-bottom:28px;letter-spacing:.5px;opacity:.55;min-height:16px}
+
+/* Origami check animation */
+@keyframes origamiCheck{
+  0%  {transform:scale(1);background:transparent;border-color:rgba(26,26,26,.4);opacity:.4;box-shadow:none}
+  12% {transform:scaleX(0.12) scaleY(1.35) rotate(-8deg);opacity:1;border-color:var(--red)}
+  35% {transform:scaleX(1.3) scaleY(0.7) rotate(6deg);background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px rgba(204,53,41,.12)}
+  58% {transform:scaleX(0.9) scaleY(1.12) rotate(-2deg);background:var(--ink);border-color:var(--ink);box-shadow:none}
+  78% {transform:scaleX(1.06) scaleY(0.95)}
+  100%{transform:scale(1);background:var(--ink);border-color:var(--ink);opacity:.8}
+}
+.check.origami-fill{animation:origamiCheck 480ms cubic-bezier(.25,.46,.45,.94) both}
+
+/* Edit / delete actions */
+.goal-actions{display:flex;gap:6px;align-items:flex-start;padding-top:4px;opacity:0;transition:opacity .2s;flex-shrink:0}
+.goal:hover .goal-actions{opacity:1}
+.goal-act{cursor:pointer;font-size:14px;color:var(--ink-faint);padding:4px 5px;line-height:1;transition:color .2s;background:none;border:none;font-family:inherit;user-select:none}
+.goal-act:hover{color:var(--ink)}
+.goal-del:hover{color:var(--red)}
+.inline-edit{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;color:var(--ink);
+  background:none;border:none;border-bottom:1.5px solid var(--red);outline:none;width:100%;padding:2px 0;line-height:1.5}
+
+/* Strand highlight */
+.goal{transition:opacity .25s,background .25s}
+/* Ryughi header — clickable to open vision drawer */
+.ryughi-header-click{cursor:pointer;transition:opacity .25s;display:inline-block}
+.ryughi-header-click:hover{opacity:.7}
+
+/* Strand active state when filtering */
+.ryughi-strand.strand-active{color:var(--red) !important;opacity:1 !important}
+
+/* Kaizen filter indicator */
+.filter-indicator{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;padding:8px 14px;background:rgba(204,53,41,.06);
+  border-left:2px solid var(--red)}
+.filter-indicator-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--red);font-family:'Noto Sans JP',sans-serif}
+.filter-clear{font-size:10px;letter-spacing:1px;color:var(--red);background:none;
+  border:none;cursor:pointer;opacity:.55;transition:opacity .2s;font-family:'Noto Sans JP',sans-serif}
+.filter-clear:hover{opacity:1}
+
+/* Bottom seal — easter egg: click to reveal stats */
+.seal{text-align:center;margin-top:64px;opacity:.15;cursor:pointer;
+  transition:opacity .35s;user-select:none}
+.seal:hover{opacity:.28}
+.seal-k{font-family:'Noto Serif JP',serif;font-size:88px;font-weight:900;color:var(--red);
+  transition:color .35s}
+.seal.open .seal-k{color:var(--ink)}
+
+/* Hokuto Shichisei banner */
+.hokuto-banner{position:relative;width:200px;height:280px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center}
+.banner-cloth{position:absolute;inset:0;background:var(--red);border-radius:2px;
+  clip-path:polygon(0 0,100% 0,100% 85%,50% 100%,0 85%);opacity:.85}
+.banner-pole{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:210px;height:6px;
+  background:linear-gradient(180deg,#2A2420,#1A1A1A);border-radius:3px}
+.banner-pole::before,.banner-pole::after{content:'';position:absolute;top:-3px;width:12px;height:12px;
+  background:radial-gradient(circle,#3A3430,#1A1A1A);border-radius:50%}
+.banner-pole::before{left:-4px}.banner-pole::after{right:-4px}
+.hokuto-stars{position:relative;z-index:1;width:120px;height:180px}
+.hokuto-stars svg{width:100%;height:100%;filter:drop-shadow(0 0 6px rgba(255,255,255,.3))}
+.banner-label{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);z-index:2;
+  font-family:'Noto Serif JP',serif;font-size:16px;font-weight:900;color:var(--white);
+  letter-spacing:6px;writing-mode:vertical-rl;opacity:.7}
+.hokuto-sub{text-align:center;font-size:10px;letter-spacing:3px;color:var(--ink-faint);margin-bottom:16px;text-transform:uppercase}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== COMPLETION CELEBRATIONS ===== */
+@keyframes sealStamp{
+  0%{transform:rotate(-3deg) scale(1);filter:none}
+  25%{transform:rotate(-3deg) scale(1.5);filter:drop-shadow(0 0 16px var(--red));opacity:.7}
+  55%{transform:rotate(-3deg) scale(1.15);filter:drop-shadow(0 0 6px var(--red));opacity:.5}
+  80%{transform:rotate(-3deg) scale(1.05);filter:none;opacity:.25}
+  100%{transform:rotate(-3deg) scale(1);filter:none;opacity:.15}
+}
+.seal-k.seal-animate{animation:sealStamp 2s cubic-bezier(.25,.46,.45,.94) forwards}
+
+@keyframes proverbRise{
+  0%{opacity:0;transform:translateY(24px)}
+  20%{opacity:1;transform:translateY(0)}
+  75%{opacity:1;transform:translateY(-6px)}
+  100%{opacity:0;transform:translateY(-16px)}
+}
+@keyframes inkBleed{
+  0%{background:rgba(204,53,41,0)}
+  20%{background:rgba(204,53,41,.07)}
+  50%{background:rgba(204,53,41,.13)}
+  80%{background:rgba(204,53,41,.07)}
+  100%{background:rgba(204,53,41,0)}
+}
+@keyframes washContent{
+  0%{opacity:0;transform:scale(.92)}
+  25%{opacity:1;transform:scale(1)}
+  70%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.04)}
+}
+
+#proverb-overlay{display:none;position:fixed;inset:0;z-index:200;pointer-events:none;
+  align-items:center;justify-content:center;background:rgba(245,240,232,.5)}
+#proverb-overlay.active{display:flex}
+.proverb-inner{text-align:center;animation:proverbRise 4.5s ease forwards}
+
+#ink-wash{display:none;position:fixed;inset:0;z-index:210;pointer-events:none;
+  align-items:center;justify-content:center}
+#ink-wash.active{display:flex;animation:inkBleed 5.5s ease forwards}
+.wash-inner{text-align:center;animation:washContent 5.5s ease forwards}
+@media(max-width:640px){
+  .scroll{padding:40px 24px 80px}.scroll::before{left:12px}.scroll::after{right:12px}
+  .title{font-size:36px;letter-spacing:12px}.form-row{flex-direction:column;gap:8px}
+  .modal{padding:32px 24px}
+}
+
+/* ===== DARK MODE (after 9PM) ===== */
+body.dark{
+  --scroll:#1C1814;--edge:#0F0D0A;--ink:#EDE8DE;--ink-light:#CFC8BB;
+  --ink-faint:#7A7568;--white:#1C1814;--shadow:rgba(0,0,0,.4);--grid-bg:#0D0B08;
+}
+body.dark .scroll{
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.01) 39px,rgba(255,255,255,.01) 40px);
+  transition:background-color .5s}
+body.dark .scroll::before,body.dark .scroll::after{background:rgba(255,255,255,.04)}
+body.dark .goal{border-bottom-color:rgba(255,255,255,.05)}
+body.dark .goal:hover{background:rgba(255,255,255,.02)}
+body.dark .check{border-color:rgba(255,255,255,.3)}
+body.dark .tabs{border-bottom-color:rgba(255,255,255,.07)}
+body.dark .tab::after{background:var(--red)}
+body.dark .pbar{background:rgba(255,255,255,.07)}
+body.dark .ob-textarea,body.dark .ob-input{border-bottom-color:rgba(255,255,255,.1)}
+body.dark .ob-link-select,body.dark .add-form input,body.dark .add-form select{border-bottom-color:rgba(255,255,255,.1);color:var(--ink)}
+body.dark .reflect-textarea{border-bottom-color:var(--red)}
+body.dark .reflect-opt{border-color:var(--red);color:var(--red)}
+body.dark .modal,body.dark .reflect-prompt-card{background:var(--scroll)}
+body.dark #proverb-overlay{background:rgba(28,24,20,.85)}
+body.dark .reflect-prompt-overlay{background:rgba(15,13,10,.75)}
+body.dark .stats-row{border-bottom-color:rgba(255,255,255,.04)}
+body.dark .stats-cols{border-bottom-color:rgba(255,255,255,.08)}
+body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06)}
+body.dark .reflect-nudge{border-color:rgba(204,53,41,.25);border-left-color:var(--red)}
+body.dark .add-trigger:hover{opacity:.5}
+body.dark .hanko{border-color:var(--red)}
+</style>
+</head>
+<body>
+<div class="scroll" id="app">
+
+  <!-- HEADER (always visible) -->
+  <header class="header">
+    <div class="header-kanji">武士道</div>
+    <h1 class="title">BUSHIDO</h1>
+    <div class="subtitle">the way of daily discipline</div>
+    <div class="hanko"><span>道</span></div>
+  </header>
+  <div class="divider"></div>
+
+  <!-- ==================== ONBOARDING ==================== -->
+  <div class="onboard active" id="onboard">
+
+    <!-- Step 0: Welcome -->
+    <div class="onboard-step active" data-step="0">
+      <div class="hokuto-banner">
+        <div class="banner-cloth"></div>
+        <div class="banner-pole"></div>
+        <div class="hokuto-stars">
+          <svg viewBox="0 0 120 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- Hokuto Shichisei — Big Dipper constellation -->
+            <!-- Bowl -->
+            <line x1="30" y1="50" x2="70" y2="42" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <line x1="70" y1="42" x2="78" y2="72" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <line x1="78" y1="72" x2="36" y2="80" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <line x1="36" y1="80" x2="30" y2="50" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <!-- Handle -->
+            <line x1="78" y1="72" x2="88" y2="105" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <line x1="88" y1="105" x2="76" y2="132" stroke="#FEFCF8" stroke-width=".8" opacity=".4"/>
+            <!-- Stars (7) -->
+            <circle cx="30" cy="50" r="4" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="70" cy="42" r="4" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="78" cy="72" r="4.5" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="36" cy="80" r="4" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="88" cy="105" r="3.5" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="76" cy="132" r="3.5" fill="#FEFCF8" opacity=".9"/>
+            <circle cx="58" cy="150" r="3" fill="#FEFCF8" opacity=".8"/>
+            <!-- Star glows -->
+            <circle cx="30" cy="50" r="8" fill="#FEFCF8" opacity=".08"/>
+            <circle cx="70" cy="42" r="8" fill="#FEFCF8" opacity=".08"/>
+            <circle cx="78" cy="72" r="9" fill="#FEFCF8" opacity=".1"/>
+            <circle cx="36" cy="80" r="8" fill="#FEFCF8" opacity=".08"/>
+            <circle cx="88" cy="105" r="7" fill="#FEFCF8" opacity=".08"/>
+            <circle cx="76" cy="132" r="7" fill="#FEFCF8" opacity=".08"/>
+            <circle cx="58" cy="150" r="6" fill="#FEFCF8" opacity=".06"/>
+          </svg>
+        </div>
+        <div class="banner-label">北斗七星</div>
+      </div>
+      <div class="hokuto-sub">hokuto shichisei — the stars that guide you</div>
+      <div class="ob-question">Before we begin, take a deep breath and close your eyes for a moment.<br>When you open them, we will find your path.</div>
+      <div class="ob-sub">this is a meditation, not a form. Take your time</div>
+      <div class="ob-nav"><div></div><button class="btn btn-red" onclick="obNext()">I am ready</button></div>
+    </div>
+
+    <!-- Step 1: Ryughi philosophy -->
+    <div class="onboard-step" data-step="1">
+      <div class="ob-kanji">流儀</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:20px;letter-spacing:6px;color:var(--ink);margin-bottom:4px">Ryughi</div>
+      <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:28px">the art of one's own way</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink-light);line-height:2.1;text-align:left;max-width:520px;margin:0 auto 32px">
+        Ryughi is the unique way or style one moves through life, art and discipline. The characters 流 <em>(ryu, "flow")</em> and 儀 <em>(gi, "ceremony")</em> reflect a refined and intentional approach where tradition and individuality harmonize. In Japanese martial and traditional arts, ryughi embodies the pursuit of mastery through practice, adaptation and dedication. True progress comes from honouring the past while shaping your own path.
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--ink),transparent);opacity:.1;margin:0 auto 32px;max-width:320px"></div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:20px;letter-spacing:6px;color:var(--ink);opacity:.5;margin-bottom:6px">塵も積もれば山となる</div>
+      <div style="font-size:10px;letter-spacing:3px;color:var(--ink-faint);margin-bottom:24px">chiri mo tsumoreba yama to naru</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink-light);line-height:2.1;text-align:left;max-width:520px;margin:0 auto 28px">
+        The only way to achieve your truest Ryughi is through this principle. Small, repeated actions create meaningful change. Like dust accumulating to form a mountain, even the smallest efforts build something remarkable when repeated. We overestimate the need for grand gestures. Meaningful progress is built on steady, intentional steps.
+      </div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5;margin-bottom:36px">this app exists for one purpose: to help you find your ryughi, and walk the path</div>
+      <div style="max-width:380px;margin:0 auto 36px;text-align:left">
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;opacity:.6">before we begin — what shall I call you?</div>
+        <input class="ob-input" id="ob-name" placeholder="Your name...">
+      </div>
+      <div class="ob-nav"><div></div><button class="btn" onclick="obNext()">Walk the path</button></div>
+    </div>
+
+    <!-- Step 2: Ryughi strands -->
+    <div class="onboard-step" data-step="2">
+      <div class="ob-kanji">流儀</div>
+      <div class="ob-question">The samurai called them Hokuto Shichisei — 北斗七星 — the seven stars of the Northern Dipper.<br>A fixed point in the cosmos serving to orient wayward travellers. The constellation symbolized divine guidance, and were believed to influence one's lifespan, health, fortune, and destiny.<br><br>What are the strands of your life's purpose?</div>
+      <div class="ob-sub">name 2-5 threads that will weave together to form your guiding constellation</div>
+      <div id="strand-list" style="text-align:left;max-width:480px;margin:0 auto"></div>
+      <div class="ob-add-strand" onclick="addStrand()" style="max-width:480px;margin:12px auto 0">+ add another strand</div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: 10-year vision (Ikigai) -->
+    <div class="onboard-step" data-step="3">
+      <div class="ob-kanji">生き甲斐</div>
+      <div class="ob-question">Ten years from now, what does your life look like?</div>
+      <div class="ob-sub">ikigai — that which makes life worth living</div>
+      <textarea class="ob-textarea" id="ob-10yr" placeholder="Describe where you are, who you've become, what you've built..."></textarea>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 4: 5-year milestones (Ikigai) -->
+    <div class="onboard-step" data-step="4">
+      <div class="ob-kanji">五年</div>
+      <div class="ob-question">To reach that vision, where must you be in five years?</div>
+      <div class="ob-sub">name 2-4 milestones that mark your halfway point</div>
+      <div id="ms5-list" style="text-align:left;max-width:480px;margin:0 auto"></div>
+      <div class="ob-add-strand" onclick="addMs5()" style="max-width:480px;margin:12px auto 0">+ add milestone</div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Annual goals (Ikigai) -->
+    <div class="onboard-step" data-step="5">
+      <div class="ob-kanji">今年</div>
+      <div class="ob-question">What must this year accomplish to begin that journey?</div>
+      <div class="ob-sub">2-4 goals for this year — connect each to a 5-year milestone</div>
+      <div id="annual-list" style="text-align:left;max-width:480px;margin:0 auto"></div>
+      <div class="ob-add-strand" onclick="addAnnual()" style="max-width:480px;margin:12px auto 0">+ add annual goal</div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 6: Shokunin goals -->
+    <div class="onboard-step" data-step="6">
+      <div class="ob-kanji">職人</div>
+      <div class="ob-question">What crafts must you master?<br>What skills will you sharpen this month and this quarter?</div>
+      <div class="ob-sub">shokunin — the artisan's path. connect each to an annual goal</div>
+      <div id="shok-list" style="text-align:left;max-width:480px;margin:0 auto"></div>
+      <div class="ob-add-strand" onclick="addShok()" style="max-width:480px;margin:12px auto 0">+ add craft</div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 7: Kaizen habits -->
+    <div class="onboard-step" data-step="7">
+      <div class="ob-kanji">改善</div>
+      <div class="ob-question">What will you do every single day?<br>The small, non-negotiable practices that compound into mastery.</div>
+      <div class="ob-sub">kaizen — change for the better. connect each to a shokunin craft</div>
+      <div id="kaizen-list" style="text-align:left;max-width:480px;margin:0 auto"></div>
+      <div class="ob-add-strand" onclick="addKaizenOb()" style="max-width:480px;margin:12px auto 0">+ add daily practice</div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 8: Seal -->
+    <div class="onboard-step" data-step="8">
+      <div class="ob-kanji" style="font-size:80px;opacity:.25">印</div>
+      <div class="ob-question">Your path is set.<br>The scroll is written. Now walk it — one day at a time.</div>
+      <div class="ob-sub">every stroke of ink began with stillness</div>
+      <div class="ob-nav"><div></div><button class="btn btn-red" onclick="finishOnboarding()">Begin</button></div>
+    </div>
+
+    <div class="ob-progress" id="ob-progress"></div>
+  </div>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div class="dashboard" id="dashboard">
+
+    <!-- Ryughi -->
+    <section class="ryughi-section">
+      <div class="ryughi-header-click" onclick="openVisionDrawer()">
+        <div class="ryughi-label">Your Ryughi</div>
+        <div class="ryughi-kanji">流儀</div>
+      </div>
+      <div class="ryughi-braid" id="ryughi-display"></div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:12px;letter-spacing:3px;color:var(--ink-faint);margin-top:20px;opacity:.4">千里の道も一歩から</div>
+      <div style="font-size:10px;letter-spacing:2px;color:var(--ink-faint);margin-top:4px;opacity:.3">even a journey of a thousand ri begins with a single step</div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- Date & greeting -->
+    <div class="date-bar">
+      <span class="date-text" id="date-display"></span>
+      <span class="streak-badge" id="streak-display"></span>
+    </div>
+    <div class="greeting-bar" id="greeting-display"></div>
+
+    <!-- Week strip (Kaizen only) -->
+    <div class="week-strip" id="week-strip"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('kaizen')">
+        <span class="tab-kanji">改善</span><span class="tab-name">Kaizen</span><span class="tab-sub">daily process</span>
+      </button>
+      <button class="tab" onclick="switchTab('shokunin')">
+        <span class="tab-kanji">職人</span><span class="tab-name">Shokunin</span><span class="tab-sub">mastery</span>
+      </button>
+      <button class="tab" onclick="switchTab('ikigai')">
+        <span class="tab-kanji">生き甲斐</span><span class="tab-name">Ikigai</span><span class="tab-sub">purpose</span>
+      </button>
+    </div>
+
+    <div id="pillar-head"></div>
+    <div class="meditation" id="med-text"></div>
+    <ul class="goals" id="goals-list"></ul>
+    <!-- Habit grid tooltip — lives outside overflow:hidden grid -->
+    <div id="hg-tooltip"></div>
+
+    <div class="divider-thin"></div>
+    <div style="text-align:center;padding:8px 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5">reflection</div>
+    <div style="display:flex;justify-content:center;gap:32px;padding:8px 0 20px">
+      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>
+      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>
+      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('annual')">年 &nbsp;Annual</button>
+    </div>
+    <!-- Export / Import / Sync -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:20px;padding:16px 0 8px" id="data-tools">
+      <button onclick="exportState()" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">↓ export</button>
+      <label style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">↑ import<input type="file" accept=".json" onchange="importState(event)" style="display:none"></label>
+      <button onclick="showSyncSetup()" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">☁ sync</button>
+      <span id="sync-status" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;color:var(--ink-faint);opacity:.5"></span>
+    </div>
+
+    <!-- Stats panel (revealed by clicking the seal) -->
+    <div class="stats-panel" id="stats-panel"></div>
+
+    <div class="seal" onclick="toggleStats()" title="">
+      <div class="seal-k" id="seal-k">道</div>
+    </div>
+  </div>
+
+  <!-- Reflection prompt (central screen) -->
+  <div class="reflect-prompt-overlay" id="reflect-prompt-overlay" onclick="overlayClickDismiss(event)">
+    <div class="reflect-prompt-card">
+      <div class="rpc-kanji" id="rpc-kanji">週</div>
+      <div class="rpc-title" id="rpc-title"></div>
+      <div class="rpc-sub" id="rpc-sub"></div>
+      <div class="rpc-actions">
+        <button class="btn btn-ghost" onclick="dismissPrompt(_activePromptType)">later</button>
+        <button class="btn btn-red" id="rpc-confirm">seal it now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proverb overlay (weekly completion) -->
+  <div id="proverb-overlay">
+    <div class="proverb-inner">
+      <div style="font-family:'Noto Serif JP',serif;font-size:32px;letter-spacing:6px;color:var(--ink);opacity:.85;margin-bottom:14px">塵も積もれば山となる</div>
+      <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px">chiri mo tsumoreba yama to naru</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);opacity:.7">a perfect week. dust becomes a mountain.</div>
+    </div>
+  </div>
+
+  <!-- Ink wash overlay (monthly completion) -->
+  <div id="ink-wash">
+    <div class="wash-inner">
+      <div style="font-family:'Noto Serif JP',serif;font-size:72px;font-weight:900;color:var(--red);opacity:.18;margin-bottom:8px;line-height:1">道</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:12px;letter-spacing:2px">extraordinary.</div>
+      <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px"><span id="wash-pct" style="color:var(--red);font-weight:700"></span> completion this month</div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);width:180px;margin:12px auto;opacity:.3"></div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);letter-spacing:2px;opacity:.6">the mountain is real</div>
+    </div>
+  </div>
+
+  <!-- Reflection modal -->
+  <div class="modal-overlay" id="reflect-modal">
+    <div class="modal" id="reflect-content"></div>
+  </div>
+
+</div>
+
+<script>
+// ============ PERSISTENCE ============
+const PROD_KEY = 'bushido_james_permanent'; // NEVER change this
+const DEV_KEY  = 'bushido_dev_v14';         // bump freely during dev
+const IS_DEV   = false;                     // set true when actively developing
+const STORAGE_KEY = IS_DEV ? DEV_KEY : PROD_KEY;
+
+function saveState(){
+  state.lastModified=Date.now();
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  scheduleSyncToCloud();
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){ const p=JSON.parse(saved); Object.assign(state,p); }
+  }catch(e){}
+}
+
+// ============ DEFAULT STATE (pre-loaded onboarding) ============
+const DEFAULT_STATE = {
+  onboarded: true,
+  name: 'James',
+  strands: [
+    'Capital and Building',
+    'The Ancient World',
+    'The Warrior\u2019s Body',
+    'Creative Mastery',
+    'Faith and Love'
+  ],
+  tenYearVision: 'Rome at dawn, coffee with Antonella in our London flat or a pied-\u00e0-terre in Paris. In great shape for my age. My work is multifaceted: business ventures, a history platform with an audience who cares, videos about the things that set me on fire. A beautiful piano in the living room I actually play. Traveling through Europe for lectures, for art, for friends. The fire within being used for the right things. The hunger fed the right nourishment. Risks taken but not recklessly. Mastery of self pursued but not selfishly. A heart full of the right kind of love.',
+  milestones5yr: [
+    'CSC and CISI held, serious role in finance or business, first real steps taken on the venture with family',
+    'History platform launched, publishing consistently, audience engaging, woven into the fabric of life',
+    'Half marathon completed, full hybrid athlete, salsa a genuine weekly practice',
+    'Piano daily habit established, visibly and measurably better, a repertoire ready for recording',
+    'Antonella and I, consciously chosen, at least engaged if not married'
+  ],
+  annualGoals: [
+    {id:100, text:'Finish CSC certification this year', parentMs:0, progress:0, done:false},
+    {id:101, text:'Establish disciplined investing practice: CC/CSP strategy, 2% weekly target on capital deployed', parentMs:0, progress:0, done:false},
+    {id:102, text:'Open family business conversation with brother and father, moving to an actual meeting with agenda', parentMs:0, progress:0, done:false},
+    {id:103, text:'Launch history platform: first video live, consistent bi-weekly cadence held through December', parentMs:1, progress:0, done:false},
+    {id:104, text:'Register for a race: bib number, date, finish line', parentMs:2, progress:0, done:false},
+    {id:105, text:'Daily piano non-negotiable by summer, two to three pieces in serious progress', parentMs:3, progress:0, done:false},
+    {id:106, text:'One intentional, significant move forward with Antonella', parentMs:4, progress:0, done:false}
+  ],
+  shokunin: [
+    {id:200, text:'CSC and Markets mastery: syllabus progress, one new concept applied monthly', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:201, text:'History platform production: research and script one week, edit and publish the next', parentAnnual:103, progress:0, timeframe:'monthly', done:false},
+    {id:202, text:'Athletic conditioning: 3 lifts and 2 runs per week, measurable monthly progress', parentAnnual:104, progress:0, timeframe:'monthly', done:false},
+    {id:203, text:'Salsa technique: one new move per week, lead it cleanly by month end', parentAnnual:104, progress:0, timeframe:'weekly', done:false},
+    {id:204, text:'Piano mastery: Through the Fire by Chaka Khan, deepening chord theory alongside', parentAnnual:105, progress:0, timeframe:'monthly', done:false},
+    {id:205, text:'Faith and Love daily practice: prayer and presence with Antonella', parentAnnual:106, progress:0, timeframe:'weekly', done:false},
+    {id:206, text:'Novel: 50 words a day (begins July 2026)', parentAnnual:105, progress:0, timeframe:'monthly', done:false}
+  ],
+  kaizen: [
+    {id:300, text:'Morning prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:302, text:'Word of affirmation to Antonella',                     days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:305, text:'Read markets community, one concept absorbed',         days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:306, text:'Cold message someone toward the right role',           days:[0,3],    parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:304, text:'CSC study, 30 focused minutes',                        days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:303, text:'Piano, 20 minutes minimum',                            days:'daily',  parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:307, text:'Lift',                                                 days:[0,2,4],  parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:308, text:'Run',                                                  days:[1,3],    parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:309, text:'Salsa class',                                          days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:312, text:'One new salsa move practiced',                         days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:310, text:'Social dance: one dance, on the floor, even when shy', days:[5],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:314, text:'History: 15 minutes of reading, notes, or scripting',        days:'daily', parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:311, text:'History platform work: deep session (record, edit, or publish)', days:[5,6], parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:313, text:'Novel, 50 words',                                      days:'daily',  startDate:'2026-07-01', parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:301, text:'Evening prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null}
+  ],
+  completionLog: {},
+  dailyNotes: {},
+  reflections: [],
+  lastModified: 0,
+  lastDailyComplete: null,
+  lastWeeklyComplete: null,
+  lastMonthlyComplete: null,
+  nextId: 400,
+};
+
+// ============ STATE ============
+let state = {
+  onboarded: false,
+  name: '',
+  strands: [],
+  tenYearVision: '',
+  milestones5yr: [],
+  annualGoals: [],    // {id, text, parentMs}
+  shokunin: [],       // {id, text, parentAnnual, progress, timeframe, done}
+  kaizen: [],         // {id, text, parentShok, streak, done, lastDone}
+  completionLog: {},  // {'YYYY-MM-DD': [id, ...]}
+  dailyNotes: {},     // {'YYYY-MM-DD': 'note text'}
+  reflections: [],    // {date, type, data}
+  lastModified: 0,
+  lastDailyComplete: null,
+  lastWeeklyComplete: null,
+  lastMonthlyComplete: null,
+  nextId: 100,
+};
+
+const PILLARS = {
+  kaizen:   {kanji:'改善',  name:'Kaizen',   tf:'Daily practice',   addLabel:'add daily practice',
+    med:'Even dust, grain by grain, becomes a mountain. Each small act of practice today compounds silently into everything you will become.<br><span style="font-size:11px;letter-spacing:2px;opacity:.5">塵も積もれば山となる \u2014 chiri mo tsumoreba yama to naru</span>'},
+  shokunin: {kanji:'職人',  name:'Shokunin', tf:'Weekly & monthly mastery', addLabel:'add craft to master',
+    med:'The artisan does not rush toward mastery. Each stroke of effort refines the hand and sharpens the spirit.'},
+  ikigai:   {kanji:'生き甲斐',name:'Ikigai', tf:'Annual purpose',   addLabel:'add purpose goal',
+    med:'Purpose is not found in grand declarations, but in the quiet return, each morning, to what matters most.'},
+};
+
+const SHR = [
+  {kanji:'守',name:'Shu',meaning:'Learn',t:33},
+  {kanji:'破',name:'Ha',meaning:'Break',t:66},
+  {kanji:'離',name:'Ri',meaning:'Transcend',t:100},
+];
+
+let currentTab = 'kaizen';
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+// JS getDay(): 0=Sun...6=Sat. Convert to Mon=0...Sun=6
+function todayIdx(){ return (new Date().getDay()+6)%7; }
+
+// ============ ONBOARDING ============
+let obStep = 0;
+const OB_STEPS = 9;
+
+function renderObProgress(){
+  const c = document.getElementById('ob-progress');
+  c.innerHTML = Array.from({length:OB_STEPS},(_,i)=>
+    `<div class="ob-dot ${i<obStep?'done':''} ${i===obStep?'current':''}"></div>`).join('');
+}
+
+function obNext(){
+  saveObStep();
+  if(obStep < OB_STEPS-1){obStep++;showObStep();}
+}
+function obBack(){if(obStep>0){obStep--;showObStep();}}
+
+function showObStep(){
+  document.querySelectorAll('.onboard-step').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`[data-step="${obStep}"]`).classList.add('active');
+  renderObProgress();
+  if(obStep===2 && !document.querySelector('#strand-list .ob-strand')) initStrands();
+  if(obStep===4 && !document.querySelector('#ms5-list .ob-strand')) initMs5();
+  if(obStep===5) initAnnual();
+  if(obStep===6) initShok();
+  if(obStep===7) initKaizenOb();
+}
+
+function saveObStep(){
+  if(obStep===1){ const n=document.getElementById('ob-name'); if(n&&n.value.trim()) state.name=n.value.trim(); }
+  if(obStep===2){
+    state.strands=[];
+    document.querySelectorAll('#strand-list input').forEach(i=>{if(i.value.trim())state.strands.push(i.value.trim())});
+  }
+  if(obStep===3) state.tenYearVision = document.getElementById('ob-10yr').value.trim();
+  if(obStep===4){
+    state.milestones5yr=[];
+    document.querySelectorAll('#ms5-list input').forEach(i=>{if(i.value.trim())state.milestones5yr.push(i.value.trim())});
+  }
+  if(obStep===5){
+    state.annualGoals=[];
+    document.querySelectorAll('.annual-row').forEach(r=>{
+      const t=r.querySelector('input').value.trim();
+      const p=r.querySelector('select')?.value||'';
+      if(t) state.annualGoals.push({id:state.nextId++,text:t,parentMs:p,progress:0,done:false});
+    });
+  }
+  if(obStep===6){
+    state.shokunin=[];
+    document.querySelectorAll('.shok-row').forEach(r=>{
+      const t=r.querySelector('input').value.trim();
+      const p=r.querySelector('select')?.value||'';
+      const tf=r.querySelector('.tf-select')?.value||'monthly';
+      if(t) state.shokunin.push({id:state.nextId++,text:t,parentAnnual:p,progress:0,timeframe:tf,done:false});
+    });
+  }
+  if(obStep===7){
+    state.kaizen=[];
+    document.querySelectorAll('.kaizen-row').forEach(r=>{
+      const t=r.querySelector('input').value.trim();
+      const p=r.querySelector('select')?.value||'';
+      if(t) state.kaizen.push({id:state.nextId++,text:t,parentShok:p,streak:0,done:false,lastDone:null});
+    });
+  }
+}
+
+function initStrands(){
+  const c=document.getElementById('strand-list');
+  c.innerHTML='';
+  for(let i=0;i<3;i++) appendStrand(c,i+1);
+}
+function addStrand(){
+  const c=document.getElementById('strand-list');
+  appendStrand(c,c.children.length+1);
+}
+function appendStrand(c,n){
+  const d=document.createElement('div');d.className='ob-strand';
+  d.innerHTML=`<span class="ob-strand-num">${n}</span><input class="ob-input" placeholder="A strand of your purpose..."/>`;
+  c.appendChild(d);
+}
+
+function initMs5(){
+  const c=document.getElementById('ms5-list');c.innerHTML='';
+  for(let i=0;i<2;i++) appendMs5(c);
+}
+function addMs5(){appendMs5(document.getElementById('ms5-list'))}
+function appendMs5(c){
+  const d=document.createElement('div');d.className='ob-strand';
+  d.innerHTML=`<span class="ob-strand-num">${c.children.length+1}</span><input class="ob-input" placeholder="A 5-year milestone..."/>`;
+  c.appendChild(d);
+}
+
+function initAnnual(){
+  const c=document.getElementById('annual-list');c.innerHTML='';
+  for(let i=0;i<2;i++) appendAnnual(c);
+}
+function addAnnual(){appendAnnual(document.getElementById('annual-list'))}
+function appendAnnual(c){
+  const opts=state.milestones5yr.map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');
+  const d=document.createElement('div');d.className='annual-row';d.style.cssText='margin-bottom:16px';
+  d.innerHTML=`<input class="ob-input" placeholder="This year I will..." style="margin-bottom:6px"/>
+    <div class="ob-link-section"><div class="ob-link-label">serves which 5-year milestone?</div>
+    <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>`;
+  c.appendChild(d);
+}
+
+function initShok(){
+  const c=document.getElementById('shok-list');c.innerHTML='';
+  for(let i=0;i<2;i++) appendShok(c);
+}
+function addShok(){appendShok(document.getElementById('shok-list'))}
+function appendShok(c){
+  const opts=state.annualGoals.map(g=>`<option value="${g.id}">${g.text.substring(0,40)}</option>`).join('');
+  const d=document.createElement('div');d.className='shok-row';d.style.cssText='margin-bottom:16px';
+  d.innerHTML=`<input class="ob-input" placeholder="A craft to master..." style="margin-bottom:6px"/>
+    <div class="form-row">
+    <div class="ob-link-section"><div class="ob-link-label">serves which annual goal?</div>
+    <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>
+    <div class="ob-link-section"><div class="ob-link-label">timeframe</div>
+    <select class="ob-link-select tf-select"><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option></select></div>
+    </div>`;
+  c.appendChild(d);
+}
+
+function initKaizenOb(){
+  const c=document.getElementById('kaizen-list');c.innerHTML='';
+  for(let i=0;i<3;i++) appendKaizenOb(c);
+}
+function addKaizenOb(){appendKaizenOb(document.getElementById('kaizen-list'))}
+function appendKaizenOb(c){
+  const opts=state.shokunin.map(g=>`<option value="${g.id}">${g.text.substring(0,40)}</option>`).join('');
+  const d=document.createElement('div');d.className='kaizen-row';d.style.cssText='margin-bottom:16px';
+  d.innerHTML=`<input class="ob-input" placeholder="Every day I will..." style="margin-bottom:6px"/>
+    <div class="ob-link-section"><div class="ob-link-label">feeds which craft?</div>
+    <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>`;
+  c.appendChild(d);
+}
+
+function finishOnboarding(){
+  saveObStep();
+  state.onboarded=true;
+  saveState();
+  document.getElementById('onboard').classList.remove('active');
+  document.getElementById('dashboard').classList.add('active');
+  renderDashboard();
+}
+
+// ============ DAILY RESET ============
+function checkDailyReset(){
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  let changed = false;
+  state.kaizen.forEach(k=>{
+    if(k.bestStreak===undefined){k.bestStreak=k.streak||0;changed=true;} // backward compat
+    if(k.done && k.lastDone !== today){
+      k.done = false;
+      changed = true;
+    }
+    // Break streak if missed a day
+    if(k.lastDone && k.lastDone !== today && k.lastDone !== yesterday){
+      k.streak = 0;
+      changed = true;
+    }
+  });
+  if(changed) saveState();
+}
+
+// ============ CALENDAR HELPERS ============
+function getDateStr(date){
+  const d=date||new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatWeekRange(s,e){
+  return s.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' \u2013 '+e.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+let weekOffset=0;
+let calMonthOffset=0;
+
+function getWeekStart(offset){
+  const now=new Date();
+  const mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)+offset*7);
+  mon.setHours(0,0,0,0);
+  return mon;
+}
+
+function navigateWeek(delta){weekOffset+=delta;renderGoals();}
+function navigateMonth(delta){calMonthOffset+=delta;renderGoals();}
+
+function isHabitDoneOnDate(habitId,dateStr){
+  const log=state.completionLog||{};
+  return (log[dateStr]||[]).includes(habitId);
+}
+
+function toggleHabitOnDate(habitId,dateStr){
+  if(!state.completionLog)state.completionLog={};
+  const arr=[...(state.completionLog[dateStr]||[])];
+  const idx=arr.indexOf(habitId);
+  const nowDone=idx<0;
+  if(nowDone)arr.push(habitId);else arr.splice(idx,1);
+  state.completionLog[dateStr]=arr;
+  // If today, sync k.done + streak + animation
+  const todayStr=getDateStr();
+  if(dateStr===todayStr){
+    const k=state.kaizen.find(k=>k.id===habitId);
+    if(k){
+      k.done=nowDone;
+      if(nowDone){k.streak=(k.streak||0)+1;k.lastDone=new Date().toDateString();autoCompound(k);_animatingIds.add(habitId);if(k.streak>(k.bestStreak||0))k.bestStreak=k.streak;}
+      else k.streak=Math.max(0,k.streak-1);
+    }
+  }
+  saveState();renderGoals();updateStreak();
+  checkCelebrations();
+}
+
+function buildKaizenGrid(){
+  const ws=getWeekStart(weekOffset);
+  const days=[];
+  for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);}
+  const isCurrentWeek=weekOffset===0;
+  const todayStr=getDateStr();
+  const todayDayIdx=todayIdx();
+
+  const habits=state.kaizen.filter(k=>{
+    if(k.startDate){
+      const s=new Date(k.startDate);s.setHours(0,0,0,0);
+      const today=new Date();today.setHours(0,0,0,0);
+      if(today<s)return false;
+    }
+    for(let i=0;i<7;i++){if(habitOnDay(k,i))return true;}
+    return false;
+  });
+
+  let html=`<div class="hg-wrap">
+    <div class="hg-nav">
+      <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
+      <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
+      <button class="hg-nav-btn" onclick="navigateWeek(1)"${isCurrentWeek?' disabled':''}>&#8250;</button>
+    </div>
+    <div class="hg-grid">
+      <div class="hg-row hg-header">
+        <div class="hg-label-cell"></div>
+        ${days.map((d,i)=>{
+          const isT=isCurrentWeek&&i===todayDayIdx;
+          return `<div class="hg-day-head${isT?' is-today':''}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
+        }).join('')}
+      </div>
+      ${habits.map(k=>{
+        const needsTip=k.text.length>18;
+        const label=needsTip?k.text.substring(0,16)+'\u2026':k.text;
+        return `<div class="hg-row">
+          <div class="hg-label"${needsTip?` data-full="${k.text.replace(/"/g,'&quot;')}"`:''}>${label}</div>
+          ${days.map((d,i)=>{
+            const dStr=getDateStr(d);
+            const scheduled=habitOnDay(k,i);
+            const done=isHabitDoneOnDate(k.id,dStr);
+            const isT=isCurrentWeek&&i===todayDayIdx;
+            const isFuture=dStr>todayStr;
+            let cls='hg-cell';
+            if(!scheduled){cls+=' hg-off';}
+            else if(isFuture){cls+=' hg-future';}
+            else if(done){cls+=' hg-done';}
+            else{cls+=' hg-miss';}
+            if(isT&&scheduled)cls+=' hg-today-col';
+            const clickable=scheduled&&!isFuture;
+            return `<div class="${cls}"${clickable?` onclick="toggleHabitOnDate(${k.id},'${dStr}')"`:''} ></div>`;
+          }).join('')}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+  return html;
+}
+
+function buildMonthCal(){
+  const now=new Date();
+  const ref=new Date(now.getFullYear(),now.getMonth()+calMonthOffset,1);
+  const year=ref.getFullYear();
+  const month=ref.getMonth();
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  const startOffset=(firstDay.getDay()+6)%7;
+  const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const todayStr=getDateStr();
+  const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
+
+  let html=`<div class="mcal-wrap">
+    <div class="mcal-nav">
+      <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
+      <span class="mcal-title">${monthName}</span>
+      <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
+    </div>
+    <div class="mcal-grid">
+      ${DAYS.map(d=>`<div class="mcal-dh">${d[0]}</div>`).join('')}`;
+
+  for(let i=0;i<startOffset;i++)html+=`<div class="mcal-cell mcal-empty"></div>`;
+
+  for(let day=1;day<=lastDay.getDate();day++){
+    const d=new Date(year,month,day);
+    const dStr=getDateStr(d);
+    const dayIdx=(d.getDay()+6)%7;
+    const isFuture=dStr>todayStr;
+    const isToday=dStr===todayStr;
+
+    const scheduled=state.kaizen.filter(k=>{
+      if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
+      return habitOnDay(k,dayIdx);
+    });
+    const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,dStr));
+    const pct=scheduled.length?done.length/scheduled.length:0;
+
+    let cls='mcal-cell';
+    if(isToday)cls+=' mcal-today';
+    if(isFuture)cls+=' mcal-future';
+
+    let dot='';
+    if(!isFuture&&scheduled.length){
+      if(pct>=1)dot=`<div class="mcal-dot mcal-full"></div>`;
+      else if(pct>0)dot=`<div class="mcal-dot mcal-partial"></div>`;
+      else dot=`<div class="mcal-dot mcal-none"></div>`;
+    }
+    html+=`<div class="${cls}"><span class="mcal-num">${day}</span>${dot}</div>`;
+  }
+
+  html+=`</div></div>`;
+  return html;
+}
+
+function buildYearView(){
+  const year=new Date().getFullYear();
+  const todayStr=getDateStr();
+  const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
+
+  let html=`<div class="ycal-wrap">
+    <div class="ycal-year-label">${year}</div>
+    <div class="ycal-months">`;
+
+  for(let m=0;m<12;m++){
+    const firstDay=new Date(year,m,1);
+    const lastDay=new Date(year,m+1,0);
+    const startOffset=(firstDay.getDay()+6)%7;
+    const mname=firstDay.toLocaleDateString('en-GB',{month:'short'});
+
+    html+=`<div class="ycal-month"><div class="ycal-mname">${mname}</div><div class="ycal-grid">`;
+    for(let i=0;i<startOffset;i++)html+=`<div class="ycal-cell ycal-empty"></div>`;
+
+    for(let day=1;day<=lastDay.getDate();day++){
+      const d=new Date(year,m,day);d.setHours(0,0,0,0);
+      const dStr=getDateStr(d);
+      const dayIdx=(d.getDay()+6)%7;
+      const isFuture=d>nowMidnight;
+      const isToday=dStr===todayStr;
+
+      const scheduled=state.kaizen.filter(k=>{
+        if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
+        return habitOnDay(k,dayIdx);
+      });
+      const doneHabits=scheduled.filter(k=>isHabitDoneOnDate(k.id,dStr));
+      const pct=scheduled.length?doneHabits.length/scheduled.length:0;
+
+      let cls='ycal-cell';
+      if(isToday)cls+=' ycal-today';
+      else if(isFuture)cls+=' ycal-future';
+      else if(!scheduled.length)cls+=' ycal-noscheduled';
+      else if(pct>=1)cls+=' ycal-full';
+      else if(pct>0)cls+=' ycal-partial';
+      else cls+=' ycal-miss';
+
+      html+=`<div class="${cls}"></div>`;
+    }
+    html+=`</div></div>`;
+  }
+
+  html+=`</div></div>`;
+  return html;
+}
+
+// ============ WEEK STRIP ============
+function habitOnDay(k, d){
+  // Respect startDate — hide habit until that date arrives
+  if(k.startDate){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(k.startDate); start.setHours(0,0,0,0);
+    if(today < start) return false;
+  }
+  if(k.days === 'daily' || !k.days) return true;
+  return Array.isArray(k.days) && k.days.includes(d);
+}
+
+
+// ============ DASHBOARD ============
+function renderDashboard(){
+  checkDailyReset();
+  // Ryughi strands
+  const rd=document.getElementById('ryughi-display');
+  rd.innerHTML=state.strands.map((s,i)=>{
+    const ms=state.milestones5yr[i]||'';
+    const msShort=ms.length>58?ms.substring(0,55)+'\u2026':ms;
+    return `<div class="strand-row">
+      <span class="ryughi-strand${_filterStrandIdx===i?' strand-active':''}" onclick="setStrandFilter(${i})">${s}</span>
+      ${ms?`<div class="strand-ms">${msShort}</div>`:''}
+    </div>`;
+  }).join('');
+  // Date
+  document.getElementById('date-display').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const greet=document.getElementById('greeting-display');
+  if(greet) greet.textContent=getGreeting();
+  const ws=document.getElementById('week-strip');
+  if(ws) ws.style.display='none'; // superseded by inline grid
+  renderTab();
+}
+
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['kaizen','shokunin','ikigai'][i]===t));
+  const ws=document.getElementById('week-strip');
+  if(ws) ws.style.display='none'; // superseded by inline grid/calendar
+  if(t==='kaizen') checkReflectionPrompts();
+  renderTab();
+}
+
+function renderTab(){
+  const p=PILLARS[currentTab];
+  document.getElementById('pillar-head').innerHTML=`<div class="pillar-head"><span class="pillar-tf">${p.tf}</span></div>`;
+  document.getElementById('med-text').innerHTML=`<p>${p.med}</p>`;
+  renderGoals();
+  updateStreak();
+}
+
+function getShrIdx(prog){return prog>=66?2:prog>=33?1:0}
+
+function renderGoals(){
+  const list=document.getElementById('goals-list');
+
+  if(currentTab==='kaizen'){
+    const todayIdx2=todayIdx();
+    let todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx2));
+    // Apply strand filter
+    let filterIndicatorHtml='';
+    if(_filterStrandIdx!==null){
+      const sgIds=new Set(state.annualGoals.filter(g=>Number(g.parentMs)===_filterStrandIdx).map(g=>g.id));
+      const ssIds=new Set(state.shokunin.filter(s=>sgIds.has(Number(s.parentAnnual))).map(s=>s.id));
+      todayItems=todayItems.filter(k=>ssIds.has(Number(k.parentShok)));
+      const sName=state.strands[_filterStrandIdx]||'';
+      filterIndicatorHtml=`<div class="filter-indicator">
+        <span class="filter-indicator-text">${sName}</span>
+        <button class="filter-clear" onclick="clearStrandFilter()">× clear</button>
+      </div>`;
+    }
+    let checklistHtml=filterIndicatorHtml;
+    if(todayItems.length){
+      checklistHtml+=`<div class="daily-reset">${_filterStrandIdx!==null?'practices today':'show up today'}</div>`+
+        todayItems.map((g,i)=>{
+          const parent=state.shokunin.find(s=>s.id==g.parentShok);
+          const freq=g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
+          const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
+          return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}">
+            <div class="check ${g.done?'done':''}${anim?' origami-fill':''}" onclick="toggleKaizen(${g.id})"></div>
+            <div class="goal-content">
+              <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
+              <div class="goal-meta">
+                ${g.streak>0?`<span class="goal-streak">${g.streak} day streak</span>`:'<span>begin your streak</span>'}
+                <span class="goal-tf">${freq}</span>
+                ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
+              </div>
+            </div>
+            </li>`;
+        }).join('');
+    } else {
+      checklistHtml+=`<div style="text-align:center;padding:32px 0;opacity:.3"><div style="font-size:11px;letter-spacing:3px;text-transform:uppercase">${_filterStrandIdx!==null?'no practices today for this strand':'rest day'}</div></div>`;
+    }
+    const _ws=getWeekStart(weekOffset),_we=new Date(_ws);_we.setDate(_ws.getDate()+6);
+    const _wr=_ws.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'\u2013'+_we.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const gridSeparator=`<div style="display:flex;align-items:center;gap:16px;margin:52px 0 24px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08))"></div>
+      <span style="font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--ink);letter-spacing:2px">this week</span>
+      <span style="font-size:9px;color:var(--ink-faint);letter-spacing:1px;opacity:.55">${_wr}</span>
+      <div style="flex:1;height:1px;background:linear-gradient(270deg,transparent,rgba(0,0,0,.08))"></div>
+    </div>`;
+    const todayNoteStr=getDateStr();
+    const todayNoteVal=(state.dailyNotes||{})[todayNoteStr]||'';
+    const noteHtml=`<div class="daily-note-wrap"><textarea class="daily-note" rows="2" placeholder="daily reflections..." onblur="saveDailyNote('${todayNoteStr}',this.value)">${todayNoteVal}</textarea></div>`;
+    let nudgeHtml='';
+    if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
+    if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
+    list.innerHTML=checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
+
+  } else if(currentTab==='shokunin'){
+    const items=state.shokunin;
+    if(!items.length){list.innerHTML=emptyState()+addTriggerHtml()+buildMonthCal();return;}
+    list.innerHTML=items.map((g,i)=>{
+      const si=getShrIdx(g.progress);
+      const parent=state.annualGoals.find(a=>a.id==g.parentAnnual);
+      const childKaizens=state.kaizen.filter(k=>k.parentShok==g.id);
+      const activeStreaks=childKaizens.filter(k=>k.streak>0).length;
+      return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.05}s" data-shok-id="${g.id}">
+        <div class="check ${g.done?'done':''}" onclick="toggleShok(${g.id})"></div>
+        <div class="goal-content">
+          <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
+          <div class="goal-meta">
+            <span class="goal-tf">${g.timeframe||'monthly'}</span>
+            ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
+            ${activeStreaks?`<span class="goal-streak">${activeStreaks} active habit${activeStreaks>1?'s':''}</span>`:''}
+          </div>
+          <div class="shr">${SHR.map((s,j)=>`
+            <div class="shr-s ${j<si?'past':''} ${j===si?'active':''}">
+              <span class="shr-k">${s.kanji}</span><span class="shr-l">${s.name}</span>
+            </div>${j<2?'<div class="shr-c"></div>':''}`).join('')}</div>
+          <div class="pbar"><div class="pfill ${si>=2?'red':''}" style="width:${g.progress}%"></div></div>
+          <div class="plabel">${g.progress}% \u2014 ${SHR[si].name}: ${SHR[si].meaning}</div>
+          <div class="pctrl">
+            <button class="pbtn" onclick="adjProg(${g.id},-5)">\u2212</button>
+            <button class="pbtn" onclick="adjProg(${g.id},5)">+</button>
+          </div>
+        </div>
+        </li>`;
+    }).join('')+addTriggerHtml()+buildMonthCal();
+
+  } else {
+    const items=state.annualGoals;
+    if(!items.length){list.innerHTML=emptyState()+addTriggerHtml()+buildYearView();return;}
+    list.innerHTML=items.map((g,i)=>{
+      const childShok=state.shokunin.filter(s=>s.parentAnnual==g.id);
+      const avgProg=childShok.length?Math.round(childShok.reduce((a,c)=>a+c.progress,0)/childShok.length):0;
+      const msLabel=g.parentMs!==''&&state.milestones5yr[g.parentMs]?state.milestones5yr[g.parentMs]:'';
+      return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.05}s" data-annual-id="${g.id}">
+        <div class="check ${g.done?'done':''}" onclick="toggleIkigai(${g.id})"></div>
+        <div class="goal-content">
+          <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
+          <div class="goal-meta">
+            <span class="goal-tf">annual</span>
+            ${msLabel?`<span class="goal-parent">\u2192 ${msLabel.substring(0,30)}</span>`:''}
+            ${childShok.length?`<span>${childShok.length} craft${childShok.length>1?'s':''} linked</span>`:''}
+          </div>
+          <div class="pbar"><div class="pfill" style="width:${avgProg}%"></div></div>
+          <div class="plabel">${avgProg}% (avg. of linked Shokunin goals)</div>
+        </div>
+        <div class="goal-actions">
+          <button class="goal-act" onclick="startEdit('annual',${g.id})">✎</button>
+          <button class="goal-act goal-del" onclick="deleteItem('annual',${g.id})">×</button>
+        </div></li>`;
+    }).join('')+addTriggerHtml()+buildYearView();
+  }
+}
+
+function addTriggerHtml(){
+  const p=PILLARS[currentTab];
+  return `<div class="add-trigger" id="add-trigger" onclick="showAdd()">
+    <div class="add-icon">+</div><span class="add-text">${p.addLabel}</span>
+  </div>
+  <div class="add-form" id="add-form">
+    <input type="text" id="new-input" placeholder="Write your intention..." onkeydown="if(event.key==='Enter')addGoal()"/>
+    <div class="form-row" id="form-extras"></div>
+    <div class="form-actions">
+      <button class="btn-ghost btn" onclick="hideAdd()">Cancel</button>
+      <button class="btn" onclick="addGoal()">Commit</button>
+    </div>
+  </div>`;
+}
+
+function emptyState(){
+  return `<div style="text-align:center;padding:40px 0;opacity:.3">
+    <div style="font-family:'Noto Serif JP',serif;font-size:32px;margin-bottom:8px">${PILLARS[currentTab].kanji}</div>
+    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase">no intentions yet</div></div>`;
+}
+
+// ============ ACTIONS ============
+function toggleKaizen(id){
+  const g=state.kaizen.find(k=>k.id===id);
+  if(!g)return;
+  g.done=!g.done;
+  const today=new Date().toDateString();
+  const todayStr=getDateStr();
+  if(!state.completionLog)state.completionLog={};
+  const arr=[...(state.completionLog[todayStr]||[])];
+  if(g.done){
+    g.streak=(g.streak||0)+1;
+    g.lastDone=today;
+    autoCompound(g);
+    if(!arr.includes(id))arr.push(id);
+    _animatingIds.add(id);
+    if(g.streak>(g.bestStreak||0))g.bestStreak=g.streak;
+  } else {
+    g.streak=Math.max(0,g.streak-1);
+    const i=arr.indexOf(id);if(i>=0)arr.splice(i,1);
+  }
+  state.completionLog[todayStr]=arr;
+  saveState();
+  renderTab();
+  checkCelebrations();
+}
+
+function autoCompound(kaizenGoal){
+  if(!kaizenGoal.parentShok)return;
+  const parent=state.shokunin.find(s=>s.id==kaizenGoal.parentShok);
+  if(!parent||parent.done)return;
+  const siblings=state.kaizen.filter(k=>k.parentShok==parent.id);
+  const completedToday=siblings.filter(k=>k.done).length;
+  if(completedToday>0){
+    const nudge=Math.round(2/siblings.length*completedToday);
+    parent.progress=Math.min(100,parent.progress+nudge);
+    if(parent.progress>=100)parent.done=true;
+    // Cascade up to Ikigai
+    if(parent.parentAnnual){
+      const ikigai=state.annualGoals.find(a=>a.id==parent.parentAnnual);
+      if(ikigai){
+        const childShok=state.shokunin.filter(s=>s.parentAnnual==ikigai.id);
+        const avg=Math.round(childShok.reduce((a,c)=>a+c.progress,0)/childShok.length);
+        ikigai.progress=avg;
+        if(avg>=100)ikigai.done=true;
+      }
+    }
+  }
+}
+
+function toggleShok(id){
+  const g=state.shokunin.find(s=>s.id===id);
+  if(g){g.done=!g.done;if(g.done)g.progress=100;saveState();renderTab();}
+}
+function toggleIkigai(id){
+  const g=state.annualGoals.find(a=>a.id===id);
+  if(g){g.done=!g.done;saveState();renderTab();}
+}
+
+function adjProg(id,delta){
+  const g=state.shokunin.find(s=>s.id===id);
+  if(g){g.progress=Math.max(0,Math.min(100,g.progress+delta));if(g.progress>=100)g.done=true;saveState();renderTab();}
+}
+
+function updateStreak(){
+  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx()));
+  const done=todayItems.filter(g=>g.done).length;
+  const d=document.getElementById('streak-display');
+  if(done===todayItems.length&&todayItems.length>0) d.textContent='\u5370 all practices complete';
+  else if(done>0) d.textContent=`${done}/${todayItems.length} today`;
+  else d.textContent='';
+  const greet=document.getElementById('greeting-display');
+  if(greet) greet.textContent=getGreeting();
+}
+
+// ============ ADD GOAL ============
+function showAdd(){
+  document.getElementById('add-trigger').style.display='none';
+  document.getElementById('add-form').classList.add('visible');
+  document.getElementById('new-input').focus();
+  const ex=document.getElementById('form-extras');
+  if(currentTab==='kaizen'){
+    const opts=state.shokunin.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('');
+    ex.innerHTML=`<select id="link-select"><option value="">feeds which craft?</option>${opts}</select>`;
+  } else if(currentTab==='shokunin'){
+    const opts=state.annualGoals.map(a=>`<option value="${a.id}">${a.text.substring(0,40)}</option>`).join('');
+    ex.innerHTML=`<select id="link-select"><option value="">serves which annual goal?</option>${opts}</select>
+      <select id="tf-select"><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option></select>`;
+  } else {
+    const opts=state.milestones5yr.map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');
+    ex.innerHTML=`<select id="link-select"><option value="">serves which 5-year milestone?</option>${opts}</select>`;
+  }
+}
+function hideAdd(){
+  document.getElementById('add-trigger').style.display='flex';
+  document.getElementById('add-form').classList.remove('visible');
+  document.getElementById('new-input').value='';
+}
+function addGoal(){
+  const text=document.getElementById('new-input').value.trim();
+  if(!text)return;
+  const link=document.getElementById('link-select')?.value||'';
+  if(currentTab==='kaizen'){
+    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null});
+  } else if(currentTab==='shokunin'){
+    const tf=document.getElementById('tf-select')?.value||'monthly';
+    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false});
+  } else {
+    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false});
+  }
+  saveState();hideAdd();renderTab();
+}
+
+// ============ STATS BOX ============
+function getLifetimeCount(habitId){
+  return Object.values(state.completionLog||{}).filter(ids=>ids.includes(habitId)).length;
+}
+
+function get30DayRate(habitId){
+  const k=state.kaizen.find(h=>h.id===habitId);
+  if(!k) return null;
+  let scheduled=0, completed=0;
+  for(let i=29;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)continue;}
+    const dayIdx=(d.getDay()+6)%7;
+    if(habitOnDay(k,dayIdx)){
+      scheduled++;
+      if(isHabitDoneOnDate(habitId,getDateStr(d))) completed++;
+    }
+  }
+  return scheduled>0?Math.round(completed/scheduled*100):null;
+}
+
+function buildStatsBox(){
+  const groups=state.shokunin.map(craft=>({
+    craft,
+    habits:state.kaizen.filter(k=>k.parentShok===craft.id)
+  })).filter(g=>g.habits.length>0);
+  const orphans=state.kaizen.filter(k=>!state.shokunin.find(s=>s.id===k.parentShok));
+
+  const renderHabits=habits=>`
+    <div class="stats-cols">
+      <div class="stats-col-h">habit</div>
+      <div class="stats-col-h">streak · best</div>
+      <div class="stats-col-h">total</div>
+      <div class="stats-col-h">30 days</div>
+    </div>
+    ${habits.map(k=>{
+      const streak=k.streak||0;
+      const best=k.bestStreak||0;
+      const total=getLifetimeCount(k.id);
+      const rate=get30DayRate(k.id);
+      const atPb=streak>0&&streak===best&&best>0;
+      const sbLabel=streak===0&&best===0?'—':`${streak} · ${best}`;
+      return `<div class="stats-row">
+        <div class="stats-row-name">${k.text}</div>
+        <div class="stats-num ${atPb?'at-pb':''}">${sbLabel}</div>
+        <div class="stats-num">${total||'—'}</div>
+        <div class="stats-num">${rate!==null?rate+'%':'—'}</div>
+      </div>`;
+    }).join('')}`;
+
+  let html=`<div class="stats-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;margin-bottom:4px;border-bottom:1px solid rgba(0,0,0,.06)">
+      <span style="font-family:'Noto Serif JP',serif;font-size:11px;letter-spacing:5px;color:var(--ink-faint);opacity:.5">統計</span>
+      <button onclick="toggleStats()" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:none;cursor:pointer;opacity:.4;transition:opacity .2s;padding:4px 0" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='.4'">× close</button>
+    </div>`;
+  groups.forEach(({craft,habits})=>{
+    html+=`<div class="stats-section">
+      <div class="stats-section-name">${craft.text.length>44?craft.text.substring(0,42)+'\u2026':craft.text}</div>
+      ${renderHabits(habits)}
+    </div>`;
+  });
+  if(orphans.length){
+    html+=`<div class="stats-section">
+      <div class="stats-section-name">other practices</div>
+      ${renderHabits(orphans)}
+    </div>`;
+  }
+  html+='</div>';
+  return html;
+}
+
+function toggleStats(){
+  const panel=document.getElementById('stats-panel');
+  const seal=document.querySelector('.seal');
+  if(!panel) return;
+  const isOpen=panel.classList.contains('open');
+  if(!isOpen) panel.innerHTML=buildStatsBox();
+  panel.classList.toggle('open');
+  if(seal) seal.classList.toggle('open',!isOpen);
+}
+
+// ============ REFLECTION PROMPTS ============
+let _weeklyPromptSeen = false;
+let _monthlyPromptSeen = false;
+let _activePromptType = 'weekly';
+
+function needsWeeklyReflection(){
+  const dayIdx=todayIdx(); // Mon=0...Sun=6
+  if(dayIdx!==6&&dayIdx!==0&&dayIdx!==1) return false; // Only Sun + 2-day grace
+  const wkOffset=(dayIdx===6)?0:-1; // Sunday = this week, Mon/Tue = last week
+  const wStart=getWeekStart(wkOffset);
+  const wEnd=new Date(wStart); wEnd.setDate(wStart.getDate()+6);
+  const wStartStr=getDateStr(wStart), wEndStr=getDateStr(wEnd);
+  return !(state.reflections||[]).some(r=>
+    r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
+  );
+}
+
+function needsMonthlyReflection(){
+  const today=new Date();
+  const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  if(today.getDate()<lastDay-2) return false; // Not in last 3 days
+  const monthStr=getDateStr(today).substring(0,7);
+  return !(state.reflections||[]).some(r=>
+    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+  );
+}
+
+function showReflectionPrompt(type){
+  _activePromptType=type;
+  const overlay=document.getElementById('reflect-prompt-overlay');
+  if(!overlay) return;
+  document.getElementById('rpc-kanji').textContent=type==='weekly'?'週':'月';
+  document.getElementById('rpc-title').textContent=type==='weekly'?
+    'the week is closing':'the month is ending';
+  document.getElementById('rpc-sub').textContent=type==='weekly'?
+    'your practices this week deserve to be remembered.':
+    'a month of work is behind you — read your weeks before you write.';
+  document.getElementById('rpc-confirm').onclick=()=>{
+    dismissPrompt(type); showReflection(type);
+  };
+  overlay.classList.add('active');
+}
+
+function overlayClickDismiss(e){
+  if(e.target===document.getElementById('reflect-prompt-overlay')) dismissPrompt(_activePromptType);
+}
+
+function dismissPrompt(type){
+  const overlay=document.getElementById('reflect-prompt-overlay');
+  if(overlay) overlay.classList.remove('active');
+  if(type==='weekly') _weeklyPromptSeen=true;
+  else _monthlyPromptSeen=true;
+}
+
+function checkReflectionPrompts(){
+  if(!state.onboarded) return;
+  if(needsMonthlyReflection()&&!_monthlyPromptSeen){
+    showReflectionPrompt('monthly'); return;
+  }
+  if(needsWeeklyReflection()&&!_weeklyPromptSeen){
+    showReflectionPrompt('weekly');
+  }
+}
+
+function buildReflectionNudgeCard(type){
+  if(type==='weekly') return `<div class="reflect-nudge">
+    <span class="reflect-nudge-text">the week is closing. seal your reflection.</span>
+    <button class="reflect-nudge-btn" onclick="showReflection('weekly')">週 &nbsp;reflect</button>
+  </div>`;
+  return `<div class="reflect-nudge">
+    <span class="reflect-nudge-text">the month is ending. seal your reflection.</span>
+    <button class="reflect-nudge-btn" onclick="showReflection('monthly')">月 &nbsp;reflect</button>
+  </div>`;
+}
+
+// ============ HABIT GRID TOOLTIP ============
+function showHgTooltip(el){
+  const tip=document.getElementById('hg-tooltip');
+  if(!tip)return;
+  const rect=el.getBoundingClientRect();
+  tip.textContent=el.dataset.full;
+  tip.style.display='block';
+  tip.style.top=(rect.bottom+6)+'px';
+  tip.style.left=rect.left+'px';
+}
+function hideHgTooltip(){
+  const tip=document.getElementById('hg-tooltip');
+  if(tip) tip.style.display='none';
+}
+
+// ============ DAILY NOTES ============
+function saveDailyNote(dateStr, val){
+  if(!state.dailyNotes) state.dailyNotes={};
+  const trimmed=val.trim();
+  if(trimmed) state.dailyNotes[dateStr]=trimmed;
+  else delete state.dailyNotes[dateStr];
+  saveState();
+}
+
+// ============ REFLECTION CASCADE HELPERS ============
+function dailyNotesCascade(){
+  // Past 7 days for weekly context
+  const entries=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const dStr=getDateStr(d);
+    const note=(state.dailyNotes||{})[dStr];
+    if(note) entries.push({label:d.toLocaleDateString('en-GB',{weekday:'short'}),text:note});
+  }
+  if(!entries.length) return '';
+  return `<div class="cascade-block">
+    ${entries.map(e=>`<div class="cascade-entry"><span class="cascade-label">${e.label}</span><span class="cascade-text">${e.text}</span></div>`).join('')}
+    <div class="cascade-divider"></div></div>`;
+}
+
+function weeklyNotesCascade(){
+  // Weekly reflections from this calendar month, shown week-by-week with date range
+  const monthStr=getDateStr(new Date()).substring(0,7);
+  const refs=(state.reflections||[])
+    .filter(r=>r.type==='weekly'&&r.date&&r.date.startsWith(monthStr)&&r.notes)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  if(!refs.length) return '';
+  return `<div class="cascade-block">
+    ${refs.map((r,i)=>{
+      const refDate=new Date(r.date+'T12:00:00');
+      const wMon=new Date(refDate);
+      wMon.setDate(refDate.getDate()-((refDate.getDay()+6)%7));
+      const wSun=new Date(wMon);wSun.setDate(wMon.getDate()+6);
+      const range=wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+
+                  ' \u2013 '+wSun.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      return `<div style="margin-bottom:${i<refs.length-1?'20px':'0'}">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.5;margin-bottom:6px">${range}</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);line-height:1.8;opacity:.7">${r.notes}</div>
+      </div>`;
+    }).join('')}
+    <div class="cascade-divider"></div></div>`;
+}
+
+function monthlyNotesCascade(){
+  // Monthly reflections from this year
+  const yearStr=String(new Date().getFullYear());
+  const refs=(state.reflections||[])
+    .filter(r=>r.type==='monthly'&&r.date&&r.date.startsWith(yearStr)&&r.working)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  if(!refs.length) return '';
+  return `<div class="cascade-block">
+    ${refs.map(r=>`<div class="cascade-entry">
+      <span class="cascade-label">${new Date(r.date+'T12:00:00').toLocaleDateString('en-GB',{month:'short'})}</span>
+      <span class="cascade-text">${r.working}</span></div>`).join('')}
+    <div class="cascade-divider"></div></div>`;
+}
+
+// ============ REFLECTION ============
+function getWeakestCraft(){
+  const results=state.shokunin.map(craft=>{
+    const habits=state.kaizen.filter(k=>k.parentShok===craft.id);
+    if(!habits.length) return null;
+    let scheduled=0,completed=0;
+    for(let i=6;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      const dayIdx=(d.getDay()+6)%7;
+      const dStr=getDateStr(d);
+      habits.forEach(k=>{
+        if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return;}
+        if(habitOnDay(k,dayIdx)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
+      });
+    }
+    if(!scheduled) return null;
+    return{craft,scheduled,completed,rate:completed/scheduled};
+  }).filter(Boolean);
+  if(!results.length) return null;
+  return results.sort((a,b)=>a.rate-b.rate)[0];
+}
+
+function switchFocusCraft(craftId){
+  const craft=state.shokunin.find(s=>s.id===craftId);
+  if(!craft) return;
+  const habits=state.kaizen.filter(k=>k.parentShok===craftId);
+  let scheduled=0,completed=0;
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const dayIdx=(d.getDay()+6)%7;
+    const dStr=getDateStr(d);
+    habits.forEach(k=>{
+      if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return;}
+      if(habitOnDay(k,dayIdx)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
+    });
+  }
+  const rate=scheduled>0?Math.round(completed/scheduled*100):0;
+  const card=document.getElementById('momentum-card');
+  if(card){
+    card.querySelector('.momentum-craft-lbl').textContent=craft.text.substring(0,45);
+    card.querySelector('.momentum-fill').style.width=rate+'%';
+    card.querySelector('.momentum-pct').textContent=rate+'% this week';
+    card.dataset.craftId=craftId;
+  }
+  const q1=document.getElementById('opt-c-q1');
+  const q2=document.getElementById('opt-c-q2');
+  if(q1) q1.value='';
+  if(q2) q2.value='';
+}
+
+function getLastWeekIntention(){
+  const thisWeekStartStr=getDateStr(getWeekStart(0));
+  const ref=(state.reflections||[])
+    .filter(r=>r.type==='weekly'&&r.date<thisWeekStartStr&&r.intention)
+    .sort((a,b)=>b.date.localeCompare(a.date))[0];
+  return ref?ref.intention:null;
+}
+
+function saveReflection(type){
+  const c=document.getElementById('reflect-content');
+  const entry={type, date:getDateStr(), ts:Date.now()};
+  if(type==='weekly'){
+    const card=c.querySelector('#momentum-card');
+    entry.weakCraft=card?+(card.dataset.craftId||0):0;
+    entry.whatGotInWay=c.querySelector('#opt-c-q1')?.value.trim()||'';
+    entry.showingUp=c.querySelector('#opt-c-q2')?.value.trim()||'';
+    entry.notes=c.querySelector('.reflect-textarea')?.value||'';
+    entry.intention=c.querySelector('#weekly-intention')?.value.trim()||'';
+  } else if(type==='monthly'){
+    const areas=c.querySelectorAll('.reflect-textarea');
+    entry.working=areas[0]?.value||'';
+    entry.changing=areas[1]?.value||'';
+    entry.shifting=areas[2]?.value||'';
+  } else {
+    const areas=c.querySelectorAll('.reflect-textarea');
+    entry.ryughi=areas[0]?.value||'';
+    entry.lessons=areas[1]?.value||'';
+    entry.intentions=areas[2]?.value||'';
+  }
+  if(!state.reflections) state.reflections=[];
+  state.reflections.push(entry);
+  saveState();
+  c.innerHTML=`<div style="text-align:center;padding:56px 0">
+    <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
+  </div>`;
+  setTimeout(()=>closeReflection(), 1800);
+}
+
+function showReflection(type){
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+
+  if(type==='weekly'){
+    const lastIntention=getLastWeekIntention();
+    const lastIntentionHtml=lastIntention?`
+      <div style="margin-bottom:28px;padding:14px 18px;border-left:2px solid rgba(204,53,41,.2)">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.45;margin-bottom:7px">last week you intended</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:1.7;opacity:.7">${lastIntention}</div>
+      </div>`:'';
+    c.innerHTML=`
+      <div class="modal-kanji">職人</div>
+      <div class="modal-title">Weekly Reflection</div>
+      <div class="modal-sub">how is your craft progressing?</div>
+      ${lastIntentionHtml}
+      ${dailyNotesCascade()}
+      ${(()=>{
+        const w=getWeakestCraft();
+        if(!w) return '';
+        const rate=Math.round(w.rate*100);
+        if(rate>=80) return `<div style="margin-bottom:24px;padding:12px 18px;border-left:2px solid rgba(204,53,41,.2);font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);opacity:.75">your crafts all had strong momentum this week.</div>`;
+        const others=state.shokunin.filter(s=>s.id!==w.craft.id);
+        return `<div class="momentum-card" id="momentum-card" data-craft-id="${w.craft.id}">
+          <div class="momentum-craft-lbl">${w.craft.text.substring(0,45)}</div>
+          <div class="momentum-stmt">has been quiet this week.</div>
+          <div class="momentum-bar-wrap">
+            <div class="momentum-bar"><div class="momentum-fill" style="width:${rate}%"></div></div>
+            <span class="momentum-pct">${rate}% this week</span>
+          </div>
+          ${others.length?`<div class="opt-c-switch">focus on a different craft: <select onchange="if(this.value)switchFocusCraft(+this.value)"><option value="">—</option>${others.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('')}</select></div>`:''}
+        </div>
+        <div class="reflect-q">
+          <div class="reflect-label">what got in the way?</div>
+          <textarea class="reflect-textarea" id="opt-c-q1" placeholder="Be honest with yourself..."></textarea>
+        </div>
+        <div class="reflect-q">
+          <div class="reflect-label">what would showing up look like next week?</div>
+          <textarea class="reflect-textarea" id="opt-c-q2" placeholder="Make it concrete..."></textarea>
+        </div>`;
+      })()}
+      <div class="reflect-q">
+        <div class="reflect-label">the week in one thought</div>
+        <textarea class="reflect-textarea" placeholder="Write freely..."></textarea>
+      </div>
+      <div class="reflect-q" style="margin-top:32px;padding-top:28px;border-top:1px solid rgba(0,0,0,.06)">
+        <div class="reflect-label">one intention for the week ahead</div>
+        <input id="weekly-intention" class="reflect-textarea" style="min-height:auto;resize:none;display:block" placeholder="one sentence...">
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="saveReflection('weekly')">Seal reflection</button>
+      </div>`;
+  } else if(type==='monthly'){
+    c.innerHTML=`
+      <div class="modal-kanji">月</div>
+      <div class="modal-title">Monthly Reflection</div>
+      <div class="modal-sub">are you still walking toward the right star?</div>
+      ${weeklyNotesCascade()}
+      <div class="reflect-q"><div class="reflect-label">What is working?</div>
+        <textarea class="reflect-textarea" placeholder="The practices that are bearing fruit..."></textarea></div>
+      <div class="reflect-q"><div class="reflect-label">What is changing in you?</div>
+        <textarea class="reflect-textarea" placeholder="How your mentality is evolving..."></textarea></div>
+      <div class="reflect-q"><div class="reflect-label">What needs to shift?</div>
+        <textarea class="reflect-textarea" placeholder="Adjustments to the path..."></textarea></div>
+      <div class="form-actions"><button class="btn" onclick="saveReflection('monthly')">Seal reflection</button></div>`;
+  } else if(type==='annual'){
+    c.innerHTML=`
+      <div class="modal-kanji">年</div>
+      <div class="modal-title">Annual Reflection</div>
+      <div class="modal-sub">a year has passed. how have you grown?</div>
+      ${monthlyNotesCascade()}
+      <div class="reflect-q"><div class="reflect-label">Look back at your strands. Are they still woven correctly?</div>
+        <textarea class="reflect-textarea" style="min-height:100px" placeholder="Reflect on your Ryughi..."></textarea></div>
+      <div class="reflect-q"><div class="reflect-label">What did this year teach you?</div>
+        <textarea class="reflect-textarea" style="min-height:100px" placeholder="The lessons of this cycle..."></textarea></div>
+      <div class="reflect-q"><div class="reflect-label">Set your intentions for the year ahead</div>
+        <textarea class="reflect-textarea" style="min-height:100px" placeholder="New intentions, renewed purpose..."></textarea></div>
+      <div class="form-actions"><button class="btn btn-red" onclick="saveReflection('annual')">Seal and begin anew</button></div>`;
+  }
+}
+
+function closeReflection(){
+  document.getElementById('reflect-modal').classList.remove('active');
+}
+
+// Close modal on overlay click
+document.getElementById('reflect-modal').addEventListener('click',function(e){
+  if(e.target===this)closeReflection();
+});
+
+// Habit grid tooltip delegation
+document.getElementById('goals-list').addEventListener('mouseover',function(e){
+  const el=e.target.closest('[data-full]');
+  if(el) showHgTooltip(el);
+});
+document.getElementById('goals-list').addEventListener('mouseout',function(e){
+  if(e.target.closest('[data-full]')) hideHgTooltip();
+});
+
+// ============ VISION DRAWER ============
+function openVisionDrawer(){
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+  c.innerHTML=`
+    <div class="modal-kanji" style="opacity:.07">流儀</div>
+    <div class="modal-title">Your North Star</div>
+    <div class="modal-sub" style="margin-bottom:36px">the vision that makes the path worth walking</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:14px;font-style:italic;line-height:2;
+      color:var(--ink-light);margin-bottom:40px;border-left:2px solid rgba(204,53,41,.2);padding-left:20px">
+      ${state.tenYearVision||'<span style="opacity:.3">Your ten-year vision lives here.</span>'}
+    </div>
+    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:20px;opacity:.6">五年 — five years in motion</div>
+    ${state.milestones5yr.map((ms,i)=>`
+      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:flex-start">
+        <span style="font-family:'Noto Serif JP',serif;font-size:16px;color:var(--red);opacity:.25;min-width:16px;margin-top:3px">${i+1}</span>
+        <span style="font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);line-height:1.8;font-style:italic">${ms}</span>
+      </div>`).join('')}
+    <div class="form-actions" style="margin-top:32px">
+      <button class="btn-ghost btn" onclick="closeReflection()">close</button>
+    </div>`;
+}
+
+// ============ GREETING ============
+function getGreeting(){
+  const h=new Date().getHours();
+  const n=state.name?', '+state.name:'';
+  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx()));
+  const done=todayItems.filter(k=>k.done).length;
+  if(todayItems.length>0&&done===todayItems.length){
+    if(h<12)return 'the morning is yours.';
+    if(h<17)return 'the afternoon is earned.';
+    return 'the scroll is full today.';
+  }
+  if(h>=5&&h<12) return `good morning${n}.`;
+  if(h>=12&&h<17) return `good afternoon${n}.`;
+  if(h>=17&&h<21) return `good evening${n}.`;
+  return `good night${n}.`;
+}
+
+// ============ ORIGAMI ANIMATION ============
+let _animatingIds=new Set();
+
+// ============ EDIT / DELETE ============
+function deleteItem(type, id){
+  if(type==='kaizen') state.kaizen=state.kaizen.filter(k=>k.id!==id);
+  else if(type==='shokunin') state.shokunin=state.shokunin.filter(s=>s.id!==id);
+  else if(type==='annual') state.annualGoals=state.annualGoals.filter(a=>a.id!==id);
+  saveState(); renderTab();
+}
+
+function startEdit(type, id){
+  const item=type==='kaizen'?state.kaizen.find(k=>k.id===id):
+             type==='shokunin'?state.shokunin.find(s=>s.id===id):
+             state.annualGoals.find(a=>a.id===id);
+  if(!item) return;
+  const el=document.querySelector(`[data-edit-id="${id}"]`);
+  if(!el) return;
+  el.innerHTML=`<input class="inline-edit" value="${item.text.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}"
+    onblur="saveEdit('${type}',${id},this)"
+    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value='';this.blur();}">`;
+  const input=el.querySelector('input');
+  input.focus(); input.select();
+}
+
+function saveEdit(type, id, input){
+  const text=input.value.trim();
+  if(text){
+    const item=type==='kaizen'?state.kaizen.find(k=>k.id===id):
+               type==='shokunin'?state.shokunin.find(s=>s.id===id):
+               state.annualGoals.find(a=>a.id===id);
+    if(item) item.text=text;
+    saveState();
+  }
+  renderTab();
+}
+
+// ============ STRAND HOVER ============
+// ============ STRAND FILTER ============
+let _filterStrandIdx=null;
+
+function setStrandFilter(idx){
+  _filterStrandIdx=(_filterStrandIdx===idx)?null:idx;
+  // Fade non-active strands
+  document.querySelectorAll('.strand-row').forEach((row,i)=>{
+    row.style.opacity=_filterStrandIdx!==null&&i!==_filterStrandIdx?'0.25':'';
+  });
+  // Switch to Kaizen if filtering
+  if(_filterStrandIdx!==null&&currentTab!=='kaizen') switchTab('kaizen');
+  else renderGoals();
+  updateStreak();
+}
+
+function clearStrandFilter(){
+  _filterStrandIdx=null;
+  document.querySelectorAll('.strand-row').forEach(row=>row.style.opacity='');
+  renderGoals();
+  updateStreak();
+}
+
+// ============ COMPLETION CELEBRATIONS ============
+function isDayComplete(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const dayIdx=(d.getDay()+6)%7;
+  const scheduled=state.kaizen.filter(k=>{
+    if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
+    return habitOnDay(k,dayIdx);
+  });
+  if(!scheduled.length) return true; // rest day — can't fail it
+  const log=state.completionLog[dateStr]||[];
+  return scheduled.every(k=>log.includes(k.id));
+}
+
+function getWeekKey(){return getDateStr(getWeekStart(0));}
+
+function isWeekComplete(){
+  const ws=getWeekStart(0);
+  const todayStr=getDateStr();
+  for(let i=0;i<7;i++){
+    const d=new Date(ws);d.setDate(ws.getDate()+i);
+    const dStr=getDateStr(d);
+    if(dStr>todayStr) break;
+    if(!isDayComplete(dStr)) return false;
+  }
+  return true;
+}
+
+function getMonthCompletionRate(){
+  const now=new Date();
+  let totalPossible=0, totalDone=0;
+  for(let day=1;day<=now.getDate();day++){
+    const d=new Date(now.getFullYear(),now.getMonth(),day);
+    const dStr=getDateStr(d);
+    const dayIdx=(d.getDay()+6)%7;
+    const scheduled=state.kaizen.filter(k=>{
+      if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
+      return habitOnDay(k,dayIdx);
+    });
+    const log=state.completionLog[dStr]||[];
+    totalPossible+=scheduled.length;
+    totalDone+=scheduled.filter(k=>log.includes(k.id)).length;
+  }
+  return totalPossible>0?Math.round(totalDone/totalPossible*100):0;
+}
+
+function animateSeal(){
+  const seal=document.querySelector('.seal-k');
+  if(!seal)return;
+  seal.classList.remove('seal-animate');
+  void seal.offsetWidth; // force reflow so animation restarts cleanly
+  seal.classList.add('seal-animate');
+}
+
+function showProverb(){
+  const el=document.getElementById('proverb-overlay');
+  if(!el)return;
+  el.style.display='flex';
+  el.style.animation='none';
+  void el.offsetWidth;
+  el.style.animation='';
+  el.classList.add('active');
+  setTimeout(()=>{el.classList.remove('active');el.style.display='none';},4600);
+}
+
+function showInkWash(pct){
+  const el=document.getElementById('ink-wash');
+  const pctEl=document.getElementById('wash-pct');
+  if(!el||!pctEl)return;
+  pctEl.textContent=pct+'%';
+  el.style.display='flex';
+  el.style.animation='none';
+  const inner=el.querySelector('.wash-inner');
+  if(inner){inner.style.animation='none';void inner.offsetWidth;inner.style.animation='';}
+  void el.offsetWidth;
+  el.style.animation='';
+  el.classList.add('active');
+  setTimeout(()=>{el.classList.remove('active');el.style.display='none';},5600);
+}
+
+function fireCelebrations(list){
+  const monthly=list.includes('monthly');
+  const weekly=list.includes('weekly')||monthly;
+  const daily=list.includes('daily')||weekly;
+  let t=200;
+  if(daily){setTimeout(animateSeal,t);t+=300;}
+  if(weekly){setTimeout(showProverb,t+1400);}
+  if(monthly){setTimeout(()=>showInkWash(getMonthCompletionRate()),t+3800);}
+}
+
+function checkCelebrations(){
+  if(!state.onboarded)return;
+  const todayStr=getDateStr();
+  const weekKey=getWeekKey();
+  const monthKey=todayStr.substring(0,7);
+  const toFire=[];
+  if(isDayComplete(todayStr)&&state.lastDailyComplete!==todayStr){
+    toFire.push('daily');state.lastDailyComplete=todayStr;
+  }
+  if(isWeekComplete()&&state.lastWeeklyComplete!==weekKey){
+    toFire.push('weekly');state.lastWeeklyComplete=weekKey;
+  }
+  if(getMonthCompletionRate()>=90&&state.lastMonthlyComplete!==monthKey){
+    toFire.push('monthly');state.lastMonthlyComplete=monthKey;
+  }
+  if(toFire.length){saveState();fireCelebrations(toFire);}
+}
+
+// ============ CLOUD SYNC (JSONbin.io) ============
+// Credentials stored separately — never in the state or HTML source
+const SYNC_CFG_KEY = 'bushido_sync_config';
+
+function getSyncConfig(){
+  try{ return JSON.parse(localStorage.getItem(SYNC_CFG_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveSyncConfig(cfg){
+  localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(cfg));
+}
+
+function setSyncStatus(status){
+  const el=document.getElementById('sync-status');
+  if(!el) return;
+  const map={syncing:'☁ syncing…',synced:'☁ synced',error:'☁ offline',off:''};
+  el.textContent=map[status]||'';
+  el.style.color=status==='error'?'var(--red)':'var(--ink-faint)';
+}
+
+let _syncTimer=null;
+function scheduleSyncToCloud(){
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(syncToCloud,5000);
+}
+
+async function syncToCloud(){
+  const{binId,masterKey}=getSyncConfig();
+  if(!binId||!masterKey) return;
+  setSyncStatus('syncing');
+  try{
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':masterKey},
+      body:JSON.stringify(state)
+    });
+    if(res.ok) setSyncStatus('synced'); else setSyncStatus('error');
+  }catch(e){ setSyncStatus('error'); }
+}
+
+async function loadFromCloud(){
+  const{binId,masterKey}=getSyncConfig();
+  if(!binId||!masterKey) return false;
+  setSyncStatus('syncing');
+  try{
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`,{
+      headers:{'X-Master-Key':masterKey}
+    });
+    if(!res.ok){ setSyncStatus('error'); return false; }
+    const data=await res.json();
+    const cloud=data.record||{};
+    if((cloud.lastModified||0)>(state.lastModified||0)){
+      Object.assign(state,cloud);
+      try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+      setSyncStatus('synced');
+      return true;
+    }
+    // Local is newer — push up to cloud
+    syncToCloud();
+    return false;
+  }catch(e){ setSyncStatus('error'); return false; }
+}
+
+function showSyncSetup(){
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+  const{binId='',masterKey=''}=getSyncConfig();
+  c.innerHTML=`
+    <div class="modal-kanji" style="font-size:36px;opacity:.12">☁</div>
+    <div class="modal-title">Cloud Sync</div>
+    <div class="modal-sub" style="margin-bottom:28px">sync your data across all devices via JSONbin.io</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:2;margin-bottom:28px;border-left:2px solid rgba(204,53,41,.15);padding-left:16px">
+      1. Sign up free at <strong style="font-style:normal">jsonbin.io</strong><br>
+      2. Go to API Keys and copy your Master Key<br>
+      3. Paste it below — the app will create your bin automatically
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">Master Key</div>
+      <input id="sync-master-key" class="reflect-textarea" style="min-height:auto;resize:none;font-style:normal;font-size:13px;font-family:'Noto Sans JP',sans-serif" value="${masterKey}" placeholder="\$2a\$10\$...">
+    </div>
+    ${binId?`<div class="reflect-q">
+      <div class="reflect-label">Bin ID (auto-saved)</div>
+      <input id="sync-bin-id" class="reflect-textarea" style="min-height:auto;resize:none;font-style:normal;font-size:12px;font-family:'Noto Sans JP',sans-serif;opacity:.6" value="${binId}" readonly>
+    </div>`:'<input type="hidden" id="sync-bin-id" value="">'}
+    <div class="form-actions" style="margin-top:28px">
+      <button class="btn-ghost btn" onclick="closeReflection()">cancel</button>
+      <button class="btn" onclick="saveSyncSetup()">Save &amp; sync</button>
+    </div>`;
+}
+
+async function saveSyncSetup(){
+  const masterKey=(document.getElementById('sync-master-key')?.value||'').trim();
+  if(!masterKey) return;
+  let binId=(document.getElementById('sync-bin-id')?.value||'').trim();
+  closeReflection();
+  setSyncStatus('syncing');
+  if(!binId){
+    // Create a new private bin
+    try{
+      const res=await fetch('https://api.jsonbin.io/v3/b',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'X-Master-Key':masterKey,
+          'X-Bin-Name':'bushido-state',
+          'X-Bin-Private':'true'
+        },
+        body:JSON.stringify(state)
+      });
+      const data=await res.json();
+      binId=data.metadata?.id||'';
+      if(!binId){ setSyncStatus('error'); return; }
+    }catch(e){ setSyncStatus('error'); return; }
+  }
+  saveSyncConfig({binId,masterKey});
+  await syncToCloud();
+}
+
+// ============ EXPORT / IMPORT ============
+function exportState(){
+  const d=new Date();
+  const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`bushido-backup-${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importState(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const imported=JSON.parse(evt.target.result);
+      Object.assign(state,imported);
+      localStorage.setItem(PROD_KEY,JSON.stringify(state));
+      // Brief confirmation
+      const tools=document.getElementById('data-tools');
+      if(tools){
+        const orig=tools.innerHTML;
+        tools.innerHTML=`<span style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);opacity:.7;padding:8px 0">scroll restored.</span>`;
+        setTimeout(()=>{tools.innerHTML=orig;renderDashboard();},1800);
+      } else { renderDashboard(); }
+    }catch(err){ alert('Could not read backup file.'); }
+  };
+  reader.readAsText(file);
+  e.target.value=''; // reset so same file can be re-imported
+}
+
+// ============ DARK MODE ============
+function updateDarkMode(){
+  const h=new Date().getHours();
+  document.body.classList.toggle('dark', h>=21||h<6);
+}
+
+// ============ GRID SWIPE NAVIGATION ============
+let _touchStartX=0,_touchStartY=0;
+let _wheelAccumX=0,_wheelCooldown=false,_wheelReset=null;
+
+function initGridSwipe(){
+  const list=document.getElementById('goals-list');
+  if(!list) return;
+
+  // Touch: record start position
+  list.addEventListener('touchstart',e=>{
+    if(!e.target.closest('.hg-wrap')) return;
+    _touchStartX=e.touches[0].clientX;
+    _touchStartY=e.touches[0].clientY;
+  },{passive:true});
+
+  // Touch: prevent page scroll during horizontal swipe on grid
+  list.addEventListener('touchmove',e=>{
+    if(!e.target.closest('.hg-wrap')) return;
+    const dx=e.touches[0].clientX-_touchStartX;
+    const dy=e.touches[0].clientY-_touchStartY;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8) e.preventDefault();
+  },{passive:false});
+
+  // Touch: navigate on release
+  list.addEventListener('touchend',e=>{
+    if(!e.target.closest('.hg-wrap')) return;
+    const dx=e.changedTouches[0].clientX-_touchStartX;
+    const dy=e.changedTouches[0].clientY-_touchStartY;
+    if(Math.abs(dx)>Math.abs(dy)*1.2&&Math.abs(dx)>48){
+      if(dx<0&&weekOffset<0) navigateWeek(1);  // swipe left → forward (past weeks only)
+      else if(dx>0) navigateWeek(-1);            // swipe right → back
+    }
+  },{passive:true});
+
+  // Trackpad: accumulate horizontal delta, navigate once threshold crossed
+  list.addEventListener('wheel',e=>{
+    if(!e.target.closest('.hg-wrap')) return;
+    if(Math.abs(e.deltaX)<Math.abs(e.deltaY)*1.2) return; // ignore diagonal/vertical
+    e.preventDefault();
+    _wheelAccumX+=e.deltaX;
+    clearTimeout(_wheelReset);
+    _wheelReset=setTimeout(()=>{_wheelAccumX=0;},200);
+    if(!_wheelCooldown&&Math.abs(_wheelAccumX)>100){
+      _wheelCooldown=true;
+      if(_wheelAccumX>0&&weekOffset<0) navigateWeek(1);
+      else if(_wheelAccumX<0) navigateWeek(-1);
+      _wheelAccumX=0;
+      setTimeout(()=>{_wheelCooldown=false;},500);
+    }
+  },{passive:false});
+}
+
+// ============ INIT ============
+loadState();
+// If no saved state, load the default pre-populated state
+if(!state.onboarded && !localStorage.getItem(STORAGE_KEY)){
+  Object.assign(state, DEFAULT_STATE);
+  saveState();
+}
+if(state.onboarded){
+  document.getElementById('onboard').classList.remove('active');
+  document.getElementById('dashboard').classList.add('active');
+  renderDashboard();           // render immediately from local state
+  checkReflectionPrompts();
+  initGridSwipe();
+  updateDarkMode();
+  setInterval(updateDarkMode, 60000);
+  // Then silently sync from cloud — re-render if cloud has newer data
+  loadFromCloud().then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); });
+} else {
+  renderObProgress();
+}
+</script>
+</body>
+</html>
