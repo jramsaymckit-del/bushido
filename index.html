@@ -919,6 +919,9 @@ function showObStep(){
   document.querySelectorAll('.onboard-step').forEach(s=>s.classList.remove('active'));
   document.querySelector(`[data-step="${obStep}"]`).classList.add('active');
   renderObProgress();
+  // Pre-fill existing data so first open feels like a reveal, not a form
+  if(obStep===1&&state.name){const ni=document.getElementById('ob-name');if(ni&&!ni.value)ni.value=state.name;}
+  if(obStep===3&&state.tenYearVision){const ta=document.getElementById('ob-10yr');if(ta&&!ta.value)ta.value=state.tenYearVision;}
   if(obStep===2 && !document.querySelector('#strand-list .ob-strand')) initStrands();
   if(obStep===4 && !document.querySelector('#ms5-list .ob-strand')) initMs5();
   if(obStep===5) initAnnual();
@@ -928,6 +931,8 @@ function showObStep(){
 
 function saveObStep(){
   if(obStep===1){ const n=document.getElementById('ob-name'); if(n&&n.value.trim()) state.name=n.value.trim(); }
+  // If state has pre-loaded cascade data, preserve it — don't regenerate IDs or break links
+  if(state.kaizen&&state.kaizen.length>0) return;
   if(obStep===2){
     state.strands=[];
     document.querySelectorAll('#strand-list input').forEach(i=>{if(i.value.trim())state.strands.push(i.value.trim())});
@@ -965,9 +970,14 @@ function saveObStep(){
 }
 
 function initStrands(){
-  const c=document.getElementById('strand-list');
-  c.innerHTML='';
-  for(let i=0;i<3;i++) appendStrand(c,i+1);
+  const c=document.getElementById('strand-list');c.innerHTML='';
+  if(state.strands&&state.strands.length){
+    state.strands.forEach((s,i)=>{
+      const d=document.createElement('div');d.className='ob-strand';
+      d.innerHTML=`<span class="ob-strand-num">${i+1}</span><input class="ob-input" value="${s.replace(/"/g,'&quot;')}" placeholder="A strand of your purpose..."/>`;
+      c.appendChild(d);
+    });
+  } else { for(let i=0;i<3;i++) appendStrand(c,i+1); }
 }
 function addStrand(){
   const c=document.getElementById('strand-list');
@@ -981,7 +991,13 @@ function appendStrand(c,n){
 
 function initMs5(){
   const c=document.getElementById('ms5-list');c.innerHTML='';
-  for(let i=0;i<2;i++) appendMs5(c);
+  if(state.milestones5yr&&state.milestones5yr.length){
+    state.milestones5yr.forEach((m,i)=>{
+      const d=document.createElement('div');d.className='ob-strand';
+      d.innerHTML=`<span class="ob-strand-num">${i+1}</span><input class="ob-input" value="${m.replace(/"/g,'&quot;')}" placeholder="A 5-year milestone..."/>`;
+      c.appendChild(d);
+    });
+  } else { for(let i=0;i<2;i++) appendMs5(c); }
 }
 function addMs5(){appendMs5(document.getElementById('ms5-list'))}
 function appendMs5(c){
@@ -992,7 +1008,16 @@ function appendMs5(c){
 
 function initAnnual(){
   const c=document.getElementById('annual-list');c.innerHTML='';
-  for(let i=0;i<2;i++) appendAnnual(c);
+  if(state.annualGoals&&state.annualGoals.length){
+    state.annualGoals.forEach(g=>{
+      const opts=state.milestones5yr.map((m,i)=>`<option value="${i}"${g.parentMs==i?' selected':''} >${m.substring(0,40)}</option>`).join('');
+      const d=document.createElement('div');d.className='annual-row';d.style.cssText='margin-bottom:16px';
+      d.innerHTML=`<input class="ob-input" value="${g.text.replace(/"/g,'&quot;')}" style="margin-bottom:6px"/>
+        <div class="ob-link-section"><div class="ob-link-label">serves which 5-year milestone?</div>
+        <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>`;
+      c.appendChild(d);
+    });
+  } else { for(let i=0;i<2;i++) appendAnnual(c); }
 }
 function addAnnual(){appendAnnual(document.getElementById('annual-list'))}
 function appendAnnual(c){
@@ -1006,7 +1031,21 @@ function appendAnnual(c){
 
 function initShok(){
   const c=document.getElementById('shok-list');c.innerHTML='';
-  for(let i=0;i<2;i++) appendShok(c);
+  if(state.shokunin&&state.shokunin.length){
+    state.shokunin.forEach(g=>{
+      const opts=state.annualGoals.map(a=>`<option value="${a.id}"${a.id==g.parentAnnual?' selected':''} >${a.text.substring(0,40)}</option>`).join('');
+      const tf=g.timeframe||'monthly';
+      const d=document.createElement('div');d.className='shok-row';d.style.cssText='margin-bottom:16px';
+      d.innerHTML=`<input class="ob-input" value="${g.text.replace(/"/g,'&quot;')}" style="margin-bottom:6px"/>
+        <div class="form-row">
+        <div class="ob-link-section"><div class="ob-link-label">serves which annual goal?</div>
+        <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>
+        <div class="ob-link-section"><div class="ob-link-label">timeframe</div>
+        <select class="ob-link-select tf-select"><option value="weekly"${tf==='weekly'?' selected':''}>Weekly</option><option value="monthly"${tf==='monthly'?' selected':''}>Monthly</option></select></div>
+        </div>`;
+      c.appendChild(d);
+    });
+  } else { for(let i=0;i<2;i++) appendShok(c); }
 }
 function addShok(){appendShok(document.getElementById('shok-list'))}
 function appendShok(c){
@@ -1024,7 +1063,16 @@ function appendShok(c){
 
 function initKaizenOb(){
   const c=document.getElementById('kaizen-list');c.innerHTML='';
-  for(let i=0;i<3;i++) appendKaizenOb(c);
+  if(state.kaizen&&state.kaizen.length){
+    state.kaizen.forEach(k=>{
+      const opts=state.shokunin.map(g=>`<option value="${g.id}"${g.id==k.parentShok?' selected':''} >${g.text.substring(0,40)}</option>`).join('');
+      const d=document.createElement('div');d.className='kaizen-row';d.style.cssText='margin-bottom:16px';
+      d.innerHTML=`<input class="ob-input" value="${k.text.replace(/"/g,'&quot;')}" style="margin-bottom:6px"/>
+        <div class="ob-link-section"><div class="ob-link-label">feeds which craft?</div>
+        <select class="ob-link-select"><option value="">— select —</option>${opts}</select></div>`;
+      c.appendChild(d);
+    });
+  } else { for(let i=0;i<3;i++) appendKaizenOb(c); }
 }
 function addKaizenOb(){appendKaizenOb(document.getElementById('kaizen-list'))}
 function appendKaizenOb(c){
