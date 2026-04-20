@@ -10,7 +10,7 @@
 :root{
   --scroll:#F5F0E8;--edge:#E8DFD0;--ink:#1A1A1A;--ink-light:#3A3A3A;
   --ink-faint:#8A8578;--red:#CC3529;--red-light:#D94A3E;--white:#FEFCF8;
-  --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;
+  --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;--navy:#1B2A4A;
 }
 body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100vh;color:var(--ink);
   transition:background-color .5s,color .5s}
@@ -244,10 +244,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 /* ===== HABIT GRID (Kaizen week view) ===== */
 .hg-wrap{margin-bottom:8px}
 .hg-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.hg-nav-btn{background:none;border:none;cursor:pointer;font-size:22px;color:var(--ink-faint);padding:4px 8px;line-height:1;transition:color .2s}
-.hg-nav-btn:hover{color:var(--ink)}.hg-nav-btn:disabled{opacity:.2;cursor:default}
-.hg-week-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
-.hg-grid{background:var(--grid-bg);border-radius:6px;overflow:hidden}
+.hg-nav-btn{background:none;border:none;cursor:pointer;font-size:22px;color:rgba(255,255,255,.28);padding:4px 8px;line-height:1;transition:color .2s}
+.hg-nav-btn:hover{color:rgba(255,255,255,.75)}.hg-nav-btn:disabled{opacity:.15;cursor:default}
+.hg-week-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.hg-grid{overflow:hidden}
 .hg-row{display:grid;grid-template-columns:minmax(88px,120px) repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,.04)}
 .hg-row:last-child{border-bottom:none}
 .hg-header{background:rgba(0,0,0,.25)}
@@ -268,12 +268,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .hg-cell.hg-future::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.07);display:block}
 
 /* ===== MONTH CALENDAR (Shokunin) ===== */
-.mcal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.mcal-wrap{margin-bottom:0}
 .mcal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .mcal-nav-btn{background:none;border:none;cursor:pointer;font-size:20px;color:rgba(255,255,255,.35);padding:2px 6px;line-height:1;transition:color .2s}
 .mcal-nav-btn:hover{color:rgba(255,255,255,.7)}
 .mcal-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45)}
-.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcal-grid{display:flex;flex-direction:column;gap:0}
+.mcal-header-row,.mcal-week-row{display:grid;grid-template-columns:18px repeat(7,1fr);gap:2px}
+.mcal-header-row{margin-bottom:4px}
 .mcal-dh{text-align:center;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.22);padding:2px 0 6px}
 .mcal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,.03)}
 .mcal-cell.mcal-empty{background:transparent}
@@ -285,9 +287,26 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .mcal-dot.mcal-full{background:var(--red)}
 .mcal-dot.mcal-partial{background:rgba(204,53,41,.55)}
 .mcal-dot.mcal-none{background:rgba(255,255,255,.12)}
+/* Week reflection indicator */
+.wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
+.wk-sealed{font-family:'Noto Serif JP',serif;font-size:10px;color:var(--red);opacity:.45;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
+.wk-sealed:hover{opacity:.85}
+.wk-sealed.is-open{opacity:1;transform:scale(1.15)}
+.wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
+/* Weekly reflection expansion panel */
+.mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
+.mcal-expansion.open{max-height:600px;opacity:1}
+.mcal-expand-inner{padding:14px 8px 18px 26px;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);margin:4px 0 6px;animation:fadeUp .2s ease}
+.exp-range{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.55;margin-bottom:12px}
+.exp-field{margin-bottom:10px}
+.exp-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:3px}
+.exp-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.62);line-height:1.75}
+.exp-intention{margin-top:12px;padding-top:11px;border-top:1px solid rgba(204,53,41,.15)}
+.exp-intention .exp-label{color:rgba(204,53,41,.5)}
+.exp-intention .exp-text{color:rgba(255,255,255,.8)}
 
 /* ===== YEAR VIEW (Ikigai) ===== */
-.ycal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.ycal-wrap{margin-bottom:0}
 .ycal-year-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.3);text-align:center;margin-bottom:16px}
 .ycal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:640px){.ycal-months{grid-template-columns:repeat(3,1fr)}}
@@ -302,6 +321,30 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .ycal-cell.ycal-partial{background:rgba(204,53,41,.5)}
 .ycal-cell.ycal-miss{background:rgba(245,240,232,.1)}
 .ycal-cell.ycal-today{outline:1.5px solid var(--red);outline-offset:0}
+
+/* ===== KAKEJIKU — Hanging Scroll Wrapper ===== */
+.kk-outer{display:flex;flex-direction:column;align-items:stretch;margin-bottom:28px;
+  filter:drop-shadow(0 10px 28px rgba(10,18,35,.35)) drop-shadow(0 2px 6px rgba(10,18,35,.20))}
+.kk-cord{display:flex;flex-direction:column;align-items:center;margin-bottom:-1px;position:relative;z-index:5}
+.kk-loop{width:14px;height:8px;border:1.5px solid rgba(160,145,125,.65);border-bottom:none;border-radius:50% 50% 0 0}
+.kk-cord-line{width:2px;height:28px;background:repeating-linear-gradient(to bottom,rgba(160,145,125,.68) 0px,rgba(130,118,100,.50) 3px,rgba(160,145,125,.68) 6px)}
+.kk-rod{height:9px;position:relative;background:linear-gradient(to bottom,#060302 0%,#180B06 16%,#3A1A0C 38%,#180B06 66%,#060302 100%);
+  box-shadow:inset 0 1px 0 rgba(255,210,155,.06),0 1px 5px rgba(0,0,0,.65);z-index:2}
+.kk-rod-btm{height:8px}
+.kk-rod::before,.kk-rod::after{content:'';position:absolute;top:50%;transform:translateY(-50%);
+  width:36px;height:14px;border-radius:7px;
+  background:linear-gradient(to bottom,#0A0503 0%,#221008 18%,#4A2210 40%,#2E1309 68%,#0A0503 100%);
+  box-shadow:0 2px 7px rgba(0,0,0,.70),inset 0 1.5px 0 rgba(255,200,150,.10),inset 0 -1px 0 rgba(0,0,0,.35);z-index:3}
+.kk-rod::before{left:-11px}.kk-rod::after{right:-11px}
+.kk-body{background-color:var(--navy);
+  background-image:repeating-linear-gradient(45deg,transparent 0px,transparent 3px,rgba(255,255,255,.013) 3px,rgba(255,255,255,.013) 6px),
+    repeating-linear-gradient(-45deg,transparent 0px,transparent 3px,rgba(255,255,255,.009) 3px,rgba(255,255,255,.009) 6px);
+  box-shadow:inset 8px 0 22px rgba(0,0,0,.38),inset -8px 0 22px rgba(0,0,0,.38),
+    inset 0 3px 10px rgba(0,0,0,.22),inset 0 -3px 10px rgba(0,0,0,.16);
+  padding:22px 26px;position:relative}
+.kk-body::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.18) 0%,transparent 12%,transparent 88%,rgba(0,0,0,.14) 100%);
+  pointer-events:none}
 
 /* Habit grid tooltip */
 #hg-tooltip{display:none;position:fixed;z-index:300;background:var(--grid-bg);
@@ -399,6 +442,55 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
   border:none;cursor:pointer;opacity:.55;transition:opacity .2s;font-family:'Noto Sans JP',sans-serif}
 .filter-clear:hover{opacity:1}
 
+/* ===== TRAVEL MODE ===== */
+.travel-toggle-bar{display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px}
+.travel-toggle-btn{display:flex;align-items:center;gap:6px;background:none;
+  border:1px solid var(--edge);border-radius:2px;padding:5px 11px;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);transition:border-color .2s,color .2s,background .2s}
+.travel-toggle-btn:hover{border-color:var(--ink-light);color:var(--ink-light)}
+.travel-toggle-btn.active{background:#2a4a6b;border-color:#2a4a6b;color:var(--white)}
+.travel-banner{display:flex;align-items:center;justify-content:space-between;
+  background:#2a4a6b;color:var(--white);padding:8px 14px;border-radius:2px;
+  margin-bottom:16px;font-size:9px;letter-spacing:2px;text-transform:uppercase}
+.travel-banner a{font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.55);
+  cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.travel-banner a:hover{color:rgba(255,255,255,.9)}
+.travel-core-tag{font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:#2a4a6b;border:1px solid rgba(42,74,107,.3);border-radius:1px;
+  padding:2px 5px;margin-left:6px;vertical-align:middle}
+/* Travel setup modal */
+.travel-backdrop{display:none;position:fixed;inset:0;background:rgba(26,18,8,.72);
+  backdrop-filter:blur(3px);z-index:300;align-items:center;justify-content:center;padding:20px}
+.travel-backdrop.show{display:flex}
+.travel-modal{background:var(--white);border:1px solid var(--edge);border-radius:2px;
+  width:100%;max-width:460px;max-height:88vh;overflow-y:auto;animation:fadeUp .22s ease}
+.travel-modal-top{padding:24px 22px 0;text-align:center}
+.travel-modal-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:#2a4a6b;margin-bottom:6px}
+.travel-modal-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--ink-light);margin-bottom:14px}
+.travel-modal-copy{font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;
+  line-height:1.75;color:var(--ink-light);padding-bottom:18px;
+  border-bottom:1px solid var(--edge);text-align:left}
+.travel-modal-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink-faint);padding:12px 22px 8px}
+.travel-modal-habits{padding:0 10px 10px;display:flex;flex-direction:column;gap:4px}
+.tmh-row{display:flex;align-items:center;gap:11px;padding:11px 12px;
+  border:1px solid var(--edge);border-radius:2px;cursor:pointer;
+  background:rgba(255,255,255,.5);transition:border-color .15s,background .15s;user-select:none}
+.tmh-row:hover{border-color:var(--ink-faint)}
+.tmh-row.sel{border-color:#2a4a6b;background:rgba(42,74,107,.06)}
+.tmh-tick{width:20px;height:20px;border:1px solid var(--edge);border-radius:1px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  color:#2a4a6b;flex-shrink:0;transition:background .15s,border-color .15s}
+.tmh-row.sel .tmh-tick{background:#2a4a6b;border-color:#2a4a6b;color:var(--white)}
+.tmh-text{font-size:13px;color:var(--ink);flex:1}
+.tmh-days{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint)}
+.travel-modal-err{font-size:10px;color:var(--red);letter-spacing:1px;
+  text-align:center;padding:0 20px 10px;display:none}
+.travel-modal-err.show{display:block}
+.travel-modal-footer{display:flex;gap:8px;padding:12px 10px 18px;border-top:1px solid var(--edge)}
+
 /* Bottom seal — easter egg: click to reveal stats */
 .seal{text-align:center;margin-top:64px;opacity:.15;cursor:pointer;
   transition:opacity .35s;user-select:none}
@@ -453,6 +545,113 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
   25%{opacity:1;transform:scale(1)}
   70%{opacity:1;transform:scale(1)}
   100%{opacity:0;transform:scale(1.04)}
+}
+
+/* ===== MILESTONE STAMPS ===== */
+.ms-row{display:flex;gap:5px;align-items:center;margin-top:4px}
+.ms{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:3px;border:2px solid currentColor;
+  font-family:'Noto Serif JP',serif;font-weight:900;font-size:11px;
+  transform:rotate(-4deg);flex-shrink:0;cursor:default;
+  position:relative;transition:transform .2s;
+}
+.ms:hover{transform:rotate(-4deg) scale(1.18)}
+.ms.pending{opacity:0;pointer-events:none}
+.ms.tier-30 {color:#3D6B5F;border-color:rgba(61,107,95,.5)}
+.ms.tier-100{color:#8BBECF;border-color:rgba(139,190,207,.5)}
+.ms.tier-365{color:#C9A94B;border-color:rgba(201,169,75,.5)}
+.ms[data-tip]::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;
+  transform:translateX(-50%);background:var(--ink);color:var(--white);
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;
+  white-space:nowrap;padding:4px 8px;border-radius:2px;
+  pointer-events:none;opacity:0;transition:opacity .15s;
+}
+.ms[data-tip]:hover::after{opacity:1}
+@keyframes stampLand{
+  0%  {opacity:0;transform:rotate(-4deg) scale(0)}
+  60% {transform:rotate(-4deg) scale(1.15)}
+  80% {transform:rotate(-4deg) scale(.92)}
+  100%{opacity:1;transform:rotate(-4deg) scale(1)}
+}
+.ms.land{animation:stampLand .55s cubic-bezier(.25,.46,.45,.94) forwards}
+
+/* ===== FLOATING SEAL OVERLAY ===== */
+#seal-overlay{
+  display:none;position:fixed;inset:0;z-index:300;pointer-events:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  background:rgba(26,26,26,.05);
+}
+#seal-overlay.active{display:flex}
+.seal-float-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px}
+#seal-float-k{
+  font-family:'Noto Serif JP',serif;font-size:128px;font-weight:900;color:var(--red);
+  line-height:1;display:block;border:4px solid var(--red);border-radius:8px;
+  padding:8px 18px;transform:rotate(-4deg);
+}
+#seal-float-copy{
+  font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  color:var(--ink-light);letter-spacing:.5px;text-align:center;opacity:0;
+}
+@keyframes sealStampIn{
+  0%  {opacity:0;transform:rotate(-4deg) scale(2);filter:none}
+  30% {opacity:1;transform:rotate(-4deg) scale(.9);
+       filter:drop-shadow(0 0 24px rgba(204,53,41,.7)) drop-shadow(0 0 48px rgba(204,53,41,.4))}
+  55% {transform:rotate(-4deg) scale(1.06)}
+  75% {transform:rotate(-4deg) scale(.98)}
+  100%{transform:rotate(-4deg) scale(1);
+       filter:drop-shadow(0 0 20px rgba(204,53,41,.55)) drop-shadow(0 0 40px rgba(204,53,41,.3))}
+}
+@keyframes sealGlowFloat{
+  0%  {transform:rotate(-4deg) scale(1) translateY(0);
+       filter:drop-shadow(0 0 20px rgba(204,53,41,.55)) drop-shadow(0 0 40px rgba(204,53,41,.3))}
+  35% {transform:rotate(-4deg) scale(1) translateY(-8px);
+       filter:drop-shadow(0 0 36px rgba(204,53,41,.8)) drop-shadow(0 0 72px rgba(204,53,41,.45))}
+  70% {transform:rotate(-4deg) scale(1) translateY(4px);
+       filter:drop-shadow(0 0 24px rgba(204,53,41,.6)) drop-shadow(0 0 48px rgba(204,53,41,.35))}
+  100%{transform:rotate(-4deg) scale(1) translateY(-5px);
+       filter:drop-shadow(0 0 32px rgba(204,53,41,.7)) drop-shadow(0 0 60px rgba(204,53,41,.4))}
+}
+@keyframes sealFadeOut{
+  0%  {opacity:1}
+  100%{opacity:0;transform:rotate(-4deg) translateY(-14px) scale(1.04);filter:none}
+}
+@keyframes copyFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes copyFadeOut{from{opacity:1}to{opacity:0}}
+
+/* ===== MILESTONE STAMP OVERLAY ===== */
+#ms-overlay{
+  display:none;position:fixed;inset:0;z-index:350;pointer-events:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:rgba(26,26,26,.05);
+}
+#ms-overlay.active{display:flex}
+#ms-large{
+  width:100px;height:100px;border:3px solid currentColor;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Serif JP',serif;font-weight:900;font-size:56px;
+  transform:rotate(-4deg);opacity:0;
+}
+#ms-copy{
+  font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  color:var(--ink-light);letter-spacing:.5px;text-align:center;
+  opacity:0;max-width:320px;line-height:1.7;
+}
+@keyframes msStampIn{
+  0%  {opacity:0;transform:rotate(-4deg) scale(2.2)}
+  30% {opacity:1;transform:rotate(-4deg) scale(.88)}
+  55% {transform:rotate(-4deg) scale(1.08)}
+  80% {transform:rotate(-4deg) scale(.97)}
+  100%{transform:rotate(-4deg) scale(1)}
+}
+@keyframes msGlowFloat{
+  0%,100%{transform:rotate(-4deg) translateY(0)}
+  50%    {transform:rotate(-4deg) translateY(-8px)}
+}
+@keyframes msFadeOut{
+  0%  {opacity:1}
+  100%{opacity:0;transform:rotate(-4deg) translateY(-10px);filter:none}
 }
 
 #proverb-overlay{display:none;position:fixed;inset:0;z-index:200;pointer-events:none;
@@ -656,8 +855,42 @@ body.dark .hanko{border-color:var(--red)}
       </div>
     </div>
 
-    <!-- Step 8: Seal -->
+    <!-- Step 8: Year-end timing -->
     <div class="onboard-step" data-step="8">
+      <div class="ob-kanji">年</div>
+      <div class="ob-question">When does your year end?</div>
+      <div class="ob-sub">your year-end review will be prompted at this time each year</div>
+      <div style="max-width:440px;margin:0 auto;text-align:left">
+        <div style="margin-bottom:20px">
+          <label style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid rgba(0,0,0,.08);cursor:pointer;transition:border-color .2s" id="ob-yearend-calendar-label">
+            <input type="radio" name="ob-yearend" value="calendar" checked onchange="obYearEndSelect('calendar')" style="margin-top:3px;accent-color:var(--red)">
+            <div>
+              <div style="font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink);margin-bottom:4px">My own year-end</div>
+              <div style="font-size:11px;color:var(--ink-faint);line-height:1.6">December, or a culturally significant year-end for you — Chinese New Year, Nowruz, Rosh Hashanah, or any month that marks a meaningful transition.</div>
+              <div id="ob-yearend-month-select" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(1,this)">Jan</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(2,this)">Feb</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(3,this)">Mar</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(4,this)">Apr</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(5,this)">May</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(6,this)">Jun</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(7,this)">Jul</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(8,this)">Aug</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(9,this)">Sep</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(10,this)">Oct</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:none;color:var(--ink-faint);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(11,this)">Nov</button><button type="button" style="padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);background:var(--ink);color:var(--scroll);font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .2s" onclick="obSelectMonth(12,this)">Dec</button>
+              </div>
+            </div>
+          </label>
+        </div>
+        <div>
+          <label style="display:flex;align-items:flex-start;gap:14px;padding:16px;border:1.5px solid rgba(0,0,0,.08);cursor:pointer;transition:border-color .2s" id="ob-yearend-anniversary-label">
+            <input type="radio" name="ob-yearend" value="anniversary" onchange="obYearEndSelect('anniversary')" style="margin-top:3px;accent-color:var(--red)">
+            <div>
+              <div style="font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink);margin-bottom:4px">12 months from today</div>
+              <div style="font-size:11px;color:var(--ink-faint);line-height:1.6">Your review fires on the anniversary of beginning your BUSHIDO path — wherever in the year that falls.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="ob-nav" style="margin-top:32px">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 9: Seal -->
+    <div class="onboard-step" data-step="9">
       <div class="ob-kanji" style="font-size:80px;opacity:.25">印</div>
       <div class="ob-question">Your path is set.<br>The scroll is written. Now walk it — one day at a time.</div>
       <div class="ob-sub">every stroke of ink began with stillness</div>
@@ -767,9 +1000,39 @@ body.dark .hanko{border-color:var(--red)}
     </div>
   </div>
 
+  <!-- Floating seal overlay (daily completion) -->
+  <div id="seal-overlay">
+    <div class="seal-float-wrap">
+      <span id="seal-float-k">印</span>
+      <span id="seal-float-copy">All practices complete. The day is sealed.</span>
+    </div>
+  </div>
+
+  <!-- Milestone stamp overlay -->
+  <div id="ms-overlay">
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px">
+      <div id="ms-large"></div>
+      <div id="ms-copy"></div>
+    </div>
+  </div>
+
   <!-- Reflection modal -->
   <div class="modal-overlay" id="reflect-modal">
     <div class="modal" id="reflect-content"></div>
+  </div>
+
+  <!-- ===== YEAR-END REVIEW OVERLAY ===== -->
+  <div id="eoy-overlay" style="display:none;position:fixed;inset:0;z-index:200;background:var(--edge);overflow-y:auto">
+    <div style="max-width:680px;margin:0 auto;padding:60px 48px 120px;min-height:100vh;background:var(--scroll);
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,.018) 39px,rgba(0,0,0,.018) 40px);
+      box-shadow:-4px 0 20px rgba(26,26,26,.06),4px 0 20px rgba(26,26,26,.06);position:relative">
+      <div style="position:absolute;top:0;bottom:0;left:32px;width:1px;background:rgba(0,0,0,.05)"></div>
+      <div style="position:absolute;top:0;bottom:0;right:32px;width:1px;background:rgba(0,0,0,.05)"></div>
+      <!-- Phase nav dots -->
+      <div id="eoy-nav" style="display:flex;gap:6px;justify-content:center;margin-bottom:40px"></div>
+      <!-- Phase content -->
+      <div id="eoy-content"></div>
+    </div>
   </div>
 
 </div>
@@ -793,6 +1056,7 @@ function loadState(){
     const saved = localStorage.getItem(STORAGE_KEY);
     if(saved){ const p=JSON.parse(saved); Object.assign(state,p); }
   }catch(e){}
+  if(!state.milestoneStamps) state.milestoneStamps={};  // backward compat
 }
 
 // ============ DEFAULT STATE (pre-loaded onboarding) ============
@@ -852,11 +1116,15 @@ const DEFAULT_STATE = {
   completionLog: {},
   dailyNotes: {},
   reflections: [],
+  milestoneStamps: {},  // {`${habitId}-${days}`: true} — permanently earned stamps
   lastModified: 0,
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   nextId: 400,
+  yearEndMode: 'calendar',   // 'calendar' | 'anniversary'
+  yearEndMonth: 12,          // 1-12, the month the year-end review fires
+  yearStartDate: null,       // set on first onboarding completion, used for anniversary mode
 };
 
 // ============ STATE ============
@@ -873,10 +1141,12 @@ let state = {
   dailyNotes: {},     // {'YYYY-MM-DD': 'note text'}
   reflections: [],    // {date, type, data}
   lastModified: 0,
+  milestoneStamps: {},
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   nextId: 100,
+  travelMode: false,
 };
 
 const PILLARS = {
@@ -901,7 +1171,7 @@ function todayIdx(){ return (new Date().getDay()+6)%7; }
 
 // ============ ONBOARDING ============
 let obStep = 0;
-const OB_STEPS = 9;
+const OB_STEPS = 10;
 
 function renderObProgress(){
   const c = document.getElementById('ob-progress');
@@ -1084,9 +1354,29 @@ function appendKaizenOb(c){
   c.appendChild(d);
 }
 
+let _obYearEndMode='calendar';
+let _obYearEndMonth=12;
+
+function obYearEndSelect(mode){
+  _obYearEndMode=mode;
+  const monthSel=document.getElementById('ob-yearend-month-select');
+  if(monthSel) monthSel.style.opacity=mode==='calendar'?'1':'0.3';
+}
+
+function obSelectMonth(month, btn){
+  _obYearEndMonth=month;
+  document.querySelectorAll('#ob-yearend-month-select button').forEach(b=>{
+    b.style.background='none'; b.style.color='var(--ink-faint)'; b.style.borderColor='rgba(0,0,0,.1)';
+  });
+  btn.style.background='var(--ink)'; btn.style.color='var(--scroll)'; btn.style.borderColor='var(--ink)';
+}
+
 function finishOnboarding(){
   saveObStep();
   state.onboarded=true;
+  state.yearEndMode=_obYearEndMode;
+  state.yearEndMonth=_obYearEndMonth;
+  state.yearStartDate=getDateStr(); // record when they began
   saveState();
   document.getElementById('onboard').classList.remove('active');
   document.getElementById('dashboard').classList.add('active');
@@ -1163,6 +1453,7 @@ function formatWeekRange(s,e){
 
 let weekOffset=0;
 let calMonthOffset=0;
+let _expandedWeek=null; // week-start string (YYYY-MM-DD) of currently open reflection in month cal
 
 function getWeekStart(offset){
   const now=new Date();
@@ -1173,7 +1464,7 @@ function getWeekStart(offset){
 }
 
 function navigateWeek(delta){weekOffset+=delta;renderGoals();}
-function navigateMonth(delta){calMonthOffset+=delta;renderGoals();}
+function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;renderGoals();}
 
 function isHabitDoneOnDate(habitId,dateStr){
   const log=state.completionLog||{};
@@ -1211,6 +1502,7 @@ function buildKaizenGrid(){
   const todayDayIdx=todayIdx();
 
   const habits=state.kaizen.filter(k=>{
+    if(state.travelMode&&k.core!==true)return false;
     if(k.startDate){
       const s=new Date(k.startDate);s.setHours(0,0,0,0);
       const today=new Date();today.setHours(0,0,0,0);
@@ -1221,12 +1513,16 @@ function buildKaizenGrid(){
   });
 
   let html=`<div class="hg-wrap">
-    <div class="hg-nav">
-      <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
-      <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
-      <button class="hg-nav-btn" onclick="navigateWeek(1)"${isCurrentWeek?' disabled':''}>&#8250;</button>
-    </div>
-    <div class="hg-grid">
+    <div class="kk-outer">
+      <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+      <div class="kk-rod"></div>
+      <div class="kk-body">
+        <div class="hg-nav">
+          <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
+          <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
+          <button class="hg-nav-btn" onclick="navigateWeek(1)"${isCurrentWeek?' disabled':''}>&#8250;</button>
+        </div>
+        <div class="hg-grid">
       <div class="hg-row hg-header">
         <div class="hg-label-cell"></div>
         ${days.map((d,i)=>{
@@ -1256,9 +1552,26 @@ function buildKaizenGrid(){
           }).join('')}
         </div>`;
       }).join('')}
+        </div>
+      </div>
+      <div class="kk-rod kk-rod-btm"></div>
     </div>
   </div>`;
   return html;
+}
+
+function getReflectionForWeek(wStartStr){
+  const wEnd=new Date(wStartStr);wEnd.setDate(wEnd.getDate()+6);
+  const wEndStr=getDateStr(wEnd);
+  return (state.reflections||[]).find(r=>
+    r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
+  );
+}
+
+function toggleWeekExpand(e,wStartStr){
+  e.stopPropagation();
+  _expandedWeek=(_expandedWeek===wStartStr)?null:wStartStr;
+  renderGoals();
 }
 
 function buildMonthCal(){
@@ -1271,47 +1584,104 @@ function buildMonthCal(){
   const startOffset=(firstDay.getDay()+6)%7;
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const todayStr=getDateStr();
-  const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
 
-  let html=`<div class="mcal-wrap">
-    <div class="mcal-nav">
-      <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
-      <span class="mcal-title">${monthName}</span>
-      <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
-    </div>
-    <div class="mcal-grid">
-      ${DAYS.map(d=>`<div class="mcal-dh">${d[0]}</div>`).join('')}`;
-
-  for(let i=0;i<startOffset;i++)html+=`<div class="mcal-cell mcal-empty"></div>`;
-
+  // Build flat cell array then split into week rows
+  const cells=[];
+  for(let i=0;i<startOffset;i++) cells.push(null);
   for(let day=1;day<=lastDay.getDate();day++){
     const d=new Date(year,month,day);
-    const dStr=getDateStr(d);
-    const dayIdx=(d.getDay()+6)%7;
-    const isFuture=dStr>todayStr;
-    const isToday=dStr===todayStr;
+    cells.push({day,dateStr:getDateStr(d),d});
+  }
+  while(cells.length%7!==0) cells.push(null);
+  const weeks=[];
+  for(let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
 
-    const scheduled=state.kaizen.filter(k=>{
-      if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-      return habitOnDay(k,dayIdx);
-    });
-    const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,dStr));
-    const pct=scheduled.length?done.length/scheduled.length:0;
+  let html=`<div class="kk-outer">
+    <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+    <div class="kk-rod"></div>
+    <div class="kk-body">
+      <div class="mcal-wrap">
+        <div class="mcal-nav">
+          <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
+          <span class="mcal-title">${monthName}</span>
+          <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
+        </div>
+        <div class="mcal-grid">
+          <div class="mcal-header-row">
+            <div></div>
+            ${DAYS.map(d=>`<div class="mcal-dh">${d[0]}</div>`).join('')}
+          </div>`;
 
-    let cls='mcal-cell';
-    if(isToday)cls+=' mcal-today';
-    if(isFuture)cls+=' mcal-future';
+  for(const week of weeks){
+    const firstCell=week.find(c=>c!==null);
+    if(!firstCell) continue;
+    // Monday of this week
+    const wMon=new Date(firstCell.d);
+    wMon.setDate(wMon.getDate()-((wMon.getDay()+6)%7));
+    wMon.setHours(0,0,0,0);
+    const wStartStr=getDateStr(wMon);
+    const wEnd=new Date(wMon);wEnd.setDate(wMon.getDate()+6);
+    const wEndStr=getDateStr(wEnd);
+    const reflection=getReflectionForWeek(wStartStr);
+    const isPast=wEndStr<todayStr;
+    const isOpen=_expandedWeek===wStartStr;
 
-    let dot='';
-    if(!isFuture&&scheduled.length){
-      if(pct>=1)dot=`<div class="mcal-dot mcal-full"></div>`;
-      else if(pct>0)dot=`<div class="mcal-dot mcal-partial"></div>`;
-      else dot=`<div class="mcal-dot mcal-none"></div>`;
+    // Week indicator
+    let wkHtml;
+    if(reflection){
+      wkHtml=`<div class="wk-indicator">
+        <span class="wk-sealed${isOpen?' is-open':''}" onclick="toggleWeekExpand(event,'${wStartStr}')">週</span>
+      </div>`;
+    } else if(isPast){
+      wkHtml=`<div class="wk-indicator"><div class="wk-dot"></div></div>`;
+    } else {
+      wkHtml=`<div class="wk-indicator"></div>`;
     }
-    html+=`<div class="${cls}"><span class="mcal-num">${day}</span>${dot}</div>`;
+
+    // Day cells
+    const dayCells=week.map(cell=>{
+      if(!cell) return `<div class="mcal-cell mcal-empty"></div>`;
+      const isToday=cell.dateStr===todayStr;
+      const isFuture=cell.dateStr>todayStr;
+      const dayIdx=(cell.d.getDay()+6)%7;
+      const scheduled=state.kaizen.filter(k=>{
+        if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(cell.d<s)return false;}
+        return habitOnDay(k,dayIdx);
+      });
+      const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,cell.dateStr));
+      const pct=scheduled.length?done.length/scheduled.length:0;
+      let cls='mcal-cell';
+      if(isToday) cls+=' mcal-today';
+      if(isFuture) cls+=' mcal-future';
+      let dot='';
+      if(!isFuture&&scheduled.length){
+        if(pct>=1) dot=`<div class="mcal-dot mcal-full"></div>`;
+        else if(pct>0) dot=`<div class="mcal-dot mcal-partial"></div>`;
+        else dot=`<div class="mcal-dot mcal-none"></div>`;
+      }
+      return `<div class="${cls}"><span class="mcal-num">${cell.day}</span>${dot}</div>`;
+    }).join('');
+
+    html+=`<div class="mcal-week-row">${wkHtml}${dayCells}</div>`;
+
+    // Expansion panel — only rendered when reflection exists
+    if(reflection){
+      const fields=[];
+      if(reflection.notes) fields.push(`<div class="exp-field"><div class="exp-label">reflection</div><div class="exp-text">${reflection.notes}</div></div>`);
+      if(reflection.whatGotInWay) fields.push(`<div class="exp-field"><div class="exp-label">what got in the way</div><div class="exp-text">${reflection.whatGotInWay}</div></div>`);
+      if(reflection.showingUp) fields.push(`<div class="exp-field"><div class="exp-label">where I showed up</div><div class="exp-text">${reflection.showingUp}</div></div>`);
+      const intentionHtml=reflection.intention?`<div class="exp-field exp-intention"><div class="exp-label">intention set →</div><div class="exp-text">${reflection.intention}</div></div>`:'';
+      const rangeStr=`${wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} — ${wEnd.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
+      html+=`<div class="mcal-expansion${isOpen?' open':''}">
+        <div class="mcal-expand-inner" onclick="event.stopPropagation()">
+          <div class="exp-range">${rangeStr}</div>
+          ${fields.join('')}${intentionHtml}
+        </div>
+      </div>`;
+    }
   }
 
-  html+=`</div></div>`;
+  html+=`</div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -1320,9 +1690,13 @@ function buildYearView(){
   const todayStr=getDateStr();
   const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
 
-  let html=`<div class="ycal-wrap">
-    <div class="ycal-year-label">${year}</div>
-    <div class="ycal-months">`;
+  let html=`<div class="kk-outer">
+    <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+    <div class="kk-rod"></div>
+    <div class="kk-body">
+      <div class="ycal-wrap">
+        <div class="ycal-year-label">${year}</div>
+        <div class="ycal-months">`;
 
   for(let m=0;m<12;m++){
     const firstDay=new Date(year,m,1);
@@ -1360,7 +1734,7 @@ function buildYearView(){
     html+=`</div></div>`;
   }
 
-  html+=`</div></div>`;
+  html+=`</div></div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -1426,7 +1800,22 @@ function renderGoals(){
 
   if(currentTab==='kaizen'){
     const todayIdx2=todayIdx();
-    const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx2));
+    // Travel mode toggle bar + banner
+    const travelSetupDone=state.kaizen.some(k=>k.core===true||k.core===false);
+    const coreCount=state.kaizen.filter(k=>k.core===true).length;
+    const travelToggleHtml=`<div class="travel-toggle-bar">
+      <button class="travel-toggle-btn${state.travelMode?' active':''}" onclick="handleTravelToggle()">
+        <span>✈</span><span>${state.travelMode?'Travelling':'Travel Mode'}</span>
+      </button></div>`;
+    const travelBannerHtml=state.travelMode?`<div class="travel-banner">
+      <span>✈ &nbsp;Travelling — ${coreCount} of ${state.kaizen.length} practices</span>
+      <a onclick="openTravelSetup(true)">Edit core practices</a>
+    </div>`:'';
+    const todayItems=state.kaizen.filter(k=>{
+      if(!habitOnDay(k,todayIdx2))return false;
+      if(state.travelMode&&k.core!==true)return false;
+      return true;
+    });
     // Compute strand-linked IDs for glow (no filtering — all habits stay visible)
     let strandLinkedIds=null;
     if(_filterStrandIdx!==null){
@@ -1449,14 +1838,26 @@ function renderGoals(){
           const freq=g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
           const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
           const strandCls=strandLinkedIds!==null?(strandLinkedIds.has(g.id)?' strand-glow':' strand-faint'):'';
+          const stamps=(state.milestoneStamps||{});
+          const msHtml=MILESTONES.filter(m=>{
+            const k=`${g.id}-${m.days}`;
+            return stamps[k]||_msPending[k];
+          }).map(m=>{
+            const k=`${g.id}-${m.days}`;
+            const isPending=_msPending[k]&&!stamps[k];
+            const isLand   =_msLand[k];
+            return `<span class="ms ${m.css}${isPending?' pending':''}${isLand?' land':''}"
+              id="ms-${g.id}-${m.days}" data-tip="${m.tip}">${m.kanji}</span>`;
+          }).join('');
+          const msRowHtml=msHtml?`<div class="ms-row">${msHtml}</div>`:'';
           return `<li class="goal ${g.done?'done':''}${strandCls}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}">
             <div class="check ${g.done?'done':''}${anim?' origami-fill':''}" onclick="toggleKaizen(${g.id})"></div>
             <div class="goal-content">
               <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
               <div class="goal-meta">
-                ${g.streak>0?`<span class="goal-streak">${g.streak} day streak</span>`:'<span>begin your streak</span>'}
                 <span class="goal-tf">${freq}</span>
                 ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
+                ${msRowHtml}
               </div>
             </div>
             </li>`;
@@ -1479,9 +1880,11 @@ function renderGoals(){
       <textarea class="daily-note" rows="2" placeholder="write freely..." onblur="saveDailyNote('${todayNoteStr}',this.value)">${todayNoteVal}</textarea>
     </div>`;
     let nudgeHtml='';
+    if(needsAnnualReflection()) nudgeHtml+=buildReflectionNudgeCard('annual');
+    else if(isAnnualReviewMonth11()) nudgeHtml+=buildReflectionNudgeCard('annual-preview');
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
-    list.innerHTML=checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
+    list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
 
   } else if(currentTab==='shokunin'){
     const items=state.shokunin;
@@ -1582,6 +1985,8 @@ function toggleKaizen(id){
   if(g.done) autoCompound(g);
   saveState();
   renderTab();
+  // Check for newly earned milestone stamps (stamps enqueue before seal)
+  if(g.done) checkMilestoneStamps(g);
   checkCelebrations();
 }
 
@@ -1755,6 +2160,7 @@ function toggleStats(){
 // ============ REFLECTION PROMPTS ============
 let _weeklyPromptSeen = false;
 let _monthlyPromptSeen = false;
+let _annualPromptSeen = false;
 let _activePromptType = 'weekly';
 
 function needsWeeklyReflection(){
@@ -1777,6 +2183,386 @@ function needsMonthlyReflection(){
   return !(state.reflections||[]).some(r=>
     r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
   );
+}
+
+function getYearEndMonth(){
+  // Returns the 0-indexed month (0=Jan) when the user's year ends
+  if((state.yearEndMode||'calendar')==='anniversary'&&state.yearStartDate){
+    const start=new Date(state.yearStartDate);
+    const anniv=new Date(start);
+    anniv.setFullYear(anniv.getFullYear()+Math.ceil((new Date()-start)/(1000*60*60*24*365)));
+    return anniv.getMonth();
+  }
+  return (state.yearEndMonth||12)-1; // calendar mode — stored as 1-12, convert to 0-indexed
+}
+
+function getYearEndYear(){
+  const today=new Date();
+  const endMonth=getYearEndMonth();
+  // If the year-end month is in the past this calendar year, it's next year's review
+  return today.getMonth()<=endMonth?today.getFullYear():today.getFullYear()+1;
+}
+
+function needsAnnualReflection(){
+  // Month 12 (final month): prompt to do the reflection
+  const today=new Date();
+  const endMonth=getYearEndMonth();
+  if(today.getMonth()!==endMonth) return false;
+  const yearStr=String(getYearEndYear());
+  return !(state.reflections||[]).some(r=>
+    r.type==='annual'&&r.date&&r.date.startsWith(yearStr)
+  );
+}
+
+function isAnnualReviewMonth11(){
+  // Month 11 (penultimate): awareness nudge only
+  const today=new Date();
+  const endMonth=getYearEndMonth();
+  const nudgeMonth=(endMonth===0)?11:endMonth-1;
+  return today.getMonth()===nudgeMonth;
+}
+
+function hasCompletedAnnualReflection(){
+  // True if this year's Ikigai annual reflection is sealed — unlocks EOY review
+  const yearStr=String(getYearEndYear());
+  return (state.reflections||[]).some(r=>
+    r.type==='annual'&&r.date&&r.date.startsWith(yearStr)
+  );
+}
+
+function getThisYearAnnualReflection(){
+  const yearStr=String(getYearEndYear());
+  return (state.reflections||[]).find(r=>
+    r.type==='annual'&&r.date&&r.date.startsWith(yearStr)
+  )||null;
+}
+
+// ============ YEAR-END REVIEW ============
+let _eoyPhase=0;
+let _eoyStrandFilter='all';
+let _eoyTypeFilter='all';
+let _eoyRatings={};   // {strandIndex: 'advancing'|'holding'|'falling'}
+let _eoyNotes={};     // {strandIndex: string}
+let _eoyLesson='';    // overall "what did this year teach you"
+
+function openEOYReview(){
+  if(!hasCompletedAnnualReflection()) return;
+  _eoyPhase=0; _eoyStrandFilter='all'; _eoyTypeFilter='all'; _eoyRatings={}; _eoyNotes={}; _eoyLesson='';
+  document.getElementById('eoy-overlay').style.display='block';
+  document.body.style.overflow='hidden';
+  renderEOYPhase(0);
+}
+
+function closeEOYReview(){
+  document.getElementById('eoy-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+
+function renderEOYNav(total, current){
+  const nav=document.getElementById('eoy-nav');
+  nav.innerHTML=Array.from({length:total},(_,i)=>`<div style="width:8px;height:8px;border-radius:50%;background:${i<current?'var(--ink)':i===current?'var(--red)':'var(--ink)'};opacity:${i<current?.35:i===current?1:.1};transform:${i===current?'scale(1.2)':'scale(1)'};transition:all .3s"></div>`).join('');
+}
+
+function eoyScroll(){ document.getElementById('eoy-overlay').scrollTo({top:0,behavior:'smooth'}); }
+
+function renderEOYPhase(n){
+  _eoyPhase=n;
+  renderEOYNav(4,n);
+  const c=document.getElementById('eoy-content');
+  const annualRef=getThisYearAnnualReflection();
+  const yearStr=String(getYearEndYear()-1); // the year being reviewed
+  const strands=state.strands||[];
+  const allRefs=(state.reflections||[]).filter(r=>r.date&&r.date.startsWith(yearStr)&&r.type!=='annual');
+  const totalDaily=allRefs.filter(r=>r.type==='daily').length;
+  const totalWeekly=allRefs.filter(r=>r.type==='weekly').length;
+  const totalMonthly=allRefs.filter(r=>r.type==='monthly').length;
+
+  if(n===0){
+    // ===== PHASE 0: GATE with Ikigai frame =====
+    const strandCounts=strands.map((_,si)=>allRefs.filter(r=>(r.strands||[]).includes(String(si))).length);
+    const maxCount=Math.max(...strandCounts,1);
+    c.innerHTML=`
+      <div style="text-align:center;margin-bottom:48px">
+        <div style="font-family:'Noto Serif JP',serif;font-size:9px;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:16px">年次評価</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;color:var(--ink);letter-spacing:4px;margin-bottom:12px">Year-End Review</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:1.9">${yearStr} — Year ${Math.max(1,(getYearEndYear()-new Date(state.yearStartDate||Date.now()).getFullYear()))} of your path</div>
+        <div style="width:64px;height:64px;border:3px solid var(--red);border-radius:5px;display:flex;align-items:center;justify-content:center;margin:24px auto;transform:rotate(-3deg)">
+          <span style="font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--red)">評</span>
+        </div>
+      </div>
+      ${annualRef?`
+      <div style="margin-bottom:32px;padding:24px;border:1px solid rgba(0,0,0,.06);background:rgba(255,255,255,.3)">
+        <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:16px">Your Ikigai reflection</div>
+        ${annualRef.ryughi?`<div style="margin-bottom:16px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px">On your strands</div><div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.9">"${annualRef.ryughi}"</div></div>`:''}
+        ${annualRef.lessons?`<div><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px">What the year taught</div><div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.9">"${annualRef.lessons}"</div></div>`:''}
+      </div>`:''}
+      <div style="display:flex;gap:20px;justify-content:center;margin:32px 0;flex-wrap:wrap">
+        <div style="text-align:center"><div style="font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;color:var(--red);line-height:1">${totalDaily}</div><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px">Daily notes</div></div>
+        <div style="text-align:center"><div style="font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;color:var(--red);line-height:1">${totalWeekly}</div><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px">Weekly</div></div>
+        <div style="text-align:center"><div style="font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;color:var(--red);line-height:1">${totalMonthly}</div><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px">Monthly</div></div>
+      </div>
+      <div style="margin-bottom:28px">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px;text-align:center">Reflections by strand</div>
+        ${strands.map((s,si)=>{
+          const name=typeof s==='object'?s.name:s;
+          const count=strandCounts[si];
+          const pct=Math.round((count/maxCount)*100);
+          const low=count<3;
+          return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <span style="font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
+            <div style="flex:2;height:4px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--ink-light);border-radius:2px;opacity:.6"></div></div>
+            <span style="font-size:10px;color:${low?'var(--red)':'var(--ink-faint)'};min-width:20px;text-align:right">${count}</span>
+          </div>`;
+        }).join('')}
+        ${strandCounts.some(c=>c<3)?`<div style="font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);margin-top:12px;opacity:.7">Some strands have few entries. Absence of reflection is data too.</div>`:''}
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:32px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="closeEOYReview()">close</button>
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 28px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="renderEOYPhase(1)">read your year →</button>
+      </div>`;
+
+  } else if(n===1){
+    // ===== PHASE 1: READ YOUR YEAR (type + strand filtered) =====
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const byMonth={};
+    allRefs.forEach(r=>{
+      const m=parseInt(r.date.split('-')[1])-1;
+      if(!byMonth[m]) byMonth[m]=[];
+      byMonth[m].push(r);
+    });
+    const strandNames=strands.map(s=>typeof s==='object'?s.name:s);
+    const typeTabStyle=(t)=>`padding:5px 13px;border:1.5px solid ${_eoyTypeFilter===t?'var(--ink)':'rgba(0,0,0,.1)'};background:${_eoyTypeFilter===t?'var(--ink)':'none'};font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:${_eoyTypeFilter===t?'var(--scroll)':'var(--ink-faint)'};cursor:pointer;border-radius:2px`;
+    const strandTabStyle=(active)=>`padding:5px 13px;border:1.5px solid ${active?'var(--ink-faint)':'rgba(0,0,0,.1)'};background:${active?'var(--ink-faint)':'none'};font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:${active?'var(--scroll)':'var(--ink-faint)'};cursor:pointer;border-radius:2px`;
+    c.innerHTML=`
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:6px">Part I of III</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:2px">Read Your Year</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);margin-top:8px;line-height:1.8">Every word you wrote — daily notes, weekly reflections, monthly reckonings. Read slowly.</div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Type</div>
+        <div id="eoy-type-tabs" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px">
+          ${['all','daily','weekly','monthly'].map(t=>`<button style="${typeTabStyle(t)}" onclick="eoyFilterType('${t}',this)">${t==='all'?'All':t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+        </div>
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Strand</div>
+        <div id="eoy-strand-tabs" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px">
+          <button style="${strandTabStyle(_eoyStrandFilter==='all')}" onclick="eoyFilterStrand('all',this)">All strands</button>
+          ${strandNames.map((name,si)=>`<button style="${strandTabStyle(_eoyStrandFilter===String(si))}" onclick="eoyFilterStrand('${si}',this)">${name.split(' ')[0]}</button>`).join('')}
+        </div>
+      </div>
+      <div id="eoy-refs-list" style="max-height:480px;overflow-y:auto;scrollbar-width:thin">
+        ${Object.keys(byMonth).sort((a,b)=>+a-+b).map(m=>`
+          <div class="eoy-month-group" data-month="${m}" style="margin-bottom:24px">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+              <span style="font-family:'Noto Serif JP',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--red)">${months[m]}</span>
+              <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(204,53,41,.2),transparent)"></div>
+            </div>
+            ${byMonth[m].map(r=>{
+              const strandTags=(r.strands||[]).map(si=>`<span style="font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(0,0,0,.1);border-radius:2px;color:var(--ink-faint)">${strandNames[+si]?.split(' ')[0]||''}</span>`).join('');
+              const text=r.notes||r.working||r.ryughi||'';
+              return text?`<div class="eoy-ref-card" data-strands="${(r.strands||[]).join(',')}" data-type="${r.type||''}" style="padding:14px 18px;margin-bottom:8px;border-left:2px solid rgba(0,0,0,.06);background:rgba(255,255,255,.4);transition:all .2s">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
+                  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                    <span style="font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:2px;color:${r.type==='weekly'?'var(--red)':r.type==='daily'?'rgba(204,53,41,.65)':'var(--ink-faint)'};border:1px solid ${r.type==='weekly'?'rgba(204,53,41,.2)':r.type==='daily'?'rgba(204,53,41,.15)':'rgba(0,0,0,.1)'}">${r.type||''}</span>
+                    <span style="font-size:9px;letter-spacing:1px;color:var(--ink-faint)">${r.date}</span>
+                  </div>
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${strandTags}</div>
+                </div>
+                <div style="font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);line-height:1.8;font-style:italic">"${text}"</div>
+              </div>`:'';
+            }).join('')}
+          </div>`).join('')}
+        ${allRefs.length===0?`<div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);text-align:center;padding:32px 0">No reflections found for ${yearStr}.</div>`:''}
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:32px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="renderEOYPhase(0)">← back</button>
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 28px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="renderEOYPhase(2)">reflect →</button>
+      </div>`;
+
+  } else if(n===2){
+    // ===== PHASE 2: REFLECT =====
+    c.innerHTML=`
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:6px">Part II of III</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:2px">Reflect</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);margin-top:8px;line-height:1.8">Strand by strand — honest assessment. Then, the thing the whole year taught you.</div>
+      </div>
+      ${strands.map((s,si)=>{
+        const name=typeof s==='object'?s.name:s;
+        const kanji=typeof s==='object'&&s.kanji?s.kanji:'';
+        const colour=typeof s==='object'&&s.colour?s.colour:'var(--ink)';
+        const saved=_eoyRatings[si]||'';
+        const ratingColour=(r)=>r==='advancing'?'#2E7D32':r==='falling'?'var(--red)':'var(--ink)';
+        const ratingBorder=(r)=>r==='advancing'?'#2E7D32':r==='falling'?'var(--red)':'var(--ink)';
+        const ratingBg=(r)=>r==='advancing'?'rgba(46,125,50,.04)':r==='falling'?'rgba(204,53,41,.04)':'rgba(26,26,26,.04)';
+        return `<div style="margin-bottom:10px;background:rgba(255,255,255,.35)">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.5)'" onmouseout="this.style.background='none'" onclick="eoyToggleBlock(${si})">
+            ${kanji?`<span style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:${colour}">${kanji}</span>`:''}
+            <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);flex:1">${name}</span>
+            ${saved?`<span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:2px;color:${ratingColour(saved)};background:${ratingBg(saved)}">${saved==='falling'?'falling behind':saved}</span>`:''}
+            <span id="eoy-block-arrow-${si}" style="font-size:9px;color:var(--ink-faint);transition:transform .3s">▶</span>
+          </div>
+          <div id="eoy-block-body-${si}" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
+            <div style="padding:0 20px 20px">
+              <div style="font-size:11px;color:var(--ink-faint);letter-spacing:.5px;line-height:1.7;margin-bottom:14px;padding-top:4px;font-style:italic">How did you feel you built toward this strand this year?</div>
+              <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="eoy-rating-${si}">
+                ${['advancing','holding','falling'].map(r=>`<button style="padding:8px 16px;border:1.5px solid ${saved===r?ratingBorder(saved):'rgba(0,0,0,.1)'};background:${saved===r?ratingBg(saved):'none'};font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${saved===r?ratingColour(saved):'var(--ink-faint)'};cursor:pointer;transition:all .2s" onclick="eoySetRating(${si},'${r}',this)">${r==='falling'?'Falling behind':r.charAt(0).toUpperCase()+r.slice(1)}</button>`).join('')}
+              </div>
+              <textarea id="eoy-note-${si}" style="width:100%;font-family:'Noto Serif JP',serif;font-size:13px;background:none;border:none;border-bottom:1px solid rgba(0,0,0,.08);padding:8px 0 16px;color:var(--ink);outline:none;resize:none;min-height:60px;line-height:1.8" placeholder="What happened in this strand. What you gave. What you didn't.">${_eoyNotes[si]||''}</textarea>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="background:rgba(255,255,255,.5);border-left:3px solid rgba(204,53,41,.3);padding:24px 28px;margin-top:24px">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.8;margin-bottom:6px">The year's lesson</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:15px;font-style:italic;color:var(--ink-light);margin-bottom:16px;line-height:1.6">What did this year teach you?</div>
+        <textarea id="eoy-lesson" style="width:100%;font-family:'Noto Serif JP',serif;font-size:13px;background:none;border:none;border-bottom:1px solid rgba(0,0,0,.1);padding:8px 0 20px;color:var(--ink);outline:none;resize:none;min-height:80px;line-height:1.9" placeholder="Not what you achieved — what you learned about yourself, about the work, about what matters.">${_eoyLesson||''}</textarea>
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:32px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="eoyStashNotes();renderEOYPhase(1)">← back</button>
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 28px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="eoyStashNotes();renderEOYPhase(3)">seal the year →</button>
+      </div>`;
+    eoyToggleBlock(0);
+
+  } else if(n===3){
+    // ===== PHASE 3: SEAL =====
+    const nextYear=getYearEndYear();
+    const yearNum=Math.max(1,(nextYear-new Date(state.yearStartDate||Date.now()).getFullYear()));
+    const ratingColour=(r)=>r==='advancing'?'#2E7D32':r==='falling'?'var(--red)':'var(--ink-faint)';
+    const ratingBg=(r)=>r==='advancing'?'rgba(46,125,50,.08)':r==='falling'?'rgba(204,53,41,.08)':'rgba(0,0,0,.05)';
+    c.innerHTML=`
+      <div style="text-align:center">
+        <div style="font-family:'Noto Serif JP',serif;font-size:100px;font-weight:900;color:var(--red);opacity:.1;line-height:1;margin-bottom:-20px">道</div>
+        <div style="font-size:9px;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:16px">Part III of III</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--ink);letter-spacing:4px;margin-bottom:12px">Seal the Year</div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:2;max-width:400px;margin:0 auto 32px">Read what you have declared. When it is true, stamp it.</div>
+        <div style="text-align:left;margin:32px 0">
+          ${strands.map((s,si)=>{
+            const name=typeof s==='object'?s.name:s;
+            const kanji=typeof s==='object'&&s.kanji?s.kanji:'';
+            const colour=typeof s==='object'&&s.colour?s.colour:'var(--ink)';
+            const r=_eoyRatings[si]||'holding';
+            const note=_eoyNotes[si]||'';
+            return `<div style="display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.04)">
+              ${kanji?`<span style="font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:${colour};min-width:28px">${kanji}</span>`:''}
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:${note?'4px':'0'}">
+                  <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)">${name}</span>
+                  <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:2px;color:${ratingColour(r)};background:${ratingBg(r)}">${r==='falling'?'falling behind':r}</span>
+                </div>
+                ${note?`<div style="font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);line-height:1.7">"${note.substring(0,120)}${note.length>120?'…':''}"</div>`:''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        ${_eoyLesson?`<div style="text-align:left;background:rgba(255,255,255,.45);border-left:2px solid rgba(204,53,41,.2);padding:20px 24px;margin-bottom:28px">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px">What this year taught you</div>
+          <div style="font-family:'Noto Serif JP',serif;font-size:14px;font-style:italic;color:var(--ink);line-height:1.9">"${_eoyLesson}"</div>
+        </div>`:''}
+        <div style="display:flex;gap:3px;margin:24px 0">
+          ${Array.from({length:5},(_,i)=>`<div style="flex:1;height:4px;background:${i<yearNum?'var(--red)':'rgba(0,0,0,.06)'};border-radius:2px"></div>`).join('')}
+        </div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);text-align:center;margin-bottom:32px">Year ${yearNum} of 5</div>
+        <div id="eoy-seal-hanko" onclick="sealEOYReview()" style="width:80px;height:80px;border:3px solid var(--red);border-radius:5px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;transform:rotate(-4deg);cursor:pointer;transition:all .3s" title="Stamp to seal">
+          <span style="font-family:'Noto Serif JP',serif;font-size:44px;font-weight:900;color:var(--red)">印</span>
+        </div>
+        <div id="eoy-seal-msg" style="display:none;font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);letter-spacing:1px;margin-bottom:6px;line-height:1.8">The year has been read. It is sealed.</div>
+        <div id="eoy-seal-msg-sub" style="display:none;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.6;margin-bottom:24px">The new year opens when you are ready.</div>
+        <div style="display:flex;justify-content:flex-start">
+          <button id="eoy-seal-back" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="renderEOYPhase(2)">← back</button>
+        </div>
+      </div>`;
+  }
+  eoyScroll();
+}
+
+function eoyApplyFilters(){
+  document.querySelectorAll('.eoy-month-group').forEach(group=>{
+    let groupVisible=false;
+    group.querySelectorAll('.eoy-ref-card').forEach(card=>{
+      const cardStrands=card.dataset.strands?card.dataset.strands.split(',').filter(Boolean):[];
+      const cardType=card.dataset.type||'';
+      const typeOk=_eoyTypeFilter==='all'||cardType===_eoyTypeFilter;
+      const strandOk=_eoyStrandFilter==='all'||cardStrands.includes(_eoyStrandFilter);
+      const show=typeOk&&strandOk;
+      card.style.display=show?'block':'none';
+      if(show) groupVisible=true;
+    });
+    group.style.display=groupVisible?'block':'none';
+  });
+}
+
+function eoyFilterType(type, btn){
+  _eoyTypeFilter=type;
+  document.querySelectorAll('#eoy-type-tabs button').forEach(b=>{
+    b.style.background='none'; b.style.color='var(--ink-faint)'; b.style.borderColor='rgba(0,0,0,.1)';
+  });
+  btn.style.background='var(--ink)'; btn.style.color='var(--scroll)'; btn.style.borderColor='var(--ink)';
+  eoyApplyFilters();
+}
+
+function eoyFilterStrand(strand, btn){
+  _eoyStrandFilter=strand;
+  document.querySelectorAll('#eoy-strand-tabs button').forEach(b=>{
+    b.style.background='none'; b.style.color='var(--ink-faint)'; b.style.borderColor='rgba(0,0,0,.1)';
+  });
+  btn.style.background='var(--ink-faint)'; btn.style.color='var(--scroll)'; btn.style.borderColor='var(--ink-faint)';
+  eoyApplyFilters();
+}
+
+function eoyToggleBlock(si){
+  const body=document.getElementById(`eoy-block-body-${si}`);
+  const arrow=document.getElementById(`eoy-block-arrow-${si}`);
+  if(!body) return;
+  const isOpen=body.style.maxHeight&&body.style.maxHeight!=='0px';
+  document.querySelectorAll('[id^="eoy-block-body-"]').forEach(b=>b.style.maxHeight='0');
+  document.querySelectorAll('[id^="eoy-block-arrow-"]').forEach(a=>a.style.transform='rotate(0deg)');
+  if(!isOpen){ body.style.maxHeight='600px'; arrow.style.transform='rotate(90deg)'; }
+}
+
+function eoySetRating(si, rating, btn){
+  _eoyRatings[si]=rating;
+  const container=document.getElementById(`eoy-rating-${si}`);
+  container.querySelectorAll('button').forEach(b=>{
+    b.style.background='none'; b.style.color='var(--ink-faint)'; b.style.borderColor='rgba(0,0,0,.1)';
+  });
+  const colours={advancing:'#2E7D32',holding:'var(--ink)',falling:'var(--red)'};
+  btn.style.color=colours[rating]; btn.style.borderColor=colours[rating];
+  btn.style.background=rating==='advancing'?'rgba(46,125,50,.05)':rating==='falling'?'rgba(204,53,41,.05)':'rgba(26,26,26,.04)';
+}
+
+function eoyStashNotes(){
+  (state.strands||[]).forEach((_,si)=>{
+    const noteEl=document.getElementById(`eoy-note-${si}`);
+    if(noteEl) _eoyNotes[si]=noteEl.value;
+  });
+  const lessonEl=document.getElementById('eoy-lesson');
+  if(lessonEl) _eoyLesson=lessonEl.value;
+}
+
+function sealEOYReview(){
+  const hanko=document.getElementById('eoy-seal-hanko');
+  if(!hanko) return;
+  hanko.style.background='rgba(204,53,41,.06)';
+  hanko.style.boxShadow='0 0 30px rgba(204,53,41,.25)';
+  hanko.style.cursor='default';
+  hanko.onclick=null;
+  const back=document.getElementById('eoy-seal-back');
+  if(back) back.style.display='none';
+  setTimeout(()=>{
+    const msg=document.getElementById('eoy-seal-msg');
+    if(msg) msg.style.display='block';
+    setTimeout(()=>{
+      const sub=document.getElementById('eoy-seal-msg-sub');
+      if(sub) sub.style.display='block';
+    }, 700);
+  }, 400);
+  // Save state and close
+  saveState();
+  setTimeout(()=>{ closeEOYReview(); renderDashboard(); }, 3200);
 }
 
 function showReflectionPrompt(type){
@@ -1803,11 +2589,15 @@ function dismissPrompt(type){
   const overlay=document.getElementById('reflect-prompt-overlay');
   if(overlay) overlay.classList.remove('active');
   if(type==='weekly') _weeklyPromptSeen=true;
+  else if(type==='annual') _annualPromptSeen=true;
   else _monthlyPromptSeen=true;
 }
 
 function checkReflectionPrompts(){
   if(!state.onboarded) return;
+  if(needsAnnualReflection()&&!_annualPromptSeen){
+    showReflectionPrompt('annual'); return;
+  }
   if(needsMonthlyReflection()&&!_monthlyPromptSeen){
     showReflectionPrompt('monthly'); return;
   }
@@ -1820,6 +2610,14 @@ function buildReflectionNudgeCard(type){
   if(type==='weekly') return `<div class="reflect-nudge">
     <span class="reflect-nudge-text">the week is closing. seal your reflection.</span>
     <button class="reflect-nudge-btn" onclick="showReflection('weekly')">週 &nbsp;reflect</button>
+  </div>`;
+  if(type==='annual') return `<div class="reflect-nudge" style="border-left-width:3px">
+    <span class="reflect-nudge-text">your year is ending. seal your Ikigai reflection to unlock the Year-End Review.</span>
+    <button class="reflect-nudge-btn" onclick="showReflection('annual')">年 &nbsp;reflect</button>
+  </div>`;
+  if(type==='annual-preview') return `<div class="reflect-nudge" style="border-color:rgba(204,53,41,.08);border-left-color:rgba(204,53,41,.3)">
+    <span class="reflect-nudge-text" style="opacity:.7">your year-end is approaching. the Annual Reflection unlocks next month.</span>
+    <button class="reflect-nudge-btn" onclick="openEOYReview()" style="opacity:${hasCompletedAnnualReflection()?1:.4};pointer-events:${hasCompletedAnnualReflection()?'auto':'none'}">年 &nbsp;review</button>
   </div>`;
   return `<div class="reflect-nudge">
     <span class="reflect-nudge-text">the month is ending. seal your reflection.</span>
@@ -1964,7 +2762,15 @@ function getLastWeekIntention(){
 
 function saveReflection(type){
   const c=document.getElementById('reflect-content');
-  const entry={type, date:getDateStr(), ts:Date.now()};
+  // On Monday grace day, anchor weekly reflections to the prior Sunday (last day of the
+  // reflected week) so needsWeeklyReflection()'s date-range check finds the entry correctly.
+  let _saveDate=getDateStr();
+  if(type==='weekly'&&todayIdx()===0){
+    const wEnd=new Date(getWeekStart(-1));
+    wEnd.setDate(wEnd.getDate()+6);
+    _saveDate=getDateStr(wEnd);
+  }
+  const entry={type, date:_saveDate, ts:Date.now()};
   if(type==='weekly'){
     const card=c.querySelector('#momentum-card');
     entry.weakCraft=card?+(card.dataset.craftId||0):0;
@@ -1977,21 +2783,35 @@ function saveReflection(type){
     entry.working=areas[0]?.value||'';
     entry.changing=areas[1]?.value||'';
     entry.shifting=areas[2]?.value||'';
-  } else {
+  } else if(type==='annual'){
     const areas=c.querySelectorAll('.reflect-textarea');
     entry.ryughi=areas[0]?.value||'';
     entry.lessons=areas[1]?.value||'';
-    entry.intentions=areas[2]?.value||'';
   }
   if(!state.reflections) state.reflections=[];
   state.reflections.push(entry);
   saveState();
-  c.innerHTML=`<div style="text-align:center;padding:56px 0">
-    <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
-    <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
-    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
-  </div>`;
-  setTimeout(()=>closeReflection(), 1800);
+  if(type==='annual'){
+    // Pivot moment — seal transitions into EOY review invitation
+    c.innerHTML=`<div style="text-align:center;padding:48px 0">
+      <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:16px">印</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:32px">your reflection has been kept</div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:0 0 28px"></div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);margin-bottom:24px;line-height:1.8">The Year-End Review is now open.<br>Your year of data is waiting.</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="closeReflection()">later</button>
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="closeReflection();openEOYReview()">Enter the Review →</button>
+      </div>
+    </div>`;
+  } else {
+    c.innerHTML=`<div style="text-align:center;padding:56px 0">
+      <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
+    </div>`;
+    setTimeout(()=>closeReflection(), 1800);
+  }
 }
 
 function showReflection(type){
@@ -2067,11 +2887,12 @@ function showReflection(type){
       <div class="modal-sub">a year has passed. how have you grown?</div>
       ${monthlyNotesCascade()}
       <div class="reflect-q"><div class="reflect-label">Look back at your strands. Are they still woven correctly?</div>
-        <textarea class="reflect-textarea" style="min-height:100px" placeholder="Reflect on your Ryughi..."></textarea></div>
+        <textarea class="reflect-textarea" style="min-height:120px" placeholder="Reflect on your Ryughi — the braid of your life..."></textarea></div>
       <div class="reflect-q"><div class="reflect-label">What did this year teach you?</div>
-        <textarea class="reflect-textarea" style="min-height:100px" placeholder="The lessons of this cycle..."></textarea></div>
-      <div class="reflect-q"><div class="reflect-label">Set your intentions for the year ahead</div>
-        <textarea class="reflect-textarea" style="min-height:100px" placeholder="New intentions, renewed purpose..."></textarea></div>
+        <textarea class="reflect-textarea" style="min-height:120px" placeholder="The lessons of this cycle, written honestly..."></textarea></div>
+      <div style="margin-top:8px;padding:14px 16px;border-left:2px solid rgba(204,53,41,.15);font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);line-height:1.8">
+        Sealing this reflection will unlock your Year-End Review — where your year's data becomes the ground for setting new goals.
+      </div>
       <div class="form-actions"><button class="btn btn-red" onclick="saveReflection('annual')">Seal and begin anew</button></div>`;
   }
 }
@@ -2085,9 +2906,10 @@ document.getElementById('reflect-modal').addEventListener('click',function(e){
   if(e.target===this)closeReflection();
 });
 
-// Click anywhere to clear strand filter
+// Click anywhere to clear strand filter and close any open week reflection
 document.addEventListener('click',function(){
   if(_filterStrandIdx!==null) clearStrandFilter();
+  if(_expandedWeek!==null){_expandedWeek=null;renderGoals();}
 });
 
 // Habit grid tooltip delegation
@@ -2143,6 +2965,32 @@ function getGreeting(){
 // ============ ORIGAMI ANIMATION ============
 let _animatingIds=new Set();
 
+// ============ MILESTONE STAMPS ============
+const MILESTONES=[
+  {days:30,  kanji:'卅', css:'tier-30',  col:'#3D6B5F', glow:'rgba(61,107,95,VAL)',
+   copy:'Thirty days unbroken. The practice has taken root.',    tip:'30 days unbroken'},
+  {days:100, kanji:'百', css:'tier-100', col:'#8BBECF', glow:'rgba(139,190,207,VAL)',
+   copy:'One hundred days. Discipline has become character.',    tip:'100 days unbroken'},
+  {days:365, kanji:'年', css:'tier-365', col:'#C9A94B', glow:'rgba(201,169,75,VAL)',
+   copy:'One full year. You showed up when no one was watching.',tip:'365 days — one full year'},
+];
+function msGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
+
+// In-memory stamp state (transient — not persisted)
+const _msPending={};  // {`id-days`: true} — stamp in DOM but hidden during fly
+const _msLand   ={};  // {`id-days`: true} — plays land pop animation once
+
+// ============ ANIMATION QUEUE ============
+const _animQueue=[];
+let   _animRunning=false;
+function enqueueAnim(fn){_animQueue.push(fn);drainAnimQueue();}
+function drainAnimQueue(){
+  if(_animRunning||_animQueue.length===0)return;
+  _animRunning=true;
+  _animQueue.shift()();
+}
+function animDone(){_animRunning=false;drainAnimQueue();}
+
 // ============ EDIT / DELETE ============
 function deleteItem(type, id){
   if(type==='kaizen') state.kaizen=state.kaizen.filter(k=>k.id!==id);
@@ -2180,6 +3028,63 @@ function saveEdit(type, id, input){
 // ============ STRAND HOVER ============
 // ============ STRAND FILTER ============
 let _filterStrandIdx=null;
+let _travelPending={};
+
+// ── TRAVEL MODE ──
+function handleTravelToggle(){
+  const setupDone=state.kaizen.some(k=>k.core===true||k.core===false);
+  if(!setupDone){openTravelSetup(false);}
+  else{state.travelMode=!state.travelMode;saveState();renderGoals();}
+}
+function openTravelSetup(isEdit){
+  _travelPending={};
+  state.kaizen.forEach(k=>{_travelPending[k.id]=!!k.core;});
+  renderTravelModalHabits();
+  document.getElementById('travelModalErr').classList.remove('show');
+  document.getElementById('travelBackdrop').classList.add('show');
+}
+function renderTravelModalHabits(){
+  const c=document.getElementById('travelModalHabits');
+  c.innerHTML=state.kaizen.map(h=>{
+    const sel=_travelPending[h.id]?'sel':'';
+    const tick=_travelPending[h.id]?'✓':'';
+    const dl=h.days==='daily'?'Daily':Array.isArray(h.days)?h.days.length+'x/wk':'Weekly';
+    return `<div class="tmh-row ${sel}" id="tmh${h.id}" onclick="toggleTravelHabit(${h.id})">
+      <div class="tmh-tick">${tick}</div>
+      <span class="tmh-text">${h.text}</span>
+      <span class="tmh-days">${dl}</span>
+    </div>`;
+  }).join('');
+}
+function toggleTravelHabit(id){
+  _travelPending[id]=!_travelPending[id];
+  document.getElementById('travelModalErr').classList.remove('show');
+  const row=document.getElementById('tmh'+id);
+  const tick=row.querySelector('.tmh-tick');
+  if(_travelPending[id]){row.classList.add('sel');tick.textContent='✓';}
+  else{row.classList.remove('sel');tick.textContent='';}
+}
+function confirmTravelSetup(){
+  const count=Object.values(_travelPending).filter(Boolean).length;
+  if(count===0){
+    document.getElementById('travelModalErr').classList.add('show');
+    const m=document.getElementById('travelModal');
+    m.classList.add('shake');setTimeout(()=>m.classList.remove('shake'),350);
+    return;
+  }
+  state.kaizen.forEach(k=>{k.core=_travelPending[k.id]||false;});
+  state.travelMode=true;_travelPending={};
+  saveState();
+  document.getElementById('travelBackdrop').classList.remove('show');
+  renderGoals();
+}
+function cancelTravelSetup(){
+  _travelPending={};
+  document.getElementById('travelBackdrop').classList.remove('show');
+}
+function handleTravelBackdrop(e){
+  if(e.target===document.getElementById('travelBackdrop'))cancelTravelSetup();
+}
 
 function setStrandFilter(e,idx){
   e.stopPropagation(); // prevent doc click from clearing immediately
@@ -2246,12 +3151,140 @@ function getMonthCompletionRate(){
   return totalPossible>0?Math.round(totalDone/totalPossible*100):0;
 }
 
-function animateSeal(){
-  const seal=document.querySelector('.seal-k');
-  if(!seal)return;
-  seal.classList.remove('seal-animate');
-  void seal.offsetWidth; // force reflow so animation restarts cleanly
-  seal.classList.add('seal-animate');
+// Replaced by triggerSeal (floating overlay) — kept as no-op for safety
+function animateSeal(){}
+
+function triggerSeal(){
+  const overlay=document.getElementById('seal-overlay');
+  const sealK  =document.getElementById('seal-float-k');
+  const copy   =document.getElementById('seal-float-copy');
+  if(!overlay||!sealK||!copy){animDone();return;}
+
+  sealK.style.animation='none';
+  copy.style.animation='none';
+  copy.style.opacity='0';
+  overlay.classList.add('active');
+  void sealK.offsetWidth; // reflow after visible so animation reset is processed
+
+  sealK.style.animation='sealStampIn .6s cubic-bezier(.25,.46,.45,.94) forwards';
+  setTimeout(()=>{
+    sealK.style.animation='sealGlowFloat 2s ease-in-out infinite';
+    copy.style.animation='copyFadeIn .5s ease forwards';
+  },600);
+  setTimeout(()=>{
+    sealK.style.animation='sealFadeOut .65s ease forwards';
+    copy.style.animation='copyFadeOut .65s ease forwards';
+  },3200);
+  setTimeout(()=>{
+    overlay.classList.remove('active');
+    sealK.style.animation='none';
+    copy.style.animation='none';
+    copy.style.opacity='0';
+    animDone();
+  },3900);
+}
+
+function earnStamp(habit,milestone){
+  const k=`${habit.id}-${milestone.days}`;
+  if(!state.milestoneStamps) state.milestoneStamps={};
+  _msPending[k]=true;
+  renderTab(); // rebuild DOM so pending stamp element exists for later positioning
+
+  const overlay=document.getElementById('ms-overlay');
+  const largeSt=document.getElementById('ms-large');
+  const copyEl =document.getElementById('ms-copy');
+  if(!overlay||!largeSt||!copyEl){
+    delete _msPending[k];
+    state.milestoneStamps[k]=true;
+    saveState();
+    renderTab();
+    animDone();
+    return;
+  }
+
+  largeSt.textContent      =milestone.kanji;
+  largeSt.style.color      =milestone.col;
+  largeSt.style.borderColor=milestone.col;
+  largeSt.style.filter     =`drop-shadow(0 0 28px ${msGlowStr(milestone,'.7')}) drop-shadow(0 0 56px ${msGlowStr(milestone,'.35')})`;
+  largeSt.style.animation  ='none';
+  copyEl.textContent       =milestone.copy;
+  copyEl.style.animation   ='none';
+  copyEl.style.opacity     ='0';
+
+  overlay.classList.add('active');
+  void largeSt.offsetWidth; // reflow after visible so msStampIn fires correctly
+
+  largeSt.style.animation='msStampIn .55s cubic-bezier(.25,.46,.45,.94) forwards';
+  setTimeout(()=>{
+    largeSt.style.animation=`msGlowFloat 2.4s ease-in-out infinite`;
+    largeSt.style.filter   =`drop-shadow(0 0 20px ${msGlowStr(milestone,'.55')}) drop-shadow(0 0 40px ${msGlowStr(milestone,'.3')})`;
+    copyEl.style.animation ='copyFadeIn .5s ease forwards';
+  },550);
+
+  const DISPLAY_MS=2600, FLY_MS=850, LARGE_PX=100, SMALL_PX=24;
+  setTimeout(()=>{
+    const destEl  =document.getElementById(`ms-${habit.id}-${milestone.days}`);
+    const destRect=destEl?destEl.getBoundingClientRect():null;
+
+    copyEl.style.animation ='copyFadeOut .35s ease forwards';
+    largeSt.style.animation='msFadeOut .35s ease forwards';
+    setTimeout(()=>{overlay.classList.remove('active');},400);
+
+    if(!destRect){
+      delete _msPending[k];
+      state.milestoneStamps[k]=true;
+      _msLand[k]=true;
+      saveState();
+      renderTab();
+      setTimeout(()=>{delete _msLand[k];animDone();},700);
+      return;
+    }
+
+    const cx=window.innerWidth/2, cy=window.innerHeight/2;
+    const fly=document.createElement('div');
+    Object.assign(fly.style,{
+      position:'fixed',left:`${cx-LARGE_PX/2}px`,top:`${cy-LARGE_PX/2}px`,
+      width:`${LARGE_PX}px`,height:`${LARGE_PX}px`,
+      display:'flex',alignItems:'center',justifyContent:'center',
+      border:`3px solid ${milestone.col}`,borderRadius:'6px',
+      fontFamily:"'Noto Serif JP',serif",fontWeight:'900',fontSize:'56px',
+      color:milestone.col,transform:'rotate(-4deg)',
+      filter:`drop-shadow(0 0 16px ${msGlowStr(milestone,'.5')})`,
+      zIndex:'500',pointerEvents:'none',
+      transition:`transform ${FLY_MS}ms cubic-bezier(.55,.02,.45,1), opacity ${FLY_MS}ms ease`,
+    });
+    fly.textContent=milestone.kanji;
+    document.body.appendChild(fly);
+
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const scale=SMALL_PX/LARGE_PX;
+      const tx=(destRect.left+destRect.width/2)-cx;
+      const ty=(destRect.top +destRect.height/2)-cy;
+      fly.style.transform=`translate(${tx}px,${ty}px) scale(${scale}) rotate(-4deg)`;
+      fly.style.filter='none';
+      setTimeout(()=>{fly.style.opacity='0';},FLY_MS*.65);
+    }));
+
+    setTimeout(()=>{
+      fly.remove();
+      delete _msPending[k];
+      state.milestoneStamps[k]=true;
+      _msLand[k]=true;
+      saveState();
+      renderTab();
+      setTimeout(()=>{delete _msLand[k];animDone();},700);
+    },FLY_MS+80);
+  },DISPLAY_MS);
+}
+
+function checkMilestoneStamps(habit){
+  if(!state.milestoneStamps) state.milestoneStamps={};
+  MILESTONES.forEach(m=>{
+    const k=`${habit.id}-${m.days}`;
+    if((habit.bestStreak||0)>=m.days && !state.milestoneStamps[k] && !_msPending[k]){
+      enqueueAnim(()=>earnStamp(habit,m));
+    }
+  });
 }
 
 function showProverb(){
@@ -2284,10 +3317,10 @@ function fireCelebrations(list){
   const monthly=list.includes('monthly');
   const weekly=list.includes('weekly')||monthly;
   const daily=list.includes('daily')||weekly;
-  let t=200;
-  if(daily){setTimeout(animateSeal,t);t+=300;}
-  if(weekly){setTimeout(showProverb,t+1400);}
-  if(monthly){setTimeout(()=>showInkWash(getMonthCompletionRate()),t+3800);}
+  // Seal queues after any milestone stamps already enqueued by checkMilestoneStamps
+  if(daily){enqueueAnim(()=>triggerSeal());}
+  if(weekly){setTimeout(showProverb,4400);}   // fires after seal (~3.9s) clears
+  if(monthly){setTimeout(()=>showInkWash(getMonthCompletionRate()),8200);}
 }
 
 function checkCelebrations(){
@@ -2383,7 +3416,7 @@ async function syncToCloud(){
   }catch(e){ setSyncStatus('error'); }
 }
 
-async function loadFromCloud(){
+async function loadFromCloud(compareTimestamp){
   const{binId,masterKey}=getSyncConfig();
   if(!binId||!masterKey) return false;
   setSyncStatus('syncing');
@@ -2401,7 +3434,11 @@ async function loadFromCloud(){
     } else {
       cloud=record;
     }
-    if((cloud.lastModified||0)>(state.lastModified||0)){
+    // Use the pre-render snapshot timestamp if provided — prevents startup saves
+    // (checkCelebrations etc.) from inflating lastModified and falsely making local
+    // look newer than a phone/other-device cloud state.
+    const localTs=compareTimestamp!==undefined?compareTimestamp:(state.lastModified||0);
+    if((cloud.lastModified||0)>localTs){
       Object.assign(state,cloud);
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
@@ -2577,16 +3614,42 @@ if(!state.onboarded && !localStorage.getItem(STORAGE_KEY)){
 if(state.onboarded){
   document.getElementById('onboard').classList.remove('active');
   document.getElementById('dashboard').classList.add('active');
+  // Snapshot lastModified BEFORE renderDashboard — startup saves (checkCelebrations etc.)
+  // would otherwise inflate lastModified and cause loadFromCloud to push local state up,
+  // overwriting newer data from another device (e.g. phone reflection sealed last night).
+  const _preRenderTs=state.lastModified||0;
   renderDashboard();           // render immediately from local state
   checkReflectionPrompts();
   initGridSwipe();
   updateDarkMode();
   setInterval(updateDarkMode, 60000);
-  // Then silently sync from cloud — re-render if cloud has newer data
-  loadFromCloud().then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); });
+  // Then silently sync from cloud — use pre-render timestamp for comparison
+  loadFromCloud(_preRenderTs).then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); });
 } else {
   renderObProgress();
 }
 </script>
+
+<!-- TRAVEL MODE SETUP MODAL -->
+<div class="travel-backdrop" id="travelBackdrop" onclick="handleTravelBackdrop(event)">
+  <div class="travel-modal" id="travelModal">
+    <div class="travel-modal-top">
+      <div class="travel-modal-kanji">旅</div>
+      <div class="travel-modal-title">Travel Mode</div>
+      <div class="travel-modal-copy">
+        "Routines get lost when we travel. Discipline can keep your core practices intact,
+        but leniency is necessary. Which of these habits must follow you anywhere —
+        and which can you loosen your grip on?"
+      </div>
+    </div>
+    <div class="travel-modal-sub">Tap to mark your core practices</div>
+    <div class="travel-modal-habits" id="travelModalHabits"></div>
+    <div class="travel-modal-err" id="travelModalErr">Select at least one core practice to continue</div>
+    <div class="travel-modal-footer">
+      <button class="btn btn-ghost" style="flex:1;font-size:9px;letter-spacing:3px;padding:11px" onclick="cancelTravelSetup()">Cancel</button>
+      <button class="btn" style="flex:2;font-size:9px;letter-spacing:3px;padding:11px;background:#2a4a6b;border-color:#2a4a6b;color:var(--white)" onclick="confirmTravelSetup()">Set Travel Practices</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
