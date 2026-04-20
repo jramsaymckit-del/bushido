@@ -10,7 +10,7 @@
 :root{
   --scroll:#F5F0E8;--edge:#E8DFD0;--ink:#1A1A1A;--ink-light:#3A3A3A;
   --ink-faint:#8A8578;--red:#CC3529;--red-light:#D94A3E;--white:#FEFCF8;
-  --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;
+  --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;--navy:#1B2A4A;
 }
 body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100vh;color:var(--ink);
   transition:background-color .5s,color .5s}
@@ -244,10 +244,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 /* ===== HABIT GRID (Kaizen week view) ===== */
 .hg-wrap{margin-bottom:8px}
 .hg-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.hg-nav-btn{background:none;border:none;cursor:pointer;font-size:22px;color:var(--ink-faint);padding:4px 8px;line-height:1;transition:color .2s}
-.hg-nav-btn:hover{color:var(--ink)}.hg-nav-btn:disabled{opacity:.2;cursor:default}
-.hg-week-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
-.hg-grid{background:var(--grid-bg);border-radius:6px;overflow:hidden}
+.hg-nav-btn{background:none;border:none;cursor:pointer;font-size:22px;color:rgba(255,255,255,.28);padding:4px 8px;line-height:1;transition:color .2s}
+.hg-nav-btn:hover{color:rgba(255,255,255,.75)}.hg-nav-btn:disabled{opacity:.15;cursor:default}
+.hg-week-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.hg-grid{overflow:hidden}
 .hg-row{display:grid;grid-template-columns:minmax(88px,120px) repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,.04)}
 .hg-row:last-child{border-bottom:none}
 .hg-header{background:rgba(0,0,0,.25)}
@@ -268,12 +268,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .hg-cell.hg-future::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.07);display:block}
 
 /* ===== MONTH CALENDAR (Shokunin) ===== */
-.mcal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.mcal-wrap{margin-bottom:0}
 .mcal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .mcal-nav-btn{background:none;border:none;cursor:pointer;font-size:20px;color:rgba(255,255,255,.35);padding:2px 6px;line-height:1;transition:color .2s}
 .mcal-nav-btn:hover{color:rgba(255,255,255,.7)}
 .mcal-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45)}
-.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcal-grid{display:flex;flex-direction:column;gap:0}
+.mcal-header-row,.mcal-week-row{display:grid;grid-template-columns:18px repeat(7,1fr);gap:2px}
+.mcal-header-row{margin-bottom:4px}
 .mcal-dh{text-align:center;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.22);padding:2px 0 6px}
 .mcal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,.03)}
 .mcal-cell.mcal-empty{background:transparent}
@@ -285,9 +287,26 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .mcal-dot.mcal-full{background:var(--red)}
 .mcal-dot.mcal-partial{background:rgba(204,53,41,.55)}
 .mcal-dot.mcal-none{background:rgba(255,255,255,.12)}
+/* Week reflection indicator */
+.wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
+.wk-sealed{font-family:'Noto Serif JP',serif;font-size:10px;color:var(--red);opacity:.45;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
+.wk-sealed:hover{opacity:.85}
+.wk-sealed.is-open{opacity:1;transform:scale(1.15)}
+.wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
+/* Weekly reflection expansion panel */
+.mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
+.mcal-expansion.open{max-height:600px;opacity:1}
+.mcal-expand-inner{padding:14px 8px 18px 26px;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);margin:4px 0 6px;animation:fadeUp .2s ease}
+.exp-range{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.55;margin-bottom:12px}
+.exp-field{margin-bottom:10px}
+.exp-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:3px}
+.exp-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.62);line-height:1.75}
+.exp-intention{margin-top:12px;padding-top:11px;border-top:1px solid rgba(204,53,41,.15)}
+.exp-intention .exp-label{color:rgba(204,53,41,.5)}
+.exp-intention .exp-text{color:rgba(255,255,255,.8)}
 
 /* ===== YEAR VIEW (Ikigai) ===== */
-.ycal-wrap{background:var(--grid-bg);border-radius:6px;padding:20px;margin-bottom:28px}
+.ycal-wrap{margin-bottom:0}
 .ycal-year-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.3);text-align:center;margin-bottom:16px}
 .ycal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:640px){.ycal-months{grid-template-columns:repeat(3,1fr)}}
@@ -302,6 +321,30 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .ycal-cell.ycal-partial{background:rgba(204,53,41,.5)}
 .ycal-cell.ycal-miss{background:rgba(245,240,232,.1)}
 .ycal-cell.ycal-today{outline:1.5px solid var(--red);outline-offset:0}
+
+/* ===== KAKEJIKU — Hanging Scroll Wrapper ===== */
+.kk-outer{display:flex;flex-direction:column;align-items:stretch;margin-bottom:28px;
+  filter:drop-shadow(0 10px 28px rgba(10,18,35,.35)) drop-shadow(0 2px 6px rgba(10,18,35,.20))}
+.kk-cord{display:flex;flex-direction:column;align-items:center;margin-bottom:-1px;position:relative;z-index:5}
+.kk-loop{width:14px;height:8px;border:1.5px solid rgba(160,145,125,.65);border-bottom:none;border-radius:50% 50% 0 0}
+.kk-cord-line{width:2px;height:28px;background:repeating-linear-gradient(to bottom,rgba(160,145,125,.68) 0px,rgba(130,118,100,.50) 3px,rgba(160,145,125,.68) 6px)}
+.kk-rod{height:9px;position:relative;background:linear-gradient(to bottom,#060302 0%,#180B06 16%,#3A1A0C 38%,#180B06 66%,#060302 100%);
+  box-shadow:inset 0 1px 0 rgba(255,210,155,.06),0 1px 5px rgba(0,0,0,.65);z-index:2}
+.kk-rod-btm{height:8px}
+.kk-rod::before,.kk-rod::after{content:'';position:absolute;top:50%;transform:translateY(-50%);
+  width:36px;height:14px;border-radius:7px;
+  background:linear-gradient(to bottom,#0A0503 0%,#221008 18%,#4A2210 40%,#2E1309 68%,#0A0503 100%);
+  box-shadow:0 2px 7px rgba(0,0,0,.70),inset 0 1.5px 0 rgba(255,200,150,.10),inset 0 -1px 0 rgba(0,0,0,.35);z-index:3}
+.kk-rod::before{left:-11px}.kk-rod::after{right:-11px}
+.kk-body{background-color:var(--navy);
+  background-image:repeating-linear-gradient(45deg,transparent 0px,transparent 3px,rgba(255,255,255,.013) 3px,rgba(255,255,255,.013) 6px),
+    repeating-linear-gradient(-45deg,transparent 0px,transparent 3px,rgba(255,255,255,.009) 3px,rgba(255,255,255,.009) 6px);
+  box-shadow:inset 8px 0 22px rgba(0,0,0,.38),inset -8px 0 22px rgba(0,0,0,.38),
+    inset 0 3px 10px rgba(0,0,0,.22),inset 0 -3px 10px rgba(0,0,0,.16);
+  padding:22px 26px;position:relative}
+.kk-body::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.18) 0%,transparent 12%,transparent 88%,rgba(0,0,0,.14) 100%);
+  pointer-events:none}
 
 /* Habit grid tooltip */
 #hg-tooltip{display:none;position:fixed;z-index:300;background:var(--grid-bg);
@@ -1406,6 +1449,7 @@ function formatWeekRange(s,e){
 
 let weekOffset=0;
 let calMonthOffset=0;
+let _expandedWeek=null; // week-start string (YYYY-MM-DD) of currently open reflection in month cal
 
 function getWeekStart(offset){
   const now=new Date();
@@ -1416,7 +1460,7 @@ function getWeekStart(offset){
 }
 
 function navigateWeek(delta){weekOffset+=delta;renderGoals();}
-function navigateMonth(delta){calMonthOffset+=delta;renderGoals();}
+function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;renderGoals();}
 
 function isHabitDoneOnDate(habitId,dateStr){
   const log=state.completionLog||{};
@@ -1465,12 +1509,16 @@ function buildKaizenGrid(){
   });
 
   let html=`<div class="hg-wrap">
-    <div class="hg-nav">
-      <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
-      <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
-      <button class="hg-nav-btn" onclick="navigateWeek(1)"${isCurrentWeek?' disabled':''}>&#8250;</button>
-    </div>
-    <div class="hg-grid">
+    <div class="kk-outer">
+      <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+      <div class="kk-rod"></div>
+      <div class="kk-body">
+        <div class="hg-nav">
+          <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
+          <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
+          <button class="hg-nav-btn" onclick="navigateWeek(1)"${isCurrentWeek?' disabled':''}>&#8250;</button>
+        </div>
+        <div class="hg-grid">
       <div class="hg-row hg-header">
         <div class="hg-label-cell"></div>
         ${days.map((d,i)=>{
@@ -1500,9 +1548,26 @@ function buildKaizenGrid(){
           }).join('')}
         </div>`;
       }).join('')}
+        </div>
+      </div>
+      <div class="kk-rod kk-rod-btm"></div>
     </div>
   </div>`;
   return html;
+}
+
+function getReflectionForWeek(wStartStr){
+  const wEnd=new Date(wStartStr);wEnd.setDate(wEnd.getDate()+6);
+  const wEndStr=getDateStr(wEnd);
+  return (state.reflections||[]).find(r=>
+    r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
+  );
+}
+
+function toggleWeekExpand(e,wStartStr){
+  e.stopPropagation();
+  _expandedWeek=(_expandedWeek===wStartStr)?null:wStartStr;
+  renderGoals();
 }
 
 function buildMonthCal(){
@@ -1515,47 +1580,104 @@ function buildMonthCal(){
   const startOffset=(firstDay.getDay()+6)%7;
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const todayStr=getDateStr();
-  const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
 
-  let html=`<div class="mcal-wrap">
-    <div class="mcal-nav">
-      <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
-      <span class="mcal-title">${monthName}</span>
-      <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
-    </div>
-    <div class="mcal-grid">
-      ${DAYS.map(d=>`<div class="mcal-dh">${d[0]}</div>`).join('')}`;
-
-  for(let i=0;i<startOffset;i++)html+=`<div class="mcal-cell mcal-empty"></div>`;
-
+  // Build flat cell array then split into week rows
+  const cells=[];
+  for(let i=0;i<startOffset;i++) cells.push(null);
   for(let day=1;day<=lastDay.getDate();day++){
     const d=new Date(year,month,day);
-    const dStr=getDateStr(d);
-    const dayIdx=(d.getDay()+6)%7;
-    const isFuture=dStr>todayStr;
-    const isToday=dStr===todayStr;
+    cells.push({day,dateStr:getDateStr(d),d});
+  }
+  while(cells.length%7!==0) cells.push(null);
+  const weeks=[];
+  for(let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
 
-    const scheduled=state.kaizen.filter(k=>{
-      if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-      return habitOnDay(k,dayIdx);
-    });
-    const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,dStr));
-    const pct=scheduled.length?done.length/scheduled.length:0;
+  let html=`<div class="kk-outer">
+    <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+    <div class="kk-rod"></div>
+    <div class="kk-body">
+      <div class="mcal-wrap">
+        <div class="mcal-nav">
+          <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
+          <span class="mcal-title">${monthName}</span>
+          <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
+        </div>
+        <div class="mcal-grid">
+          <div class="mcal-header-row">
+            <div></div>
+            ${DAYS.map(d=>`<div class="mcal-dh">${d[0]}</div>`).join('')}
+          </div>`;
 
-    let cls='mcal-cell';
-    if(isToday)cls+=' mcal-today';
-    if(isFuture)cls+=' mcal-future';
+  for(const week of weeks){
+    const firstCell=week.find(c=>c!==null);
+    if(!firstCell) continue;
+    // Monday of this week
+    const wMon=new Date(firstCell.d);
+    wMon.setDate(wMon.getDate()-((wMon.getDay()+6)%7));
+    wMon.setHours(0,0,0,0);
+    const wStartStr=getDateStr(wMon);
+    const wEnd=new Date(wMon);wEnd.setDate(wMon.getDate()+6);
+    const wEndStr=getDateStr(wEnd);
+    const reflection=getReflectionForWeek(wStartStr);
+    const isPast=wEndStr<todayStr;
+    const isOpen=_expandedWeek===wStartStr;
 
-    let dot='';
-    if(!isFuture&&scheduled.length){
-      if(pct>=1)dot=`<div class="mcal-dot mcal-full"></div>`;
-      else if(pct>0)dot=`<div class="mcal-dot mcal-partial"></div>`;
-      else dot=`<div class="mcal-dot mcal-none"></div>`;
+    // Week indicator
+    let wkHtml;
+    if(reflection){
+      wkHtml=`<div class="wk-indicator">
+        <span class="wk-sealed${isOpen?' is-open':''}" onclick="toggleWeekExpand(event,'${wStartStr}')">週</span>
+      </div>`;
+    } else if(isPast){
+      wkHtml=`<div class="wk-indicator"><div class="wk-dot"></div></div>`;
+    } else {
+      wkHtml=`<div class="wk-indicator"></div>`;
     }
-    html+=`<div class="${cls}"><span class="mcal-num">${day}</span>${dot}</div>`;
+
+    // Day cells
+    const dayCells=week.map(cell=>{
+      if(!cell) return `<div class="mcal-cell mcal-empty"></div>`;
+      const isToday=cell.dateStr===todayStr;
+      const isFuture=cell.dateStr>todayStr;
+      const dayIdx=(cell.d.getDay()+6)%7;
+      const scheduled=state.kaizen.filter(k=>{
+        if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(cell.d<s)return false;}
+        return habitOnDay(k,dayIdx);
+      });
+      const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,cell.dateStr));
+      const pct=scheduled.length?done.length/scheduled.length:0;
+      let cls='mcal-cell';
+      if(isToday) cls+=' mcal-today';
+      if(isFuture) cls+=' mcal-future';
+      let dot='';
+      if(!isFuture&&scheduled.length){
+        if(pct>=1) dot=`<div class="mcal-dot mcal-full"></div>`;
+        else if(pct>0) dot=`<div class="mcal-dot mcal-partial"></div>`;
+        else dot=`<div class="mcal-dot mcal-none"></div>`;
+      }
+      return `<div class="${cls}"><span class="mcal-num">${cell.day}</span>${dot}</div>`;
+    }).join('');
+
+    html+=`<div class="mcal-week-row">${wkHtml}${dayCells}</div>`;
+
+    // Expansion panel — only rendered when reflection exists
+    if(reflection){
+      const fields=[];
+      if(reflection.notes) fields.push(`<div class="exp-field"><div class="exp-label">reflection</div><div class="exp-text">${reflection.notes}</div></div>`);
+      if(reflection.whatGotInWay) fields.push(`<div class="exp-field"><div class="exp-label">what got in the way</div><div class="exp-text">${reflection.whatGotInWay}</div></div>`);
+      if(reflection.showingUp) fields.push(`<div class="exp-field"><div class="exp-label">where I showed up</div><div class="exp-text">${reflection.showingUp}</div></div>`);
+      const intentionHtml=reflection.intention?`<div class="exp-field exp-intention"><div class="exp-label">intention set →</div><div class="exp-text">${reflection.intention}</div></div>`:'';
+      const rangeStr=`${wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} — ${wEnd.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
+      html+=`<div class="mcal-expansion${isOpen?' open':''}">
+        <div class="mcal-expand-inner" onclick="event.stopPropagation()">
+          <div class="exp-range">${rangeStr}</div>
+          ${fields.join('')}${intentionHtml}
+        </div>
+      </div>`;
+    }
   }
 
-  html+=`</div></div>`;
+  html+=`</div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -1564,9 +1686,13 @@ function buildYearView(){
   const todayStr=getDateStr();
   const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
 
-  let html=`<div class="ycal-wrap">
-    <div class="ycal-year-label">${year}</div>
-    <div class="ycal-months">`;
+  let html=`<div class="kk-outer">
+    <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
+    <div class="kk-rod"></div>
+    <div class="kk-body">
+      <div class="ycal-wrap">
+        <div class="ycal-year-label">${year}</div>
+        <div class="ycal-months">`;
 
   for(let m=0;m<12;m++){
     const firstDay=new Date(year,m,1);
@@ -1604,7 +1730,7 @@ function buildYearView(){
     html+=`</div></div>`;
   }
 
-  html+=`</div></div>`;
+  html+=`</div></div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -1725,7 +1851,6 @@ function renderGoals(){
             <div class="goal-content">
               <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
               <div class="goal-meta">
-                ${g.streak>0?`<span class="goal-streak">${g.streak} day streak</span>`:'<span>begin your streak</span>'}
                 <span class="goal-tf">${freq}</span>
                 ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
                 ${msRowHtml}
@@ -2633,7 +2758,15 @@ function getLastWeekIntention(){
 
 function saveReflection(type){
   const c=document.getElementById('reflect-content');
-  const entry={type, date:getDateStr(), ts:Date.now()};
+  // On Monday grace day, anchor weekly reflections to the prior Sunday (last day of the
+  // reflected week) so needsWeeklyReflection()'s date-range check finds the entry correctly.
+  let _saveDate=getDateStr();
+  if(type==='weekly'&&todayIdx()===0){
+    const wEnd=new Date(getWeekStart(-1));
+    wEnd.setDate(wEnd.getDate()+6);
+    _saveDate=getDateStr(wEnd);
+  }
+  const entry={type, date:_saveDate, ts:Date.now()};
   if(type==='weekly'){
     const card=c.querySelector('#momentum-card');
     entry.weakCraft=card?+(card.dataset.craftId||0):0;
@@ -2769,9 +2902,10 @@ document.getElementById('reflect-modal').addEventListener('click',function(e){
   if(e.target===this)closeReflection();
 });
 
-// Click anywhere to clear strand filter
+// Click anywhere to clear strand filter and close any open week reflection
 document.addEventListener('click',function(){
   if(_filterStrandIdx!==null) clearStrandFilter();
+  if(_expandedWeek!==null){_expandedWeek=null;renderGoals();}
 });
 
 // Habit grid tooltip delegation
@@ -3278,7 +3412,7 @@ async function syncToCloud(){
   }catch(e){ setSyncStatus('error'); }
 }
 
-async function loadFromCloud(){
+async function loadFromCloud(compareTimestamp){
   const{binId,masterKey}=getSyncConfig();
   if(!binId||!masterKey) return false;
   setSyncStatus('syncing');
@@ -3296,7 +3430,11 @@ async function loadFromCloud(){
     } else {
       cloud=record;
     }
-    if((cloud.lastModified||0)>(state.lastModified||0)){
+    // Use the pre-render snapshot timestamp if provided — prevents startup saves
+    // (checkCelebrations etc.) from inflating lastModified and falsely making local
+    // look newer than a phone/other-device cloud state.
+    const localTs=compareTimestamp!==undefined?compareTimestamp:(state.lastModified||0);
+    if((cloud.lastModified||0)>localTs){
       Object.assign(state,cloud);
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
@@ -3472,13 +3610,17 @@ if(!state.onboarded && !localStorage.getItem(STORAGE_KEY)){
 if(state.onboarded){
   document.getElementById('onboard').classList.remove('active');
   document.getElementById('dashboard').classList.add('active');
+  // Snapshot lastModified BEFORE renderDashboard — startup saves (checkCelebrations etc.)
+  // would otherwise inflate lastModified and cause loadFromCloud to push local state up,
+  // overwriting newer data from another device (e.g. phone reflection sealed last night).
+  const _preRenderTs=state.lastModified||0;
   renderDashboard();           // render immediately from local state
   checkReflectionPrompts();
   initGridSwipe();
   updateDarkMode();
   setInterval(updateDarkMode, 60000);
-  // Then silently sync from cloud — re-render if cloud has newer data
-  loadFromCloud().then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); });
+  // Then silently sync from cloud — use pre-render timestamp for comparison
+  loadFromCloud(_preRenderTs).then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); });
 } else {
   renderObProgress();
 }
