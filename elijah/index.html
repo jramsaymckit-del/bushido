@@ -3,8 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BUSHIDO</title>
+<title>BUSHIDO — Canvas</title>
 <style>
+/* ─── CANVAS MODE INDICATOR ─────────────────────────────────────────────────
+   This file is the design canvas. Experiment freely.
+   Approved changes propagate to coreproject via bushido-feature-sync.
+   ────────────────────────────────────────────────────────────────────────── */
+#canvas-badge{
+  position:fixed;bottom:16px;right:16px;z-index:9999;
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:rgba(204,53,41,0.6);
+  border:1px solid rgba(204,53,41,0.3);padding:5px 12px;
+  background:rgba(245,240,232,0.92);border-radius:2px;
+  pointer-events:none;user-select:none;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -19,6 +32,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .scroll{max-width:800px;margin:0 auto;min-height:100vh;background:var(--scroll);
   background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,.018) 39px,rgba(0,0,0,.018) 40px);
   box-shadow:-4px 0 20px var(--shadow),4px 0 20px var(--shadow);position:relative;padding:60px 48px 100px;
+  overflow-x:clip;
   animation:scrollUnroll 1s cubic-bezier(0.22,1,0.36,1) forwards}
 @keyframes scrollUnroll{
   0%  {clip-path:inset(0 0 99% 0);box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -97,6 +111,15 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .date-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}
 .date-text{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-faint);letter-spacing:2px}
 .streak-badge{font-size:11px;color:var(--red);letter-spacing:1px;font-weight:700}
+/* ── Native kakejiku date header (Kaizen scroll) ──────────────────── */
+.kk-date-header{display:flex;align-items:baseline;gap:8px;padding:0 0 12px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+.kk-date-text{font-family:'Noto Serif JP',serif;font-size:12px;color:rgba(255,255,255,.55);letter-spacing:1.5px}
+.kk-streak-whisper{font-size:9px;letter-spacing:1px;color:rgba(204,53,41,.6)}
+/* ── Practice stamp badge (clan row) ─────────────────────────────── */
+.ps-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid currentColor;border-radius:3px;font-family:'Noto Serif JP',serif;font-size:11px;font-weight:900;margin-left:6px;transform:rotate(-3deg);vertical-align:middle;flex-shrink:0}
+.ik-arc-native{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sh-shelf-native{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.clan-momentum-block{margin-bottom:0}
 
 /* Pillar tabs */
 .tabs{display:flex;margin-bottom:36px;border-bottom:1px solid rgba(0,0,0,.06)}
@@ -277,16 +300,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .mcal-header-row,.mcal-week-row{display:grid;grid-template-columns:18px repeat(7,1fr);gap:2px}
 .mcal-header-row{margin-bottom:4px}
 .mcal-dh{text-align:center;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.22);padding:2px 0 6px}
-.mcal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,.03)}
+.mcal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,.03);transition:background .4s ease}
 .mcal-cell.mcal-empty{background:transparent}
-.mcal-cell.mcal-today{background:rgba(204,53,41,.15);outline:1.5px solid var(--red);outline-offset:-1px}
-.mcal-cell.mcal-future{opacity:.25}
-.mcal-num{font-size:9px;color:rgba(255,255,255,.35);line-height:1}
+.mcal-cell.mcal-today{outline:1.5px solid var(--red);outline-offset:-1px}
+.mcal-cell.mcal-future{opacity:.22}
+.mcal-num{font-size:9px;color:rgba(255,255,255,.6);line-height:1}
 .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
-.mcal-dot{width:4px;height:4px;border-radius:50%;margin-top:2px}
-.mcal-dot.mcal-full{background:var(--red)}
-.mcal-dot.mcal-partial{background:rgba(204,53,41,.55)}
-.mcal-dot.mcal-none{background:rgba(255,255,255,.12)}
+.mcal-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5px;padding-top:2px;max-width:100%}
+.mcal-dot{width:3px;height:3px;border-radius:50%;background:var(--red);opacity:.55;flex-shrink:0}
 /* Week reflection indicator */
 .wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
 .wk-sealed{font-family:'Noto Serif JP',serif;font-size:10px;color:var(--red);opacity:.45;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
@@ -411,12 +432,59 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
 
 /* Edit / delete actions */
 .goal-actions{display:flex;gap:6px;align-items:flex-start;padding-top:4px;opacity:0;transition:opacity .2s;flex-shrink:0}
-.goal:hover .goal-actions{opacity:1}
+body.edit-mode .goal-actions{opacity:1}
 .goal-act{cursor:pointer;font-size:14px;color:var(--ink-faint);padding:4px 5px;line-height:1;transition:color .2s;background:none;border:none;font-family:inherit;user-select:none}
 .goal-act:hover{color:var(--ink)}
 .goal-del:hover{color:var(--red)}
+
+/* Edit mode toggle button in account bar */
+.btn-edit-mode{border:1.5px solid rgba(26,26,26,.2);color:var(--ink-faint);font-size:9px;
+  letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;background:none;
+  transition:all .2s;font-family:'Noto Sans JP',sans-serif;padding:5px 12px;border-radius:1px}
+.btn-edit-mode:hover{border-color:var(--ink);color:var(--ink)}
+.btn-edit-mode.active{background:var(--ink);border-color:var(--ink);color:var(--scroll);letter-spacing:2px}
+.edit-mode-bar{display:none;align-items:center;justify-content:center;gap:8px;
+  padding:6px 16px;
+  margin:0 -48px;
+  background:rgba(26,26,26,.04);border-bottom:1px solid rgba(26,26,26,.06);
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--ink-faint)}
+body.edit-mode .edit-mode-bar{display:flex}
 .inline-edit{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;color:var(--ink);
   background:none;border:none;border-bottom:1.5px solid var(--red);outline:none;width:100%;padding:2px 0;line-height:1.5}
+
+/* Blade delete confirmation modal */
+.blade-backdrop{display:none;position:fixed;inset:0;background:rgba(26,18,8,.78);
+  backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;padding:24px}
+.blade-backdrop.show{display:flex}
+.blade-modal{background:var(--white);border:1px solid var(--edge);border-radius:2px;
+  width:100%;max-width:400px;padding:36px 32px 28px;text-align:center;animation:fadeUp .2s ease;position:relative}
+.blade-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:var(--red);opacity:.18;
+  margin-bottom:8px;letter-spacing:4px}
+.blade-question{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--ink);
+  margin-bottom:8px;letter-spacing:.5px}
+.blade-item-name{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  color:var(--ink-faint);margin-bottom:24px;padding:0 8px;line-height:1.6;
+  border-left:2px solid rgba(204,53,41,.25);text-align:left}
+.blade-actions{display:flex;gap:10px}
+.blade-confirm{flex:1;font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;padding:13px 16px;cursor:pointer;
+  background:var(--ink);border:1.5px solid var(--ink);color:var(--white);
+  transition:background .2s,border-color .2s}
+.blade-confirm:hover{background:var(--red);border-color:var(--red)}
+.blade-cancel{flex:1;font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;padding:13px 16px;cursor:pointer;
+  background:none;border:1.5px solid var(--ink);color:var(--ink);
+  transition:background .2s,color .2s}
+.blade-cancel:hover{background:var(--ink);color:var(--white)}
+
+/* Severed flash */
+.severed-flash{display:none;text-align:center;padding:14px 20px;
+  font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  color:var(--ink-faint);line-height:1.7;letter-spacing:.3px;
+  border-left:2px solid rgba(204,53,41,.3);margin:0 0 8px;
+  animation:fadeUp .3s ease}
+.severed-flash.show{display:block}
 
 /* Strand highlight */
 .goal{transition:opacity .25s,background .25s}
@@ -654,6 +722,37 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
   100%{opacity:0;transform:rotate(-4deg) translateY(-10px);filter:none}
 }
 
+/* ===== PRACTICE STAMP CEREMONY OVERLAY ===== */
+#ps-overlay{
+  display:none;position:fixed;inset:0;z-index:355;pointer-events:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:rgba(26,26,26,.10);
+}
+#ps-overlay.active{display:flex}
+#ps-large{
+  width:120px;height:120px;border:3px solid currentColor;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Serif JP',serif;font-weight:900;font-size:68px;
+  transform:rotate(-4deg);opacity:0;
+}
+#ps-title{
+  font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:5px;
+  text-transform:uppercase;opacity:0;margin-top:2px;
+}
+#ps-copy{
+  font-family:'Noto Serif JP',serif;font-size:14px;font-style:italic;
+  color:var(--ink-light);letter-spacing:.5px;text-align:center;
+  opacity:0;max-width:340px;line-height:1.9;padding:0 20px;
+}
+/* Gold shimmer bonus for 道 (365 days) */
+#ps-overlay.ps-gold #ps-large{
+  animation:psGoldPulse 1.6s ease-in-out infinite !important;
+}
+@keyframes psGoldPulse{
+  0%,100%{filter:drop-shadow(0 0 28px rgba(201,169,75,.6)) drop-shadow(0 0 56px rgba(201,169,75,.3))}
+  50%    {filter:drop-shadow(0 0 52px rgba(201,169,75,1.0)) drop-shadow(0 0 96px rgba(201,169,75,.6))}
+}
+
 #proverb-overlay{display:none;position:fixed;inset:0;z-index:200;pointer-events:none;
   align-items:center;justify-content:center;background:rgba(245,240,232,.5)}
 #proverb-overlay.active{display:flex}
@@ -697,9 +796,376 @@ body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06)}
 body.dark .reflect-nudge{border-color:rgba(204,53,41,.25);border-left-color:var(--red)}
 body.dark .add-trigger:hover{opacity:.5}
 body.dark .hanko{border-color:var(--red)}
-/* ── Clan momentum box ───────────────────────────────────────────── */
-.ps-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid currentColor;border-radius:3px;font-family:'Noto Serif JP',serif;font-size:11px;font-weight:900;margin-left:6px;transform:rotate(-3deg);vertical-align:middle;flex-shrink:0}
-.clan-momentum-block{margin-bottom:0}
+
+/* ═══════════════════════════════════════════════════════
+   PLATFORM SHELL — account bar, primary nav, clan panel
+   ═══════════════════════════════════════════════════════ */
+
+/* Account bar — bleeds to scroll edges */
+.account-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 48px;
+  margin:0 -48px -1px;
+  margin-top:-60px;
+  border-bottom:1px solid rgba(0,0,0,.05);
+  background:rgba(255,255,255,.3);
+}
+.account-name{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.account-right{display:flex;gap:12px;align-items:center}
+.account-avatar{width:28px;height:28px;border-radius:50%;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;cursor:pointer}
+.account-avatar span{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--scroll)}
+.btn-sign-out{border:none;color:var(--ink-faint);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer;background:none;transition:color .2s;
+  font-family:'Noto Sans JP',sans-serif;padding:4px 0}
+.btn-sign-out:hover{color:var(--ink)}
+
+/* Primary nav — bleeds to scroll edges, sticky */
+.primary-nav{
+  display:flex;
+  margin:0 -48px;
+  border-top:1px solid rgba(0,0,0,.07);
+  border-bottom:1px solid rgba(0,0,0,.07);
+  position:sticky;top:0;z-index:50;
+  background:var(--scroll);
+  transition:box-shadow .3s;
+}
+.primary-nav.stuck{
+  box-shadow:0 2px 20px rgba(26,26,26,.10);
+  border-top-color:transparent;
+}
+.primary-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:20px 16px 18px;cursor:pointer;position:relative;overflow:hidden;
+  background:none;border:none;font-family:'Noto Sans JP',sans-serif;
+  transition:background .2s,padding .32s ease,gap .32s ease;
+}
+.primary-nav.stuck .primary-tab{padding:9px 16px 7px;gap:1px}
+.primary-tab:first-child{border-right:1px solid rgba(0,0,0,.06)}
+.primary-tab::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--red);transform:scaleY(0);transform-origin:bottom;transition:transform .25s;
+}
+.primary-tab.active::after{transform:scaleY(1)}
+.primary-tab.active{background:rgba(255,255,255,.4)}
+.pt-kanji{
+  font-family:'Noto Serif JP',serif;font-size:26px;color:var(--ink-faint);line-height:1;
+  overflow:hidden;max-height:34px;
+  transition:color .2s,max-height .32s ease,opacity .28s ease;
+}
+.primary-nav.stuck .pt-kanji{max-height:0;opacity:0}
+.primary-tab.active .pt-kanji{color:var(--ink)}
+.pt-label{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);
+  transition:color .2s;
+  white-space:nowrap;
+}
+.primary-tab.active .pt-label{color:var(--red)}
+.pt-sub{
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);
+  opacity:.5;overflow:hidden;max-height:14px;
+  transition:max-height .28s ease,opacity .22s ease;
+}
+.primary-nav.stuck .pt-sub{max-height:0;opacity:0}
+
+/* Clan panel wrapper */
+.clan-wrap{padding:36px 0}
+.clan-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.clan-title{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.clan-count{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.clan-section-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);
+  margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.06)}
+
+/* Visibility toggle */
+.vis-toggle{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.vis-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.vis-switch{display:flex;border:1.5px solid var(--ink);overflow:hidden}
+.vis-opt{padding:7px 14px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;background:none;border:none;font-family:'Noto Sans JP',sans-serif;color:var(--ink-faint)}
+.vis-opt.active{background:var(--ink);color:var(--scroll)}
+.vis-hint{font-size:9px;color:var(--ink-faint);opacity:.7;font-style:italic;font-family:'Noto Serif JP',serif}
+
+/* Clan member cards */
+.clan-card{margin-bottom:20px;padding:24px;background:rgba(255,255,255,.5);
+  border:1px solid rgba(0,0,0,.06);border-radius:2px}
+.clan-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.clan-member-id{display:flex;align-items:center;gap:12px}
+.clan-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:'Noto Serif JP',serif;font-size:14px;color:var(--white)}
+.clan-member-name{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--ink)}
+.clan-member-sub{font-size:9px;letter-spacing:1px;color:var(--ink-faint);margin-top:2px}
+.clan-view-badge{font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 10px;border:1px solid rgba(0,0,0,.1);color:var(--ink-faint)}
+.clan-strand-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.clan-strand-chip{display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:2px}
+.clan-strand-chip .kanji{font-family:'Noto Serif JP',serif;font-size:14px}
+.clan-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.clan-stat{text-align:center;padding:12px 8px;background:rgba(0,0,0,.02);border-radius:2px}
+.clan-stat-num{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--ink)}
+.clan-stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+.clan-crafts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.craft-tag{font-size:10px;color:var(--ink-faint);background:rgba(0,0,0,.04);padding:4px 10px;border-radius:2px}
+.clan-goals{display:flex;flex-direction:column;gap:6px}
+.clan-goal-row{display:flex;align-items:center;gap:10px}
+.cg-bar{flex:1;height:4px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden}
+.cg-fill{height:100%;border-radius:2px}
+.cg-label{font-size:10px;color:var(--ink-faint);min-width:120px}
+.cg-pct{font-size:10px;color:var(--ink-faint);min-width:32px;text-align:right}
+
+/* Shinobi dark card */
+.clan-card.shinobi{
+  background:#1a1a2e;border-color:#2a2a42;position:relative;overflow:hidden;
+}
+.clan-card.shinobi::before{
+  content:'忍';font-family:'Noto Serif JP',serif;font-size:120px;font-weight:900;
+  color:rgba(255,255,255,.02);position:absolute;right:-10px;top:-20px;line-height:1;pointer-events:none;
+}
+.shinobi .clan-member-name{color:rgba(254,252,248,.9)}
+.shinobi .clan-member-sub{color:rgba(254,252,248,.45)}
+.shinobi .clan-view-badge{color:rgba(254,252,248,.35);border-color:rgba(254,252,248,.15)}
+.shin-strand-row{display:flex;gap:14px;margin-bottom:16px}
+.shin-ember{display:flex;flex-direction:column;align-items:center;gap:5px}
+.shin-kanji{font-family:'Noto Serif JP',serif;font-size:16px;opacity:.35;color:rgba(254,252,248,.9)}
+.shin-ember-dot{width:8px;height:8px;border-radius:50%}
+.shin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.shin-stat{text-align:center;padding:14px 8px;background:transparent;border:none}
+.shin-stat-num{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:rgba(254,252,248,.75)}
+.shin-stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(254,252,248,.35);margin-top:4px}
+.shin-obscure{display:flex;gap:5px;align-items:center;margin-bottom:8px}
+.shin-glyph{width:18px;height:18px;border-radius:2px;background:rgba(255,255,255,.08)}
+.shin-glyph.lit{background:rgba(204,53,41,.5)}
+.shin-obscure-label{font-size:9px;color:rgba(254,252,248,.4);letter-spacing:2px;margin-left:8px}
+.shin-note{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:rgba(254,252,248,.45)}
+
+/* ═══════════════════════════════════════════════════════
+   SAMURAI CARD THEME
+   Red treatment for clan members in full Samurai (open) mode.
+   Scoped to .samurai-card only — panel stays parchment.
+   Shinobi cards keep their existing dark treatment.
+   ═══════════════════════════════════════════════════════ */
+:root{
+  --clan-red:         #B52016;
+  --clan-white:       #FEFCF8;
+  --clan-white-dim:   rgba(254,252,248,.6);
+  --clan-white-faint: rgba(254,252,248,.3);
+}
+
+/* The card itself */
+.clan-card.samurai-card{
+  background:var(--clan-red);
+  border-color:transparent;
+}
+
+/* Identity */
+.samurai-card .clan-member-name{ color:var(--clan-white) }
+.samurai-card .clan-member-sub{ color:var(--clan-white-dim) }
+.samurai-card .clan-view-badge{
+  border-color:rgba(254,252,248,.25);
+  color:var(--clan-white-faint);
+}
+
+/* Strand chips — flat, no box */
+.samurai-card .clan-strand-chip{ background:transparent !important; padding:5px 4px }
+.samurai-card .clan-strand-chip .kanji{ filter:brightness(2) }
+.samurai-card .clan-strand-chip div div:first-child{ color:var(--clan-white-faint) !important }
+.samurai-card .clan-strand-chip div div:last-child{ color:var(--clan-white) !important }
+
+/* Stats — no box, just the numbers */
+.samurai-card .clan-stat{ background:transparent }
+.samurai-card .clan-stat-num{ color:var(--clan-white) !important }
+.samurai-card .clan-stat-label{ color:var(--clan-white-faint) }
+
+/* Craft tags — flat */
+.samurai-card .craft-tag{
+  background:transparent;
+  color:var(--clan-white-dim);
+  border:1px solid rgba(254,252,248,.2);
+}
+
+/* Goals */
+.samurai-card .clan-goals-hd{ color:var(--clan-white-faint) !important }
+.samurai-card .cg-label{ color:var(--clan-white-dim) }
+.samurai-card .cg-pct{ color:var(--clan-white-faint) }
+.samurai-card .cg-bar{ background:rgba(0,0,0,.25) }
+.samurai-card .cg-fill{ background:var(--clan-white) !important }
+
+/* Invite section */
+.invite-section{margin-top:32px;padding-top:28px;border-top:1px solid rgba(0,0,0,.06)}
+.invite-input-row{display:flex;gap:10px;margin-top:16px}
+.invite-input{flex:1;font-family:'Noto Serif JP',serif;font-size:14px;background:none;border:none;
+  border-bottom:1.5px solid rgba(0,0,0,.12);padding:10px 0;color:var(--ink);outline:none}
+.invite-input:focus{border-bottom-color:var(--ink)}
+.invite-input::placeholder{color:var(--ink-faint);opacity:.4}
+.pending-card{margin-top:12px;padding:14px 18px;background:rgba(204,53,41,.04);
+  border:1px dashed rgba(204,53,41,.2);display:flex;align-items:center;
+  justify-content:space-between;border-radius:2px}
+.pending-name{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-faint)}
+.pending-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.7}
+.pending-actions{display:flex;gap:8px}
+.pending-btn{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;
+  border:1px solid;cursor:pointer;background:none;font-family:'Noto Sans JP',sans-serif;transition:all .2s}
+.pending-btn.accept{border-color:var(--ink);color:var(--ink)}
+.pending-btn.accept:hover{background:var(--ink);color:var(--scroll)}
+.pending-btn.decline{border-color:rgba(0,0,0,.1);color:var(--ink-faint)}
+
+/* ═══ AUTH SCREEN ═══════════════════════════════════════════════════════ */
+#auth-screen{
+  position:fixed;inset:0;background:var(--edge);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9998;padding:24px;
+}
+.auth-scroll{
+  width:100%;max-width:420px;background:var(--scroll);
+  box-shadow:-4px 0 20px rgba(26,26,26,.06),4px 0 20px rgba(26,26,26,.06);
+  padding:48px 48px 36px;position:relative;
+  animation:scrollUnroll .8s cubic-bezier(.22,1,.36,1) forwards;
+}
+.auth-scroll::before,.auth-scroll::after{content:'';position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.05)}
+.auth-scroll::before{left:24px}.auth-scroll::after{right:24px}
+.auth-header{text-align:center;margin-bottom:36px}
+.auth-hanko{
+  width:52px;height:52px;border:2.5px solid var(--red);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;transform:rotate(-3deg);
+}
+.auth-hanko span{font-family:'Noto Serif JP',serif;font-size:30px;font-weight:900;color:var(--red)}
+.auth-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;letter-spacing:12px;color:var(--ink);margin-bottom:4px}
+.auth-tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint)}
+.auth-config-notice{
+  background:rgba(204,53,41,.04);border:1px dashed rgba(204,53,41,.25);
+  padding:12px 16px;margin-bottom:20px;border-radius:2px;
+}
+.auth-config-notice p{font-size:10px;line-height:1.8;color:var(--ink-faint)}
+.auth-config-notice strong{color:var(--red);font-weight:700;font-style:normal}
+.auth-tabs{display:flex;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:24px}
+.auth-tab{
+  flex:1;text-align:center;padding:10px 8px;
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ink-faint);cursor:pointer;border:none;background:none;position:relative;transition:color .2s;
+}
+.auth-tab::after{
+  content:'';position:absolute;bottom:-1px;left:20%;right:20%;
+  height:2px;background:var(--red);transform:scaleX(0);transition:transform .3s;
+}
+.auth-tab.active{color:var(--ink)}.auth-tab.active::after{transform:scaleX(1)}
+.auth-field{margin-bottom:18px}
+.auth-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;display:block}
+.auth-input{
+  width:100%;font-family:'Noto Serif JP',serif;font-size:15px;
+  background:none;border:none;border-bottom:1px solid rgba(0,0,0,.1);
+  padding:10px 0;color:var(--ink);outline:none;transition:border-color .2s;
+}
+.auth-input:focus{border-bottom-color:var(--ink)}
+.auth-input::placeholder{color:var(--ink-faint);opacity:.4}
+.auth-submit{width:100%;margin-top:4px;margin-bottom:20px}
+.auth-divider{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(0,0,0,.08)}
+.auth-divider-text{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.auth-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:12px 24px;border:1.5px solid rgba(0,0,0,.1);background:none;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink);transition:all .2s;margin-bottom:16px;
+}
+.auth-google:hover{border-color:var(--ink);background:rgba(0,0,0,.02)}
+.auth-google svg{width:18px;height:18px;flex-shrink:0}
+.auth-error{
+  font-size:11px;color:var(--red);text-align:center;min-height:18px;
+  letter-spacing:.5px;opacity:0;transition:opacity .2s;
+}
+.auth-error.visible{opacity:1}
+.auth-demo-link{
+  display:block;text-align:center;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink-faint);opacity:.4;cursor:pointer;margin-top:14px;transition:opacity .2s;
+  background:none;border:none;width:100%;font-family:'Noto Sans JP',sans-serif;padding:8px;
+}
+.auth-demo-link:hover{opacity:.7}
+
+/* ── Migration overlay ───────────────────────────────────────────────────── */
+#migrate-overlay{
+  position:fixed;inset:0;z-index:200;background:var(--scroll);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+#migrate-overlay.active{display:flex}
+.migrate-card{max-width:440px;width:100%}
+.migrate-stats{
+  background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);
+  border-radius:2px;padding:14px 18px;margin-bottom:24px;
+  font-size:13px;line-height:2;font-family:'Noto Sans JP',sans-serif;color:var(--ink);
+}
+.migrate-actions{text-align:center;margin-top:12px}
+
+/* ═══ STREAK SYSTEM EXPERIMENT ═══════════════════════════════════════════ */
+.streak-experiment{padding:48px 0 60px}
+.streak-exp-header{text-align:center;margin-bottom:36px}
+.streak-exp-title{font-family:'Noto Serif JP',serif;font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
+.streak-exp-sub{font-size:9px;letter-spacing:2px;color:var(--ink-faint);opacity:.5}
+.streak-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:640px){.streak-grid{grid-template-columns:1fr}}
+.streak-panel{background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.07);display:flex;flex-direction:column}
+.streak-panel-label{padding:11px 16px 9px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:baseline;gap:10px}
+.sp-letter{font-family:'Noto Serif JP',serif;font-size:11px;font-weight:900;color:var(--red)}
+.sp-tab{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.sp-q{font-size:9px;letter-spacing:.5px;color:rgba(0,0,0,.28);font-style:italic;margin-left:auto}
+.streak-panel-body{padding:20px 16px;flex:1}
+.sp-desc{font-size:10px;color:var(--ink-faint);letter-spacing:.3px;line-height:1.75;margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+
+/* A — Kaizen whisper */
+.kz-datebar{display:flex;align-items:baseline;gap:7px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.06)}
+.kz-date{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);letter-spacing:1px}
+.kz-whisper{font-size:9px;letter-spacing:1px;color:rgba(204,53,41,.42)}
+.kz-dots{display:flex;gap:2px;margin-left:auto}
+.kz-dot-w{width:4px;height:4px;border-radius:50%;background:var(--red);opacity:.22}
+.kz-dot-w.lit{opacity:1}
+.kz-greeting{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);letter-spacing:1px;margin-bottom:12px}
+.kz-habits-mock{display:flex;flex-direction:column;gap:6px}
+.kz-habit-row{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--ink-faint)}
+.kz-pip{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.kz-pip.done{background:var(--red)}
+.kz-pip.miss{border:1.5px solid rgba(0,0,0,.15)}
+
+/* B — Ikigai arc */
+.ik-arc-head{margin-bottom:12px}
+.ik-arc-label-sm{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+.ik-arc-narrative{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink-light);line-height:1.6}
+.ik-arc-narrative em{color:var(--red);font-style:normal}
+.ik-tl{display:flex;gap:2px;flex-wrap:wrap;margin:12px 0 4px}
+.ik-d{width:7px;height:7px;border-radius:1px;flex-shrink:0}
+.ik-d.full{background:var(--red)}
+.ik-d.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(204,53,41,.28)}
+.ik-d.partial{background:rgba(204,53,41,.36)}
+.ik-d.miss{background:rgba(0,0,0,.09)}
+.ik-d.future{background:rgba(0,0,0,.04)}
+.ik-d.current{background:var(--red);outline:1.5px solid rgba(255,255,255,.65);outline-offset:0}
+.ik-month-row{display:flex;justify-content:space-between;font-size:7px;letter-spacing:1px;color:var(--ink-faint);opacity:.55;margin-bottom:10px}
+.ik-anns{display:flex;flex-direction:column;gap:4px}
+.ik-ann-row{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--ink-faint)}
+.ik-swatch{width:18px;height:5px;border-radius:1px;flex-shrink:0}
+.ik-swatch.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(204,53,41,.25)}
+.ik-swatch.gap{background:rgba(0,0,0,.09)}
+.ik-swatch.current{background:var(--red);outline:1px solid rgba(0,0,0,.15)}
+
+/* C — Shokunin shelf */
+.sh-shelf-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px}
+.sh-shelf{display:flex;justify-content:space-between;gap:4px;margin-bottom:14px}
+.sh-stamp{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 3px 8px;border:1px solid rgba(0,0,0,.06);background:rgba(0,0,0,.02);position:relative}
+.sh-stamp.earned{background:rgba(204,53,41,.04);border-color:rgba(204,53,41,.18)}
+.sh-stamp.next{border-color:rgba(204,53,41,.14);border-style:dashed}
+.sh-kanji{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:900;line-height:1}
+.sh-stamp.earned .sh-kanji{color:var(--red)}
+.sh-stamp.next   .sh-kanji{color:rgba(204,53,41,.28)}
+.sh-stamp.future .sh-kanji{color:rgba(0,0,0,.1)}
+.sh-days{font-size:8px;letter-spacing:.5px;text-align:center;line-height:1.4}
+.sh-stamp.earned .sh-days{color:rgba(204,53,41,.55)}
+.sh-stamp.next   .sh-days{color:rgba(0,0,0,.22)}
+.sh-stamp.future .sh-days{color:rgba(0,0,0,.14)}
+.sh-earned-dot{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--red)}
+.sh-progress-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--ink-faint)}
+.sh-prog-bar{flex:1;height:3px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden}
+.sh-prog-fill{height:100%;background:var(--red);border-radius:2px}
+.sh-prog-pct{font-size:9px;color:rgba(204,53,41,.65);letter-spacing:1px;flex-shrink:0}
+
+/* D — Clan momentum */
 .clan-exp-wrap{background:#FFFFFF;border:1.5px solid rgba(204,53,41,.18);padding:16px 16px 14px}
 .clan-exp-lbl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px}
 .clan-exp-members{display:flex;flex-direction:column;gap:10px}
@@ -717,28 +1183,13 @@ body.dark .hanko{border-color:var(--red)}
 .clan-exp-today{text-align:right}
 .clan-exp-today-num{font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--red);line-height:1}
 .clan-exp-today-lbl{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-top:2px}
+/* Clan name inline edit */
 .clan-name-field{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);background:transparent;border:none;border-bottom:1px solid transparent;outline:none;cursor:pointer;letter-spacing:.5px;width:100%;transition:border-color .2s}
 .clan-name-field:hover{border-bottom-color:rgba(204,53,41,.3)}
 .clan-name-field:focus{border-bottom-color:var(--red);cursor:text}
 .clan-name-field::placeholder{color:rgba(204,53,41,.4);font-style:italic;font-weight:400}
 .clan-agg-bar{width:100%;border-radius:1px 1px 0 0;transition:height .4s ease,background .3s ease}
-/* primary nav (BUSHIDO / CLAN switcher) */
-.primary-nav{display:flex;margin:0 -48px;border-top:1px solid rgba(0,0,0,.07);border-bottom:1px solid rgba(0,0,0,.07);position:sticky;top:0;z-index:50;background:var(--scroll);transition:box-shadow .3s}
-.primary-nav.stuck{box-shadow:0 2px 20px rgba(26,26,26,.10);border-top-color:transparent}
-.primary-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 16px 18px;cursor:pointer;position:relative;overflow:hidden;background:none;border:none;font-family:'Noto Sans JP',sans-serif;transition:background .2s,padding .32s ease,gap .32s ease}
-.primary-nav.stuck .primary-tab{padding:9px 16px 7px;gap:1px}
-.primary-tab:first-child{border-right:1px solid rgba(0,0,0,.06)}
-.primary-tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red);transform:scaleY(0);transform-origin:bottom;transition:transform .25s}
-.primary-tab.active::after{transform:scaleY(1)}
-.primary-tab.active{background:rgba(255,255,255,.4)}
-.pt-kanji{font-family:'Noto Serif JP',serif;font-size:26px;color:var(--ink-faint);line-height:1;overflow:hidden;max-height:34px;transition:color .2s,max-height .32s ease,opacity .28s ease}
-.primary-nav.stuck .pt-kanji{max-height:0;opacity:0}
-.primary-tab.active .pt-kanji{color:var(--ink)}
-.pt-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);transition:color .2s;white-space:nowrap}
-.primary-tab.active .pt-label{color:var(--red)}
-.pt-sub{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);opacity:.5;overflow:hidden;max-height:14px;transition:max-height .28s ease,opacity .22s ease}
-.primary-nav.stuck .pt-sub{max-height:0;opacity:0}
-.clan-wrap{padding:36px 0}
+
 /* ════════════════════════════════════════════════════════════════════
    MOBILE — SESSION 1: DASHBOARD CARD LAYOUT
    Target: ≤640px (tablets/phones) and ≤480px (small phones)
@@ -946,10 +1397,168 @@ body.dark .hanko{border-color:var(--red)}
 }
 </style>
 
+<!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
+     Setup checklist (do these in Firebase Console before wiring):
+       1. Create project at https://console.firebase.google.com
+       2. Authentication → Sign-in method → enable Email/Password + Google
+       3. Firestore Database → Create database (start in test mode)
+       4. Project Settings → Your Apps → Add web app → copy the config object
+     Then paste your config into firebaseConfig below and reload.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────────────────
+// From: Firebase Console → Project Settings → Your Apps → SDK setup → Config
+const firebaseConfig = {
+  apiKey:            "AIzaSyCaGlnWIrqh5xcxaqihzjPj2IP_4H15c9Q",
+  authDomain:        "bushido-4e8ca.firebaseapp.com",
+  projectId:         "bushido-4e8ca",
+  storageBucket:     "bushido-4e8ca.firebasestorage.app",
+  messagingSenderId: "904422694097",
+  appId:             "1:904422694097:web:593e85a05dd9be4377b9f0"
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+const FIREBASE_CONFIGURED = !firebaseConfig.apiKey.startsWith('PASTE');
+var db, auth;
+if (FIREBASE_CONFIGURED) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db   = firebase.firestore();
+    auth = firebase.auth();
+  } catch(e) {
+    console.warn('Firebase SDK not available:', e.message);
+  }
+}
+</script>
 </head>
 <body>
-<div class="scroll" id="app">
 
+<!-- ═══ AUTH SCREEN ═══════════════════════════════════════════════════════════
+     Shown by default. Hidden by onAuthStateChanged once user is signed in.
+     Also hidden when user enters Demo Mode (no Firebase required).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-scroll">
+
+    <div class="auth-header">
+      <div class="auth-hanko"><span>道</span></div>
+      <div class="auth-title">BUSHIDO</div>
+      <div class="auth-tagline">武士道 · The warrior's path</div>
+    </div>
+
+    <!-- Shown when firebaseConfig hasn't been filled in yet -->
+    <div class="auth-config-notice" id="auth-config-notice" style="display:none">
+      <p><strong>Firebase not configured.</strong><br>
+      Paste your project config into the <em>firebaseConfig</em> block in &lt;head&gt;,
+      then reload. Or click <strong>Demo Mode</strong> below to explore without auth.</p>
+    </div>
+
+    <!-- Sign In / Create Account tabs -->
+    <div class="auth-tabs" id="auth-tabs">
+      <button class="auth-tab active" onclick="setAuthMode('signin')">Sign In</button>
+      <button class="auth-tab" onclick="setAuthMode('signup')">Create Account</button>
+    </div>
+
+    <!-- Email + password form -->
+    <div id="auth-form">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="auth-email" type="email" placeholder="your@email.com"
+               onkeydown="if(event.key==='Enter')submitAuthForm()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="auth-password" type="password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')submitAuthForm()">
+      </div>
+      <button class="btn auth-submit" id="auth-submit-btn" onclick="submitAuthForm()">Enter</button>
+    </div>
+
+    <div class="auth-divider"><span class="auth-divider-text">or</span></div>
+
+    <!-- Google sign-in -->
+    <button class="auth-google" onclick="signInGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-error" id="auth-error"></div>
+
+    <!-- Canvas demo bypass — always available in canvas mode -->
+    <button class="auth-demo-link" id="auth-demo-link" onclick="enterDemoMode()">
+      canvas demo — enter without auth
+    </button>
+
+  </div>
+</div>
+
+<!-- ── CLOUD MIGRATION OVERLAY ─────────────────────────────────────────────── -->
+<div id="migrate-overlay">
+  <div class="migrate-card">
+    <div class="auth-header">
+      <div class="auth-hanko"><span>移</span></div>
+      <div class="auth-title">Your data found.</div>
+      <div class="auth-tagline">The warrior's history travels with him</div>
+    </div>
+    <div id="migrate-stats" class="migrate-stats"></div>
+    <button class="btn auth-submit" id="migrate-confirm-btn" onclick="performMigration()">
+      Bring it to the cloud →
+    </button>
+    <div class="migrate-actions">
+      <button class="auth-demo-link" onclick="declineMigration()">start fresh instead</button>
+    </div>
+  </div>
+</div>
+
+<div class="scroll" id="app" style="display:none">
+
+  <!-- ── ACCOUNT BAR ── -->
+  <div class="account-bar" id="account-bar">
+    <div class="account-name">Good morning, James</div>
+    <div class="account-right">
+      <button class="btn-edit-mode" id="account-edit-btn" onclick="toggleEditMode()">Edit</button>
+      <button class="btn-sign-out" onclick="signOutUser()">Sign out</button>
+      <div class="account-avatar"><span>J</span></div>
+    </div>
+  </div>
+  <div class="edit-mode-bar">✎ &nbsp;edit mode — hover to edit or delete practices</div>
+
+  <!-- sentinel: when this scrolls out of view, nav gets .stuck -->
+  <div id="nav-sentinel" style="height:1px;margin:0"></div>
+
+  <!-- ── PRIMARY NAV ── -->
+  <div class="primary-nav" id="primary-nav">
+    <button class="primary-tab active" data-primary="bushido" onclick="switchPrimary('bushido')">
+      <span class="pt-kanji">道</span>
+      <span class="pt-label">My Bushido</span>
+      <span class="pt-sub">Practice</span>
+    </button>
+    <button class="primary-tab" data-primary="clan" onclick="switchPrimary('clan')">
+      <span class="pt-kanji">氏</span>
+      <span class="pt-label">My Clan</span>
+      <span class="pt-sub">Accountability</span>
+    </button>
+  </div>
+
+  <!-- ══════════ MY BUSHIDO PANEL ══════════ -->
+  <div id="primary-bushido" style="display:block">
+
+  <!-- HEADER (always visible) -->
+  <header class="header">
+    <div class="header-kanji">武士道</div>
+    <h1 class="title">BUSHIDO</h1>
+    <div class="subtitle">the way of daily discipline</div>
+    <div class="hanko"><span>道</span></div>
+  </header>
+  <div class="divider"></div>
 
   <!-- ==================== ONBOARDING ==================== -->
   <div class="onboard active" id="onboard">
@@ -1143,36 +1752,6 @@ body.dark .hanko{border-color:var(--red)}
   <!-- ==================== DASHBOARD ==================== -->
   <div class="dashboard" id="dashboard">
 
-    <!-- sentinel: when this scrolls out of view, nav gets .stuck -->
-    <div id="nav-sentinel" style="height:1px;margin:0"></div>
-
-    <!-- PRIMARY NAV -->
-    <div class="primary-nav" id="primary-nav">
-      <button class="primary-tab active" data-primary="bushido" onclick="switchPrimary('bushido')">
-        <span class="pt-kanji">道</span>
-        <span class="pt-label">My Bushido</span>
-        <span class="pt-sub">Practice</span>
-      </button>
-      <button class="primary-tab" data-primary="clan" onclick="switchPrimary('clan')">
-        <span class="pt-kanji">氏</span>
-        <span class="pt-label">My Clan</span>
-        <span class="pt-sub">Accountability</span>
-      </button>
-    </div>
-
-    <!-- MY BUSHIDO PANEL -->
-    <div id="primary-bushido" style="display:block">
-
-    <!-- HEADER -->
-    <header class="header">
-      <div class="header-kanji">武士道</div>
-      <h1 class="title">BUSHIDO</h1>
-      <div class="subtitle">the way of daily discipline</div>
-      <div class="hanko"><span>道</span></div>
-    </header>
-    <div class="divider"></div>
-
-
     <!-- Ryughi -->
     <section class="ryughi-section">
       <div class="ryughi-header-click" onclick="openVisionDrawer()">
@@ -1185,11 +1764,7 @@ body.dark .hanko{border-color:var(--red)}
     </section>
     <div class="divider"></div>
 
-    <!-- Date & greeting -->
-    <div class="date-bar">
-      <span class="date-text" id="date-display"></span>
-      <span class="streak-badge" id="streak-display"></span>
-    </div>
+    <!-- Greeting (date now lives natively in Kaizen scroll) -->
     <div class="greeting-bar" id="greeting-display"></div>
 
     <!-- Week strip (Kaizen only) -->
@@ -1229,131 +1804,12 @@ body.dark .hanko{border-color:var(--red)}
       <span id="sync-status" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;color:var(--ink-faint);opacity:.5"></span>
     </div>
 
-
-
     <!-- Stats panel (revealed by clicking the seal) -->
     <div class="stats-panel" id="stats-panel"></div>
 
     <div class="seal" onclick="toggleStats()" title="">
       <div class="seal-k" id="seal-k">道</div>
     </div>
-    </div><!-- /primary-bushido -->
-
-    <!-- MY CLAN PANEL -->
-    <div id="primary-clan" style="display:none">
-      <div class="clan-wrap">
-        <div class="clan-momentum-block">
-        <div class="clan-exp-wrap" style="padding:18px 16px 16px">
-          <!-- Box header: clan name + warrior count -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.18)">
-            <div style="flex:1;min-width:0;margin-right:12px">
-              <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:4px">YOUR CLAN</div>
-              <input class="clan-name-field" id="clan-name-input" type="text" placeholder="Name your clan&hellip;" maxlength="32" spellcheck="false">
-            </div>
-            <div style="text-align:right;flex-shrink:0">
-              <div style="font-size:17px;font-weight:700;font-family:'Noto Serif JP',serif;color:var(--red);line-height:1">3</div>
-              <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-top:2px">warriors</div>
-            </div>
-          </div>
-          <!-- Group performance strip -->
-          <div id="clan-perf-strip" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.12)">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
-              <div style="display:flex;align-items:baseline;gap:7px">
-                <div id="clan-weekly-pct" style="font-family:'Noto Serif JP',serif;font-size:26px;font-weight:700;color:var(--red);line-height:1">74%</div>
-                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.5);align-self:center;line-height:1.5">Completion Rate<br>This Week</div>
-              </div>
-              <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(204,53,41,.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
-            </div>
-            <div id="clan-record-line" style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:11px">clan record 12d &middot; current 4d</div>
-            <div>
-              <div style="font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:5px">CLAN AGGREGATE KAIZEN</div>
-              <div id="clan-agg-bars" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;align-items:end;height:28px">
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-              </div>
-              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:3px">
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">M</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">W</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">F</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
-              </div>
-            </div>
-          </div>
-          <div class="clan-exp-members" id="clan-exp-members">
-            <!-- Elijah — static demo data -->
-            <div class="clan-exp-row">
-              <div><div class="clan-exp-streak">31</div><div class="clan-exp-streak-lbl">days</div></div>
-              <div style="flex:1;min-width:0">
-                <div class="clan-exp-name">Elijah</div>
-                <div class="clan-exp-bars">
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar today" style="height:15px"></div>
-                  <div class="clan-exp-bar"       style="height:3px"></div>
-                  <div class="clan-exp-bar"       style="height:3px"></div>
-                </div>
-              </div>
-              <div class="clan-exp-today"><div class="clan-exp-today-num">10/14</div><div class="clan-exp-today-lbl">today</div></div>
-            </div>
-            <!-- James — live data + inline visibility toggle -->
-            <div class="clan-exp-row" style="align-items:start">
-              <div style="padding-top:2px"><div class="clan-exp-streak" id="clan-my-streak">&#x2014;</div><div class="clan-exp-streak-lbl">days</div></div>
-              <div style="min-width:0;overflow:hidden">
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:3px">
-                  <span class="clan-exp-name" style="margin:0;flex-shrink:0">James</span>
-                  <span class="clan-you" style="flex-shrink:0">you</span>
-                  <span id="clan-my-badge" class="ps-badge" style="display:none"></span>
-                  <div id="clan-vis-pill" style="display:flex;border:1px solid rgba(204,53,41,.25);border-radius:2px;overflow:hidden;flex-shrink:0">
-                    <button id="clan-vis-samurai" onclick="setVis('samurai')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;border-right:1px solid rgba(204,53,41,.2);background:var(--red);color:#FEFCF8;cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif;font-weight:700">Samurai</button>
-                    <button id="clan-vis-shinobi" onclick="setVis('shinobi')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;background:transparent;color:rgba(26,26,26,.3);cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif">Shinobi</button>
-                  </div>
-                </div>
-                <div id="vis-hint" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px;transition:color .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">your clan sees everything</div>
-                <div class="clan-exp-bars" id="clan-my-bars">
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                  <div class="clan-exp-bar today" style="height:3px"></div>
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                  <div class="clan-exp-bar" style="height:3px"></div>
-                </div>
-              </div>
-              <div class="clan-exp-today" style="padding-top:2px"><div class="clan-exp-today-num" id="clan-my-today">&#x2014;</div><div class="clan-exp-today-lbl">today</div></div>
-            </div>
-            <!-- Chark — static demo data -->
-            <div class="clan-exp-row">
-              <div><div class="clan-exp-streak">8</div><div class="clan-exp-streak-lbl">days</div></div>
-              <div style="flex:1;min-width:0">
-                <div class="clan-exp-name">Chark</div>
-                <div class="clan-exp-bars">
-                  <div class="clan-exp-bar done"    style="height:20px"></div>
-                  <div class="clan-exp-bar partial"  style="height:13px"></div>
-                  <div class="clan-exp-bar done"     style="height:20px"></div>
-                  <div class="clan-exp-bar done"     style="height:20px"></div>
-                  <div class="clan-exp-bar today"    style="height:9px"></div>
-                  <div class="clan-exp-bar"          style="height:3px"></div>
-                  <div class="clan-exp-bar"          style="height:3px"></div>
-                </div>
-              </div>
-              <div class="clan-exp-today"><div class="clan-exp-today-num">5/10</div><div class="clan-exp-today-lbl">today</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-      </div>
-    </div><!-- /primary-clan -->
   </div>
 
   <!-- Reflection prompt (central screen) -->
@@ -1405,6 +1861,15 @@ body.dark .hanko{border-color:var(--red)}
     </div>
   </div>
 
+  <!-- Practice stamp ceremony overlay -->
+  <div id="ps-overlay">
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div id="ps-large"></div>
+      <div id="ps-title"></div>
+      <div id="ps-copy"></div>
+    </div>
+  </div>
+
   <!-- Reflection modal -->
   <div class="modal-overlay" id="reflect-modal">
     <div class="modal" id="reflect-content"></div>
@@ -1428,80 +1893,97 @@ body.dark .hanko{border-color:var(--red)}
 
 <script>
 // ============ PERSISTENCE ============
+// Canvas has its own isolated key — never reads or writes to any real user's data
 const PROD_KEY = 'bushido_elijah_permanent'; // NEVER change this
 const DEV_KEY  = 'bushido_elijah_dev_v14';  // bump freely during dev
 const IS_DEV   = false;                     // set true when actively developing
-const STORAGE_KEY = IS_DEV ? DEV_KEY : PROD_KEY;
+const STORAGE_KEY = PROD_KEY;
 const HARDCODED_BIN_ID = '69dea163aaba882197fc5550'; // permanent bin — enables cross-device sync
 
 function saveState(){
   state.lastModified=Date.now();
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-  scheduleSyncToCloud();
+  if(FIREBASE_CONFIGURED){
+    saveStateToFirestore(); // async fire-and-forget
+  } else {
+    scheduleSyncToCloud(); // legacy JSONbin fallback
+  }
 }
 
 function loadState(){
-  try{
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if(saved){ const p=JSON.parse(saved); Object.assign(state,p); }
-  }catch(e){}
-  if(!state.milestoneStamps) state.milestoneStamps={};  // backward compat
+  // Canvas always starts from DEFAULT_STATE — ignore any cached data
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  if(!state.milestoneStamps)  state.milestoneStamps={};
+  if(!state.practiceStamps)   state.practiceStamps={};
 }
 
-// ============ DEFAULT STATE (pre-loaded onboarding) ============
+// ============ DEFAULT STATE — canvas blank slate ============
+// No personal data. Canvas is for design experimentation only.
 const DEFAULT_STATE = {
-  onboarded: false,
-  name: 'Elijah',
+  onboarded: true,
+  name: 'James',
   strands: [
-    'The Discipline',
-    'The Builder of Belonging',
-    'Faith as Practice',
-    'The Independent Path',
-    'The Ocean'
+    'Capital and Building',
+    'The Ancient World',
+    'The Warrior\u2019s Body',
+    'Creative Mastery',
+    'Faith and Love'
   ],
-  tenYearVision: '2036. You are 35. You wake up around 7 and thank God immediately — for rest, for family, for everything provided. Coffee made, drunk 90 minutes later. You ride your Harley to the gym you own — a place unlike any other. No judgment. Everyone who walks in gets a trainer. There is a café, a community, a reason to stay. Churches, schools, offices know your name. Your team shares the vision and runs the morning rush. You work out, build programs, lead a class or direct one. Lunch with your partner. Ride back. You welcome new people personally — because that is the whole point. You pick the kids up from school. Evening run club. Home to a wholesome meal. Evening together. Pray before bed. Maybe call your brother.',
+  tenYearVision: 'Rome at dawn, coffee with Antonella in our London flat or a pied-\u00e0-terre in Paris. In great shape for my age. My work is multifaceted: business ventures, a history platform with an audience who cares, videos about the things that set me on fire. A beautiful piano in the living room I actually play. Traveling through Europe for lectures, for art, for friends. The fire within being used for the right things. The hunger fed the right nourishment. Risks taken but not recklessly. Mastery of self pursued but not selfishly. A heart full of the right kind of love.',
   milestones5yr: [
-    'Gym open and revenue generating — small team in place that carries the vision',
-    'PT and safety certifications complete — the credentials that make it legitimate',
-    'Gym loan established and being paid down — financial foundation is real',
-    'Right network built — mentors found, connections made, the right doors opened',
-    'Marathon completed — you are the living proof of what you are selling',
-    'You have met her — and you are building something together'
+    'CSC and CISI held, serious role in finance or business, first real steps taken on the venture with family',
+    'History platform launched, publishing consistently, audience engaging, woven into the fabric of life',
+    'Half marathon completed, full hybrid athlete, salsa a genuine weekly practice',
+    'Piano daily habit established, visibly and measurably better, a repertoire ready for recording',
+    'Antonella and I, consciously chosen, at least engaged if not married'
   ],
   annualGoals: [
-    {id:100, text:'Build a real business plan for the gym — something ready to put in front of the right people', parentMs:0, progress:0, done:false},
-    {id:101, text:'Find your first mentor or connector — start with your dad this week', parentMs:3, progress:0, done:false},
-    {id:102, text:'Complete your first marathon', parentMs:4, progress:0, done:false},
-    {id:103, text:'Put yourself out there intentionally for a serious relationship — with intent, not casually', parentMs:5, progress:0, done:false}
+    {id:100, text:'Finish CSC certification this year', parentMs:0, progress:0, done:false},
+    {id:101, text:'Establish disciplined investing practice: CC/CSP strategy, 2% weekly target on capital deployed', parentMs:0, progress:0, done:false},
+    {id:102, text:'Open family business conversation with brother and father, moving to an actual meeting with agenda', parentMs:0, progress:0, done:false},
+    {id:103, text:'Launch history platform: first video live, consistent bi-weekly cadence held through December', parentMs:1, progress:0, done:false},
+    {id:104, text:'Register for a race: bib number, date, finish line', parentMs:2, progress:0, done:false},
+    {id:105, text:'Daily piano non-negotiable by summer, two to three pieces in serious progress', parentMs:3, progress:0, done:false},
+    {id:106, text:'One intentional, significant move forward with Antonella', parentMs:4, progress:0, done:false}
   ],
   shokunin: [
-    {id:200, text:'Industry Immersion: study successful gym models, community fitness, faith-integrated spaces', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
-    {id:201, text:'Business and Financial Literacy: startup costs, loan structures, gym economics', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
-    {id:202, text:'Marathon Training: building the body that leads by example', parentAnnual:102, progress:0, timeframe:'weekly', done:false},
-    {id:203, text:'Networking and Relationship Building: the right coffees, rooms, and people', parentAnnual:101, progress:0, timeframe:'weekly', done:false},
-    {id:204, text:'Intentional Partnership Pursuit: church, community, social presence — building on firm foundation', parentAnnual:103, progress:0, timeframe:'weekly', done:false},
-    {id:205, text:'Personal Brand and Content Creation: you are the gym before the gym exists', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
-    {id:206, text:'Faith and Daily Discipline: the practice that anchors everything else', parentAnnual:103, progress:0, timeframe:'daily', done:false}
+    {id:200, text:'CSC and Markets mastery: syllabus progress, one new concept applied monthly', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:201, text:'History platform production: research and script one week, edit and publish the next', parentAnnual:103, progress:0, timeframe:'monthly', done:false},
+    {id:202, text:'Athletic conditioning: 3 lifts and 2 runs per week, measurable monthly progress', parentAnnual:104, progress:0, timeframe:'monthly', done:false},
+    {id:203, text:'Salsa technique: one new move per week, lead it cleanly by month end', parentAnnual:104, progress:0, timeframe:'weekly', done:false},
+    {id:204, text:'Piano mastery: Through the Fire by Chaka Khan, deepening chord theory alongside', parentAnnual:105, progress:0, timeframe:'monthly', done:false},
+    {id:205, text:'Faith and Love daily practice: prayer and presence with Antonella', parentAnnual:106, progress:0, timeframe:'weekly', done:false},
+    {id:206, text:'Novel: 50 words a day (begins July 2026)', parentAnnual:105, progress:0, timeframe:'monthly', done:false}
   ],
   kaizen: [
-    {id:300, text:'Morning prayer',                                                    days:'daily',  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:301, text:'Bible reading',                                                     days:[1,3,6],  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:302, text:'5 mins business or industry learning',                              days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:303, text:'Run (Mon/Wed short, Sat long)',                                     days:[0,2,5],  parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:304, text:'Story post',                                                        days:[0,2,4,6],parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:305, text:'Strike up a conversation (doubles to 2x after 2 weeks)',            days:[5],      parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:306, text:'One outreach message to someone worth knowing',                     days:[0],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:307, text:'Gym content post (one every 10 days)',                              days:[1,5],    parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:308, text:'Evening prayer',                                                    days:'daily',  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null}
+    {id:300, text:'Morning prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:302, text:'Word of affirmation to Antonella',                     days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:305, text:'Read markets community, one concept absorbed',         days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:306, text:'Cold message someone toward the right role',           days:[0,3],    parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:304, text:'CSC study, 30 focused minutes',                        days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:303, text:'Piano, 20 minutes minimum',                            days:'daily',  parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:307, text:'Lift',                                                 days:[0,2,4],  parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:308, text:'Run',                                                  days:[1,3],    parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:309, text:'Salsa class',                                          days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:312, text:'One new salsa move practiced',                         days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:310, text:'Social dance: one dance, on the floor, even when shy', days:[5],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:314, text:'History: 15 minutes of reading, notes, or scripting',        days:'daily', parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:311, text:'History platform work: deep session (record, edit, or publish)', days:[5,6], parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:313, text:'Novel, 50 words',                                      days:'daily',  startDate:'2026-07-01', parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:301, text:'Evening prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null}
   ],
   completionLog: {},
   dailyNotes: {},
   reflections: [],
+  milestoneStamps: {},  // {`${habitId}-${days}`: true} — permanently earned stamps
   lastModified: 0,
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   nextId: 400,
+  yearEndMode: 'calendar',   // 'calendar' | 'anniversary'
+  yearEndMonth: 12,          // 1-12, the month the year-end review fires
+  yearStartDate: null,       // set on first onboarding completion, used for anniversary mode
 };
 
 // ============ STATE ============
@@ -1542,6 +2024,7 @@ const SHR = [
 ];
 
 let currentTab = 'kaizen';
+let editMode = false;
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 // JS getDay(): 0=Sun...6=Sat. Convert to Mon=0...Sun=6
 function todayIdx(){ return (new Date().getDay()+6)%7; }
@@ -1889,11 +2372,20 @@ function buildKaizenGrid(){
     return false;
   });
 
+  // Date header — native to the scroll
+  const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
+  const nowDateStr=new Date().toLocaleDateString('en-GB',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const dateHeaderHtml=`<div class="kk-date-header">
+    <span class="kk-date-text">${nowDateStr}</span>
+    ${maxSt>1?`<span class="kk-streak-whisper">\u00b7 day ${maxSt}</span>`:''}
+  </div>`;
+
   let html=`<div class="hg-wrap">
     <div class="kk-outer">
       <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
       <div class="kk-rod"></div>
       <div class="kk-body">
+        ${dateHeaderHtml}
         <div class="hg-nav">
           <button class="hg-nav-btn" onclick="navigateWeek(-1)">&#8249;</button>
           <span class="hg-week-label">${isCurrentWeek?'this week':formatWeekRange(ws,days[6])}</span>
@@ -1973,11 +2465,30 @@ function buildMonthCal(){
   const weeks=[];
   for(let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
 
+  // C — milestone shelf (practice continuance stamps — uses PRACTICE_MILESTONES global)
+  if(!state.practiceStamps) state.practiceStamps={};
+  var stampsHtml='';
+  PRACTICE_MILESTONES.forEach(function(s){
+    var k='ps-'+s.days;
+    var earned=!!state.practiceStamps[k];
+    var pending=!!_psPending[k];
+    var landing=!!_psLand[k];
+    var isActive=earned||pending;
+    var cls='sh-stamp'+(isActive?' earned':' future');
+    var dot=isActive?'<div class="sh-earned-dot'+(landing?' land':'')+'" style="background:'+s.col+';box-shadow:0 0 6px '+s.col+'"></div>':'';
+    var kanjiStyle=isActive?'color:'+s.col+';opacity:1':'';
+    var daysStyle=isActive?'color:'+s.col+';opacity:.65':'';
+    stampsHtml+='<div id="ps-stamp-'+s.days+'" class="'+cls+'">'
+      +dot+'<span class="sh-kanji" style="'+kanjiStyle+'">'+s.kanji+'</span>'
+      +'<span class="sh-days" style="'+daysStyle+'">'+s.days+'<br>days</span></div>';
+  });
+  var shelfHtml='<div class="sh-shelf-native"><div class="sh-shelf-lbl">Milestones of continuance</div><div class="sh-shelf">'+stampsHtml+'</div></div>';
+
   let html=`<div class="kk-outer">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
     <div class="kk-rod"></div>
     <div class="kk-body">
-      <div class="mcal-wrap">
+      ${shelfHtml}<div class="mcal-wrap">
         <div class="mcal-nav">
           <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
           <span class="mcal-title">${monthName}</span>
@@ -2030,13 +2541,10 @@ function buildMonthCal(){
       let cls='mcal-cell';
       if(isToday) cls+=' mcal-today';
       if(isFuture) cls+=' mcal-future';
-      let dot='';
-      if(!isFuture&&scheduled.length){
-        if(pct>=1) dot=`<div class="mcal-dot mcal-full"></div>`;
-        else if(pct>0) dot=`<div class="mcal-dot mcal-partial"></div>`;
-        else dot=`<div class="mcal-dot mcal-none"></div>`;
-      }
-      return `<div class="${cls}"><span class="mcal-num">${cell.day}</span>${dot}</div>`;
+
+      // N dots = habits done that day
+      const dotHtml=done.length?`<div class="mcal-dots">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
+      return `<div class="${cls}"><span class="mcal-num">${cell.day}</span>${dotHtml}</div>`;
     }).join('');
 
     html+=`<div class="mcal-week-row">${wkHtml}${dayCells}</div>`;
@@ -2067,11 +2575,28 @@ function buildYearView(){
   const todayStr=getDateStr();
   const nowMidnight=new Date();nowMidnight.setHours(0,0,0,0);
 
+  // B — arc narrative (current vs best streak)
+  const habitsAll=state.kaizen;
+  const currSt=habitsAll.length?Math.max(...habitsAll.map(k=>k.streak||0)):0;
+  const bestSt=habitsAll.length?Math.max(...habitsAll.map(k=>Math.max(k.bestStreak||0,k.streak||0))):0;
+  let arcNarr='';
+  if(bestSt>0){
+    if(currSt>0&&currSt<bestSt)
+      arcNarr='Best run: <em>'+bestSt+' days</em> \u00b7 broken<br>Back on track: <em>'+currSt+' day'+(currSt===1?'':'s')+'</em> and climbing';
+    else if(currSt>0&&currSt===bestSt&&currSt>1)
+      arcNarr='<em>'+currSt+' days</em> unbroken \u00b7 your best yet';
+    else if(currSt>0)
+      arcNarr='<em>'+currSt+' day'+(currSt===1?'':'s')+'</em> on the path';
+    else
+      arcNarr='Best run: <em>'+bestSt+' days</em> \u00b7 awaiting return';
+  }
+  const arcHtml=arcNarr?('<div class="ik-arc-native"><div class="ik-arc-label-sm">'+year+' \u2014 the arc</div><div class="ik-arc-narrative">'+arcNarr+'</div></div>'):'';
+
   let html=`<div class="kk-outer">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
     <div class="kk-rod"></div>
     <div class="kk-body">
-      <div class="ycal-wrap">
+      ${arcHtml}<div class="ycal-wrap">
         <div class="ycal-year-label">${year}</div>
         <div class="ycal-months">`;
 
@@ -2099,14 +2624,19 @@ function buildYearView(){
       const pct=scheduled.length?doneHabits.length/scheduled.length:0;
 
       let cls='ycal-cell';
-      if(isToday)cls+=' ycal-today';
-      else if(isFuture)cls+=' ycal-future';
-      else if(!scheduled.length)cls+=' ycal-noscheduled';
-      else if(pct>=1)cls+=' ycal-full';
-      else if(pct>0)cls+=' ycal-partial';
-      else cls+=' ycal-miss';
-
-      html+=`<div class="${cls}"></div>`;
+      let ycalInline='';
+      if(isToday) cls+=' ycal-today';
+      else if(isFuture) cls+=' ycal-future';
+      else if(!scheduled.length) cls+=' ycal-noscheduled';
+      else {
+        // Continuous heatmap: alpha scales with completion rate
+        const alpha=pct===0?0.07:Math.max(0.18,pct*0.90);
+        ycalInline=` style="background:rgba(204,53,41,${alpha.toFixed(2)})"`;
+        if(pct>=1) cls+=' ycal-full';
+        else if(pct>0) cls+=' ycal-partial';
+        else cls+=' ycal-miss';
+      }
+      html+=`<div class="${cls}"${ycalInline}></div>`;
     }
     html+=`</div></div>`;
   }
@@ -2130,7 +2660,6 @@ function habitOnDay(k, d){
 
 // ============ DASHBOARD ============
 function renderDashboard(){
-  setupNavSquish();
   checkDailyReset();
   // Ryughi strands
   const rd=document.getElementById('ryughi-display');
@@ -2142,8 +2671,7 @@ function renderDashboard(){
       ${ms?`<div class="strand-ms">${msShort}</div>`:''}
     </div>`;
   }).join('');
-  // Date
-  document.getElementById('date-display').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // Date (now rendered natively inside Kaizen scroll via buildKaizenGrid)
   const greet=document.getElementById('greeting-display');
   if(greet) greet.textContent=getGreeting();
   const ws=document.getElementById('week-strip');
@@ -2238,6 +2766,10 @@ function renderGoals(){
                 ${msRowHtml}
               </div>
             </div>
+            <div class="goal-actions">
+              <button class="goal-act" onclick="startEdit('kaizen',${g.id})">✎</button>
+              <button class="goal-act goal-del" onclick="confirmDelete('kaizen',${g.id})">×</button>
+            </div>
             </li>`;
         }).join('');
     } else {
@@ -2292,6 +2824,10 @@ function renderGoals(){
             <button class="pbtn" onclick="adjProg(${g.id},5)">+</button>
           </div>
         </div>
+        <div class="goal-actions">
+          <button class="goal-act" onclick="startEdit('shokunin',${g.id})">✎</button>
+          <button class="goal-act goal-del" onclick="confirmDelete('shokunin',${g.id})">×</button>
+        </div>
         </li>`;
     }).join('')+addTriggerHtml()+buildMonthCal();
 
@@ -2316,7 +2852,7 @@ function renderGoals(){
         </div>
         <div class="goal-actions">
           <button class="goal-act" onclick="startEdit('annual',${g.id})">✎</button>
-          <button class="goal-act goal-del" onclick="deleteItem('annual',${g.id})">×</button>
+          <button class="goal-act goal-del" onclick="confirmDelete('annual',${g.id})">×</button>
         </div></li>`;
     }).join('')+addTriggerHtml()+buildYearView();
   }
@@ -2406,66 +2942,11 @@ function adjProg(id,delta){
 }
 
 function updateStreak(){
-  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx()));
-  const done=todayItems.filter(g=>g.done).length;
-  const d=document.getElementById('streak-display');
-  if(done===todayItems.length&&todayItems.length>0) d.textContent='\u5370 all practices complete';
-  else if(done>0) d.textContent=`${done}/${todayItems.length} today`;
-  else d.textContent='';
+  // D — update James's live row in clan momentum (includes practice badge)
+  updateClanMomentum();
+
   const greet=document.getElementById('greeting-display');
   if(greet) greet.textContent=getGreeting();
-  updateClanMomentum();
-}
-
-// ============ PRIMARY NAV ============
-var _navSquishInit = false;
-
-function switchPrimary(name){
-  document.querySelectorAll('.primary-tab').forEach(t=>{
-    t.classList.toggle('active', t.getAttribute('data-primary')===name);
-  });
-  document.getElementById('primary-bushido').style.display = name==='bushido' ? 'block' : 'none';
-  document.getElementById('primary-clan').style.display    = name==='clan'    ? 'block' : 'none';
-  window.scrollTo({top:0, behavior:'instant'});
-}
-
-function setupNavSquish(){
-  if(_navSquishInit) return;
-  _navSquishInit = true;
-  const nav      = document.getElementById('primary-nav');
-  const sentinel = document.getElementById('nav-sentinel');
-  if(!nav) return;
-  function onScroll(){
-    const app       = document.getElementById('app');
-    const appScroll = app ? app.scrollTop : 0;
-    const winScroll = window.scrollY || 0;
-    const scrolled  = Math.max(appScroll, winScroll);
-    const threshold = sentinel ? (sentinel.offsetTop || 10) : 10;
-    nav.classList.toggle('stuck', scrolled > threshold);
-  }
-  const app = document.getElementById('app');
-  if(app) app.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('scroll', onScroll, {passive:true});
-}
-
-// ============ CLAN MOMENTUM ============
-var _visMode='samurai';
-
-function setVis(force){
-  if(force==='samurai'||force==='shinobi') _visMode=force;
-  else _visMode=(_visMode==='samurai'?'shinobi':'samurai');
-  const sSam=document.getElementById('clan-vis-samurai');
-  const sShi=document.getElementById('clan-vis-shinobi');
-  const hint=document.getElementById('vis-hint');
-  if(_visMode==='samurai'){
-    if(sSam){sSam.style.background='#CC3529';sSam.style.color='#FEFCF8';sSam.style.fontWeight='700';}
-    if(sShi){sShi.style.background='transparent';sShi.style.color='rgba(26,26,26,.3)';sShi.style.fontWeight='400';}
-    if(hint){hint.textContent='your clan sees everything';hint.style.color='rgba(204,53,41,.7)';}
-  } else {
-    if(sSam){sSam.style.background='transparent';sSam.style.color='rgba(26,26,26,.3)';sSam.style.fontWeight='400';}
-    if(sShi){sShi.style.background='#4A3F5C';sShi.style.color='rgba(255,255,255,.85)';sShi.style.fontWeight='700';}
-    if(hint){hint.textContent='your clan sees only shadow';hint.style.color='rgba(139,123,170,.55)';}
-  }
 }
 
 function updateClanMomentum(){
@@ -2501,15 +2982,15 @@ function updateClanMomentum(){
     bHtml+='<div class="'+cls+'" style="height:'+h+'px"></div>';
   }
   mb.innerHTML=bHtml;
-  // Milestone badge — highest earned stamp
+
+  // Practice stamp badge — highest earned stamp beside James's name
   const clBadge=document.getElementById('clan-my-badge');
   if(clBadge){
-    if(!state.milestoneStamps) state.milestoneStamps={};
+    if(!state.practiceStamps) state.practiceStamps={};
     let highest=null;
-    for(let i=MILESTONES.length-1;i>=0;i--){
-      const m=MILESTONES[i];
-      const hasIt=Object.keys(state.milestoneStamps).some(k=>k.endsWith('-'+m.days)&&state.milestoneStamps[k]);
-      if(hasIt){highest=m;break;}
+    for(let i=PRACTICE_MILESTONES.length-1;i>=0;i--){
+      const pm=PRACTICE_MILESTONES[i];
+      if(state.practiceStamps['ps-'+pm.days]){highest=pm;break;}
     }
     if(highest){
       clBadge.textContent=highest.kanji;
@@ -2524,22 +3005,24 @@ function updateClanMomentum(){
   updateClanPerf();
 }
 
+// Sort clan momentum rows by streak, highest first
 function sortClanRows(){
-  const wrap=document.getElementById('clan-exp-members');
+  const wrap = document.getElementById('clan-exp-members');
   if(!wrap) return;
-  const rows=[...wrap.querySelectorAll(':scope > .clan-exp-row')];
-  if(rows.length<2) return;
-  rows.sort((a,b)=>{
-    const getVal=el=>{
-      const s=el.querySelector('.clan-exp-streak');
-      const v=parseInt(s?s.textContent:'0');
-      return isNaN(v)?0:v;
+  const rows = [...wrap.querySelectorAll(':scope > .clan-exp-row')];
+  if(rows.length < 2) return;
+  rows.sort((a, b) => {
+    const getVal = el => {
+      const s = el.querySelector('.clan-exp-streak');
+      const v = parseInt(s ? s.textContent : '0');
+      return isNaN(v) ? 0 : v;
     };
-    return getVal(b)-getVal(a);
+    return getVal(b) - getVal(a);
   });
-  rows.forEach(r=>wrap.appendChild(r));
+  rows.forEach(r => wrap.appendChild(r));
 }
 
+// Group performance — weekly grade, active-today, aggregate bar
 function updateClanPerf(){
   var eli=[1.0,1.0,1.0,1.0,0.72,0,0];
   var chk=[1.0,0.58,1.0,1.0,0.50,0,0];
@@ -3363,7 +3846,7 @@ function saveReflection(type){
       <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
       <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
     </div>`;
-    setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 1800);
+    setTimeout(()=>closeReflection(), 1800);
   }
 }
 
@@ -3529,9 +4012,31 @@ const MILESTONES=[
 ];
 function msGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
 
+// ============ PRACTICE MILESTONES (overall streak continuance) ============
+const PRACTICE_MILESTONES=[
+  {days:7,   kanji:'\u7d99', name:'Continuance', col:'#3D4A52', glow:'rgba(61,74,82,VAL)',
+   copy:'You are shaping yourself like iron.'},
+  {days:21,  kanji:'\u932c', name:'Tempering',   col:'#7A3828', glow:'rgba(122,56,40,VAL)',
+   copy:'As the katana\u2019s metal must be folded in on itself, patience and persistence will create the strongest swords.'},
+  {days:30,  kanji:'\u935b', name:'Forging',     col:'#3D6B5F', glow:'rgba(61,107,95,VAL)',
+   copy:'There is a fire within you and the forge is hot.'},
+  {days:50,  kanji:'\u525b', name:'Unyielding',  col:'#2D3D6B', glow:'rgba(45,61,107,VAL)',
+   copy:'Your mettle is unbreakable.'},
+  {days:100, kanji:'\u58eb', name:'Warrior',     col:'#8B2E1A', glow:'rgba(139,46,26,VAL)',
+   copy:'The warrior has arrived.'},
+  {days:180, kanji:'\u5c06', name:'Commander',   col:'#2D7A7A', glow:'rgba(45,122,122,VAL)',
+   copy:'You are leading yourself.'},
+  {days:365, kanji:'\u9053', name:'The Way',     col:'#C9A94B', glow:'rgba(201,169,75,VAL)',
+   copy:'A full year. Congratulations. You are on your way to becoming your truest self.',
+   gold:true},
+];
+function psGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
+
 // In-memory stamp state (transient — not persisted)
 const _msPending={};  // {`id-days`: true} — stamp in DOM but hidden during fly
 const _msLand   ={};  // {`id-days`: true} — plays land pop animation once
+const _psPending={};  // {`ps-days`: true} — practice stamp in DOM but ceremony playing
+const _psLand   ={};  // {`ps-days`: true} — plays land pop animation once
 
 // ============ ANIMATION QUEUE ============
 const _animQueue=[];
@@ -3544,12 +4049,60 @@ function drainAnimQueue(){
 }
 function animDone(){_animRunning=false;drainAnimQueue();}
 
+// ============ EDIT MODE ============
+function toggleEditMode(){
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('account-edit-btn');
+  if(btn){ btn.textContent = editMode ? 'Done' : 'Edit'; btn.classList.toggle('active', editMode); }
+}
+
 // ============ EDIT / DELETE ============
-function deleteItem(type, id){
-  if(type==='kaizen') state.kaizen=state.kaizen.filter(k=>k.id!==id);
-  else if(type==='shokunin') state.shokunin=state.shokunin.filter(s=>s.id!==id);
-  else if(type==='annual') state.annualGoals=state.annualGoals.filter(a=>a.id!==id);
-  saveState(); renderTab();
+let _deleteTarget = null;
+
+function confirmDelete(type, id){
+  const item = type==='kaizen'    ? state.kaizen.find(k=>k.id===id)
+             : type==='shokunin'  ? state.shokunin.find(s=>s.id===id)
+             : state.annualGoals.find(a=>a.id===id);
+  if(!item) return;
+  _deleteTarget = {type, id};
+  document.getElementById('bladeItemName').textContent = item.text;
+  document.getElementById('bladeBackdrop').classList.add('show');
+}
+
+function executeDelete(){
+  if(!_deleteTarget) return;
+  const {type, id} = _deleteTarget;
+  if(type==='kaizen')   state.kaizen      = state.kaizen.filter(k=>k.id!==id);
+  else if(type==='shokunin') state.shokunin = state.shokunin.filter(s=>s.id!==id);
+  else if(type==='annual')   state.annualGoals = state.annualGoals.filter(a=>a.id!==id);
+  saveState();
+  closeBladModal();
+  renderTab();
+  showSeveredFlash();
+}
+
+function closeBladModal(){
+  document.getElementById('bladeBackdrop').classList.remove('show');
+  _deleteTarget = null;
+}
+
+function handleBladeBackdrop(e){
+  if(e.target===document.getElementById('bladeBackdrop')) closeBladModal();
+}
+
+function showSeveredFlash(){
+  const list = document.getElementById('goals-list');
+  if(!list) return;
+  // Remove any previous flash
+  const old = list.querySelector('.severed-flash');
+  if(old) old.remove();
+  const flash = document.createElement('div');
+  flash.className = 'severed-flash show';
+  flash.innerHTML = 'With the swift swish of your blade, the practice falls to the ground. It is severed.';
+  list.insertBefore(flash, list.firstChild);
+  setTimeout(()=>{ flash.style.transition='opacity .6s'; flash.style.opacity='0';
+    setTimeout(()=>flash.remove(), 650); }, 2400);
 }
 
 function startEdit(type, id){
@@ -3840,6 +4393,116 @@ function checkMilestoneStamps(habit){
   });
 }
 
+function checkPracticeStamps(){
+  if(!state.practiceStamps) state.practiceStamps={};
+  const allBest=state.kaizen.length?Math.max(...state.kaizen.map(k=>Math.max(k.bestStreak||0,k.streak||0))):0;
+  PRACTICE_MILESTONES.forEach(m=>{
+    const k=`ps-${m.days}`;
+    if(allBest>=m.days && !state.practiceStamps[k] && !_psPending[k]){
+      enqueueAnim(()=>earnPracticeStamp(m));
+    }
+  });
+}
+
+function earnPracticeStamp(milestone){
+  const k=`ps-${milestone.days}`;
+  if(!state.practiceStamps) state.practiceStamps={};
+  _psPending[k]=true;
+  renderTab(); // rebuild DOM so shelf shows pending state
+
+  const overlay=document.getElementById('ps-overlay');
+  const largeSt=document.getElementById('ps-large');
+  const titleEl=document.getElementById('ps-title');
+  const copyEl =document.getElementById('ps-copy');
+  if(!overlay||!largeSt||!copyEl){
+    delete _psPending[k];
+    state.practiceStamps[k]=true;
+    saveState(); renderTab(); animDone();
+    return;
+  }
+
+  largeSt.textContent      =milestone.kanji;
+  largeSt.style.color      =milestone.col;
+  largeSt.style.borderColor=milestone.col;
+  largeSt.style.filter     =`drop-shadow(0 0 28px ${psGlowStr(milestone,'.7')}) drop-shadow(0 0 56px ${psGlowStr(milestone,'.35')})`;
+  largeSt.style.animation  ='none';
+  if(titleEl){titleEl.textContent=milestone.name;titleEl.style.color=milestone.col;titleEl.style.animation='none';titleEl.style.opacity='0';}
+  copyEl.textContent       =milestone.copy;
+  copyEl.style.animation   ='none';
+  copyEl.style.opacity     ='0';
+
+  if(milestone.gold) overlay.classList.add('ps-gold'); else overlay.classList.remove('ps-gold');
+  overlay.classList.add('active');
+  void largeSt.offsetWidth;
+
+  largeSt.style.animation='msStampIn .55s cubic-bezier(.25,.46,.45,.94) forwards';
+  setTimeout(()=>{
+    largeSt.style.animation=milestone.gold?'psGoldPulse 1.6s ease-in-out infinite':'msGlowFloat 2.4s ease-in-out infinite';
+    largeSt.style.filter   =`drop-shadow(0 0 20px ${psGlowStr(milestone,'.55')}) drop-shadow(0 0 40px ${psGlowStr(milestone,'.3')})`;
+    if(titleEl) titleEl.style.animation='copyFadeIn .5s ease forwards';
+    copyEl.style.animation ='copyFadeIn .5s ease forwards';
+  },560);
+
+  // Pomp escalates with milestone rank
+  const rank=PRACTICE_MILESTONES.findIndex(m=>m.days===milestone.days);
+  const DISPLAY_MS=2600+rank*350; // 2600ms → 4900ms across 7 ranks
+
+  setTimeout(()=>{
+    if(titleEl) titleEl.style.animation='copyFadeOut .4s ease forwards';
+    copyEl.style.animation ='copyFadeOut .4s ease forwards';
+    largeSt.style.animation='msFadeOut .4s ease forwards';
+
+    // Try to fly to the shelf stamp if Shokunin tab is visible
+    const destEl=document.getElementById(`ps-stamp-${milestone.days}`);
+    const destRect=destEl?destEl.getBoundingClientRect():null;
+
+    setTimeout(()=>{
+      overlay.classList.remove('active','ps-gold');
+
+      if(destRect&&destRect.width>0){
+        const LARGE_PX=120,SMALL_PX=22;
+        const cx=window.innerWidth/2,cy=window.innerHeight/2;
+        const fly=document.createElement('div');
+        Object.assign(fly.style,{
+          position:'fixed',left:`${cx-LARGE_PX/2}px`,top:`${cy-LARGE_PX/2}px`,
+          width:`${LARGE_PX}px`,height:`${LARGE_PX}px`,
+          display:'flex',alignItems:'center',justifyContent:'center',
+          border:`3px solid ${milestone.col}`,borderRadius:'6px',
+          fontFamily:"'Noto Serif JP',serif",fontWeight:'900',fontSize:'68px',
+          color:milestone.col,transform:'rotate(-4deg)',
+          filter:`drop-shadow(0 0 16px ${psGlowStr(milestone,'.5')})`,
+          zIndex:'500',pointerEvents:'none',
+          transition:`transform 700ms cubic-bezier(.55,.02,.45,1), opacity 700ms ease`,
+        });
+        fly.textContent=milestone.kanji;
+        document.body.appendChild(fly);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          const scale=SMALL_PX/LARGE_PX;
+          const tx=(destRect.left+destRect.width/2)-cx;
+          const ty=(destRect.top +destRect.height/2)-cy;
+          fly.style.transform=`translate(${tx}px,${ty}px) scale(${scale}) rotate(-4deg)`;
+          fly.style.filter='none';
+          setTimeout(()=>{fly.style.opacity='0';},700*.65);
+        }));
+        setTimeout(()=>{
+          fly.remove();
+          _psPending[k]=false; delete _psPending[k];
+          state.practiceStamps[k]=true;
+          _psLand[k]=true;
+          saveState(); renderTab(); updateClanMomentum();
+          setTimeout(()=>{delete _psLand[k]; animDone();},600);
+        },800);
+      } else {
+        _psPending[k]=false; delete _psPending[k];
+        state.practiceStamps[k]=true;
+        _psLand[k]=true;
+        saveState(); renderTab(); updateClanMomentum();
+        setTimeout(()=>{delete _psLand[k]; animDone();},600);
+      }
+    },440);
+  },DISPLAY_MS);
+}
+
 function showProverb(){
   const el=document.getElementById('proverb-overlay');
   if(!el)return;
@@ -3891,6 +4554,8 @@ function checkCelebrations(){
   if(getMonthCompletionRate()>=90&&state.lastMonthlyComplete!==monthKey){
     toFire.push('monthly');state.lastMonthlyComplete=monthKey;
   }
+  // Practice milestone stamps (overall streak continuance)
+  checkPracticeStamps();
   if(toFire.length){saveState();fireCelebrations(toFire);}
 }
 
@@ -4155,36 +4820,577 @@ function initGridSwipe(){
   },{passive:false});
 }
 
+// ============ FIREBASE AUTH ============
+let _currentUser = null;
+let _authMode    = 'signin';
+
 // ============ INIT ============
-loadState();
-// If no saved state, load the default pre-populated state
-// Use direct localStorage write (not saveState) to avoid stamping a fresh
-// timestamp — keeps lastModified:0 so cloud data always wins on new devices
-if(!state.onboarded && !localStorage.getItem(STORAGE_KEY)){
-  Object.assign(state, DEFAULT_STATE);
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+// Hoist shared state vars before initFirebaseAuth() — onAuthStateChanged can fire
+// synchronously (cached session), which would hit these before their let declarations.
+var _visMode = 'samurai';
+var _navSquishInit = false;
+
+// Firebase auth listener handles everything from here:
+//   • If FIREBASE_CONFIGURED → onAuthStateChanged fires → loadFirestoreState → showDashboard/onboard
+//   • If not configured      → config notice shown, demo mode button prominent
+//   • Demo mode              → enterDemoMode() → showDashboard() with DEFAULT_STATE
+try { initFirebaseAuth(); } catch(e) { console.warn('Auth init failed:', e.message); enterDemoMode(); }
+
+function initFirebaseAuth(){
+  if(!FIREBASE_CONFIGURED){
+    // Not set up yet — show config notice and make demo mode prominent
+    document.getElementById('auth-config-notice').style.display = 'block';
+    document.getElementById('auth-tabs').style.display   = 'none';
+    document.getElementById('auth-form').style.display   = 'none';
+    const gBtn = document.querySelector('.auth-google');
+    const div  = document.querySelector('.auth-divider');
+    if(gBtn) gBtn.style.display = 'none';
+    if(div)  div.style.display  = 'none';
+    const demoLink = document.getElementById('auth-demo-link');
+    if(demoLink){ demoLink.style.opacity='1'; demoLink.style.fontSize='11px'; demoLink.textContent='→ Enter Demo Mode'; }
+    return;
+  }
+  // Firebase is configured — listen for auth state
+  auth.onAuthStateChanged(user => {
+    _currentUser = user;
+    if(user){
+      // Signed in: update account bar, hide auth screen, load from Firestore
+      const nameEl   = document.querySelector('.account-name');
+      const avatarEl = document.querySelector('.account-avatar span');
+      if(nameEl)   nameEl.textContent   = user.displayName || user.email || 'Warrior';
+      if(avatarEl) avatarEl.textContent = (user.displayName || user.email || 'W')[0].toUpperCase();
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app').style.display         = 'block';
+      loadFirestoreState(user);
+    } else {
+      // Signed out: show auth screen
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('app').style.display         = 'none';
+    }
+  });
 }
-if(state.onboarded){
+
+// ── MIGRATION ──────────────────────────────────────────────────────────────
+const MIGRATE_KEYS = ['bushido_james_permanent', 'bushido_coreproject'];
+let _migrationUid  = null;
+let _migrationData = null;
+
+function detectLocalMigrationData(){
+  for(const key of MIGRATE_KEYS){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) continue;
+      const data = JSON.parse(raw);
+      if(data && data.strands && data.strands.length && data.onboarded){
+        return { key, data };
+      }
+    } catch(e){}
+  }
+  return null;
+}
+
+function showMigrationOverlay(uid, localResult){
+  _migrationUid  = uid;
+  _migrationData = localResult.data;
+  const d = localResult.data;
+  const habitsCount  = (d.kaizen || []).length;
+  const logDays      = Object.keys(d.completionLog || {}).length;
+  const firstDay     = logDays ? Object.keys(d.completionLog).sort()[0] : null;
+  const strandsCount = (d.strands || []).length;
+  document.getElementById('migrate-stats').innerHTML =
+    strandsCount + ' strand' + (strandsCount !== 1 ? 's' : '') + ' &nbsp;&middot;&nbsp; ' +
+    habitsCount  + ' habit'  + (habitsCount  !== 1 ? 's' : '') + '<br>' +
+    logDays + ' day' + (logDays !== 1 ? 's' : '') + ' of completion history' +
+    (firstDay ? ' &nbsp;&middot;&nbsp; since ' + firstDay : '') + '<br>' +
+    '<span style="color:var(--ink-faint);font-size:11px">stored in: ' + localResult.key + '</span>';
+  document.getElementById('migrate-overlay').classList.add('active');
+}
+
+async function performMigration(){
+  const btn = document.getElementById('migrate-confirm-btn');
+  btn.textContent = 'Migrating\u2026';
+  btn.disabled = true;
+  try{
+    Object.assign(state, DEFAULT_STATE, _migrationData);
+    state.lastModified = Date.now();
+    await db.collection('users').doc(_migrationUid).set({
+      state: JSON.stringify(state),
+      created: new Date().toISOString(),
+      migratedFrom: 'localStorage',
+      migratedAt: new Date().toISOString()
+    });
+    document.getElementById('migrate-overlay').classList.remove('active');
+    if(!state.milestoneStamps) state.milestoneStamps = {};
+    if(!state.practiceStamps)  state.practiceStamps  = {};
+    showDashboard();
+  } catch(e){
+    btn.textContent = 'Migration failed \u2014 try again';
+    btn.disabled = false;
+    console.error('Migration error:', e);
+  }
+}
+
+async function declineMigration(){
+  Object.assign(state, DEFAULT_STATE, { onboarded: false });
+  await db.collection('users').doc(_migrationUid).set({
+    state: JSON.stringify(state),
+    created: new Date().toISOString()
+  });
+  document.getElementById('migrate-overlay').classList.remove('active');
+  document.getElementById('onboard').classList.add('active');
+  renderObProgress();
+}
+// ── /MIGRATION ─────────────────────────────────────────────────────────────
+
+async function loadFirestoreState(user){
+  try{
+    const docSnap = await db.collection('users').doc(user.uid).get();
+    if(docSnap.exists){
+      const saved = JSON.parse(docSnap.data().state);
+      Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+    } else {
+      // New user — check for existing localStorage data to migrate
+      const localResult = detectLocalMigrationData();
+      if(localResult){
+        showMigrationOverlay(user.uid, localResult);
+        return; // Pause — migration functions will resume the flow
+      }
+      // No local data — fresh start, begin onboarding
+      Object.assign(state, DEFAULT_STATE, { onboarded: false });
+      await db.collection('users').doc(user.uid).set({
+        state: JSON.stringify(state),
+        created: new Date().toISOString()
+      });
+    }
+  } catch(e){
+    console.warn('Firestore load failed:', e);
+    Object.assign(state, DEFAULT_STATE);
+  }
+  if(!state.milestoneStamps) state.milestoneStamps = {};
+  if(!state.practiceStamps)  state.practiceStamps  = {};
+  if(state.onboarded){
+    showDashboard();
+  } else {
+    document.getElementById('onboard').classList.add('active');
+    renderObProgress();
+  }
+}
+
+function showDashboard(){
   document.getElementById('onboard').classList.remove('active');
   document.getElementById('dashboard').classList.add('active');
-  // Snapshot lastModified BEFORE renderDashboard — startup saves (checkCelebrations etc.)
-  // would otherwise inflate lastModified and cause loadFromCloud to push local state up,
-  // overwriting newer data from another device (e.g. phone reflection sealed last night).
-  const _preRenderTs=state.lastModified||0;
-  renderDashboard();           // render immediately from local state
+  setupNavSquish();
+  const _preRenderTs = state.lastModified || 0;
+  renderDashboard();
+  checkReflectionPrompts();
   initGridSwipe();
   updateDarkMode();
   setInterval(updateDarkMode, 60000);
-  // Sync from cloud first — use pre-render timestamp for comparison so we never overwrite
-  // newer data from another device. checkReflectionPrompts fires AFTER cloud resolves so
-  // it uses the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
-  loadFromCloud(_preRenderTs)
-    .then(cloudWasNewer=>{ if(cloudWasNewer) renderDashboard(); })
-    .finally(()=>{ checkReflectionPrompts(); });
-} else {
-  renderObProgress();
+  // Legacy JSONbin sync (only when Firebase not configured)
+  if(!FIREBASE_CONFIGURED){
+    loadFromCloud(_preRenderTs).then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); });
+  }
+}
+
+async function saveStateToFirestore(){
+  if(!FIREBASE_CONFIGURED || !_currentUser) return;
+  try{
+    await db.collection('users').doc(_currentUser.uid).set(
+      { state: JSON.stringify(state), updated: new Date().toISOString() },
+      { merge: true }
+    );
+  } catch(e){ console.warn('Firestore save failed:', e); }
+}
+
+// Auth mode toggle (Sign In ↔ Create Account)
+function setAuthMode(mode){
+  _authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => {
+    t.classList.toggle('active', (mode==='signin'&&i===0)||(mode==='signup'&&i===1));
+  });
+  document.getElementById('auth-submit-btn').textContent = mode==='signin' ? 'Enter' : 'Begin the Path';
+  clearAuthError();
+}
+
+function submitAuthForm(){
+  if(!FIREBASE_CONFIGURED){ enterDemoMode(); return; }
+  const email    = (document.getElementById('auth-email')?.value||'').trim();
+  const password =  document.getElementById('auth-password')?.value||'';
+  if(!email||!password){ showAuthError('Enter your email and password.'); return; }
+  if(_authMode==='signin'){
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(err => showAuthError(humanizeAuthError(err)));
+  } else {
+    if(password.length<6){ showAuthError('Password must be at least 6 characters.'); return; }
+    auth.createUserWithEmailAndPassword(email, password)
+      .catch(err => showAuthError(humanizeAuthError(err)));
+  }
+}
+
+function signInGoogle(){
+  if(!FIREBASE_CONFIGURED){ enterDemoMode(); return; }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .catch(err => { if(!err.code?.includes('popup-closed')) showAuthError(humanizeAuthError(err)); });
+}
+
+function signOutUser(){
+  if(!FIREBASE_CONFIGURED){
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').style.display         = 'none';
+    return;
+  }
+  auth.signOut();
+}
+
+function showAuthError(msg){
+  const el = document.getElementById('auth-error');
+  if(!el||!msg) return;
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+function clearAuthError(){
+  const el = document.getElementById('auth-error');
+  if(!el) return;
+  el.textContent = '';
+  el.classList.remove('visible');
+}
+function humanizeAuthError(err){
+  const code = err?.code||'';
+  if(code.includes('user-not-found')||code.includes('wrong-password')||code.includes('invalid-credential'))
+    return 'Incorrect email or password.';
+  if(code.includes('email-already-in-use'))
+    return 'An account with this email already exists. Sign in instead.';
+  if(code.includes('invalid-email'))    return 'That email address isn\'t valid.';
+  if(code.includes('weak-password'))    return 'Password must be at least 6 characters.';
+  if(code.includes('network'))          return 'Network error — check your connection.';
+  return err?.message||'Something went wrong. Try again.';
+}
+
+// Demo mode — skips Firebase, uses DEFAULT_STATE, shows dashboard immediately
+function enterDemoMode(){
+  _currentUser = null;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display         = 'block';
+  Object.assign(state, DEFAULT_STATE);
+  if(!state.milestoneStamps) state.milestoneStamps = {};
+  if(!state.practiceStamps)  state.practiceStamps  = {};
+  showDashboard();
+}
+
+// ── Platform shell ────────────────────────────────────────────────────────
+function switchPrimary(name){
+  document.querySelectorAll('.primary-tab').forEach(t=>{
+    t.classList.toggle('active', t.getAttribute('data-primary')===name);
+  });
+  document.getElementById('primary-bushido').style.display = name==='bushido' ? 'block' : 'none';
+  document.getElementById('primary-clan').style.display    = name==='clan'    ? 'block' : 'none';
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function setVis(force){
+  if(force==='samurai'||force==='shinobi') _visMode=force;
+  else _visMode=(_visMode==='samurai'?'shinobi':'samurai');
+  const sSam = document.getElementById('clan-vis-samurai');
+  const sShi = document.getElementById('clan-vis-shinobi');
+  const hint = document.getElementById('vis-hint');
+  if(_visMode==='samurai'){
+    if(sSam){ sSam.style.background='#CC3529'; sSam.style.color='#FEFCF8'; sSam.style.fontWeight='700'; }
+    if(sShi){ sShi.style.background='transparent'; sShi.style.color='rgba(26,26,26,.3)'; sShi.style.fontWeight='400'; }
+    if(hint){ hint.textContent='your clan sees everything'; hint.style.color='rgba(204,53,41,.7)'; }
+  } else {
+    if(sSam){ sSam.style.background='transparent'; sSam.style.color='rgba(255,255,255,.3)'; sSam.style.fontWeight='400'; }
+    if(sShi){ sShi.style.background='#4A3F5C'; sShi.style.color='rgba(255,255,255,.85)'; sShi.style.fontWeight='700'; }
+    if(hint){ hint.textContent='your clan sees only shadow'; hint.style.color='rgba(139,123,170,.55)'; }
+  }
+}
+
+// Squish primary nav on scroll — works whether window or #app is the scroll container
+// (.scroll has overflow-x:clip which can make #app the scroll container in some browsers)
+function setupNavSquish(){
+  if(_navSquishInit) return;
+  _navSquishInit=true;
+  const nav      = document.getElementById('primary-nav');
+  const sentinel = document.getElementById('nav-sentinel');
+  if(!nav) return;
+  function onScroll(){
+    const app       = document.getElementById('app');
+    const appScroll = app ? app.scrollTop : 0;
+    const winScroll = window.scrollY || 0;
+    const scrolled  = Math.max(appScroll, winScroll);
+    const threshold = sentinel ? (sentinel.offsetTop || 10) : 10;
+    nav.classList.toggle('stuck', scrolled > threshold);
+  }
+  const app = document.getElementById('app');
+  if(app) app.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('scroll', onScroll, {passive:true});
 }
 </script>
+
+  <!-- ══════════ MY CLAN PANEL ══════════ -->
+  <div id="primary-clan" style="display:none">
+    <div class="clan-wrap">
+
+      <!-- Clan Momentum — header absorbed, toggle inline on James's row -->
+      <div class="clan-momentum-block">
+        <div class="clan-exp-wrap" style="padding:18px 16px 16px">
+          <!-- Box header: clan name + warrior count -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.18)">
+            <div style="flex:1;min-width:0;margin-right:12px">
+              <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:4px">YOUR CLAN</div>
+              <input class="clan-name-field" id="clan-name-input" type="text" placeholder="Name your clan…" maxlength="32" spellcheck="false">
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:17px;font-weight:700;font-family:'Noto Serif JP',serif;color:var(--red);line-height:1">3</div>
+              <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-top:2px">warriors</div>
+            </div>
+          </div>
+          <!-- Group performance strip -->
+          <div id="clan-perf-strip" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.12)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+              <div style="display:flex;align-items:baseline;gap:7px">
+                <div id="clan-weekly-pct" style="font-family:'Noto Serif JP',serif;font-size:26px;font-weight:700;color:var(--red);line-height:1">74%</div>
+                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.5);align-self:center;line-height:1.5">Completion Rate<br>This Week</div>
+              </div>
+              <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(204,53,41,.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
+            </div>
+            <div id="clan-record-line" style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:11px">clan record 12d &middot; current 4d</div>
+            <div>
+              <div style="font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:5px">CLAN AGGREGATE KAIZEN</div>
+              <div id="clan-agg-bars" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;align-items:end;height:28px">
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:3px">
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">M</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">W</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">F</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
+              </div>
+            </div>
+          </div>
+          <div class="clan-exp-members" id="clan-exp-members">
+            <!-- Elijah — static demo data -->
+            <div class="clan-exp-row">
+              <div><div class="clan-exp-streak">31</div><div class="clan-exp-streak-lbl">days</div></div>
+              <div style="flex:1;min-width:0">
+                <div class="clan-exp-name">Elijah</div>
+                <div class="clan-exp-bars">
+                  <div class="clan-exp-bar done"  style="height:20px"></div>
+                  <div class="clan-exp-bar done"  style="height:20px"></div>
+                  <div class="clan-exp-bar done"  style="height:20px"></div>
+                  <div class="clan-exp-bar done"  style="height:20px"></div>
+                  <div class="clan-exp-bar today" style="height:15px"></div>
+                  <div class="clan-exp-bar"       style="height:3px"></div>
+                  <div class="clan-exp-bar"       style="height:3px"></div>
+                </div>
+              </div>
+              <div class="clan-exp-today"><div class="clan-exp-today-num">10/14</div><div class="clan-exp-today-lbl">today</div></div>
+            </div>
+            <!-- James — live data + inline visibility toggle -->
+            <div class="clan-exp-row" style="align-items:start">
+              <div style="padding-top:2px"><div class="clan-exp-streak" id="clan-my-streak">&#x2014;</div><div class="clan-exp-streak-lbl">days</div></div>
+              <div style="min-width:0;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:3px">
+                  <span class="clan-exp-name" style="margin:0;flex-shrink:0">James</span>
+                  <span class="clan-you" style="flex-shrink:0">you</span>
+                  <span id="clan-my-badge" class="ps-badge" style="display:none"></span>
+                  <!-- Samurai / Shinobi two-state pill -->
+                  <div id="clan-vis-pill" style="display:flex;border:1px solid rgba(204,53,41,.25);border-radius:2px;overflow:hidden;flex-shrink:0">
+                    <button id="clan-vis-samurai" onclick="setVis('samurai')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;border-right:1px solid rgba(204,53,41,.2);background:var(--red);color:#FEFCF8;cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif;font-weight:700">Samurai</button>
+                    <button id="clan-vis-shinobi" onclick="setVis('shinobi')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;background:transparent;color:rgba(26,26,26,.3);cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif">Shinobi</button>
+                  </div>
+                </div>
+                <div id="vis-hint" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px;transition:color .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">your clan sees everything</div>
+                <div class="clan-exp-bars" id="clan-my-bars">
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                  <div class="clan-exp-bar today" style="height:3px"></div>
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                  <div class="clan-exp-bar" style="height:3px"></div>
+                </div>
+              </div>
+              <div class="clan-exp-today" style="padding-top:2px"><div class="clan-exp-today-num" id="clan-my-today">&#x2014;</div><div class="clan-exp-today-lbl">today</div></div>
+            </div>
+            <!-- Chark — static demo data -->
+            <div class="clan-exp-row">
+              <div><div class="clan-exp-streak">8</div><div class="clan-exp-streak-lbl">days</div></div>
+              <div style="flex:1;min-width:0">
+                <div class="clan-exp-name">Chark</div>
+                <div class="clan-exp-bars">
+                  <div class="clan-exp-bar done"    style="height:20px"></div>
+                  <div class="clan-exp-bar partial" style="height:13px"></div>
+                  <div class="clan-exp-bar done"    style="height:20px"></div>
+                  <div class="clan-exp-bar done"    style="height:20px"></div>
+                  <div class="clan-exp-bar today"   style="height:9px"></div>
+                  <div class="clan-exp-bar"         style="height:3px"></div>
+                  <div class="clan-exp-bar"         style="height:3px"></div>
+                </div>
+              </div>
+              <div class="clan-exp-today"><div class="clan-exp-today-num">5/10</div><div class="clan-exp-today-lbl">today</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="clan-section-label">Active Warriors</div>
+
+      <!-- ELIJAH — Samurai view -->
+      <div class="clan-card samurai-card">
+        <div class="clan-card-header">
+          <div class="clan-member-id">
+            <div class="clan-avatar" style="background:var(--s2)"><span>E</span></div>
+            <div>
+              <div class="clan-member-name">Elijah</div>
+              <div class="clan-member-sub">Discipline · Builder · Faith · Independence · The Ocean</div>
+            </div>
+          </div>
+          <div class="clan-view-badge">Samurai View</div>
+        </div>
+        <div class="clan-strand-row">
+          <div class="clan-strand-chip" style="background:rgba(44,62,45,.08)"><span class="kanji" style="color:var(--s2)">規</span><div><div style="font-size:9px;color:var(--s2);letter-spacing:1px">Discipline</div><div style="font-size:11px;font-weight:700;color:var(--ink)">78%</div></div></div>
+          <div class="clan-strand-chip" style="background:rgba(27,42,74,.08)"><span class="kanji" style="color:var(--s3)">義</span><div><div style="font-size:9px;color:var(--s3);letter-spacing:1px">Builder</div><div style="font-size:11px;font-weight:700;color:var(--ink)">65%</div></div></div>
+          <div class="clan-strand-chip" style="background:rgba(123,59,78,.08)"><span class="kanji" style="color:var(--s4)">信</span><div><div style="font-size:9px;color:var(--s4);letter-spacing:1px">Faith</div><div style="font-size:11px;font-weight:700;color:var(--ink)">91%</div></div></div>
+          <div class="clan-strand-chip" style="background:rgba(184,134,11,.08)"><span class="kanji" style="color:var(--s0)">独</span><div><div style="font-size:9px;color:var(--s0);letter-spacing:1px">Path</div><div style="font-size:11px;font-weight:700;color:var(--ink)">54%</div></div></div>
+          <div class="clan-strand-chip" style="background:rgba(74,55,40,.08)"><span class="kanji" style="color:var(--s1)">海</span><div><div style="font-size:9px;color:var(--s1);letter-spacing:1px">Ocean</div><div style="font-size:11px;font-weight:700;color:var(--ink)">80%</div></div></div>
+        </div>
+        <div class="clan-stats-row">
+          <div class="clan-stat"><div class="clan-stat-num">7<span style="font-size:13px;opacity:.4">/9</span></div><div class="clan-stat-label">Today</div></div>
+          <div class="clan-stat"><div class="clan-stat-num" style="color:var(--red)">14</div><div class="clan-stat-label">Day Streak</div></div>
+          <div class="clan-stat"><div class="clan-stat-num">9</div><div class="clan-stat-label">Habits</div></div>
+        </div>
+        <div class="clan-crafts">
+          <span class="craft-tag">Faith &amp; Daily Discipline</span>
+          <span class="craft-tag">Marathon Training</span>
+          <span class="craft-tag">Industry Immersion</span>
+          <span class="craft-tag">Networking</span>
+        </div>
+        <div>
+          <div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Annual Goals</div>
+          <div class="clan-goals">
+            <div class="clan-goal-row"><div class="cg-label">Real business plan</div><div class="cg-bar"><div class="cg-fill" style="width:40%;background:var(--red)"></div></div><div class="cg-pct">40%</div></div>
+            <div class="clan-goal-row"><div class="cg-label">Find first mentor</div><div class="cg-bar"><div class="cg-fill" style="width:70%;background:var(--red)"></div></div><div class="cg-pct">70%</div></div>
+            <div class="clan-goal-row"><div class="cg-label">Complete marathon</div><div class="cg-bar"><div class="cg-fill" style="width:55%;background:var(--red)"></div></div><div class="cg-pct">55%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUSAN — Samurai view -->
+      <div class="clan-card samurai-card">
+        <div class="clan-card-header">
+          <div class="clan-member-id">
+            <div class="clan-avatar" style="background:var(--s4)"><span>S</span></div>
+            <div>
+              <div class="clan-member-name">Susan</div>
+              <div class="clan-member-sub">Faith · Raising People Up · Pura Vida · Voice</div>
+            </div>
+          </div>
+          <div class="clan-view-badge">Samurai View</div>
+        </div>
+        <div class="clan-strand-row">
+          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s4);filter:brightness(2)">愛</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Faith</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">84%</div></div></div>
+          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s2);filter:brightness(2)">義</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">People</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">71%</div></div></div>
+          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s3);filter:brightness(2)">道</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Pura Vida</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">60%</div></div></div>
+          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s0);filter:brightness(2)">声</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Voice</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">45%</div></div></div>
+        </div>
+        <div class="clan-stats-row">
+          <div class="clan-stat"><div class="clan-stat-num">5<span style="font-size:13px;opacity:.4">/7</span></div><div class="clan-stat-label">Today</div></div>
+          <div class="clan-stat"><div class="clan-stat-num">6</div><div class="clan-stat-label">Day Streak</div></div>
+          <div class="clan-stat"><div class="clan-stat-num">7</div><div class="clan-stat-label">Habits</div></div>
+        </div>
+        <div class="clan-crafts">
+          <span class="craft-tag">Faith Practice</span>
+          <span class="craft-tag">Physical Faithfulness</span>
+          <span class="craft-tag">Holding a Room</span>
+          <span class="craft-tag">Pura Vida Stewardship</span>
+        </div>
+        <div>
+          <div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Annual Goals</div>
+          <div class="clan-goals">
+            <div class="clan-goal-row"><div class="cg-label">The Blessing dinner</div><div class="cg-bar"><div class="cg-fill" style="width:60%;background:var(--clan-white)"></div></div><div class="cg-pct">60%</div></div>
+            <div class="clan-goal-row"><div class="cg-label">Speaking opportunity</div><div class="cg-bar"><div class="cg-fill" style="width:30%;background:var(--clan-white)"></div></div><div class="cg-pct">30%</div></div>
+            <div class="clan-goal-row"><div class="cg-label">Pura Vida practice daily</div><div class="cg-bar"><div class="cg-fill" style="width:75%;background:var(--clan-white)"></div></div><div class="cg-pct">75%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARK — Shinobi view -->
+      <div class="clan-card shinobi">
+        <div class="clan-card-header">
+          <div class="clan-member-id">
+            <div class="clan-avatar" style="background:var(--ink)"><span>C</span></div>
+            <div>
+              <div class="clan-member-name">Chark</div>
+              <div class="clan-member-sub">Moving in the shadows</div>
+            </div>
+          </div>
+          <div class="clan-view-badge">Shinobi View</div>
+        </div>
+        <div class="shin-strand-row">
+          <div class="shin-ember"><span class="shin-kanji">信</span><div class="shin-ember-dot" style="background:var(--red);opacity:.9"></div></div>
+          <div class="shin-ember"><span class="shin-kanji">静</span><div class="shin-ember-dot" style="background:var(--red);opacity:.55"></div></div>
+          <div class="shin-ember"><span class="shin-kanji">旅</span><div class="shin-ember-dot" style="background:var(--red);opacity:.85"></div></div>
+          <div class="shin-ember"><span class="shin-kanji">学</span><div class="shin-ember-dot" style="background:var(--red);opacity:.45"></div></div>
+          <div class="shin-ember"><span class="shin-kanji">絆</span><div class="shin-ember-dot" style="background:var(--red);opacity:.7"></div></div>
+        </div>
+        <div class="shin-stats">
+          <div class="shin-stat"><div class="shin-stat-num">4</div><div class="shin-stat-label">Today</div></div>
+          <div class="shin-stat"><div class="shin-stat-num">●●●●●<span style="opacity:.25">●●</span></div><div class="shin-stat-label">Streak</div></div>
+          <div class="shin-stat"><div class="shin-stat-num">11</div><div class="shin-stat-label">Habits</div></div>
+        </div>
+        <div class="shin-obscure">
+          <div class="shin-glyph lit"></div><div class="shin-glyph lit"></div>
+          <div class="shin-glyph lit"></div><div class="shin-glyph lit"></div>
+          <div class="shin-glyph"></div><div class="shin-glyph"></div>
+          <div class="shin-glyph"></div><div class="shin-glyph"></div>
+          <div class="shin-glyph"></div><div class="shin-glyph"></div>
+          <div class="shin-glyph"></div>
+          <div class="shin-obscure-label">habits checked</div>
+        </div>
+        <div class="shin-note">5 crafts active · the rest is shadow</div>
+      </div>
+
+      <!-- INVITE SECTION -->
+      <div class="invite-section">
+        <div class="clan-section-label" style="margin-bottom:12px">Invite to Clan</div>
+        <div class="serif" style="font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:12px">Only those you invite will see your path.</div>
+        <div class="invite-input-row">
+          <input class="invite-input" type="email" placeholder="Warrior's email address">
+          <button class="btn btn-red">Send Invite</button>
+        </div>
+        <div style="margin-top:24px">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px">Pending — 1 invitation received</div>
+          <div class="pending-card">
+            <div>
+              <div class="pending-name">Antonella</div>
+              <div class="pending-label">Wants to join your clan</div>
+            </div>
+            <div class="pending-actions">
+              <button class="pending-btn accept">Accept</button>
+              <button class="pending-btn decline">Decline</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /clan-wrap -->
+  </div><!-- /primary-clan -->
+
+  <!-- streak experiment removed — A/B/C/D now live natively in each tab -->
+
+</div><!-- /scroll -->
+
 
 <!-- TRAVEL MODE SETUP MODAL -->
 <div class="travel-backdrop" id="travelBackdrop" onclick="handleTravelBackdrop(event)">
@@ -4207,5 +5413,20 @@ if(state.onboarded){
     </div>
   </div>
 </div>
+<!-- BLADE DELETE CONFIRMATION MODAL -->
+<div class="blade-backdrop" id="bladeBackdrop" onclick="handleBladeBackdrop(event)">
+  <div class="blade-modal" id="bladeModal">
+    <div class="blade-kanji">斬</div>
+    <div class="blade-question">Are you SURE you want to delete this?</div>
+    <div class="blade-item-name" id="bladeItemName"></div>
+    <div class="blade-actions">
+      <button class="blade-cancel" onclick="closeBladModal()">No, keep it.</button>
+      <button class="blade-confirm" onclick="executeDelete()">Yes, destroy it.</button>
+    </div>
+  </div>
+</div>
+
+<div id="canvas-badge">canvas</div>
+
 </body>
 </html>
