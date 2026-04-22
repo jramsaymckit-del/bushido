@@ -4795,11 +4795,14 @@ async function writeClanSummary(user){
       : 0;
     var weekDays=computeWeekRates();
     var tidx=(new Date().getDay()+6)%7;
+    var ni=document.getElementById('clan-name-input');
+    var clanName=(ni&&ni.value.trim())||state.clanName||'McKitrick Clan';
     await db.collection('clan').doc(user.uid).set({
       name:      state.name || 'Warrior',
       streak:    maxStreak,
       todayRate: weekDays[tidx]||0,
       weekDays:  weekDays,
+      clanName:  clanName,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   }catch(e){ console.warn('Clan write failed:',e); }
@@ -4811,11 +4814,20 @@ async function loadClanData(){
   try{
     var snap=await db.collection('clan').get();
     _clanCache={};
+    var sharedClanName=null;
     snap.forEach(function(doc){
+      var d=doc.data();
       if(doc.id!==_currentUser.uid){
-        _clanCache[doc.id]=doc.data();
+        _clanCache[doc.id]=d;
       }
+      if(d.clanName&&!sharedClanName) sharedClanName=d.clanName;
     });
+    // Populate clan name input from Firestore (any member's doc is the source)
+    if(sharedClanName){
+      var ni=document.getElementById('clan-name-input');
+      if(ni&&!ni.value.trim()) ni.value=sharedClanName;
+      state.clanName=sharedClanName;
+    }
     renderClanRows();
     updateClanPerfFromCache();
   }catch(e){ console.warn('Clan load failed:',e); }
@@ -5290,7 +5302,7 @@ function setupNavSquish(){
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.18)">
             <div style="flex:1;min-width:0;margin-right:12px">
               <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:4px">YOUR CLAN</div>
-              <input class="clan-name-field" id="clan-name-input" type="text" placeholder="Name your clan…" maxlength="32" spellcheck="false">
+              <input class="clan-name-field" id="clan-name-input" type="text" placeholder="Name your clan…" maxlength="32" spellcheck="false" value="McKitrick Clan" onblur="if(this.value.trim()){state.clanName=this.value.trim();if(_currentUser)writeClanSummary(_currentUser);}">
             </div>
             <div style="text-align:right;flex-shrink:0">
               <div id="clan-warrior-count" style="font-size:17px;font-weight:700;font-family:'Noto Serif JP',serif;color:var(--red);line-height:1">—</div>
