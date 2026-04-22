@@ -4987,10 +4987,6 @@ function updateClanPerfFromCache(){
   });
   var scoreEl=document.getElementById('clan-today-score');
   if(scoreEl) scoreEl.textContent=(totalPossible>0?(totalDone+'/'+totalPossible):(totalDone||'—'));
-  // Weekly grade
-  var grade=wkPct>=90?'A':wkPct>=80?'B':wkPct>=70?'C':wkPct>=60?'D':'F';
-  var gradeEl=document.getElementById('clan-weekly-grade');
-  if(gradeEl) gradeEl.textContent=grade;
 }
 // Render full Active Warriors cards from _clanCache (replaces static HTML)
 function renderClanCards(){
@@ -5046,9 +5042,10 @@ function renderClanCards(){
         var color='var('+COLORS[i%5]+')';
         var k=KANJI[i%5];
         var pct=rates[i]||0;
+        var label=s.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();
         return '<div class="clan-strand-chip">'
           +'<span class="kanji" style="color:'+color+'">'+k+'</span>'
-          +'<div><div style="font-size:9px;letter-spacing:1px">'+s+'</div>'
+          +'<div><div style="font-size:9px;letter-spacing:1px">'+label+'</div>'
           +'<div style="font-size:11px;font-weight:700">'+pct+'%</div></div></div>';
       }).join('');
       var craftsHtml=(m.crafts||[]).map(function(c){
@@ -5061,7 +5058,7 @@ function renderClanCards(){
           +'<div class="cg-bar"><div class="cg-fill" style="width:'+pct+'%"></div></div>'
           +'<div class="cg-pct">'+pct+'%</div></div>';
       }).join('');
-      var strandSub=strands.join(' · ');
+      var strandSub=strands.map(function(s){return s.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).join(' \u00b7 ');
       return '<div class="clan-card samurai-card">'
         +'<div class="clan-card-header">'
         +'<div class="clan-member-id">'
@@ -5462,16 +5459,10 @@ function setupNavSquish(){
               </div>
               <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(204,53,41,.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
             </div>
-            <!-- Today's score + weekly grade -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <div style="display:flex;align-items:baseline;gap:6px">
-                <div id="clan-today-score" style="font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);line-height:1">—</div>
-                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45);align-self:center">Today's Score</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px">
-                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45)">Weekly Grade</div>
-                <div id="clan-weekly-grade" style="font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--red);line-height:1">—</div>
-              </div>
+            <!-- Today's score -->
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
+              <div id="clan-today-score" style="font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);line-height:1">—</div>
+              <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45);align-self:center">Today's Score</div>
             </div>
             <div id="clan-record-line" style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:11px">clan record 12d &middot; current 4d</div>
             <div>
