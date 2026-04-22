@@ -2925,6 +2925,8 @@ function updateClanMomentum(){
   const mt=document.getElementById('clan-my-today');
   const mb=document.getElementById('clan-my-bars');
   if(!ms||!mt||!mb) return;
+  const mn=document.getElementById('clan-my-name');
+  if(mn) mn.textContent=state.name||'You';
   const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
   ms.textContent=maxSt||'\u2014';
   const todayStr=getDateStr();
@@ -5322,7 +5324,7 @@ function setupNavSquish(){
               <div style="padding-top:2px"><div class="clan-exp-streak" id="clan-my-streak">&#x2014;</div><div class="clan-exp-streak-lbl">days</div></div>
               <div style="min-width:0;overflow:hidden">
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:3px">
-                  <span class="clan-exp-name" style="margin:0;flex-shrink:0">James</span>
+                  <span class="clan-exp-name" id="clan-my-name" style="margin:0;flex-shrink:0">—</span>
                   <span class="clan-you" style="flex-shrink:0">you</span>
                   <span id="clan-my-badge" class="ps-badge" style="display:none"></span>
                   <!-- Samurai / Shinobi two-state pill -->
