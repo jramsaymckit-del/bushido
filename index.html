@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BUSHIDO — Canvas</title>
+<title>BUSHIDO</title>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
@@ -4914,12 +4914,14 @@ function renderClanRows(){
       else if(pct>0) cls+=' partial';
       bHtml+='<div class="'+cls+'" style="height:'+h+'px"></div>';
     }
-    var todayDone=Math.round((m.todayRate||0)*10);
+    var tDone=m.todayDone||0;
+    var tTotal=m.todayTotal||0;
+    var todayStr=tTotal>0?(tDone+'/'+tTotal):(tDone||'—');
     return '<div class="clan-exp-row">'
       +'<div><div class="clan-exp-streak">'+(m.streak||0)+'</div><div class="clan-exp-streak-lbl">days</div></div>'
       +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+m.name+'</div>'
       +'<div class="clan-exp-bars">'+bHtml+'</div></div>'
-      +'<div class="clan-exp-today"><div class="clan-exp-today-num">'+todayDone+'/10</div>'
+      +'<div class="clan-exp-today"><div class="clan-exp-today-num">'+todayStr+'</div>'
       +'<div class="clan-exp-today-lbl">today</div></div>'
       +'</div>';
   }).join('');
@@ -5202,7 +5204,11 @@ async function performMigration(){
     document.getElementById('migrate-overlay').classList.remove('active');
     if(!state.milestoneStamps) state.milestoneStamps = {};
     if(!state.practiceStamps)  state.practiceStamps  = {};
+    // Ensure name fallback before writing clan doc
+    if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
     showDashboard();
+    writeClanSummary(_currentUser);
+    loadClanData();
   } catch(e){
     btn.textContent = 'Migration failed \u2014 try again';
     btn.disabled = false;
@@ -5228,6 +5234,8 @@ async function loadFirestoreState(user){
     if(docSnap.exists){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+      // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
+      if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
       // catches the case where a blank doc was auto-created before migration ran
       if(!state.onboarded){
