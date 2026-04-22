@@ -3,20 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BUSHIDO — Canvas</title>
+<title>BUSHIDO</title>
 <style>
-/* ─── CANVAS MODE INDICATOR ─────────────────────────────────────────────────
-   This file is the design canvas. Experiment freely.
-   Approved changes propagate to coreproject via bushido-feature-sync.
-   ────────────────────────────────────────────────────────────────────────── */
-#canvas-badge{
-  position:fixed;bottom:16px;right:16px;z-index:9999;
-  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;color:rgba(204,53,41,0.6);
-  border:1px solid rgba(204,53,41,0.3);padding:5px 12px;
-  background:rgba(245,240,232,0.92);border-radius:2px;
-  pointer-events:none;user-select:none;
-}
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1491,12 +1479,6 @@ if (FIREBASE_CONFIGURED) {
     </button>
 
     <div class="auth-error" id="auth-error"></div>
-
-    <!-- Canvas demo bypass — always available in canvas mode -->
-    <button class="auth-demo-link" id="auth-demo-link" onclick="enterDemoMode()">
-      canvas demo — enter without auth
-    </button>
-
   </div>
 </div>
 
@@ -1895,10 +1877,10 @@ if (FIREBASE_CONFIGURED) {
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
 const PROD_KEY = 'bushido_elijah_permanent'; // NEVER change this
-const DEV_KEY  = 'bushido_elijah_dev_v14';  // bump freely during dev
+const DEV_KEY  = 'bushido_elijah_dev_v1';   // bump freely during dev
 const IS_DEV   = false;                     // set true when actively developing
 const STORAGE_KEY = PROD_KEY;
-const HARDCODED_BIN_ID = '69dea163aaba882197fc5550'; // permanent bin — enables cross-device sync
+const HARDCODED_BIN_ID = ''; // set once Elijah creates his own JSONbin account and shares his bin ID
 
 function saveState(){
   state.lastModified=Date.now();
@@ -1917,73 +1899,60 @@ function loadState(){
   if(!state.practiceStamps)   state.practiceStamps={};
 }
 
-// ============ DEFAULT STATE — canvas blank slate ============
-// No personal data. Canvas is for design experimentation only.
+// ============ DEFAULT STATE (pre-loaded onboarding) ============
 const DEFAULT_STATE = {
-  onboarded: true,
-  name: 'James',
+  onboarded: false,
+  name: 'Elijah',
   strands: [
-    'Capital and Building',
-    'The Ancient World',
-    'The Warrior\u2019s Body',
-    'Creative Mastery',
-    'Faith and Love'
+    'The Discipline',
+    'The Builder of Belonging',
+    'Faith as Practice',
+    'The Independent Path',
+    'The Ocean'
   ],
-  tenYearVision: 'Rome at dawn, coffee with Antonella in our London flat or a pied-\u00e0-terre in Paris. In great shape for my age. My work is multifaceted: business ventures, a history platform with an audience who cares, videos about the things that set me on fire. A beautiful piano in the living room I actually play. Traveling through Europe for lectures, for art, for friends. The fire within being used for the right things. The hunger fed the right nourishment. Risks taken but not recklessly. Mastery of self pursued but not selfishly. A heart full of the right kind of love.',
+  tenYearVision: '2036. You are 35. You wake up around 7 and thank God immediately — for rest, for family, for everything provided. Coffee made, drunk 90 minutes later. You ride your Harley to the gym you own — a place unlike any other. No judgment. Everyone who walks in gets a trainer. There is a café, a community, a reason to stay. Churches, schools, offices know your name. Your team shares the vision and runs the morning rush. You work out, build programs, lead a class or direct one. Lunch with your partner. Ride back. You welcome new people personally — because that is the whole point. You pick the kids up from school. Evening run club. Home to a wholesome meal. Evening together. Pray before bed. Maybe call your brother.',
   milestones5yr: [
-    'CSC and CISI held, serious role in finance or business, first real steps taken on the venture with family',
-    'History platform launched, publishing consistently, audience engaging, woven into the fabric of life',
-    'Half marathon completed, full hybrid athlete, salsa a genuine weekly practice',
-    'Piano daily habit established, visibly and measurably better, a repertoire ready for recording',
-    'Antonella and I, consciously chosen, at least engaged if not married'
+    'Gym open and revenue generating — small team in place that carries the vision',
+    'PT and safety certifications complete — the credentials that make it legitimate',
+    'Gym loan established and being paid down — financial foundation is real',
+    'Right network built — mentors found, connections made, the right doors opened',
+    'Marathon completed — you are the living proof of what you are selling',
+    'You have met her — and you are building something together'
   ],
   annualGoals: [
-    {id:100, text:'Finish CSC certification this year', parentMs:0, progress:0, done:false},
-    {id:101, text:'Establish disciplined investing practice: CC/CSP strategy, 2% weekly target on capital deployed', parentMs:0, progress:0, done:false},
-    {id:102, text:'Open family business conversation with brother and father, moving to an actual meeting with agenda', parentMs:0, progress:0, done:false},
-    {id:103, text:'Launch history platform: first video live, consistent bi-weekly cadence held through December', parentMs:1, progress:0, done:false},
-    {id:104, text:'Register for a race: bib number, date, finish line', parentMs:2, progress:0, done:false},
-    {id:105, text:'Daily piano non-negotiable by summer, two to three pieces in serious progress', parentMs:3, progress:0, done:false},
-    {id:106, text:'One intentional, significant move forward with Antonella', parentMs:4, progress:0, done:false}
+    {id:100, text:'Build a real business plan for the gym — something ready to put in front of the right people', parentMs:0, progress:0, done:false},
+    {id:101, text:'Find your first mentor or connector — start with your dad this week', parentMs:3, progress:0, done:false},
+    {id:102, text:'Complete your first marathon', parentMs:4, progress:0, done:false},
+    {id:103, text:'Put yourself out there intentionally for a serious relationship — with intent, not casually', parentMs:5, progress:0, done:false}
   ],
   shokunin: [
-    {id:200, text:'CSC and Markets mastery: syllabus progress, one new concept applied monthly', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
-    {id:201, text:'History platform production: research and script one week, edit and publish the next', parentAnnual:103, progress:0, timeframe:'monthly', done:false},
-    {id:202, text:'Athletic conditioning: 3 lifts and 2 runs per week, measurable monthly progress', parentAnnual:104, progress:0, timeframe:'monthly', done:false},
-    {id:203, text:'Salsa technique: one new move per week, lead it cleanly by month end', parentAnnual:104, progress:0, timeframe:'weekly', done:false},
-    {id:204, text:'Piano mastery: Through the Fire by Chaka Khan, deepening chord theory alongside', parentAnnual:105, progress:0, timeframe:'monthly', done:false},
-    {id:205, text:'Faith and Love daily practice: prayer and presence with Antonella', parentAnnual:106, progress:0, timeframe:'weekly', done:false},
-    {id:206, text:'Novel: 50 words a day (begins July 2026)', parentAnnual:105, progress:0, timeframe:'monthly', done:false}
+    {id:200, text:'Industry Immersion: study successful gym models, community fitness, faith-integrated spaces', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:201, text:'Business and Financial Literacy: startup costs, loan structures, gym economics', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:202, text:'Marathon Training: building the body that leads by example', parentAnnual:102, progress:0, timeframe:'weekly', done:false},
+    {id:203, text:'Networking and Relationship Building: the right coffees, rooms, and people', parentAnnual:101, progress:0, timeframe:'weekly', done:false},
+    {id:204, text:'Intentional Partnership Pursuit: church, community, social presence — building on firm foundation', parentAnnual:103, progress:0, timeframe:'weekly', done:false},
+    {id:205, text:'Personal Brand and Content Creation: you are the gym before the gym exists', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:206, text:'Faith and Daily Discipline: the practice that anchors everything else', parentAnnual:103, progress:0, timeframe:'daily', done:false}
   ],
   kaizen: [
-    {id:300, text:'Morning prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:302, text:'Word of affirmation to Antonella',                     days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:305, text:'Read markets community, one concept absorbed',         days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:306, text:'Cold message someone toward the right role',           days:[0,3],    parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:304, text:'CSC study, 30 focused minutes',                        days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:303, text:'Piano, 20 minutes minimum',                            days:'daily',  parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:307, text:'Lift',                                                 days:[0,2,4],  parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:308, text:'Run',                                                  days:[1,3],    parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:309, text:'Salsa class',                                          days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:312, text:'One new salsa move practiced',                         days:[2],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:310, text:'Social dance: one dance, on the floor, even when shy', days:[5],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:314, text:'History: 15 minutes of reading, notes, or scripting',        days:'daily', parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:311, text:'History platform work: deep session (record, edit, or publish)', days:[5,6], parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:313, text:'Novel, 50 words',                                      days:'daily',  startDate:'2026-07-01', parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
-    {id:301, text:'Evening prayer',                                       days:'daily',  parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null}
+    {id:300, text:'Morning prayer',                                                    days:'daily',  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:301, text:'Bible reading',                                                     days:[1,3,6],  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:302, text:'5 mins business or industry learning',                              days:'daily',  parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:303, text:'Run (Mon/Wed short, Sat long)',                                     days:[0,2,5],  parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:304, text:'Story post',                                                        days:[0,2,4,6],parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:305, text:'Strike up a conversation (doubles to 2x after 2 weeks)',            days:[5],      parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:306, text:'One outreach message to someone worth knowing',                     days:[0],      parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:307, text:'Gym content post (one every 10 days)',                              days:[1,5],    parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:308, text:'Evening prayer',                                                    days:'daily',  parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null}
   ],
   completionLog: {},
   dailyNotes: {},
   reflections: [],
-  milestoneStamps: {},  // {`${habitId}-${days}`: true} — permanently earned stamps
   lastModified: 0,
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   nextId: 400,
-  yearEndMode: 'calendar',   // 'calendar' | 'anniversary'
-  yearEndMonth: 12,          // 1-12, the month the year-end review fires
-  yearStartDate: null,       // set on first onboarding completion, used for anniversary mode
 };
 
 // ============ STATE ============
@@ -4971,6 +4940,15 @@ async function loadFirestoreState(user){
     if(docSnap.exists){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+      // If doc exists but onboarded:false, still check for migration data —
+      // catches the case where a blank doc was auto-created before migration ran
+      if(\!state.onboarded){
+        const result = await detectMigrationData();
+        if(result){
+          showMigrationOverlay(user.uid, result);
+          return;
+        }
+      }
     } else {
       // New user — check localStorage then JSONbin for existing data to migrate
       const result = await detectMigrationData();
@@ -5449,7 +5427,6 @@ function setupNavSquish(){
   </div>
 </div>
 
-<div id="canvas-badge">canvas</div>
 
 </body>
 </html>
