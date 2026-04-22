@@ -4828,7 +4828,7 @@ async function writeClanSummary(user){
       habitCount: state.kaizen.length,
       strands:    (state.strands||[]).slice(0,5),
       strandRates: isShinobi?[]:computeStrandRates(),
-      crafts:     (state.shokunin||[]).map(function(s){return s.text;}).slice(0,6),
+      crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
       goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
       updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -5049,7 +5049,8 @@ function renderClanCards(){
           +'<div style="font-size:11px;font-weight:700">'+pct+'%</div></div></div>';
       }).join('');
       var craftsHtml=(m.crafts||[]).map(function(c){
-        return '<span class="craft-tag">'+c+'</span>';
+        var cl=c.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();
+        return '<span class="craft-tag">'+cl+'</span>';
       }).join('');
       var goalsHtml=(m.goals||[]).map(function(g){
         var pct=Math.min(100,Math.max(0,g.progress||0));
