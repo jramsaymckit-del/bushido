@@ -4970,6 +4970,22 @@ function updateClanPerfFromCache(){
   if(wkEl) wkEl.textContent=wkPct+'%';
   var actEl=document.getElementById('clan-active-today');
   if(actEl) actEl.textContent=activeToday+' of '+memberCount+' warriors active today';
+  // Today's score — sum real todayDone/todayTotal across all members
+  var totalDone=0,totalPossible=0;
+  var jTodayHabits=(state.kaizen||[]).filter(function(k){return habitOnDay(k,tidx);});
+  totalDone+=jTodayHabits.filter(function(k){return k.done;}).length;
+  totalPossible+=jTodayHabits.length;
+  Object.keys(_clanCache).forEach(function(uid){
+    var m=_clanCache[uid];
+    totalDone+=(m.todayDone||0);
+    totalPossible+=(m.todayTotal||0);
+  });
+  var scoreEl=document.getElementById('clan-today-score');
+  if(scoreEl) scoreEl.textContent=(totalPossible>0?(totalDone+'/'+totalPossible):(totalDone||'—'));
+  // Weekly grade
+  var grade=wkPct>=90?'A':wkPct>=80?'B':wkPct>=70?'C':wkPct>=60?'D':'F';
+  var gradeEl=document.getElementById('clan-weekly-grade');
+  if(gradeEl) gradeEl.textContent=grade;
 }
 // Render full Active Warriors cards from _clanCache (replaces static HTML)
 function renderClanCards(){
@@ -5441,6 +5457,17 @@ function setupNavSquish(){
               </div>
               <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(204,53,41,.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
             </div>
+            <!-- Today's score + weekly grade -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <div id="clan-today-score" style="font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);line-height:1">—</div>
+                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45);align-self:center">Today's Score</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45)">Weekly Grade</div>
+                <div id="clan-weekly-grade" style="font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--red);line-height:1">—</div>
+              </div>
+            </div>
             <div id="clan-record-line" style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:11px">clan record 12d &middot; current 4d</div>
             <div>
               <div style="font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:5px">CLAN AGGREGATE KAIZEN</div>
@@ -5505,27 +5532,10 @@ function setupNavSquish(){
       <div id="clan-active-warriors"></div>
 
 
-      <!-- INVITE SECTION -->
-      <div class="invite-section">
-        <div class="clan-section-label" style="margin-bottom:12px">Invite to Clan</div>
-        <div class="serif" style="font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:12px">Only those you invite will see your path.</div>
-        <div class="invite-input-row">
-          <input class="invite-input" type="email" placeholder="Warrior's email address">
-          <button class="btn btn-red">Send Invite</button>
-        </div>
-        <div style="margin-top:24px">
-          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px">Pending — 1 invitation received</div>
-          <div class="pending-card">
-            <div>
-              <div class="pending-name">Antonella</div>
-              <div class="pending-label">Wants to join your clan</div>
-            </div>
-            <div class="pending-actions">
-              <button class="pending-btn accept">Accept</button>
-              <button class="pending-btn decline">Decline</button>
-            </div>
-          </div>
-        </div>
+      <!-- CLAN CLOSED NOTE -->
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
+        <div style="font-size:22px;color:rgba(204,53,41,.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
+        <div class="serif" style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.7">The McKitrick Clan rides together.<br>No new blood until the clan calls for it.</div>
       </div>
 
     </div><!-- /clan-wrap -->
