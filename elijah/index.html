@@ -4770,27 +4770,67 @@ function computeWeekRates(){
   return rates;
 }
 
+// Compute 30-day completion rate per strand
+function computeStrandRates(){
+  var rates=[];
+  var strands=state.strands||[];
+  var today=new Date(); today.setHours(0,0,0,0);
+  for(var si=0;si<strands.length;si++){
+    var strandGoalIds=(state.annualGoals||[])
+      .filter(function(g){return g.parentMs===si;})
+      .map(function(g){return g.id;});
+    var shokIdSet={};
+    (state.shokunin||[]).forEach(function(s){
+      if(strandGoalIds.indexOf(Number(s.parentAnnual))>=0) shokIdSet[s.id]=true;
+    });
+    var sk=(state.kaizen||[]).filter(function(k){return shokIdSet[k.parentShok];});
+    if(!sk.length){rates.push(0);continue;}
+    var total=0,done=0;
+    for(var d=0;d<30;d++){
+      var day=new Date(today); day.setDate(today.getDate()-d);
+      var dStr=getDateStr(day);
+      var dIdx=(day.getDay()+6)%7;
+      sk.forEach(function(k){
+        if(habitOnDay(k,dIdx)){total++;if(isHabitDoneOnDate(k.id,dStr))done++;}
+      });
+    }
+    rates.push(total>0?Math.round(done/total*100):0);
+  }
+  return rates;
+}
+
 // Write a compact summary of this user's progress to /clan/{uid}
 // Called on every saveStateToFirestore() and on first sign-in.
 async function writeClanSummary(user){
   if(!FIREBASE_CONFIGURED||!user) return;
-  // Skip write if user is in Shinobi mode (hidden from clan)
-  if(_visMode==='shinobi') return;
+  var isShinobi=_visMode==='shinobi';
   try{
     var maxStreak=state.kaizen&&state.kaizen.length
       ? Math.max.apply(null,state.kaizen.map(function(k){return k.streak||0;}))
       : 0;
     var weekDays=computeWeekRates();
     var tidx=(new Date().getDay()+6)%7;
+    var today=getDateStr(new Date());
+    var todayIdx2=(new Date().getDay()+6)%7;
+    var todayHabits=state.kaizen.filter(function(k){return habitOnDay(k,todayIdx2);});
+    var todayDone=todayHabits.filter(function(k){return k.done;}).length;
     var ni=document.getElementById('clan-name-input');
     var clanName=(ni&&ni.value.trim())||state.clanName||'McKitrick Clan';
     await db.collection('clan').doc(user.uid).set({
-      name:      state.name || 'Warrior',
-      streak:    maxStreak,
-      todayRate: weekDays[tidx]||0,
-      weekDays:  weekDays,
-      clanName:  clanName,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      name:       state.name||'Warrior',
+      streak:     maxStreak,
+      todayRate:  weekDays[tidx]||0,
+      weekDays:   weekDays,
+      clanName:   clanName,
+      shinobi:    isShinobi,
+      todayDone:  todayDone,
+      todayTotal: todayHabits.length,
+      habitCount: state.kaizen.length,
+      strands:    (state.strands||[]).slice(0,5),
+      strandRates: isShinobi?[]:computeStrandRates(),
+      crafts:     (state.shokunin||[]).map(function(s){return s.text;}).slice(0,6),
+      goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
+      updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
     });
   }catch(e){ console.warn('Clan write failed:',e); }
 }
@@ -4816,6 +4856,7 @@ async function loadClanData(){
       state.clanName=sharedClanName;
     }
     renderClanRows();
+    renderClanCards();
     updateClanPerfFromCache();
   }catch(e){ console.warn('Clan load failed:',e); }
 }
@@ -4932,6 +4973,98 @@ function updateClanPerfFromCache(){
   if(wkEl) wkEl.textContent=wkPct+'%';
   var actEl=document.getElementById('clan-active-today');
   if(actEl) actEl.textContent=activeToday+' of '+memberCount+' warriors active today';
+}
+// Render full Active Warriors cards from _clanCache (replaces static HTML)
+function renderClanCards(){
+  var wrap=document.getElementById('clan-active-warriors');
+  if(!wrap) return;
+  var KANJI=['志','史','鍛','匠','愛'];
+  var COLORS=['--s0','--s1','--s2','--s3','--s4'];
+  var members=Object.keys(_clanCache).map(function(uid){return _clanCache[uid];});
+  members.sort(function(a,b){return (b.streak||0)-(a.streak||0);});
+  wrap.innerHTML=members.map(function(m){
+    var initial=(m.name||'?')[0].toUpperCase();
+    var avatarColor='var('+COLORS[initial.charCodeAt(0)%5]+')';
+    if(m.shinobi){
+      // Shinobi card — minimal view
+      var strands=m.strands||[];
+      var rates=m.strandRates||[];
+      var emberHtml=strands.map(function(s,i){
+        var op=Math.max(0.2,Math.min(1,(rates[i]||0)/100));
+        var k=KANJI[i%5];
+        return '<div class="shin-ember"><span class="shin-kanji">'+k+'</span>'
+          +'<div class="shin-ember-dot" style="background:var(--red);opacity:'+op.toFixed(2)+'"></div></div>';
+      }).join('');
+      var glyphHtml='';
+      var done=m.todayDone||0, total=m.todayTotal||0;
+      for(var g=0;g<Math.max(total,1);g++){
+        glyphHtml+='<div class="shin-glyph'+(g<done?' lit':'')+'"></div>';
+      }
+      var streakDots='';
+      var st=Math.min(m.streak||0,7);
+      for(var d=0;d<7;d++) streakDots+='<span style="opacity:'+(d<st?'1':'.2')+'">●</span>';
+      var craftCount=(m.crafts||[]).length;
+      return '<div class="clan-card shinobi">'
+        +'<div class="clan-card-header">'
+        +'<div class="clan-member-id">'
+        +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
+        +'<div><div class="clan-member-name">'+m.name+'</div>'
+        +'<div class="clan-member-sub">Moving in the shadows</div></div></div>'
+        +'<div class="clan-view-badge">Shinobi View</div></div>'
+        +'<div class="shin-strand-row">'+emberHtml+'</div>'
+        +'<div class="shin-stats">'
+        +'<div class="shin-stat"><div class="shin-stat-num">'+(m.todayDone||0)+'</div><div class="shin-stat-label">Today</div></div>'
+        +'<div class="shin-stat"><div class="shin-stat-num">'+streakDots+'</div><div class="shin-stat-label">Streak</div></div>'
+        +'<div class="shin-stat"><div class="shin-stat-num">'+(m.habitCount||0)+'</div><div class="shin-stat-label">Habits</div></div>'
+        +'</div>'
+        +'<div class="shin-obscure">'+glyphHtml+'<div class="shin-obscure-label">habits checked</div></div>'
+        +'<div class="shin-note">'+craftCount+' craft'+(craftCount!==1?'s':'')+' active · the rest is shadow</div>'
+        +'</div>';
+    } else {
+      // Samurai card — full view
+      var strands=m.strands||[];
+      var rates=m.strandRates||[];
+      var strandHtml=strands.map(function(s,i){
+        var color='var('+COLORS[i%5]+')';
+        var k=KANJI[i%5];
+        var pct=rates[i]||0;
+        return '<div class="clan-strand-chip">'
+          +'<span class="kanji" style="color:'+color+'">'+k+'</span>'
+          +'<div><div style="font-size:9px;letter-spacing:1px">'+s+'</div>'
+          +'<div style="font-size:11px;font-weight:700">'+pct+'%</div></div></div>';
+      }).join('');
+      var craftsHtml=(m.crafts||[]).map(function(c){
+        return '<span class="craft-tag">'+c+'</span>';
+      }).join('');
+      var goalsHtml=(m.goals||[]).map(function(g){
+        var pct=Math.min(100,Math.max(0,g.progress||0));
+        return '<div class="clan-goal-row">'
+          +'<div class="cg-label">'+g.text+'</div>'
+          +'<div class="cg-bar"><div class="cg-fill" style="width:'+pct+'%"></div></div>'
+          +'<div class="cg-pct">'+pct+'%</div></div>';
+      }).join('');
+      var strandSub=strands.join(' · ');
+      return '<div class="clan-card samurai-card">'
+        +'<div class="clan-card-header">'
+        +'<div class="clan-member-id">'
+        +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
+        +'<div><div class="clan-member-name">'+m.name+'</div>'
+        +'<div class="clan-member-sub">'+strandSub+'</div></div></div>'
+        +'<div class="clan-view-badge">Samurai View</div></div>'
+        +(strandHtml?'<div class="clan-strand-row">'+strandHtml+'</div>':'')
+        +'<div class="clan-stats-row">'
+        +'<div class="clan-stat"><div class="clan-stat-num">'+(m.todayDone||0)
+        +(m.todayTotal?'<span style="font-size:13px;opacity:.4">/'+m.todayTotal+'</span>':'')
+        +'</div><div class="clan-stat-label">Today</div></div>'
+        +'<div class="clan-stat"><div class="clan-stat-num">'+(m.streak||0)+'</div><div class="clan-stat-label">Day Streak</div></div>'
+        +'<div class="clan-stat"><div class="clan-stat-num">'+(m.habitCount||0)+'</div><div class="clan-stat-label">Habits</div></div>'
+        +'</div>'
+        +(craftsHtml?'<div class="clan-crafts">'+craftsHtml+'</div>':'')
+        +(goalsHtml?'<div><div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">Annual Goals</div>'
+          +'<div class="clan-goals">'+goalsHtml+'</div></div>':'')
+        +'</div>';
+    }
+  }).join('');
 }
 // ── /CLAN SHARED DATA LAYER ─────────────────────────────────────────────────
 
@@ -5365,120 +5498,9 @@ function setupNavSquish(){
       <div class="divider"></div>
       <div class="clan-section-label">Active Warriors</div>
 
-      <!-- ELIJAH — Samurai view -->
-      <div class="clan-card samurai-card">
-        <div class="clan-card-header">
-          <div class="clan-member-id">
-            <div class="clan-avatar" style="background:var(--s2)"><span>E</span></div>
-            <div>
-              <div class="clan-member-name">Elijah</div>
-              <div class="clan-member-sub">Discipline · Builder · Faith · Independence · The Ocean</div>
-            </div>
-          </div>
-          <div class="clan-view-badge">Samurai View</div>
-        </div>
-        <div class="clan-strand-row">
-          <div class="clan-strand-chip" style="background:rgba(44,62,45,.08)"><span class="kanji" style="color:var(--s2)">規</span><div><div style="font-size:9px;color:var(--s2);letter-spacing:1px">Discipline</div><div style="font-size:11px;font-weight:700;color:var(--ink)">78%</div></div></div>
-          <div class="clan-strand-chip" style="background:rgba(27,42,74,.08)"><span class="kanji" style="color:var(--s3)">義</span><div><div style="font-size:9px;color:var(--s3);letter-spacing:1px">Builder</div><div style="font-size:11px;font-weight:700;color:var(--ink)">65%</div></div></div>
-          <div class="clan-strand-chip" style="background:rgba(123,59,78,.08)"><span class="kanji" style="color:var(--s4)">信</span><div><div style="font-size:9px;color:var(--s4);letter-spacing:1px">Faith</div><div style="font-size:11px;font-weight:700;color:var(--ink)">91%</div></div></div>
-          <div class="clan-strand-chip" style="background:rgba(184,134,11,.08)"><span class="kanji" style="color:var(--s0)">独</span><div><div style="font-size:9px;color:var(--s0);letter-spacing:1px">Path</div><div style="font-size:11px;font-weight:700;color:var(--ink)">54%</div></div></div>
-          <div class="clan-strand-chip" style="background:rgba(74,55,40,.08)"><span class="kanji" style="color:var(--s1)">海</span><div><div style="font-size:9px;color:var(--s1);letter-spacing:1px">Ocean</div><div style="font-size:11px;font-weight:700;color:var(--ink)">80%</div></div></div>
-        </div>
-        <div class="clan-stats-row">
-          <div class="clan-stat"><div class="clan-stat-num">7<span style="font-size:13px;opacity:.4">/9</span></div><div class="clan-stat-label">Today</div></div>
-          <div class="clan-stat"><div class="clan-stat-num" style="color:var(--red)">14</div><div class="clan-stat-label">Day Streak</div></div>
-          <div class="clan-stat"><div class="clan-stat-num">9</div><div class="clan-stat-label">Habits</div></div>
-        </div>
-        <div class="clan-crafts">
-          <span class="craft-tag">Faith &amp; Daily Discipline</span>
-          <span class="craft-tag">Marathon Training</span>
-          <span class="craft-tag">Industry Immersion</span>
-          <span class="craft-tag">Networking</span>
-        </div>
-        <div>
-          <div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Annual Goals</div>
-          <div class="clan-goals">
-            <div class="clan-goal-row"><div class="cg-label">Real business plan</div><div class="cg-bar"><div class="cg-fill" style="width:40%;background:var(--red)"></div></div><div class="cg-pct">40%</div></div>
-            <div class="clan-goal-row"><div class="cg-label">Find first mentor</div><div class="cg-bar"><div class="cg-fill" style="width:70%;background:var(--red)"></div></div><div class="cg-pct">70%</div></div>
-            <div class="clan-goal-row"><div class="cg-label">Complete marathon</div><div class="cg-bar"><div class="cg-fill" style="width:55%;background:var(--red)"></div></div><div class="cg-pct">55%</div></div>
-          </div>
-        </div>
-      </div>
+      <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
+      <div id="clan-active-warriors"></div>
 
-      <!-- SUSAN — Samurai view -->
-      <div class="clan-card samurai-card">
-        <div class="clan-card-header">
-          <div class="clan-member-id">
-            <div class="clan-avatar" style="background:var(--s4)"><span>S</span></div>
-            <div>
-              <div class="clan-member-name">Susan</div>
-              <div class="clan-member-sub">Faith · Raising People Up · Pura Vida · Voice</div>
-            </div>
-          </div>
-          <div class="clan-view-badge">Samurai View</div>
-        </div>
-        <div class="clan-strand-row">
-          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s4);filter:brightness(2)">愛</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Faith</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">84%</div></div></div>
-          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s2);filter:brightness(2)">義</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">People</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">71%</div></div></div>
-          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s3);filter:brightness(2)">道</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Pura Vida</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">60%</div></div></div>
-          <div class="clan-strand-chip" style="background:transparent"><span class="kanji" style="color:var(--s0);filter:brightness(2)">声</span><div><div style="font-size:9px;color:var(--clan-white-faint);letter-spacing:1px">Voice</div><div style="font-size:11px;font-weight:700;color:var(--clan-white)">45%</div></div></div>
-        </div>
-        <div class="clan-stats-row">
-          <div class="clan-stat"><div class="clan-stat-num">5<span style="font-size:13px;opacity:.4">/7</span></div><div class="clan-stat-label">Today</div></div>
-          <div class="clan-stat"><div class="clan-stat-num">6</div><div class="clan-stat-label">Day Streak</div></div>
-          <div class="clan-stat"><div class="clan-stat-num">7</div><div class="clan-stat-label">Habits</div></div>
-        </div>
-        <div class="clan-crafts">
-          <span class="craft-tag">Faith Practice</span>
-          <span class="craft-tag">Physical Faithfulness</span>
-          <span class="craft-tag">Holding a Room</span>
-          <span class="craft-tag">Pura Vida Stewardship</span>
-        </div>
-        <div>
-          <div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px">Annual Goals</div>
-          <div class="clan-goals">
-            <div class="clan-goal-row"><div class="cg-label">The Blessing dinner</div><div class="cg-bar"><div class="cg-fill" style="width:60%;background:var(--clan-white)"></div></div><div class="cg-pct">60%</div></div>
-            <div class="clan-goal-row"><div class="cg-label">Speaking opportunity</div><div class="cg-bar"><div class="cg-fill" style="width:30%;background:var(--clan-white)"></div></div><div class="cg-pct">30%</div></div>
-            <div class="clan-goal-row"><div class="cg-label">Pura Vida practice daily</div><div class="cg-bar"><div class="cg-fill" style="width:75%;background:var(--clan-white)"></div></div><div class="cg-pct">75%</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHARK — Shinobi view -->
-      <div class="clan-card shinobi">
-        <div class="clan-card-header">
-          <div class="clan-member-id">
-            <div class="clan-avatar" style="background:var(--ink)"><span>C</span></div>
-            <div>
-              <div class="clan-member-name">Chark</div>
-              <div class="clan-member-sub">Moving in the shadows</div>
-            </div>
-          </div>
-          <div class="clan-view-badge">Shinobi View</div>
-        </div>
-        <div class="shin-strand-row">
-          <div class="shin-ember"><span class="shin-kanji">信</span><div class="shin-ember-dot" style="background:var(--red);opacity:.9"></div></div>
-          <div class="shin-ember"><span class="shin-kanji">静</span><div class="shin-ember-dot" style="background:var(--red);opacity:.55"></div></div>
-          <div class="shin-ember"><span class="shin-kanji">旅</span><div class="shin-ember-dot" style="background:var(--red);opacity:.85"></div></div>
-          <div class="shin-ember"><span class="shin-kanji">学</span><div class="shin-ember-dot" style="background:var(--red);opacity:.45"></div></div>
-          <div class="shin-ember"><span class="shin-kanji">絆</span><div class="shin-ember-dot" style="background:var(--red);opacity:.7"></div></div>
-        </div>
-        <div class="shin-stats">
-          <div class="shin-stat"><div class="shin-stat-num">4</div><div class="shin-stat-label">Today</div></div>
-          <div class="shin-stat"><div class="shin-stat-num">●●●●●<span style="opacity:.25">●●</span></div><div class="shin-stat-label">Streak</div></div>
-          <div class="shin-stat"><div class="shin-stat-num">11</div><div class="shin-stat-label">Habits</div></div>
-        </div>
-        <div class="shin-obscure">
-          <div class="shin-glyph lit"></div><div class="shin-glyph lit"></div>
-          <div class="shin-glyph lit"></div><div class="shin-glyph lit"></div>
-          <div class="shin-glyph"></div><div class="shin-glyph"></div>
-          <div class="shin-glyph"></div><div class="shin-glyph"></div>
-          <div class="shin-glyph"></div><div class="shin-glyph"></div>
-          <div class="shin-glyph"></div>
-          <div class="shin-obscure-label">habits checked</div>
-        </div>
-        <div class="shin-note">5 crafts active · the rest is shadow</div>
-      </div>
 
       <!-- INVITE SECTION -->
       <div class="invite-section">
