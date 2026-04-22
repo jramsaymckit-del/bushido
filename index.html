@@ -5,18 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BUSHIDO — Canvas</title>
 <style>
-/* ─── CANVAS MODE INDICATOR ─────────────────────────────────────────────────
-   This file is the design canvas. Experiment freely.
-   Approved changes propagate to coreproject via bushido-feature-sync.
-   ────────────────────────────────────────────────────────────────────────── */
-#canvas-badge{
-  position:fixed;bottom:16px;right:16px;z-index:9999;
-  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;color:rgba(204,53,41,0.6);
-  border:1px solid rgba(204,53,41,0.3);padding:5px 12px;
-  background:rgba(245,240,232,0.92);border-radius:2px;
-  pointer-events:none;user-select:none;
-}
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1492,10 +1480,6 @@ if (FIREBASE_CONFIGURED) {
 
     <div class="auth-error" id="auth-error"></div>
 
-    <!-- Canvas demo bypass — always available in canvas mode -->
-    <button class="auth-demo-link" id="auth-demo-link" onclick="enterDemoMode()">
-      canvas demo — enter without auth
-    </button>
 
   </div>
 </div>
@@ -3022,57 +3006,8 @@ function sortClanRows(){
   rows.forEach(r => wrap.appendChild(r));
 }
 
-// Group performance — weekly grade, active-today, aggregate bar
-function updateClanPerf(){
-  var eli=[1.0,1.0,1.0,1.0,0.72,0,0];
-  var chk=[1.0,0.58,1.0,1.0,0.50,0,0];
-  var today=new Date(); today.setHours(0,0,0,0);
-  var tidx=(today.getDay()+6)%7;
-  var wStart=new Date(today); wStart.setDate(today.getDate()-tidx);
-  var jDays=[0,0,0,0,0,0,0];
-  for(var d=0;d<=tidx;d++){
-    var dt=new Date(wStart); dt.setDate(wStart.getDate()+d);
-    var dStr=getDateStr(dt);
-    var dayOfW=(dt.getDay()+6)%7;
-    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW);});
-    var dn=sc.filter(function(k){return isHabitDoneOnDate(k.id,dStr);}).length;
-    jDays[d]=sc.length?dn/sc.length:0;
-  }
-  var aggBars=document.querySelectorAll('#clan-agg-bars .clan-agg-bar');
-  aggBars.forEach(function(bar,i){
-    if(i>tidx){
-      bar.style.height='3px';
-      bar.style.background='rgba(204,53,41,.08)';
-      bar.style.outline='';
-      return;
-    }
-    var rate=(eli[i]+chk[i]+jDays[i])/3;
-    var h=Math.max(4,Math.round(rate*26));
-    bar.style.height=h+'px';
-    bar.style.outline='';
-    if(i===tidx){
-      bar.style.background=rate>=0.8?'var(--red)':'rgba(204,53,41,.45)';
-      bar.style.outline='1.5px solid rgba(204,53,41,.3)';
-      bar.style.outlineOffset='-1px';
-    } else {
-      bar.style.background=rate>=0.85?'var(--red)':rate>=0.5?'rgba(204,53,41,.5)':'rgba(204,53,41,.22)';
-    }
-  });
-  var activeToday=0;
-  if(eli[tidx]>0.3) activeToday++;
-  if(chk[tidx]>0.3) activeToday++;
-  if(jDays[tidx]>0) activeToday++;
-  var actEl=document.getElementById('clan-active-today');
-  if(actEl) actEl.textContent=activeToday+' of 3 warriors active today';
-  var wkTotal=0,wkCount=0;
-  for(var d2=0;d2<=tidx;d2++){
-    wkTotal+=eli[d2]+chk[d2]+jDays[d2];
-    wkCount+=3;
-  }
-  var wkPct=wkCount>0?Math.round((wkTotal/wkCount)*100):0;
-  var wkEl=document.getElementById('clan-weekly-pct');
-  if(wkEl) wkEl.textContent=wkPct+'%';
-}
+// Group performance — delegates to updateClanPerfFromCache() (real Firestore data)
+function updateClanPerf(){ updateClanPerfFromCache(); }
 
 // ============ ADD GOAL ============
 function showAdd(){
@@ -4824,6 +4759,181 @@ function initGridSwipe(){
 let _currentUser = null;
 let _authMode    = 'signin';
 
+// ── CLAN SHARED DATA LAYER ──────────────────────────────────────────────────
+// _clanCache: { [uid]: { name, streak, todayRate, weekDays[7], updatedAt } }
+// Excludes the current user's own uid — their row is always live from state.
+var _clanCache = {};
+
+// Compute this week's daily completion rates (Mon=0…Sun=6) from state.kaizen
+function computeWeekRates(){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var tidx=(today.getDay()+6)%7;
+  var wStart=new Date(today); wStart.setDate(today.getDate()-tidx);
+  var rates=[0,0,0,0,0,0,0];
+  for(var d=0;d<=tidx;d++){
+    var dt=new Date(wStart); dt.setDate(wStart.getDate()+d);
+    var dStr=getDateStr(dt);
+    var dayOfW=(dt.getDay()+6)%7;
+    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW);});
+    var dn=sc.filter(function(k){return isHabitDoneOnDate(k.id,dStr);}).length;
+    rates[d]=sc.length?dn/sc.length:0;
+  }
+  return rates;
+}
+
+// Write a compact summary of this user's progress to /clan/{uid}
+// Called on every saveStateToFirestore() and on first sign-in.
+async function writeClanSummary(user){
+  if(!FIREBASE_CONFIGURED||!user) return;
+  // Skip write if user is in Shinobi mode (hidden from clan)
+  if(_visMode==='shinobi') return;
+  try{
+    var maxStreak=state.kaizen&&state.kaizen.length
+      ? Math.max.apply(null,state.kaizen.map(function(k){return k.streak||0;}))
+      : 0;
+    var weekDays=computeWeekRates();
+    var tidx=(new Date().getDay()+6)%7;
+    await db.collection('clan').doc(user.uid).set({
+      name:      state.name || 'Warrior',
+      streak:    maxStreak,
+      todayRate: weekDays[tidx]||0,
+      weekDays:  weekDays,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }catch(e){ console.warn('Clan write failed:',e); }
+}
+
+// Fetch all /clan docs (excluding own uid), populate _clanCache, re-render
+async function loadClanData(){
+  if(!FIREBASE_CONFIGURED||!_currentUser) return;
+  try{
+    var snap=await db.collection('clan').get();
+    _clanCache={};
+    snap.forEach(function(doc){
+      if(doc.id!==_currentUser.uid){
+        _clanCache[doc.id]=doc.data();
+      }
+    });
+    renderClanRows();
+    updateClanPerfFromCache();
+  }catch(e){ console.warn('Clan load failed:',e); }
+}
+
+// Replace static member rows with dynamic rows from _clanCache
+function renderClanRows(){
+  var wrap=document.getElementById('clan-exp-members');
+  if(!wrap) return;
+
+  // Collect clan members from cache (others) + James's live row
+  var members=[];
+  Object.keys(_clanCache).forEach(function(uid){
+    var d=_clanCache[uid];
+    if(d) members.push({name:d.name,streak:d.streak||0,todayRate:d.todayRate||0,weekDays:d.weekDays||[0,0,0,0,0,0,0],isYou:false});
+  });
+
+  // Sort cache members by streak descending
+  members.sort(function(a,b){return (b.streak||0)-(a.streak||0);});
+
+  // Update warrior count (cache members + James)
+  var countEl=document.getElementById('clan-warrior-count');
+  if(countEl) countEl.textContent=members.length+1;
+
+  // Build and inject rows for cache members only.
+  // James's row (#clan-my-row) already exists in static HTML — never overwrite it.
+  var dynamicWrap=document.getElementById('clan-dynamic-members');
+  if(!dynamicWrap) return;
+
+  var today=new Date(); today.setHours(0,0,0,0);
+  var tidx=(today.getDay()+6)%7;
+
+  dynamicWrap.innerHTML=members.map(function(m){
+    var weekDays=m.weekDays||[0,0,0,0,0,0,0];
+    var bHtml='';
+    for(var i=0;i<7;i++){
+      if(i>tidx){ bHtml+='<div class="clan-exp-bar" style="height:3px"></div>'; continue; }
+      var pct=weekDays[i]||0;
+      var h=Math.max(3,Math.round(pct*20));
+      var cls='clan-exp-bar';
+      if(i===tidx) cls+=' today';
+      else if(pct>=1) cls+=' done';
+      else if(pct>0) cls+=' partial';
+      bHtml+='<div class="'+cls+'" style="height:'+h+'px"></div>';
+    }
+    var todayDone=Math.round((m.todayRate||0)*10);
+    return '<div class="clan-exp-row">'
+      +'<div><div class="clan-exp-streak">'+(m.streak||0)+'</div><div class="clan-exp-streak-lbl">days</div></div>'
+      +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+m.name+'</div>'
+      +'<div class="clan-exp-bars">'+bHtml+'</div></div>'
+      +'<div class="clan-exp-today"><div class="clan-exp-today-num">'+todayDone+'/10</div>'
+      +'<div class="clan-exp-today-lbl">today</div></div>'
+      +'</div>';
+  }).join('');
+
+  sortClanRows();
+}
+
+// Group performance using real _clanCache data instead of hardcoded arrays
+function updateClanPerfFromCache(){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var tidx=(today.getDay()+6)%7;
+  var wStart=new Date(today); wStart.setDate(today.getDate()-tidx);
+
+  // Build James's live week rates
+  var jDays=[0,0,0,0,0,0,0];
+  for(var d=0;d<=tidx;d++){
+    var dt=new Date(wStart); dt.setDate(wStart.getDate()+d);
+    var dStr=getDateStr(dt);
+    var dayOfW=(dt.getDay()+6)%7;
+    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW);});
+    var dn=sc.filter(function(k){return isHabitDoneOnDate(k.id,dStr);}).length;
+    jDays[d]=sc.length?dn/sc.length:0;
+  }
+
+  // Collect all members' weekDays
+  var allWeekDays=[jDays];
+  Object.keys(_clanCache).forEach(function(uid){
+    var d=_clanCache[uid];
+    if(d&&d.weekDays) allWeekDays.push(d.weekDays);
+  });
+
+  var memberCount=allWeekDays.length;
+  var aggBars=document.querySelectorAll('#clan-agg-bars .clan-agg-bar');
+  var wkTotal=0, wkCount=0, activeToday=0;
+
+  aggBars.forEach(function(bar,i){
+    if(i>tidx){
+      bar.style.height='3px';
+      bar.style.background='rgba(204,53,41,.08)';
+      bar.style.outline='';
+      return;
+    }
+    var daySum=0;
+    allWeekDays.forEach(function(wd){ daySum+=wd[i]||0; });
+    var rate=memberCount?daySum/memberCount:0;
+    wkTotal+=daySum; wkCount+=memberCount;
+    if(i===tidx){
+      allWeekDays.forEach(function(wd){ if((wd[i]||0)>0.1) activeToday++; });
+    }
+    var h=Math.max(4,Math.round(rate*26));
+    bar.style.height=h+'px';
+    bar.style.outline='';
+    if(i===tidx){
+      bar.style.background=rate>=0.8?'var(--red)':'rgba(204,53,41,.45)';
+      bar.style.outline='1.5px solid rgba(204,53,41,.3)';
+      bar.style.outlineOffset='-1px';
+    } else {
+      bar.style.background=rate>=0.85?'var(--red)':rate>=0.5?'rgba(204,53,41,.5)':'rgba(204,53,41,.22)';
+    }
+  });
+
+  var wkPct=wkCount>0?Math.round((wkTotal/wkCount)*100):0;
+  var wkEl=document.getElementById('clan-weekly-pct');
+  if(wkEl) wkEl.textContent=wkPct+'%';
+  var actEl=document.getElementById('clan-active-today');
+  if(actEl) actEl.textContent=activeToday+' of '+memberCount+' warriors active today';
+}
+// ── /CLAN SHARED DATA LAYER ─────────────────────────────────────────────────
+
 // ============ INIT ============
 // Hoist shared state vars before initFirebaseAuth() — onAuthStateChanged can fire
 // synchronously (cached session), which would hit these before their let declarations.
@@ -4971,6 +5081,15 @@ async function loadFirestoreState(user){
     if(docSnap.exists){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+      // If doc exists but onboarded:false, still check for migration data —
+      // catches the case where a blank doc was auto-created before migration ran
+      if(!state.onboarded){
+        const result = await detectMigrationData();
+        if(result){
+          showMigrationOverlay(user.uid, result);
+          return;
+        }
+      }
     } else {
       // New user — check localStorage then JSONbin for existing data to migrate
       const result = await detectMigrationData();
@@ -4991,6 +5110,13 @@ async function loadFirestoreState(user){
   }
   if(!state.milestoneStamps) state.milestoneStamps = {};
   if(!state.practiceStamps)  state.practiceStamps  = {};
+  // Write this user's summary to /clan and load all clan members
+  writeClanSummary(user);
+  loadClanData();
+  // Auto-refresh clan data every 5 minutes
+  if(!window._clanRefreshTimer){
+    window._clanRefreshTimer = setInterval(loadClanData, 5 * 60 * 1000);
+  }
   if(state.onboarded){
     showDashboard();
   } else {
@@ -5022,6 +5148,7 @@ async function saveStateToFirestore(){
       { state: JSON.stringify(state), updated: new Date().toISOString() },
       { merge: true }
     );
+    writeClanSummary(_currentUser); // fire-and-forget clan update
   } catch(e){ console.warn('Firestore save failed:', e); }
 }
 
@@ -5164,7 +5291,7 @@ function setupNavSquish(){
               <input class="clan-name-field" id="clan-name-input" type="text" placeholder="Name your clan…" maxlength="32" spellcheck="false">
             </div>
             <div style="text-align:right;flex-shrink:0">
-              <div style="font-size:17px;font-weight:700;font-family:'Noto Serif JP',serif;color:var(--red);line-height:1">3</div>
+              <div id="clan-warrior-count" style="font-size:17px;font-weight:700;font-family:'Noto Serif JP',serif;color:var(--red);line-height:1">—</div>
               <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-top:2px">warriors</div>
             </div>
           </div>
@@ -5201,23 +5328,8 @@ function setupNavSquish(){
             </div>
           </div>
           <div class="clan-exp-members" id="clan-exp-members">
-            <!-- Elijah — static demo data -->
-            <div class="clan-exp-row">
-              <div><div class="clan-exp-streak">31</div><div class="clan-exp-streak-lbl">days</div></div>
-              <div style="flex:1;min-width:0">
-                <div class="clan-exp-name">Elijah</div>
-                <div class="clan-exp-bars">
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar done"  style="height:20px"></div>
-                  <div class="clan-exp-bar today" style="height:15px"></div>
-                  <div class="clan-exp-bar"       style="height:3px"></div>
-                  <div class="clan-exp-bar"       style="height:3px"></div>
-                </div>
-              </div>
-              <div class="clan-exp-today"><div class="clan-exp-today-num">10/14</div><div class="clan-exp-today-lbl">today</div></div>
-            </div>
+            <!-- Dynamic clan member rows — rendered by renderClanRows() from Firestore /clan -->
+            <div id="clan-dynamic-members"></div>
             <!-- James — live data + inline visibility toggle -->
             <div class="clan-exp-row" style="align-items:start">
               <div style="padding-top:2px"><div class="clan-exp-streak" id="clan-my-streak">&#x2014;</div><div class="clan-exp-streak-lbl">days</div></div>
@@ -5244,23 +5356,6 @@ function setupNavSquish(){
                 </div>
               </div>
               <div class="clan-exp-today" style="padding-top:2px"><div class="clan-exp-today-num" id="clan-my-today">&#x2014;</div><div class="clan-exp-today-lbl">today</div></div>
-            </div>
-            <!-- Chark — static demo data -->
-            <div class="clan-exp-row">
-              <div><div class="clan-exp-streak">8</div><div class="clan-exp-streak-lbl">days</div></div>
-              <div style="flex:1;min-width:0">
-                <div class="clan-exp-name">Chark</div>
-                <div class="clan-exp-bars">
-                  <div class="clan-exp-bar done"    style="height:20px"></div>
-                  <div class="clan-exp-bar partial" style="height:13px"></div>
-                  <div class="clan-exp-bar done"    style="height:20px"></div>
-                  <div class="clan-exp-bar done"    style="height:20px"></div>
-                  <div class="clan-exp-bar today"   style="height:9px"></div>
-                  <div class="clan-exp-bar"         style="height:3px"></div>
-                  <div class="clan-exp-bar"         style="height:3px"></div>
-                </div>
-              </div>
-              <div class="clan-exp-today"><div class="clan-exp-today-num">5/10</div><div class="clan-exp-today-lbl">today</div></div>
             </div>
           </div>
         </div>
@@ -5448,8 +5543,6 @@ function setupNavSquish(){
     </div>
   </div>
 </div>
-
-<div id="canvas-badge">canvas</div>
 
 </body>
 </html>
