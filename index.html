@@ -4871,38 +4871,61 @@ function initFirebaseAuth(){
 }
 
 // ── MIGRATION ──────────────────────────────────────────────────────────────
-const MIGRATE_KEYS = ['bushido_james_permanent', 'bushido_coreproject'];
-let _migrationUid  = null;
-let _migrationData = null;
+// Check own PROD_KEY first, then well-known legacy keys — deduped
+const MIGRATE_KEYS = [PROD_KEY, DEV_KEY, 'bushido_james_permanent', 'bushido_coreproject']
+  .filter((v, i, a) => v && a.indexOf(v) === i);
+let _migrationUid    = null;
+let _migrationData   = null;
+let _migrationSource = 'localStorage';
 
-function detectLocalMigrationData(){
+async function detectMigrationData(){
+  // 1. Check localStorage — fast, no network, checks this user's own key first
   for(const key of MIGRATE_KEYS){
     try{
       const raw = localStorage.getItem(key);
       if(!raw) continue;
       const data = JSON.parse(raw);
       if(data && data.strands && data.strands.length && data.onboarded){
-        return { key, data };
+        return { source: 'localStorage', key, data };
       }
     } catch(e){}
   }
+  // 2. Fallback: try JSONbin if API key + bin ID are in localStorage config
+  try{
+    const cfg = getSyncConfig();
+    if(cfg.binId && cfg.masterKey){
+      const resp = await fetch(
+        'https://api.jsonbin.io/v3/b/' + cfg.binId + '/latest',
+        { headers: { 'X-Master-Key': cfg.masterKey } }
+      );
+      if(resp.ok){
+        const json = await resp.json();
+        const data = json.record;
+        if(data && data.strands && data.strands.length && data.onboarded){
+          return { source: 'JSONbin', key: cfg.binId, data };
+        }
+      }
+    }
+  } catch(e){}
   return null;
 }
 
-function showMigrationOverlay(uid, localResult){
-  _migrationUid  = uid;
-  _migrationData = localResult.data;
-  const d = localResult.data;
+function showMigrationOverlay(uid, result){
+  _migrationUid    = uid;
+  _migrationData   = result.data;
+  _migrationSource = result.source;
+  const d = result.data;
   const habitsCount  = (d.kaizen || []).length;
   const logDays      = Object.keys(d.completionLog || {}).length;
   const firstDay     = logDays ? Object.keys(d.completionLog).sort()[0] : null;
   const strandsCount = (d.strands || []).length;
+  const sourceLabel  = result.source === 'JSONbin' ? 'cloud backup (JSONbin)' : result.key;
   document.getElementById('migrate-stats').innerHTML =
     strandsCount + ' strand' + (strandsCount !== 1 ? 's' : '') + ' &nbsp;&middot;&nbsp; ' +
     habitsCount  + ' habit'  + (habitsCount  !== 1 ? 's' : '') + '<br>' +
     logDays + ' day' + (logDays !== 1 ? 's' : '') + ' of completion history' +
     (firstDay ? ' &nbsp;&middot;&nbsp; since ' + firstDay : '') + '<br>' +
-    '<span style="color:var(--ink-faint);font-size:11px">stored in: ' + localResult.key + '</span>';
+    '<span style="color:var(--ink-faint);font-size:11px">source: ' + sourceLabel + '</span>';
   document.getElementById('migrate-overlay').classList.add('active');
 }
 
@@ -4916,7 +4939,7 @@ async function performMigration(){
     await db.collection('users').doc(_migrationUid).set({
       state: JSON.stringify(state),
       created: new Date().toISOString(),
-      migratedFrom: 'localStorage',
+      migratedFrom: _migrationSource,
       migratedAt: new Date().toISOString()
     });
     document.getElementById('migrate-overlay').classList.remove('active');
@@ -4949,13 +4972,13 @@ async function loadFirestoreState(user){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
     } else {
-      // New user — check for existing localStorage data to migrate
-      const localResult = detectLocalMigrationData();
-      if(localResult){
-        showMigrationOverlay(user.uid, localResult);
+      // New user — check localStorage then JSONbin for existing data to migrate
+      const result = await detectMigrationData();
+      if(result){
+        showMigrationOverlay(user.uid, result);
         return; // Pause — migration functions will resume the flow
       }
-      // No local data — fresh start, begin onboarding
+      // No existing data anywhere — fresh start, begin onboarding
       Object.assign(state, DEFAULT_STATE, { onboarded: false });
       await db.collection('users').doc(user.uid).set({
         state: JSON.stringify(state),
