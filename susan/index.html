@@ -3024,10 +3024,16 @@ function emptyState(){
 // ============ HABIT DETAIL (bullets + WHY) ============
 const _openHabitDetails = new Set();
 
-// Click-outside-to-close
+// Click-outside-to-close (also closes when clicking inside the detail panel)
 document.addEventListener('click', function(e){
   if(!_openHabitDetails.size) return;
-  if(e.target.closest('li.goal.hd-open')) return; // click inside an open card — ignore
+  if(e.target.closest('li.goal.hd-open')){
+    // Click on main row (checkbox, title) → ignore
+    if(!e.target.closest('.habit-detail')) return;
+    // Click on interactive elements inside edit form → ignore
+    if(e.target.closest('input,textarea,select')) return;
+    // Click anywhere else inside the detail panel → fall through to close
+  }
   // Close all open panels
   _openHabitDetails.forEach(id=>{
     const li = document.querySelector(`[data-kaizen-id="${id}"]`);
