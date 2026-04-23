@@ -2857,10 +2857,10 @@ function renderGoals(){
     const coreCount=state.kaizen.filter(k=>k.core===true).length;
     const travelToggleHtml=`<div class="travel-toggle-bar">
       <button class="travel-toggle-btn${state.travelMode?' active':''}" onclick="handleTravelToggle()">
-        <span>✈</span><span>${state.travelMode?'Travelling':'Travel Mode'}</span>
+        <span>✈︎</span><span>${state.travelMode?'Travelling':'Travel Mode'}</span>
       </button></div>`;
     const travelBannerHtml=state.travelMode?`<div class="travel-banner">
-      <span>✈ &nbsp;Travelling — ${coreCount} of ${state.kaizen.length} practices</span>
+      <span>✈︎ &nbsp;Travelling — ${coreCount} of ${state.kaizen.length} practices</span>
       <a onclick="openTravelSetup(true)">Edit core practices</a>
     </div>`:'';
     const todayItems=state.kaizen.filter(k=>{
