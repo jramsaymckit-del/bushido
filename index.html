@@ -2952,9 +2952,9 @@ document.addEventListener('click', function(e){
 function buildHabitDetailHtml(g){
   const bullets = g.bullets && g.bullets.length ? g.bullets : null;
   const why = g.why && g.why.trim() ? g.why : null;
-  const bulletsHtml = bullets
+  const bulletsHtml = `<div class="hd-why-label" style="margin-bottom:6px">what</div>` + (bullets
     ? `<ul class="hd-bullets">${bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`
-    : `<ul class="hd-bullets hd-placeholder"><li>What does this habit look like in practice?</li></ul>`;
+    : `<ul class="hd-bullets hd-placeholder"><li>What does this habit look like in practice?</li></ul>`);
   const whyHtml = why
     ? `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text">${why}</div>`
     : `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text hd-placeholder">Why does this habit exist in your life?</div>`;
