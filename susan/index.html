@@ -1136,17 +1136,17 @@ body.dark .hanko{border-color:var(--red)}
 /* C — Shokunin shelf */
 .sh-shelf-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px}
 .sh-shelf{display:flex;justify-content:space-between;gap:4px;margin-bottom:14px}
-.sh-stamp{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 3px 8px;border:1px solid rgba(0,0,0,.06);background:rgba(0,0,0,.02);position:relative}
-.sh-stamp.earned{background:rgba(204,53,41,.04);border-color:rgba(204,53,41,.18)}
-.sh-stamp.next{border-color:rgba(204,53,41,.14);border-style:dashed}
-.sh-kanji{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:900;line-height:1}
-.sh-stamp.earned .sh-kanji{color:var(--red)}
-.sh-stamp.next   .sh-kanji{color:rgba(204,53,41,.28)}
-.sh-stamp.future .sh-kanji{color:rgba(0,0,0,.1)}
+.sh-stamp{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 3px 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);position:relative}
+.sh-stamp.earned{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.sh-stamp.next{border-color:rgba(255,255,255,.12);border-style:dashed}
+.sh-kanji{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;line-height:1}
+.sh-stamp.earned .sh-kanji{opacity:1}
+.sh-stamp.next   .sh-kanji{opacity:0}
+.sh-stamp.future .sh-kanji{opacity:0}
 .sh-days{font-size:8px;letter-spacing:.5px;text-align:center;line-height:1.4}
-.sh-stamp.earned .sh-days{color:rgba(204,53,41,.55)}
-.sh-stamp.next   .sh-days{color:rgba(0,0,0,.22)}
-.sh-stamp.future .sh-days{color:rgba(0,0,0,.14)}
+.sh-stamp.earned .sh-days{opacity:.75}
+.sh-stamp.next   .sh-days{opacity:0}
+.sh-stamp.future .sh-days{opacity:0}
 .sh-earned-dot{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--red)}
 .sh-progress-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--ink-faint)}
 .sh-prog-bar{flex:1;height:3px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden}
@@ -2496,8 +2496,9 @@ function buildMonthCal(){
     var isActive=earned||pending;
     var cls='sh-stamp'+(isActive?' earned':' future');
     var dot=isActive?'<div class="sh-earned-dot'+(landing?' land':'')+'" style="background:'+s.col+';box-shadow:0 0 6px '+s.col+'"></div>':'';
-    var kanjiStyle=isActive?'color:'+s.col+';opacity:1':'';
-    var daysStyle=isActive?'color:'+s.col+';opacity:.65':'';
+    var displayCol=s.light||s.col;
+    var kanjiStyle=isActive?'color:'+displayCol+';opacity:1':'';
+    var daysStyle=isActive?'color:'+displayCol+';opacity:.75':'';
     stampsHtml+='<div id="ps-stamp-'+s.days+'" class="'+cls+'">'
       +dot+'<span class="sh-kanji" style="'+kanjiStyle+'">'+s.kanji+'</span>'
       +'<span class="sh-days" style="'+daysStyle+'">'+s.days+'<br>days</span></div>';
@@ -4083,19 +4084,19 @@ function msGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
 
 // ============ PRACTICE MILESTONES (overall streak continuance) ============
 const PRACTICE_MILESTONES=[
-  {days:7,   kanji:'\u7d99', name:'Continuance', col:'#3D4A52', glow:'rgba(61,74,82,VAL)',
+  {days:7,   kanji:'\u7d99', name:'Continuance', col:'#3D4A52', light:'#8FAAB8', glow:'rgba(61,74,82,VAL)',
    copy:'You are shaping yourself like iron.'},
-  {days:21,  kanji:'\u932c', name:'Tempering',   col:'#7A3828', glow:'rgba(122,56,40,VAL)',
+  {days:21,  kanji:'\u932c', name:'Tempering',   col:'#7A3828', light:'#C4836B', glow:'rgba(122,56,40,VAL)',
    copy:'As the katana\u2019s metal must be folded in on itself, patience and persistence will create the strongest swords.'},
-  {days:30,  kanji:'\u935b', name:'Forging',     col:'#3D6B5F', glow:'rgba(61,107,95,VAL)',
+  {days:30,  kanji:'\u935b', name:'Forging',     col:'#3D6B5F', light:'#7DB5A7', glow:'rgba(61,107,95,VAL)',
    copy:'There is a fire within you and the forge is hot.'},
-  {days:50,  kanji:'\u525b', name:'Unyielding',  col:'#2D3D6B', glow:'rgba(45,61,107,VAL)',
+  {days:50,  kanji:'\u525b', name:'Unyielding',  col:'#2D3D6B', light:'#7B8EC4', glow:'rgba(45,61,107,VAL)',
    copy:'Your mettle is unbreakable.'},
-  {days:100, kanji:'\u58eb', name:'Warrior',     col:'#8B2E1A', glow:'rgba(139,46,26,VAL)',
+  {days:100, kanji:'\u58eb', name:'Warrior',     col:'#8B2E1A', light:'#D4765E', glow:'rgba(139,46,26,VAL)',
    copy:'The warrior has arrived.'},
-  {days:180, kanji:'\u5c06', name:'Commander',   col:'#2D7A7A', glow:'rgba(45,122,122,VAL)',
+  {days:180, kanji:'\u5c06', name:'Commander',   col:'#2D7A7A', light:'#72BFBF', glow:'rgba(45,122,122,VAL)',
    copy:'You are leading yourself.'},
-  {days:365, kanji:'\u9053', name:'The Way',     col:'#C9A94B', glow:'rgba(201,169,75,VAL)',
+  {days:365, kanji:'\u9053', name:'The Way',     col:'#C9A94B', light:'#E8CF80', glow:'rgba(201,169,75,VAL)',
    copy:'A full year. Congratulations. You are on your way to becoming your truest self.',
    gold:true},
 ];
