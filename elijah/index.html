@@ -1919,8 +1919,24 @@ function loadState(){
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
   if(!state.milestoneStamps)  state.milestoneStamps={};
   if(!state.practiceStamps)   state.practiceStamps={};
-  // Ensure habit detail fields exist on all kaizen items (migration)
-  if(state.kaizen) state.kaizen.forEach(k=>{ if(!k.bullets) k.bullets=[]; if(!k.why) k.why=''; });
+  applyHabitDetailDefaults();
+}
+
+// One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
+// Safe to call repeatedly — only fills empty fields, never overwrites user edits.
+function applyHabitDetailDefaults(){
+  if(!state.kaizen) return;
+  let changed = false;
+  state.kaizen.forEach(k=>{
+    if(!k.bullets) { k.bullets=[]; }
+    if(!k.why)     { k.why=''; }
+    const def=(DEFAULT_STATE.kaizen||[]).find(d=>d.id===k.id);
+    if(def){
+      if(k.bullets.length===0 && def.bullets && def.bullets.length){ k.bullets=def.bullets; changed=true; }
+      if(k.why===''           && def.why     && def.why!=='')      { k.why=def.why;         changed=true; }
+    }
+  });
+  if(changed) saveState();
 }
 
 // ============ DEFAULT STATE (pre-loaded onboarding) ============
@@ -4718,6 +4734,7 @@ async function loadFromCloud(compareTimestamp){
     const localTs=compareTimestamp!==undefined?compareTimestamp:(state.lastModified||0);
     if((cloud.lastModified||0)>localTs){
       Object.assign(state,cloud);
+      applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
       return true;
@@ -5371,6 +5388,7 @@ async function loadFirestoreState(user){
     if(docSnap.exists){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+      applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
