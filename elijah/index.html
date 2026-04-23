@@ -1383,6 +1383,26 @@ body.dark .hanko{border-color:var(--red)}
   /* Momentum craft lbl: very tight at 4px spacing on 9px — ease to 2px */
   .momentum-craft-lbl{ letter-spacing:2px }
 }
+
+/* ── Habit detail (bullets + WHY) ── */
+.hd-hint{font-size:8px;color:var(--ink-faint);opacity:.4;display:inline-block;margin-left:4px;transition:opacity .2s,transform .2s;vertical-align:middle}
+li.goal.hd-open .hd-hint{opacity:.7;transform:rotate(180deg)}
+.goal-content{cursor:pointer}
+body.edit-mode .goal-content{cursor:default}
+.habit-detail{display:none;border-top:1px solid var(--edge);padding:12px 14px 14px 48px;animation:hdIn .18s ease}
+li.goal.hd-open .habit-detail{display:block}
+@keyframes hdIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.hd-bullets{list-style:none;margin-bottom:12px;display:flex;flex-direction:column;gap:4px}
+.hd-bullets li{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.6;padding-left:14px;position:relative}
+.hd-bullets li::before{content:'—';position:absolute;left:0;color:var(--ink-faint);opacity:.45;font-style:normal;font-size:9px;top:4px}
+.hd-bullets.hd-placeholder li,.hd-why-text.hd-placeholder{color:var(--ink-faint);opacity:.45}
+.hd-why-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65;margin-bottom:4px;font-family:'Noto Sans JP',sans-serif}
+.hd-why-text{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.65}
+.hd-divider{height:1px;background:linear-gradient(90deg,rgba(0,0,0,.06),transparent);margin:0 0 10px}
+.hd-edit-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid var(--edge);padding:3px 10px;cursor:pointer;border-radius:1px;margin-top:10px;transition:all .15s;font-family:'Noto Sans JP',sans-serif}
+.hd-edit-btn:hover{border-color:var(--ink-light);color:var(--ink-light)}
+.hd-save-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;background:var(--ink);color:var(--scroll);border:none;padding:5px 14px;cursor:pointer;border-radius:1px;font-family:'Noto Sans JP',sans-serif}
+.hd-ta{width:100%;font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.65;border:1px solid var(--edge);border-radius:2px;background:transparent;padding:7px 9px;outline:none;resize:none;min-height:50px;margin-bottom:8px}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -1899,6 +1919,8 @@ function loadState(){
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
   if(!state.milestoneStamps)  state.milestoneStamps={};
   if(!state.practiceStamps)   state.practiceStamps={};
+  // Ensure habit detail fields exist on all kaizen items (migration)
+  if(state.kaizen) state.kaizen.forEach(k=>{ if(!k.bullets) k.bullets=[]; if(!k.why) k.why=''; });
 }
 
 // ============ DEFAULT STATE (pre-loaded onboarding) ============
@@ -2065,7 +2087,7 @@ function saveObStep(){
     document.querySelectorAll('.kaizen-row').forEach(r=>{
       const t=r.querySelector('input').value.trim();
       const p=r.querySelector('select')?.value||'';
-      if(t) state.kaizen.push({id:state.nextId++,text:t,parentShok:p,streak:0,done:false,lastDone:null});
+      if(t) state.kaizen.push({id:state.nextId++,text:t,parentShok:p,streak:0,done:false,lastDone:null,bullets:[],why:''});
     });
   }
 }
@@ -2727,10 +2749,11 @@ function renderGoals(){
               id="ms-${g.id}-${m.days}" data-tip="${m.tip}">${m.kanji}</span>`;
           }).join('');
           const msRowHtml=msHtml?`<div class="ms-row">${msHtml}</div>`:'';
+          const hdBullets=buildHabitDetailHtml(g);
           return `<li class="goal ${g.done?'done':''}${strandCls}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}">
             <div class="check ${g.done?'done':''}${anim?' origami-fill':''}" onclick="toggleKaizen(${g.id})"></div>
-            <div class="goal-content">
-              <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
+            <div class="goal-content" onclick="if(!document.body.classList.contains('edit-mode'))toggleHabitDetail(${g.id})">
+              <div class="goal-title" data-edit-id="${g.id}">${g.text}<span class="hd-hint">&#9660;</span></div>
               <div class="goal-meta">
                 <span class="goal-tf">${freq}</span>
                 ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
@@ -2741,6 +2764,7 @@ function renderGoals(){
               <button class="goal-act" onclick="startEdit('kaizen',${g.id})">✎</button>
               <button class="goal-act goal-del" onclick="confirmDelete('kaizen',${g.id})">×</button>
             </div>
+            <div class="habit-detail" id="hd-${g.id}">${hdBullets}</div>
             </li>`;
         }).join('');
     } else {
@@ -2766,6 +2790,7 @@ function renderGoals(){
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
     list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
+    reApplyHabitDetails();
 
   } else if(currentTab==='shokunin'){
     const items=state.shokunin;
@@ -2848,6 +2873,87 @@ function emptyState(){
   return `<div style="text-align:center;padding:40px 0;opacity:.3">
     <div style="font-family:'Noto Serif JP',serif;font-size:32px;margin-bottom:8px">${PILLARS[currentTab].kanji}</div>
     <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase">no intentions yet</div></div>`;
+}
+
+// ============ HABIT DETAIL (bullets + WHY) ============
+const _openHabitDetails = new Set();
+
+function buildHabitDetailHtml(g){
+  const bullets = g.bullets && g.bullets.length ? g.bullets : null;
+  const why = g.why && g.why.trim() ? g.why : null;
+  const bulletsHtml = bullets
+    ? `<ul class="hd-bullets">${bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`
+    : `<ul class="hd-bullets hd-placeholder"><li>What does this habit look like in practice?</li></ul>`;
+  const whyHtml = why
+    ? `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text">${why}</div>`
+    : `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text hd-placeholder">Why does this habit exist in your life?</div>`;
+  return bulletsHtml + whyHtml +
+    `<button class="hd-edit-btn" onclick="event.stopPropagation();openHabitEdit(${g.id})">edit</button>`;
+}
+
+function toggleHabitDetail(id){
+  const li = document.querySelector(`[data-kaizen-id="${id}"]`);
+  if(!li) return;
+  if(_openHabitDetails.has(id)){
+    _openHabitDetails.delete(id);
+    li.classList.remove('hd-open');
+  } else {
+    _openHabitDetails.add(id);
+    li.classList.add('hd-open');
+  }
+}
+
+function reApplyHabitDetails(){
+  _openHabitDetails.forEach(id=>{
+    const li = document.querySelector(`[data-kaizen-id="${id}"]`);
+    if(li) li.classList.add('hd-open');
+  });
+}
+
+function openHabitEdit(id){
+  const g = state.kaizen.find(k=>k.id===id);
+  if(!g) return;
+  const panel = document.getElementById('hd-'+id);
+  if(!panel) return;
+  const bulletsVal = (g.bullets||[]).join('\n');
+  const whyVal = g.why||'';
+  panel.innerHTML = `
+    <div style="margin-bottom:8px">
+      <div class="hd-why-label" style="margin-bottom:5px">practice — one item per line</div>
+      <textarea class="hd-ta" id="hd-bullets-${id}">${bulletsVal}</textarea>
+    </div>
+    <div class="hd-divider"></div>
+    <div class="hd-why-label" style="margin-bottom:5px">why</div>
+    <textarea class="hd-ta" id="hd-why-${id}">${whyVal}</textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
+      <button class="hd-edit-btn" onclick="event.stopPropagation();cancelHabitEdit(${id})">cancel</button>
+      <button class="hd-save-btn" onclick="event.stopPropagation();saveHabitDetail(${id})">save</button>
+    </div>`;
+  ['hd-bullets-'+id,'hd-why-'+id].forEach(tid=>{
+    const ta=document.getElementById(tid);
+    if(!ta)return;
+    ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px';
+    ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});
+  });
+}
+
+function cancelHabitEdit(id){
+  const g = state.kaizen.find(k=>k.id===id);
+  if(!g) return;
+  const panel = document.getElementById('hd-'+id);
+  if(panel) panel.innerHTML = buildHabitDetailHtml(g);
+}
+
+function saveHabitDetail(id){
+  const g = state.kaizen.find(k=>k.id===id);
+  if(!g) return;
+  const bulletsRaw = (document.getElementById('hd-bullets-'+id)||{}).value||'';
+  const why = ((document.getElementById('hd-why-'+id)||{}).value||'').trim();
+  g.bullets = bulletsRaw.split('\n').map(l=>l.trim()).filter(Boolean);
+  g.why = why;
+  saveState();
+  const panel = document.getElementById('hd-'+id);
+  if(panel) panel.innerHTML = buildHabitDetailHtml(g);
 }
 
 // ============ ACTIONS ============
@@ -3026,7 +3132,7 @@ function addGoal(){
   if(!text)return;
   const link=document.getElementById('link-select')?.value||'';
   if(currentTab==='kaizen'){
-    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null});
+    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:''});
   } else if(currentTab==='shokunin'){
     const tf=document.getElementById('tf-select')?.value||'monthly';
     state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false});
