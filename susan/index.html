@@ -298,8 +298,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .mcal-dot{width:3px;height:3px;border-radius:50%;background:var(--red);opacity:.55;flex-shrink:0}
 /* Week reflection indicator */
 .wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
-.wk-sealed{font-family:'Noto Serif JP',serif;font-size:10px;color:var(--red);opacity:.45;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
-.wk-sealed:hover{opacity:.85}
+.wk-sealed{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--red);opacity:.75;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
+.wk-sealed:hover{opacity:1}
 .wk-sealed.is-open{opacity:1;transform:scale(1.15)}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
@@ -1403,6 +1403,51 @@ li.goal.hd-open .habit-detail{display:block}
 .hd-edit-btn:hover{border-color:var(--ink-light);color:var(--ink-light)}
 .hd-save-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;background:var(--ink);color:var(--scroll);border:none;padding:5px 14px;cursor:pointer;border-radius:1px;font-family:'Noto Sans JP',sans-serif}
 .hd-ta{width:100%;font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.65;border:1px solid var(--edge);border-radius:2px;background:transparent;padding:7px 9px;outline:none;resize:none;min-height:50px;margin-bottom:8px}
+
+/* ── Day journal tap ──────────────────────────────────────────────── */
+.mcal-cell.has-note{ cursor:pointer }
+.mcal-cell.has-note .mcal-note-mark{
+  font-family:'Noto Serif JP',serif;font-size:6px;color:var(--scroll);opacity:.7;
+  line-height:1;margin-top:1px;display:block;
+}
+#day-note-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(15,13,10,.55);backdrop-filter:blur(2px);
+  align-items:center;justify-content:center;
+}
+#day-note-overlay.active{ display:flex }
+.day-note-card{
+  background:var(--scroll);max-width:380px;width:90%;
+  padding:36px 32px 28px;position:relative;
+  box-shadow:0 24px 64px rgba(0,0,0,.18);animation:fadeUp .2s ease;
+}
+.day-note-date{
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--red);margin-bottom:16px;opacity:.75;
+}
+.day-note-kanji{
+  font-family:'Noto Serif JP',serif;font-size:13px;letter-spacing:4px;
+  color:var(--ink-faint);opacity:.3;margin-bottom:10px;
+}
+.day-note-body{
+  font-family:'Noto Serif JP',serif;font-size:14px;font-weight:700;
+  color:var(--ink);line-height:1.7;white-space:pre-wrap;margin-bottom:16px;
+}
+.day-note-meta{ font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);opacity:.4 }
+.day-note-close{
+  position:absolute;top:14px;right:16px;background:none;border:none;
+  font-size:16px;color:var(--ink-faint);opacity:.3;cursor:pointer;padding:4px 8px;transition:opacity .2s;
+}
+.day-note-close:hover{ opacity:.7 }
+
+/* ── Monthly reflection on ycal ──────────────────────────────────── */
+.ycal-mname{ display:flex; align-items:center; gap:3px }
+.ycal-mname.has-reflect{ cursor:pointer }
+.ycal-mname.has-reflect{ color:rgba(255,255,255,.55) }
+.ycal-month-seal{
+  font-family:'Noto Serif JP',serif;font-size:12px;
+  color:var(--red);opacity:.85;line-height:1;flex-shrink:0;
+}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -1878,6 +1923,16 @@ if (FIREBASE_CONFIGURED) {
   <div class="modal-overlay" id="reflect-modal">
     <div class="modal" id="reflect-content"></div>
   </div>
+  <!-- Day journal note overlay -->
+  <div id="day-note-overlay" onclick="closeDayNote()">
+    <div class="day-note-card" onclick="event.stopPropagation()">
+      <button class="day-note-close" onclick="closeDayNote()">&#10005;</button>
+      <div class="day-note-kanji">&#30465;</div>
+      <div class="day-note-date" id="day-note-date"></div>
+      <div class="day-note-body" id="day-note-body"></div>
+      <div class="day-note-meta" id="day-note-meta"></div>
+    </div>
+  </div>
 
   <!-- ===== YEAR-END REVIEW OVERLAY ===== -->
   <div id="eoy-overlay" style="display:none;position:fixed;inset:0;z-index:200;background:var(--edge);overflow-y:auto">
@@ -2345,6 +2400,61 @@ function getWeekStart(offset){
 
 function navigateWeek(delta){weekOffset+=delta;renderGoals();}
 function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;renderGoals();}
+var _dayNoteOpen=null;
+function openDayNote(dateStr){
+  var todayStr=getDateStr();
+  if(dateStr>todayStr) return;
+  var note=(state.dailyNotes||{})[dateStr];
+  if(!note) return;
+  if(_dayNoteOpen===dateStr){closeDayNote();return;}
+  _dayNoteOpen=dateStr;
+  var d=new Date(dateStr+'T00:00:00');
+  var dateLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var log=(state.completionLog||{})[dateStr]||[];
+  var dayIdx=(d.getDay()+6)%7;
+  var sched=state.kaizen.filter(function(k){
+    if(k.startDate){var s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
+    return habitOnDay(k,dayIdx);
+  });
+  var metaStr=sched.length
+    ?log.length+' of '+sched.length+' practice'+(sched.length!==1?'s':'')+' completed'
+    :'no practices scheduled';
+  document.getElementById('day-note-date').textContent=dateLabel;
+  document.getElementById('day-note-body').textContent=note;
+  document.getElementById('day-note-meta').textContent=metaStr;
+  document.getElementById('day-note-overlay').classList.add('active');
+}
+function closeDayNote(){
+  _dayNoteOpen=null;
+  document.getElementById('day-note-overlay').classList.remove('active');
+}
+function getMonthlyReflection(year,month){
+  var monthStr=year+'-'+(month+1<10?'0':'')+(month+1);
+  var refs=state.reflections||[];
+  for(var i=0;i<refs.length;i++){
+    var r=refs[i];
+    if(r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)) return r;
+  }
+  return null;
+}
+var _monthReflectOpen=null;
+function openMonthReflect(year,month){
+  var ref=getMonthlyReflection(year,month);
+  if(!ref) return;
+  var key=year+'-'+month;
+  if(_monthReflectOpen===key){closeDayNote();return;}
+  _monthReflectOpen=key; _dayNoteOpen=null;
+  var monthName=new Date(year,month,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  var pairs=[['what is working',ref.working],['what needs to change',ref.changing],['what is shifting',ref.shifting],['notes',ref.notes]];
+  var bodyHtml=pairs.filter(function(p){return p[1];}).map(function(p){
+    return '<div style="margin-bottom:14px"><div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.35;margin-bottom:4px">'+p[0]+'</div>'
+      +'<div style="font-family:&quot;Noto Serif JP&quot;,serif;font-size:13px;font-weight:700;line-height:1.65;color:var(--ink)">'+p[1]+'</div></div>';
+  }).join('');
+  document.getElementById('day-note-date').textContent=monthName;
+  document.getElementById('day-note-body').innerHTML=bodyHtml;
+  document.getElementById('day-note-meta').textContent='monthly reflection';
+  document.getElementById('day-note-overlay').classList.add('active');
+}
 
 function isHabitDoneOnDate(habitId,dateStr){
   const log=state.completionLog||{};
@@ -2565,7 +2675,11 @@ function buildMonthCal(){
 
       // N dots = habits done that day
       const dotHtml=done.length?`<div class="mcal-dots">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
-      return `<div class="${cls}"><span class="mcal-num">${cell.day}</span>${dotHtml}</div>`;
+      const hasNote=!isFuture&&!!((state.dailyNotes||{})[cell.dateStr]);
+      if(hasNote) cls+=' has-note';
+      const noteMarkHtml=hasNote?`<span class="mcal-note-mark">省</span>`:'';
+      const clickAttr=hasNote?` onclick="openDayNote('${cell.dateStr}')"`:'';
+      return `<div class="${cls}"${clickAttr}><span class="mcal-num">${cell.day}</span>${dotHtml}${noteMarkHtml}</div>`;
     }).join('');
 
     html+=`<div class="mcal-week-row">${wkHtml}${dayCells}</div>`;
@@ -2627,7 +2741,11 @@ function buildYearView(){
     const startOffset=(firstDay.getDay()+6)%7;
     const mname=firstDay.toLocaleDateString('en-GB',{month:'short'});
 
-    html+=`<div class="ycal-month"><div class="ycal-mname">${mname}</div><div class="ycal-grid">`;
+    const _mRef=getMonthlyReflection(year,m);
+    const _mSeal=_mRef?'<span class="ycal-month-seal">月</span>':'';
+    const _mHas=_mRef?' has-reflect':'';
+    const _mClick=_mRef?` onclick="openMonthReflect(${year},${m})"`:"\'"[0];
+    html+=`<div class="ycal-month"><div class="ycal-mname${_mHas}"${_mClick}>${mname}${_mSeal}</div><div class="ycal-grid">`;
     for(let i=0;i<startOffset;i++)html+=`<div class="ycal-cell ycal-empty"></div>`;
 
     for(let day=1;day<=lastDay.getDate();day++){
