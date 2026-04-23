@@ -2873,6 +2873,18 @@ function emptyState(){
 // ============ HABIT DETAIL (bullets + WHY) ============
 const _openHabitDetails = new Set();
 
+// Click-outside-to-close
+document.addEventListener('click', function(e){
+  if(!_openHabitDetails.size) return;
+  if(e.target.closest('li.goal.hd-open')) return; // click inside an open card — ignore
+  // Close all open panels
+  _openHabitDetails.forEach(id=>{
+    const li = document.querySelector(`[data-kaizen-id="${id}"]`);
+    if(li) li.classList.remove('hd-open');
+  });
+  _openHabitDetails.clear();
+});
+
 function buildHabitDetailHtml(g){
   const bullets = g.bullets && g.bullets.length ? g.bullets : null;
   const why = g.why && g.why.trim() ? g.why : null;
