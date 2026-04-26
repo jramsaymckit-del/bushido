@@ -809,6 +809,88 @@ body.dark .hanko{border-color:var(--red)}
   font-family:'Noto Sans JP',sans-serif;padding:4px 0}
 .btn-sign-out:hover{color:var(--ink)}
 
+/* Avatar dropdown */
+.avatar-wrap{position:relative}
+.avatar-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--scroll);border:1px solid var(--edge);border-radius:2px;min-width:180px;
+  box-shadow:0 8px 32px rgba(26,18,8,.18);z-index:200;animation:fadeUp .15s ease}
+.avatar-dropdown.show{display:block}
+.avatar-dd-name{padding:14px 16px 10px;font-family:'Noto Serif JP',serif;font-size:13px;
+  font-weight:700;color:var(--ink);border-bottom:1px solid var(--edge)}
+.avatar-dd-sub{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+.avatar-dd-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-light);transition:background .15s,color .15s;
+  border:none;background:none;width:100%;text-align:left}
+.avatar-dd-item:hover{background:rgba(26,18,8,.04);color:var(--ink)}
+.avatar-dd-item .dd-kanji{font-family:'Noto Serif JP',serif;font-size:14px;
+  color:var(--red);opacity:.5;width:16px;text-align:center}
+.avatar-dd-divider{height:1px;background:var(--edge);margin:4px 0}
+.avatar-dd-item.dd-danger{color:var(--ink-faint)}
+.avatar-dd-item.dd-danger:hover{color:var(--red);background:rgba(204,53,41,.04)}
+
+/* Manifesto overlay */
+.manifesto-overlay{display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(26,18,8,.82);backdrop-filter:blur(6px);overflow-y:auto;padding:40px 20px}
+.manifesto-overlay.show{display:block}
+.manifesto-scroll{max-width:640px;margin:0 auto;background:var(--scroll);
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(26,18,8,.018) 28px,rgba(26,18,8,.018) 29px);
+  box-shadow:0 4px 80px rgba(0,0,0,.45);padding:72px 60px 100px;position:relative}
+.manifesto-close{position:absolute;top:24px;right:24px;background:none;border:none;
+  cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint);transition:color .2s}
+.manifesto-close:hover{color:var(--ink)}
+.m-header{text-align:center;padding-bottom:48px;border-bottom:1px solid var(--edge);margin-bottom:48px}
+.m-kanji{font-size:44px;font-weight:300;color:var(--red);opacity:.15;letter-spacing:8px;margin-bottom:12px}
+.m-eyebrow{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:6px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+.m-title{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:700;
+  letter-spacing:4px;color:var(--ink);margin-bottom:10px}
+.m-subtitle{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink-faint)}
+.m-body p{font-family:'Noto Serif JP',serif;font-size:15px;line-height:1.95;
+  color:var(--ink);margin-bottom:28px}
+.m-pull{border-left:2px solid var(--red);padding:4px 0 4px 22px;margin:36px 0;
+  font-family:'Noto Serif JP',serif;font-style:italic;font-size:16px;color:var(--ink);line-height:1.75}
+.m-proverb{text-align:center;padding:48px 0;border-top:1px solid var(--edge);
+  border-bottom:1px solid var(--edge);margin:48px 0}
+.m-proverb-jp{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:300;
+  letter-spacing:6px;color:var(--ink);margin-bottom:12px}
+.m-proverb-en{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink-faint)}
+.m-divider{display:flex;align-items:center;gap:14px;margin:48px 0}
+.m-divider::before,.m-divider::after{content:'';flex:1;height:1px;background:var(--edge)}
+.m-divider-k{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--red);opacity:.45}
+.m-appendix-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:32px}
+.m-appendix-intro{font-family:'Noto Serif JP',serif;font-size:16px;font-style:italic;
+  line-height:1.8;color:var(--ink);margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid var(--edge)}
+.m-cal-block{display:flex;align-items:flex-start;gap:32px;margin:40px 0;padding:28px 0;
+  border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+.m-cal-img{width:80px;flex-shrink:0;opacity:.88}
+.m-cal-phrase{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;
+  letter-spacing:3px;color:var(--ink);margin-bottom:8px}
+.m-cal-attr{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);line-height:1.8;margin-bottom:14px}
+.m-cal-text{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
+  line-height:1.85;color:var(--ink-light)}
+.m-appendix-body p{font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.9;
+  color:var(--ink-light);margin-bottom:24px}
+.m-def-section{margin:40px 0;padding-top:36px;border-top:1px solid var(--edge)}
+.m-def-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--red);opacity:.65;margin-bottom:16px}
+.m-def-section p{font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.9;
+  color:var(--ink-light);margin-bottom:18px}
+.m-def-section p:last-child{margin-bottom:0}
+.m-def-kanji{font-size:24px;font-weight:300;color:var(--ink);opacity:.1;
+  float:right;margin:-4px 0 8px 12px;line-height:1}
+.m-seal{text-align:center;padding-top:60px;margin-top:60px;border-top:1px solid var(--edge)}
+.m-seal-char{font-family:'Noto Serif JP',serif;font-size:44px;font-weight:300;
+  color:var(--ink);opacity:.07;display:block;margin-bottom:16px}
+.m-seal-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink-faint)}
+
 /* Primary nav — bleeds to scroll edges, sticky */
 .primary-nav{
   display:flex;
@@ -1575,8 +1657,15 @@ if (FIREBASE_CONFIGURED) {
     <div class="account-name">Good morning, James</div>
     <div class="account-right">
       <button class="btn-edit-mode" id="account-edit-btn" onclick="toggleEditMode()">Edit</button>
-      <button class="btn-sign-out" onclick="signOutUser()">Sign out</button>
-      <div class="account-avatar"><span>J</span></div>
+      <div class="avatar-wrap">
+        <div class="account-avatar" onclick="toggleAvatarDropdown(event)"><span>J</span></div>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <div class="avatar-dd-name">James<div class="avatar-dd-sub">your bushido</div></div>
+          <button class="avatar-dd-item" onclick="openManifesto()"><span class="dd-kanji">道</span>Read the Manifesto</button>
+          <div class="avatar-dd-divider"></div>
+          <button class="avatar-dd-item dd-danger" onclick="signOutUser()"><span class="dd-kanji">出</span>Sign out</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="edit-mode-bar">✎ &nbsp;edit mode — hover to edit or delete practices</div>
@@ -4244,6 +4333,31 @@ function drainAnimQueue(){
 }
 function animDone(){_animRunning=false;drainAnimQueue();}
 
+// ============ AVATAR DROPDOWN ============
+function toggleAvatarDropdown(e){
+  e.stopPropagation();
+  const dd = document.getElementById('avatarDropdown');
+  dd.classList.toggle('show');
+}
+document.addEventListener('click', function(){
+  const dd = document.getElementById('avatarDropdown');
+  if(dd) dd.classList.remove('show');
+});
+
+// ============ MANIFESTO OVERLAY ============
+function openManifesto(){
+  document.getElementById('avatarDropdown').classList.remove('show');
+  document.getElementById('manifestoOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeManifesto(){
+  document.getElementById('manifestoOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function handleManifestoBackdrop(e){
+  if(e.target === document.getElementById('manifestoOverlay')) closeManifesto();
+}
+
 // ============ EDIT MODE ============
 function toggleEditMode(){
   editMode = !editMode;
@@ -5837,6 +5951,72 @@ function setupNavSquish(){
     </div>
   </div>
 </div>
+<!-- MANIFESTO OVERLAY -->
+<div class="manifesto-overlay" id="manifestoOverlay" onclick="handleManifestoBackdrop(event)">
+  <div class="manifesto-scroll" id="manifestoScroll">
+    <button class="manifesto-close" onclick="closeManifesto()">✕ &nbsp;close</button>
+    <div class="m-header">
+      <div class="m-kanji">武士道</div>
+      <div class="m-eyebrow">the manifesto</div>
+      <div class="m-title">BUSHIDO</div>
+      <div class="m-subtitle">the way of daily discipline</div>
+    </div>
+    <div class="m-body">
+      <p>We live in a world that mistakes busyness for progress. That turns self-improvement into a dashboard. That measures a life in metrics and misinterprets it as meaning. We've been sold a story about success. That it belongs to those who simply want it most, who grind hardest, who will their way through every wall. Like fury is glorious and force alone is sufficient.</p>
+      <p>But a crashing wave breaks against the cliffside, while dripping water pierces stone and a flowing stream carves through mountains. True power is found in persistence.</p>
+      <div class="m-pull">You don't need more will. You need more flow. You need to take daily action, making progress on your path, until the groove becomes a canyon.</div>
+      <p>BUSHIDO is not a productivity system. It's a way of life. It doesn't reduce your life to a dashboard, a metric, a mere record of output. It holds something larger: the habit and the goal, the daily reflection and the private journal — all woven together not as a mechanism to be tuned, but as a practice to be inhabited. Because a machine produces while a practice transforms.</p>
+      <p>You don't exist just to achieve what you want to or should achieve. Meaning is found in pursuing our truest self, a striving to become that. You were never lacking focus, will, or ability. You were lacking a structure that would give shape to your flow and allow you to cut through the mountain. Bushido is the striving, it is the honing, and it is the path.</p>
+      <div class="m-pull" style="text-align:center; border-left:none; padding-left:0; font-size:17px; letter-spacing:1px; margin-top:40px; margin-bottom:0;">Progress comes from process.</div>
+    </div>
+    <div class="m-proverb">
+      <div class="m-proverb-jp">塵も積もれば山となる</div>
+      <div class="m-proverb-en">even dust, when piled up, becomes a mountain</div>
+    </div>
+    <div class="m-divider"><span class="m-divider-k">道</span></div>
+    <div class="m-appendix-label">Philosophical Appendix</div>
+    <div class="m-appendix-intro">BUSHIDO is not trying to give you more willpower. It is trying to make willpower unnecessary.</div>
+    <div class="m-cal-block">
+      <img class="m-cal-img" src="Visual%20References/muso_soseki.jpg" alt="別無工夫" onerror="this.style.display='none'">
+      <div>
+        <div class="m-cal-phrase">別無工夫</div>
+        <div class="m-cal-attr">Musō Soseki (夢窓疎石) · 1275–1351<br>Zen master · poet · calligrapher<br>betsu ni kufū nashi</div>
+        <div class="m-cal-text">"No special method, no other way." A Zen statement that the practice is the practice. There's no trick, no shortcut, no hidden technique. You show up, you brush, you do it again tomorrow. That's BUSHIDO in four characters.</div>
+      </div>
+    </div>
+    <div class="m-appendix-body">
+      <p>The Samurai code "Bushido" was influenced by elements of Zen Buddhism, emphasizing the importance of balance in one's life. As such, Samurai were expected to be more than just skilled warriors. They were contemplative poets, innovative artists, musicians, and many were also Calligraphers — a practice that embodies elements of Zen.</p>
+      <p>To write Zen calligraphy with mastery, one must clear one's mind and let the letters flow out of themselves, not practice and make a tremendous effort. This state of mind was called the mushin (無心, "no mind state") by the Japanese philosopher Nishida Kitaro.</p>
+    </div>
+    <div class="m-def-section">
+      <div class="m-def-label">The Definition of Bushido</div>
+      <span class="m-def-kanji">一</span>
+      <p><strong>The code was never singular.</strong> Bushido was not a rulebook. It was never handed down in a single scroll, never codified by one authority, never the same in any two clans or any two lives. Nitobe called it <em>"an organic growth of decades and centuries"</em> — something that grew in the soil of lived experience rather than in the halls of legislation. It was absorbed, not taught. Practiced, not studied.</p>
+      <p>This is the spirit BUSHIDO carries. Your Ryughi strands are not assigned to you. Your cascade is not a template handed down from above. Nobody else's BUSHIDO looks like yours — because nobody else has your strands, your vision, your particular mountain to carve through. The code was always personal. It still is.</p>
+    </div>
+    <div class="m-def-section">
+      <span class="m-def-kanji">道</span>
+      <p><strong>道 — the way, not the destination.</strong> The word itself tells you everything. 武士道 — Bushidō. Bushi, the warrior. Dō, the road, the way, the walking of it. Not the arrival. Not the achievement. The daily, unhurried, unrelenting movement along the path.</p>
+      <p>The point is never to finish. The point is to walk. Every habit logged, every reflection written, every craft sharpened is not a step toward the destination — it is the destination, lived one day at a time.</p>
+    </div>
+    <div class="m-def-section">
+      <span class="m-def-kanji">心</span>
+      <p><strong>"It was not needed to create or establish them."</strong> The samurai did not sit down and decide to have values. The code was never an imposition from outside — it was a slow crystallisation from within, shaped by years of practice until it became indistinguishable from character. You could not point to the moment the samurai became honourable. Honour had simply become what he was.</p>
+      <p>This is the deepest promise of BUSHIDO — not that it will give you better habits, but that one day, through the patient accumulation of practice, the habits will dissolve into identity. You will simply be the person who does those things. The practice will have become the practitioner.</p>
+    </div>
+    <div class="m-def-section">
+      <span class="m-def-kanji">和</span>
+      <p><strong>The balance of force and wisdom.</strong> What made Bushido remarkable was not its embrace of the warrior — it was its insistence that the warrior was incomplete without the scholar, the monk, the poet. Neo-Confucian ethics, Shinto reverence, Zen stillness — all of it lived alongside the sword. Violence without wisdom was brutality. Discipline without reflection was mechanism.</p>
+      <p>BUSHIDO is built on the same balance. The Kaizen checklist and the daily journal. The habit streak and the weekly reflection. The goal and the question of why the goal matters. You are not here to optimise. You are here to become.</p>
+      <p><em>Warrior and monk. In the same practice. Every day.</em></p>
+    </div>
+    <div class="m-seal">
+      <span class="m-seal-char">道</span>
+      <div class="m-seal-label">the way of daily discipline</div>
+    </div>
+  </div>
+</div>
+
 <!-- BLADE DELETE CONFIRMATION MODAL -->
 <div class="blade-backdrop" id="bladeBackdrop" onclick="handleBladeBackdrop(event)">
   <div class="blade-modal" id="bladeModal">
