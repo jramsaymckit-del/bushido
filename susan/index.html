@@ -212,7 +212,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .reflect-textarea::placeholder{color:var(--ink-faint);opacity:.4}
 .reflect-textarea:focus{border-bottom-color:var(--red-light)}
 
-
 /* ===== STATS BOX ===== */
 .stats-panel{max-height:0;overflow:hidden;transition:max-height .5s ease}
 .stats-panel.open{max-height:4000px;transition:max-height 1.2s ease-in-out}
@@ -373,7 +372,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   padding:8px 0 10px;outline:none;resize:none;min-height:36px;line-height:1.8;
   transition:border-color .2s;display:block}
 .daily-note:focus{border-bottom-color:rgba(0,0,0,.15)}
-.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.4;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s3);opacity:.85;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .daily-note-kanji{font-size:18px;opacity:.65}
 .daily-note::placeholder{color:var(--ink);opacity:.18;font-weight:400;font-style:normal}
 
@@ -1942,7 +1941,6 @@ if (FIREBASE_CONFIGURED) {
 
     <div class="auth-error" id="auth-error"></div>
 
-
   </div>
 </div>
 
@@ -2379,14 +2377,6 @@ function saveState(){
   }
 }
 
-function loadState(){
-  // Canvas always starts from DEFAULT_STATE — ignore any cached data
-  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-  if(!state.milestoneStamps)  state.milestoneStamps={};
-  if(!state.practiceStamps)   state.practiceStamps={};
-  applyHabitDetailDefaults();
-}
-
 // One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
 // Safe to call repeatedly — only fills empty fields, never overwrites user edits.
 function applyHabitDetailDefaults(){
@@ -2424,16 +2414,18 @@ const DEFAULT_STATE = {
   ],
   annualGoals: [
     {id:100, text:'Host the first Blessing — six names, your home, a great meal. Aim for May. Send one message this week.', parentMs:1, progress:0, done:false},
-    {id:101, text:'Give Pura Vida one protected Friday hour every week. Non-negotiable. Alta West does not get Friday.', parentMs:0, progress:0, done:false},
+    {id:101, text:'Establish Pura Vida as a daily practice — 20 minutes every weekday, Friday review protected. Alta West does not get Monday or Friday.', parentMs:0, progress:0, done:false},
     {id:102, text:'Say yes to one speaking invitation within two months. People are already asking.', parentMs:2, progress:0, done:false},
-    {id:103, text:'Strong body — breakfast every day, trainer 3x/week, weighted vest walks 2x/week.', parentMs:4, progress:0, done:false}
+    {id:103, text:'Strong body — breakfast every day, trainer 3x/week, weighted vest walks 2x/week.', parentMs:4, progress:0, done:false},
+    {id:104, text:'The Giving Fund — by end of 2026, the structure is identified and the first step is taken. Research done, framework chosen, first real conversation had.', parentMs:0, progress:0, done:false}
   ],
   shokunin: [
     {id:200, text:'Holding a Room — the art of facilitation; asking the question that opens people; creating space for truth at every Blessing', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
     {id:201, text:'Shaping Your Story — distilling the eight-year-old girl to the Tuesday garden into a narrative that is clean, true, and ready for a stage', parentAnnual:102, progress:0, timeframe:'monthly', done:false},
-    {id:202, text:'Pura Vida Stewardship — one Friday hour reading what you hold, making one decision, tending the engine that carries the mission', parentAnnual:101, progress:0, timeframe:'weekly', done:false},
+    {id:202, text:'Garden Stewardship — 20 minutes every weekday tending what you hold: signing, monitoring, investments, trust flows. The scattered interruptions through the day end here.', parentAnnual:101, progress:0, timeframe:'daily', done:false},
     {id:203, text:'Physical Faithfulness — resistance training, weighted vest walks, consistent nourishment; tending the vessel that carries everything else', parentAnnual:103, progress:0, timeframe:'weekly', done:false},
-    {id:204, text:'Faith Practice — morning prayer, scripture, or worship music before the world asks anything; the root from which everything grows', parentAnnual:100, progress:0, timeframe:'weekly', done:false}
+    {id:204, text:'Faith Practice — morning prayer, scripture, or worship music before the world asks anything; the root from which everything grows', parentAnnual:100, progress:0, timeframe:'weekly', done:false},
+    {id:205, text:'The Giving Fund — building the philanthropic structure one step at a time: research, conversations, decisions. This is where Pura Vida and Raising People Up become one thing.', parentAnnual:104, progress:0, timeframe:'weekly', done:false}
   ],
   kaizen: [
     {id:300, text:'Morning prayer', days:'daily', parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null,
@@ -2457,9 +2449,15 @@ const DEFAULT_STATE = {
     {id:306, text:'Shape your story', days:[2], parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null,
       bullets:['Sit for 20 minutes and think about your story.','Write one paragraph, it can be any part of it.','The eight-year-old girl. The chance Rick took with you. The secretary who saw you. The road that brought you here.','You do not have to write it in order. Just write.'],
       why:'A room is waiting to hear this. Not a polished version, but the true one. The stage does not need a performance. It needs a Susan. The only way to get ready is to keep shaping it, Wednesday by Wednesday.'},
-    {id:307, text:'Pura Vida hour', days:[4], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Close Alta West. Open Pura Vida.','Read what you hold.','Move towards some decision, however small.','Send one message, answer one question, push one thing forward.','One hour. Then close it and enjoy your Friday.'],
-      why:'Pura Vida carries the spirit of \'you are not alone.\' That does not happen by accident. It happens because someone guards the Friday hour and refuses to let the week swallow it. That someone is you.'}
+    {id:307, text:'Garden stewardship', days:[0,1,2,3,4], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
+      bullets:['20 minutes. Not 10. Not when you get a moment.','Sign what needs signing. Check what needs checking. Move what needs moving.','If it can wait until Friday\'s review, let it wait.','When the 20 minutes are done, close it. The garden is tended.'],
+      why:'You have been tending this garden in scattered 10-minute bursts all week. This is the same work, done with intention. One clean block every weekday morning means the rest of your day belongs to you.'},
+    {id:308, text:'Business article', days:'daily', parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
+      bullets:['Read one article — business, finance, investment, stewardship.','It does not have to be long.','Notice one thing that applies to what you hold.'],
+      why:'This is already working. You do it because it makes you a sharper steward. The garden grows when the gardener keeps learning. Keep this exactly as it is.'},
+    {id:309, text:'Pura Vida review', days:[4], parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null,
+      bullets:['Monday is yours. Friday is yours. Alta West does not get either.','Walk through the week — what was tended, what was left, what needs a decision.','Then: one Giving Fund step. Research, a call, a question answered, a form read.','Close the week knowing the garden and the fund both moved.'],
+      why:'The daily 20 minutes keeps the garden alive. The Friday session is where you look at the whole picture and build something. The Giving Fund does not build itself — it gets one hour a week, here, on Fridays, when the week is done and the mission needs tending.'}
   ],
   completionLog: {},
   dailyNotes: {},
@@ -2468,7 +2466,7 @@ const DEFAULT_STATE = {
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
-  nextId: 407,
+  nextId: 410,
 };
 
 // ============ STATE ============
@@ -3314,7 +3312,6 @@ function habitOnDay(k, d){
   return Array.isArray(k.days) && k.days.includes(d);
 }
 
-
 // ============ DASHBOARD ============
 function renderDashboard(){
   checkDailyReset();
@@ -3453,7 +3450,7 @@ function renderGoals(){
     else if(isAnnualReviewMonth11()) nudgeHtml+=buildReflectionNudgeCard('annual-preview');
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
-    list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
+    list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+noteHtml+buildKaizenGrid()+nudgeHtml;
     reApplyHabitDetails();
 
   } else if(currentTab==='shokunin'){
@@ -4995,8 +4992,6 @@ function getMonthCompletionRate(){
 }
 
 // Replaced by triggerSeal (floating overlay) — kept as no-op for safety
-function animateSeal(){}
-
 function triggerSeal(){
   const overlay=document.getElementById('seal-overlay');
   const sealK  =document.getElementById('seal-float-k');
@@ -7377,7 +7372,6 @@ hiInit = function(){
       <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
       <div id="clan-active-warriors"></div>
 
-
       <!-- CLAN CLOSED NOTE -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
         <div style="font-size:22px;color:rgba(204,53,41,.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
@@ -7390,7 +7384,6 @@ hiInit = function(){
   <!-- streak experiment removed — A/B/C/D now live natively in each tab -->
 
 </div><!-- /scroll -->
-
 
 <!-- TRAVEL MODE SETUP MODAL -->
 <div class="travel-backdrop" id="travelBackdrop" onclick="handleTravelBackdrop(event)">

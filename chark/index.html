@@ -212,7 +212,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .reflect-textarea::placeholder{color:var(--ink-faint);opacity:.4}
 .reflect-textarea:focus{border-bottom-color:var(--red-light)}
 
-
 /* ===== STATS BOX ===== */
 .stats-panel{max-height:0;overflow:hidden;transition:max-height .5s ease}
 .stats-panel.open{max-height:4000px;transition:max-height 1.2s ease-in-out}
@@ -373,7 +372,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   padding:8px 0 10px;outline:none;resize:none;min-height:36px;line-height:1.8;
   transition:border-color .2s;display:block}
 .daily-note:focus{border-bottom-color:rgba(0,0,0,.15)}
-.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.4;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s3);opacity:.85;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .daily-note-kanji{font-size:18px;opacity:.65}
 .daily-note::placeholder{color:var(--ink);opacity:.18;font-weight:400;font-style:normal}
 
@@ -1942,7 +1941,6 @@ if (FIREBASE_CONFIGURED) {
 
     <div class="auth-error" id="auth-error"></div>
 
-
   </div>
 </div>
 
@@ -2377,14 +2375,6 @@ function saveState(){
   } else {
     scheduleSyncToCloud(); // legacy JSONbin fallback
   }
-}
-
-function loadState(){
-  // Canvas always starts from DEFAULT_STATE — ignore any cached data
-  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-  if(!state.milestoneStamps)  state.milestoneStamps={};
-  if(!state.practiceStamps)   state.practiceStamps={};
-  applyHabitDetailDefaults();
 }
 
 // One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
@@ -3322,7 +3312,6 @@ function habitOnDay(k, d){
   return Array.isArray(k.days) && k.days.includes(d);
 }
 
-
 // ============ DASHBOARD ============
 function renderDashboard(){
   checkDailyReset();
@@ -3461,7 +3450,7 @@ function renderGoals(){
     else if(isAnnualReviewMonth11()) nudgeHtml+=buildReflectionNudgeCard('annual-preview');
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
-    list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+buildKaizenGrid()+noteHtml+nudgeHtml;
+    list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+noteHtml+buildKaizenGrid()+nudgeHtml;
     reApplyHabitDetails();
 
   } else if(currentTab==='shokunin'){
@@ -5003,8 +4992,6 @@ function getMonthCompletionRate(){
 }
 
 // Replaced by triggerSeal (floating overlay) — kept as no-op for safety
-function animateSeal(){}
-
 function triggerSeal(){
   const overlay=document.getElementById('seal-overlay');
   const sealK  =document.getElementById('seal-float-k');
@@ -7385,7 +7372,6 @@ hiInit = function(){
       <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
       <div id="clan-active-warriors"></div>
 
-
       <!-- CLAN CLOSED NOTE -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
         <div style="font-size:22px;color:rgba(204,53,41,.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
@@ -7398,7 +7384,6 @@ hiInit = function(){
   <!-- streak experiment removed — A/B/C/D now live natively in each tab -->
 
 </div><!-- /scroll -->
-
 
 <!-- TRAVEL MODE SETUP MODAL -->
 <div class="travel-backdrop" id="travelBackdrop" onclick="handleTravelBackdrop(event)">
