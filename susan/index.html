@@ -1917,8 +1917,7 @@ if (FIREBASE_CONFIGURED) {
         <div class="ryughi-kanji">流儀</div>
       </div>
       <div class="ryughi-braid" id="ryughi-display"></div>
-      <div style="font-family:'Noto Serif JP',serif;font-size:12px;letter-spacing:3px;color:var(--ink-faint);margin-top:20px;opacity:.4">千里の道も一歩から</div>
-      <div style="font-size:10px;letter-spacing:2px;color:var(--ink-faint);margin-top:4px;opacity:.3">even a journey of a thousand ri begins with a single step</div>
+
     </section>
     <div class="divider"></div>
 
@@ -4538,7 +4537,7 @@ function showSeveredFlash(){
   flash.innerHTML = 'With the swift swish of your blade, the practice falls to the ground. It is severed.';
   list.insertBefore(flash, list.firstChild);
   setTimeout(()=>{ flash.style.transition='opacity .6s'; flash.style.opacity='0';
-    setTimeout(()=>flash.remove(), 650); }, 2400);
+    setTimeout(()=>flash.remove(), 650); }, 3850);
 }
 
 function startEdit(type, id){
@@ -4716,14 +4715,14 @@ function triggerSeal(){
   setTimeout(()=>{
     sealK.style.animation='sealFadeOut .65s ease forwards';
     copy.style.animation='copyFadeOut .65s ease forwards';
-  },3200);
+  },3800);
   setTimeout(()=>{
     overlay.classList.remove('active');
     sealK.style.animation='none';
     copy.style.animation='none';
     copy.style.opacity='0';
     animDone();
-  },3900);
+  },4600);
 }
 
 function earnStamp(habit,milestone){
@@ -4763,7 +4762,7 @@ function earnStamp(habit,milestone){
     copyEl.style.animation ='copyFadeIn .5s ease forwards';
   },550);
 
-  const DISPLAY_MS=2600, FLY_MS=850, LARGE_PX=100, SMALL_PX=24;
+  const DISPLAY_MS=4100, FLY_MS=850, LARGE_PX=100, SMALL_PX=24;
   setTimeout(()=>{
     const destEl  =document.getElementById(`ms-${habit.id}-${milestone.days}`);
     const destRect=destEl?destEl.getBoundingClientRect():null;
@@ -4881,7 +4880,7 @@ function earnPracticeStamp(milestone){
 
   // Pomp escalates with milestone rank
   const rank=PRACTICE_MILESTONES.findIndex(m=>m.days===milestone.days);
-  const DISPLAY_MS=2600+rank*350; // 2600ms → 4900ms across 7 ranks
+  const DISPLAY_MS=4100+rank*350; // 4100ms → 6200ms across 7 ranks
 
   setTimeout(()=>{
     if(titleEl) titleEl.style.animation='copyFadeOut .4s ease forwards';
