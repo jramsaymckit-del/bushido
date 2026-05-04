@@ -126,6 +126,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .pillar-head{text-align:center;margin-bottom:12px}
 .meditation{text-align:center;padding:0 32px;margin-bottom:28px}
 .meditation p{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.8}
+.proverb-rot{text-align:center}
+.proverb-jp{font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);letter-spacing:3px;margin-bottom:6px}
+.proverb-rom{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);letter-spacing:2px;margin-bottom:10px;opacity:.7}
+.proverb-en{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.8;margin-bottom:10px}
+.proverb-attr{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;color:var(--ink-faint);opacity:.5;text-transform:uppercase}
 
 /* Daily reset */
 .daily-reset{text-align:center;margin-bottom:16px;padding:6px;font-size:10px;letter-spacing:2px;color:var(--ink-faint);opacity:.5}
@@ -863,17 +868,17 @@ body.dark .hanko{border-color:var(--red)}
 .m-divider{display:flex;align-items:center;gap:14px;margin:48px 0}
 .m-divider::before,.m-divider::after{content:'';flex:1;height:1px;background:var(--edge)}
 .m-divider-k{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--red);opacity:.45}
-.m-appendix-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:5px;
-  text-transform:uppercase;color:var(--ink-faint);margin-bottom:32px}
+.m-appendix-label{font-family:'Noto Sans JP',sans-serif;font-size:13px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink);margin-bottom:32px}
 .m-appendix-intro{font-family:'Noto Serif JP',serif;font-size:16px;font-style:italic;
   line-height:1.8;color:var(--ink);margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid var(--edge)}
-.m-cal-block{display:flex;align-items:flex-start;gap:32px;margin:40px 0;padding:28px 0;
+.m-cal-block{display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px;margin:40px 0;padding:32px 0;
   border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
-.m-cal-img{width:80px;flex-shrink:0;opacity:.88}
-.m-cal-phrase{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:300;
-  letter-spacing:3px;color:var(--ink);margin-bottom:8px}
+.m-cal-img{width:120px;opacity:.88;display:block}
+.m-cal-phrase{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:300;
+  letter-spacing:6px;color:var(--ink);margin-bottom:8px;text-align:center}
 .m-cal-attr{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
-  text-transform:uppercase;color:var(--ink-faint);line-height:1.8;margin-bottom:14px}
+  text-transform:uppercase;color:var(--ink-faint);line-height:1.8;margin-bottom:14px;text-align:center}
 .m-cal-text{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
   line-height:1.85;color:var(--ink-light)}
 .m-appendix-body p{font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.9;
@@ -960,6 +965,12 @@ body.dark .hanko{border-color:var(--red)}
 /* Clan member cards */
 .clan-card{margin-bottom:20px;padding:24px;background:rgba(255,255,255,.5);
   border:1px solid rgba(0,0,0,.06);border-radius:2px}
+.clan-reflect-strip{display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
+.clan-reflect-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5;flex:1}
+.clan-reflect-seal{font-family:'Noto Serif JP',serif;font-size:13px;line-height:1;transition:opacity .2s}
+.clan-reflect-seal.sealed{color:var(--red);opacity:.85}
+.clan-reflect-seal.unsealed{color:var(--ink-faint);opacity:.2}
 .clan-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .clan-member-id{display:flex;align-items:center;gap:12px}
 .clan-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
@@ -978,6 +989,13 @@ body.dark .hanko{border-color:var(--red)}
 .clan-crafts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .craft-tag{font-size:10px;color:var(--ink-faint);background:rgba(0,0,0,.04);padding:4px 10px;border-radius:2px}
 .clan-goals{display:flex;flex-direction:column;gap:6px}
+.clan-reflect-row{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+.clan-reflect-seal{font-family:'Noto Serif JP',serif;font-size:12px;display:flex;align-items:center;gap:5px;color:var(--ink-faint);opacity:.3;transition:opacity .2s}
+.clan-reflect-seal.lit{color:var(--red);opacity:.85}
+.clan-reflect-seal .rs-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase}
+.shinobi .clan-reflect-row{border-top-color:rgba(255,255,255,.08)}
+.shinobi .clan-reflect-seal{color:rgba(254,252,248,.3)}
+.shinobi .clan-reflect-seal.lit{color:var(--red);opacity:.85}
 .clan-goal-row{display:flex;align-items:center;gap:10px}
 .cg-bar{flex:1;height:4px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden}
 .cg-fill{height:100%;border-radius:2px}
@@ -2183,13 +2201,121 @@ let state = {
 };
 
 const PILLARS = {
-  kaizen:   {kanji:'改善',  name:'Kaizen',   tf:'Daily practice',   addLabel:'add daily practice',
-    med:'Even dust, grain by grain, becomes a mountain. Each small act of practice today compounds silently into everything you will become.<br><span style="font-size:11px;letter-spacing:2px;opacity:.5">塵も積もれば山となる \u2014 chiri mo tsumoreba yama to naru</span>'},
-  shokunin: {kanji:'職人',  name:'Shokunin', tf:'Weekly & monthly mastery', addLabel:'add craft to master',
-    med:'The artisan does not rush toward mastery. Each stroke of effort refines the hand and sharpens the spirit.'},
-  ikigai:   {kanji:'生き甲斐',name:'Ikigai', tf:'Annual purpose',   addLabel:'add purpose goal',
-    med:'Purpose is not found in grand declarations, but in the quiet return, each morning, to what matters most.'},
+  kaizen:   {kanji:'改善',  name:'Kaizen',   tf:'Daily practice',   addLabel:'add daily practice'},
+  shokunin: {kanji:'職人',  name:'Shokunin', tf:'Weekly & monthly mastery', addLabel:'add craft to master'},
+  ikigai:   {kanji:'生き甲斐',name:'Ikigai', tf:'Annual purpose',   addLabel:'add purpose goal'},
 };
+
+// ============ ROTATING PROVERB ENGINE ============
+// 85 banked entries. Sequences: DIPTYCH (Blake→有構無構), TRIPTYCH (心持→身→観).
+const PROVERBS = [
+  {jp:'別無工夫',rom:'betsu ni kufū nashi',en:'No special method. No other way.',attr:'— Musō Soseki, Zen master, 1275–1351'},
+  {jp:'雨垂れ石を穿つ',rom:'amadare ishi o ugatsu',en:'Dripping water pierces stone.',attr:'— Japanese proverb'},
+  {jp:'七転び八起き',rom:'nana korobi ya oki',en:'Fall seven times, stand up eight.',attr:'— Japanese proverb'},
+  {jp:'継続は力なり',rom:'keizoku wa chikara nari',en:'Persistence is power.',attr:'— Japanese proverb'},
+  {jp:'石の上にも三年',rom:'ishi no ue ni mo san nen',en:'Three years on a cold stone, and even stone grows warm.',attr:'— Japanese proverb'},
+  {jp:'今日の勝利は昨日の自分への勝利',rom:'kyou no shouri wa kinou no jibun e no shouri',en:'Today is victory over yourself of yesterday; tomorrow is your victory over lesser men.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'自分を軽く思い、世界を深く思え',rom:null,en:'Think lightly of yourself and deeply of the world.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'為せば成る、為さねば成らぬ何事も',rom:'naseba naru, nasaneba naranu nanigoto mo',en:'If you do it, it will be done. If you don\'t, nothing will be.',attr:'— Uesugi Yozan'},
+  {jp:'花は桜木、人は武士',rom:'hana wa sakuragi, hito wa bushi',en:'Among flowers, the cherry blossom. Among men, the samurai.',attr:'— Japanese proverb'},
+  {jp:'一歩一歩千里の道を歩め',rom:'ippo ippo senri no michi wo ayume',en:'Step by step, walk the thousand-mile road.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'一事を知れば万事を知れ',rom:'ichiji wo shireba banji wo shire',en:'From one thing, know ten thousand things.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'役に立たぬことをするな',rom:'yaku ni tatanu koto wo suru na',en:'Do nothing which is of no use.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'精神を磨け。心眼を磨け。',rom:'seishin wo migake. shingan wo migake.',en:'Polish the spirit. Sharpen the mind\'s eye.',attr:'— Miyamoto Musashi, Go Rin No Sho (The Void Book)'},
+  {jp:'心に曇りなければ、真の空がある',rom:'kokoro ni kumori nakereba, shin no sora ga aru',en:'When your spirit is not in the least clouded, there is the true void.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'武士道は文武二道なり',rom:'bushidō wa bunbu nidō nari',en:'The warrior\'s is the twofold Way of pen and sword, and he should have a taste for both Ways.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'すべては崩れる。リズムが乱れたとき。',rom:null,en:'Everything can collapse — houses, bodies, enemies — when their rhythm becomes deranged.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'速さは道ではない',rom:null,en:'Speed is not part of the true Way of strategy. The master does not appear hurried.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'敵が急ぎ乱れるなら、己は静かに構えよ',rom:null,en:'When your opponent is hurrying recklessly, act contrarily and keep calm.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'環境を見よ',rom:'kankyō wo miyo',en:'Examine your environment.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:'武士道の道は死を見出すことにある',rom:'bushidō to wa shinu koto to mitsuketari',en:'The way of the samurai is found in death. To live fully, hold nothing back.',attr:'— Yamamoto Tsunetomo, Hagakure'},
+  {jp:'大事の義は、かねて思案するものなり',rom:null,en:'Matters of great importance should be treated lightly. Matters of small importance should be treated seriously.',attr:'— Yamamoto Tsunetomo, Hagakure'},
+  {jp:'あるがままに受け入れよ',rom:null,en:'Accept everything just the way it is.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'快楽を目的として求めるな',rom:null,en:'Do not seek pleasure for its own sake.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'欲望から離れよ',rom:null,en:'Be detached from desire your whole life long.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'なしたることを悔やむな',rom:null,en:'Do not regret what you have done.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'嫉妬することなかれ',rom:null,en:'Never be jealous.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'恨みと不平は自他ともに相応しくない',rom:null,en:'Resentment and complaint are appropriate neither for oneself nor others.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'死を恐れるな',rom:null,en:'Do not fear death.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'己の身は捨てても、名誉を守れ',rom:null,en:'You may abandon your own body but you must preserve your honour.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'道より外れるな',rom:null,en:'Never stray from the Way.',attr:'— Miyamoto Musashi, Dokkōdō'},
+  {jp:'日日是好日',rom:'nichi nichi kore kōjitsu',en:'Every day is a good day.',attr:'— Yunmen Wenyan, Zen master (Tang Dynasty)'},
+  {jp:'急がば回れ',rom:'isogaba maware',en:'More haste, less speed. If you are in a hurry, take the roundabout route.',attr:'— Japanese proverb'},
+  {jp:'虎穴に入らずんば虎子を得ず',rom:'koketsu ni irazunba koji wo ezu',en:'If you do not enter the tiger\'s cave, you will not catch its cub. Nothing ventured, nothing gained.',attr:'— Japanese proverb'},
+  {jp:'柔よく剛を制す',rom:'juu yoku gou wo seisu',en:'Softness overcomes hardness. Flow cuts through force.',attr:'— Japanese proverb'},
+  {jp:'失敗は成功のもと',rom:'shippai wa seikou no moto',en:'Failure is the mother of success.',attr:'— Japanese proverb'},
+  {jp:'初心忘るべからず',rom:'shoshin wasuru bekarazu',en:'Never forget the spirit of the beginner.',attr:'— Zeami Motokiyo'},
+  {jp:'一期一会',rom:'ichi-go ichi-e',en:'One time, one meeting. Treasure each encounter as if it will never come again.',attr:'— Tea ceremony tradition, attributed to Sen no Rikyū'},
+  {jp:'勝って兜の緒を締めよ',rom:'katte kabuto no o wo shimeyo',en:'After victory, tighten the straps of your helmet.',attr:'— Attributed to Uesugi Kenshin'},
+  {jp:'人事を尽くして天命を待つ',rom:'jinji wo tsukushite tenmei wo matsu',en:'Do everything in your power, then await Heaven\'s will.',attr:'— Japanese proverb'},
+  {jp:'艱難汝を玉にす',rom:'kannan nanji wo tama ni su',en:'Adversity polishes the gem within you.',attr:'— Japanese proverb'},
+  {jp:'一念岩をも通す',rom:'ichinen iwa wo mo toosu',en:'A single unwavering intention can penetrate even stone.',attr:'— Japanese proverb'},
+  {jp:'光陰矢の如し',rom:'kouin ya no gotoshi',en:'Time flies like an arrow. Do not waste it.',attr:'— Japanese proverb'},
+  {jp:'思い立ったが吉日',rom:'omoitatta ga kichijitsu',en:'The day you decide to begin is the auspicious day.',attr:'— Japanese proverb'},
+  {jp:'磨けば光る',rom:'migakeba hikaru',en:'Polish it and it will shine.',attr:'— Japanese proverb'},
+  {jp:'武士は食わねど高楊枝',rom:'bushi wa kuwanedo takayouji',en:'A samurai holds his toothpick high even if he hasn\'t eaten. Dignity must be maintained in adversity.',attr:'— Japanese proverb'},
+  {jp:'文武両道',rom:'bunbu ryōdō',en:'The dual path of scholar and warrior. Mastery demands both the sword and the brush.',attr:'— Classical Japanese ideal'},
+  {jp:'身を捨ててこそ浮かぶ瀬もあれ',rom:'mi wo sutete koso ukabu se mo are',en:'Only by abandoning the self can one find a way through.',attr:'— Japanese proverb'},
+  {jp:'己に克つ',rom:'onore ni katsu',en:'The greatest victory is victory over oneself.',attr:'— Japanese proverb / Miyamoto Musashi'},
+  {jp:'生きることは修行',rom:'ikiru koto wa shugyō',en:'To live is to train. Life itself is the practice.',attr:'— Japanese proverb / Buddhist tradition'},
+  {jp:'一刀両断',rom:'ittō ryōdan',en:'Cut through with one stroke. Decide clearly; do not hesitate.',attr:'— Japanese proverb'},
+  {jp:'明日は明日の風が吹く',rom:'ashita wa ashita no kaze ga fuku',en:'Tomorrow\'s wind will blow tomorrow. Give today everything you have.',attr:'— Japanese proverb'},
+  {jp:'剣を磨くように心を磨け',rom:'ken wo migaku you ni kokoro wo migake',en:'Polish the mind as you would polish a sword.',attr:'— Japanese martial tradition'},
+  {jp:'案ずるより産むが易し',rom:'anzuru yori umu ga yasushi',en:'Action is easier than worry.',attr:'— Japanese proverb'},
+  {jp:'不動心',rom:'fudōshin',en:'Immovable mind. The calm that cannot be disturbed by any circumstance.',attr:'— Zen martial tradition'},
+  {jp:'残心',rom:'zanshin',en:'Remaining mind. Full awareness even after the action is complete — nothing is over until attention returns.',attr:'— Japanese martial tradition'},
+  {jp:'精神一到何事か成らざらん',rom:'seishin ittō nanikoto ka narazaran',en:'With total concentration of spirit, what is there that cannot be accomplished?',attr:'— Zhu Xi (absorbed into Japanese martial tradition)'},
+  {jp:'我以外皆我師',rom:'ware igai mina waga shi',en:'Everyone outside myself is my teacher.',attr:'— Miyamoto Musashi (attributed)'},
+  {jp:'知足者富',rom:'chisoku sha tomi',en:'The one who knows contentment is rich.',attr:'— Lao Tzu (absorbed into Japanese Zen tradition)'},
+  {jp:null,rom:null,en:'How you live your days is how you live your life.',attr:'— Annie Dillard, The Writing Life (1989)'},
+  {jp:'和を以て貴しとなす',rom:'wa wo motte tōtoshi to nasu',en:'Harmony is to be valued above all.',attr:'— Prince Shōtoku, Constitution of Seventeen Articles, Article 1 (604 AD)'},
+  {jp:'知行合一',rom:'chikō gōitsu',en:'Knowledge and action are one. Knowing without doing is not yet knowing.',attr:'— Wang Yangming (absorbed into Japanese samurai philosophy)'},
+  {jp:'武士に二言なし',rom:'bushi ni nigon nashi',en:'A samurai has no second word. His word, once given, is final.',attr:'— Japanese proverb'},
+  {jp:'礼に始まり礼に終わる',rom:'rei ni hajimari rei ni owaru',en:'Begin with respect, end with respect.',attr:'— Japanese martial arts axiom'},
+  {jp:'義を見てせざるは勇なきなり',rom:'gi wo mite sezaru wa yū naki nari',en:'To see what is right and fail to do it is cowardice.',attr:'— Confucius, Analects 2:24'},
+  {jp:'忠臣は二君に仕えず',rom:'chūshin wa nikun ni tsukaezu',en:'A loyal retainer does not serve two lords.',attr:'— Classical Confucian, absorbed into Japanese tradition'},
+  {jp:'怒りは敵と思え',rom:'ikari wa teki to omoe',en:'Consider anger your enemy.',attr:'— Tokugawa Ieyasu'},
+  {jp:null,rom:null,en:'Expect poison from standing water.',attr:'— William Blake, Proverbs of Hell, The Marriage of Heaven and Hell (1790–93)'},
+  {jp:'道に脇道あり',rom:'michi ni wakimichi ari',en:'If you study a Way daily, and your spirit diverges, you may think you are obeying a good way — but objectively it is not the true Way. If you are following the true Way and diverge a little, this will later become a large divergence. You must realise this.',attr:'— Miyamoto Musashi, Go Rin No Sho (Wind Book)'},
+  {jp:'各々その道を磨くべし',rom:'onoono sono michi wo migaku beshi',en:'If you know the Way broadly, you will see it in everything. Men must polish their particular Way.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
+  {jp:'万事に拍子あり',rom:'banji ni hyōshi ari',en:'There is timing in everything. Timing in strategy cannot be mastered without a great deal of practice.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
+  {jp:'興廃にも拍子あり',rom:'kōhai ni mo hyōshi ari',en:'There is timing in the whole life of the warrior, in his thriving and declining, in his harmony and discord. Similarly, there is timing in the Way of the merchant, in the rise and fall of capital. All things entail rising and falling timing. You must be able to discern this.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
+  {jp:'兵法を学ぶ道',rom:'heihō wo manabu michi',en:'1. Do not think dishonestly.<br>2. The Way is in training.<br>3. Become acquainted with every art.<br>4. Know the Ways of all professions.<br>5. Distinguish between gain and loss in worldly matters.<br>6. Develop intuitive judgment and understanding for everything.<br>7. Perceive those things which cannot be seen.<br>8. Pay attention even to trifles.<br>9. Do nothing which is of no use.',attr:'— Miyamoto Musashi, Go Rin No Sho, the Nine Principles'},
+  {jp:'兵法の心持',rom:'heihō no kokoromochi',en:'In strategy your spiritual bearing must not be any different from normal. Both in fighting and in everyday life you should be determined though calm. Meet the situation without tenseness yet not recklessly, your spirit settled yet unbiased. Even when your spirit is calm do not let your body relax, and when your body is relaxed do not let your spirit slacken.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
+  {jp:'兵法の身、平常の身',rom:'heihō no mi, heijō no mi',en:'In all forms of strategy, it is necessary to maintain the combat stance in everyday life and to make your everyday stance your combat stance. You must research this well.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
+  {jp:'観の目強く、見の目弱く',rom:'kan no me tsuyoku, ken no me yowaku',en:'The gaze should be large and broad. Perception is strong and sight weak. In strategy it is important to see distant things as if they were close and to take a distanced view of close things. The gaze is the same for single combat and for large-scale combat.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
+  {jp:'有構無構',rom:'ukō mukō',en:'Fixed formation is bad. Study this well.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
+  {jp:'三つの先',rom:'mittsu no sen',en:'The Three Methods to Forestall the Enemy: to forestall by attacking, to forestall as he attacks, and to forestall when you and the enemy attack together. There are no methods of taking the lead other than these three. Because you can win quickly by taking the lead, it is one of the most important things in strategy.',attr:'— Miyamoto Musashi, Go Rin No Sho (Fire Book)'},
+  {jp:null,rom:null,en:'Difficulties strengthen the mind, as labour does the body.',attr:'— Seneca, Moral Letters to Lucilius'},
+  {jp:null,rom:null,en:'The wound is the place where the Light enters you.',attr:'— Rumi (Jalāl al-Dīn Muḥammad Rūmī, 1207–1273)'},
+  {jp:null,rom:null,en:'You have the right to work, but never to its fruits. Let not the fruits of action be your motive, nor let your attachment be to inaction.',attr:'— Bhagavad Gita 2:47'},
+  {jp:'知人者智、自知者明<br>勝人者有力、自勝者強',rom:null,en:'Knowing others is intelligence; knowing yourself is true wisdom. Mastering others is strength; mastering yourself is true power.',attr:'— Lao Tzu, Tao Te Ching, Chapter 33'},
+  {jp:null,rom:null,en:'If I am not for myself, who will be for me?<br>If I am only for myself, what am I?<br>If not now, when?',attr:'— Hillel the Elder, Pirkei Avot 1:14'},
+  {jp:null,rom:null,en:'If you want to go fast, go alone. If you want to go far, go together.',attr:'— African proverb (Akan and Maasai traditions)'},
+  {jp:null,rom:null,en:'Whatever you can do, or dream you can, begin it. Boldness has genius, power, and magic in it.',attr:'— John Anster, after Goethe\'s Faust (1835)'},
+  {jp:null,rom:null,en:'Have patience with everything unresolved in your heart and try to love the questions themselves.',attr:'— Rainer Maria Rilke, Letters to a Young Poet (1903)'},
+];
+function _buildProverbPlaylist(){
+  const o=[];
+  for(let i=0;i<=65;i++) o.push(i);
+  o.push(66,75,67,68,69,70,71,72,73,74);
+  for(let i=76;i<=84;i++) o.push(i);
+  return o.map(i=>PROVERBS[i]);
+}
+const PROVERB_PLAYLIST=_buildProverbPlaylist();
+function getDailyProverb(){
+  const d=Math.floor(Date.now()/86400000);
+  return PROVERB_PLAYLIST[Math.floor(d/3)%PROVERB_PLAYLIST.length];
+}
+function renderProverb(p){
+  let h='<div class="proverb-rot">';
+  if(p.jp) h+='<div class="proverb-jp">'+p.jp+'</div>';
+  if(p.rom) h+='<div class="proverb-rom">'+p.rom+'</div>';
+  h+='<div class="proverb-en">'+p.en+'</div>';
+  if(p.attr) h+='<div class="proverb-attr">'+p.attr+'</div>';
+  return h+'</div>';
+}
+// ============ END PROVERB ENGINE ============
 
 const SHR = [
   {kanji:'守',name:'Shu',meaning:'Learn',t:33},
@@ -2932,7 +3058,7 @@ function switchTab(t){
 function renderTab(){
   const p=PILLARS[currentTab];
   document.getElementById('pillar-head').innerHTML=`<div class="pillar-head"><span class="pillar-tf">${p.tf}</span></div>`;
-  document.getElementById('med-text').innerHTML=`<p>${p.med}</p>`;
+  document.getElementById('med-text').innerHTML=renderProverb(getDailyProverb());
   renderGoals();
   updateStreak();
 }
@@ -5206,6 +5332,12 @@ async function writeClanSummary(user){
     var weekDays=computeWeekRates();
     var tidx=(new Date().getDay()+6)%7;
     var today=getDateStr(new Date());
+    var wStart=getWeekStart(0);
+    var wStartStr=getDateStr(wStart);
+    var wEnd=new Date(wStart);wEnd.setDate(wStart.getDate()+6);var wEndStr=getDateStr(wEnd);
+    var nowDate=new Date();var mStr=nowDate.getFullYear()+'-'+((nowDate.getMonth()+1)<10?'0':'')+(nowDate.getMonth()+1);
+    var weekReflect=(state.reflections||[]).some(function(r){return r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr;});
+    var monthReflect=(state.reflections||[]).some(function(r){return r.type==='monthly'&&r.date&&r.date.startsWith(mStr);});
     var todayIdx2=(new Date().getDay()+6)%7;
     var todayHabits=state.kaizen.filter(function(k){return habitOnDay(k,todayIdx2);});
     var todayDone=todayHabits.filter(function(k){return k.done;}).length;
@@ -5225,6 +5357,8 @@ async function writeClanSummary(user){
       strandRates: isShinobi?[]:computeStrandRates(),
       crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
       goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
+      weekReflect: weekReflect,
+      monthReflect: monthReflect,
       updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
     });
   }catch(e){ console.warn('Clan write failed:',e); }
@@ -5428,6 +5562,10 @@ function renderClanCards(){
         +'</div>'
         +'<div class="shin-obscure">'+glyphHtml+'<div class="shin-obscure-label">habits checked</div></div>'
         +'<div class="shin-note">'+craftCount+' craft'+(craftCount!==1?'s':'')+' active · the rest is shadow</div>'
+        +'<div class="clan-reflect-row">'
+        +'<span class="clan-reflect-seal'+(m.weekReflect?' lit':'')+'">週<span class="rs-label">weekly</span></span>'
+        +'<span class="clan-reflect-seal'+(m.monthReflect?' lit':'')+'">月<span class="rs-label">monthly</span></span>'
+        +'</div>'
         +'</div>';
     } else {
       // Samurai card — full view
@@ -5473,6 +5611,10 @@ function renderClanCards(){
         +(craftsHtml?'<div class="clan-crafts">'+craftsHtml+'</div>':'')
         +(goalsHtml?'<div><div class="clan-goals-hd" style="font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px">Annual Goals</div>'
           +'<div class="clan-goals">'+goalsHtml+'</div></div>':'')
+        +'<div class="clan-reflect-row">'
+        +'<span class="clan-reflect-seal'+(m.weekReflect?' lit':'')+'">週<span class="rs-label">weekly</span></span>'
+        +'<span class="clan-reflect-seal'+(m.monthReflect?' lit':'')+'">月<span class="rs-label">monthly</span></span>'
+        +'</div>'
         +'</div>';
     }
   }).join('');
@@ -5971,11 +6113,11 @@ function setupNavSquish(){
       <div class="m-subtitle">the way of daily discipline</div>
     </div>
     <div class="m-body">
-      <p>We live in a world that mistakes busyness for progress. That turns self-improvement into a dashboard. That measures a life in metrics and misinterprets it as meaning. We've been sold a story about success. That it belongs to those who simply want it most, who grind hardest, who will their way through every wall. Like fury is glorious and force alone is sufficient.</p>
-      <p>But a crashing wave breaks against the cliffside, while dripping water pierces stone and a flowing stream carves through mountains. True power is found in persistence.</p>
+      <p>We live in a world that mistakes busyness for progress, that turns self-improvement into a dashboard and that measures a life through titles and metrics and misinterprets it as meaning. We've been sold a story about success; that it belongs to those who simply want it the most, who grind the hardest, who WILL their way through every wall. The myth glorifies fury and holds that force alone is sufficient.</p>
+      <p>But a crashing wave breaks against the cliffside, while a flowing stream gently carves through mountains. True power is found in persistence.</p>
       <div class="m-pull">You don't need more will. You need more flow. You need to take daily action, making progress on your path, until the groove becomes a canyon.</div>
-      <p>BUSHIDO is not a productivity system. It's a way of life. It doesn't reduce your life to a dashboard, a metric, a mere record of output. It holds something larger: the habit and the goal, the daily reflection and the private journal — all woven together not as a mechanism to be tuned, but as a practice to be inhabited. Because a machine produces while a practice transforms.</p>
-      <p>You don't exist just to achieve what you want to or should achieve. Meaning is found in pursuing our truest self, a striving to become that. You were never lacking focus, will, or ability. You were lacking a structure that would give shape to your flow and allow you to cut through the mountain. Bushido is the striving, it is the honing, and it is the path.</p>
+      <p>BUSHIDO is not a productivity system. It's a way of life. It doesn't reduce your life to a dashboard, a metric, a mere record of output. It represents something larger: the habit IS the goal, the daily reflection and the private journal are the self-improvements. Everything is woven together not as a mechanism to be tuned, but as a practice to be inhabited.</p>
+      <p>Bushido was created out of the belief that YOU don't exist solely to achieve what you want to or should achieve, but that meaning is found in pursuing your truest self and striving to become that. You were never lacking focus, will, or ability. You were lacking a structure that would give shape to your flow and allow you to cut through the mountain. Bushido is the striving, it is the honing, and it is the path. Bushido is the dripping water that pierces stone.</p>
       <div class="m-pull" style="text-align:center; border-left:none; padding-left:0; font-size:17px; letter-spacing:1px; margin-top:40px; margin-bottom:0;">Progress comes from process.</div>
     </div>
     <div class="m-proverb">
@@ -5990,15 +6132,15 @@ function setupNavSquish(){
       <div>
         <div class="m-cal-phrase">別無工夫</div>
         <div class="m-cal-attr">Musō Soseki (夢窓疎石) · 1275–1351<br>Zen master · poet · calligrapher<br>betsu ni kufū nashi</div>
-        <div class="m-cal-text">"No special method, no other way." A Zen statement that the practice is the practice. There's no trick, no shortcut, no hidden technique. You show up, you brush, you do it again tomorrow. That's BUSHIDO in four characters.</div>
+        <div class="m-cal-text">"No special method, no other way." A Zen statement that the practice is the practice. There's no trick, no shortcut, no hidden technique. If you do it, it will be done.</div>
       </div>
     </div>
     <div class="m-appendix-body">
+      <div class="m-appendix-label" style="margin-bottom:16px">Definition of Bushido</div>
       <p>The Samurai code "Bushido" was influenced by elements of Zen Buddhism, emphasizing the importance of balance in one's life. As such, Samurai were expected to be more than just skilled warriors. They were contemplative poets, innovative artists, musicians, and many were also Calligraphers — a practice that embodies elements of Zen.</p>
       <p>To write Zen calligraphy with mastery, one must clear one's mind and let the letters flow out of themselves, not practice and make a tremendous effort. This state of mind was called the mushin (無心, "no mind state") by the Japanese philosopher Nishida Kitaro.</p>
     </div>
     <div class="m-def-section">
-      <div class="m-def-label">The Definition of Bushido</div>
       <span class="m-def-kanji">一</span>
       <p><strong>The code was never singular.</strong> Bushido was not a rulebook. It was never handed down in a single scroll, never codified by one authority, never the same in any two clans or any two lives. Nitobe called it <em>"an organic growth of decades and centuries"</em> — something that grew in the soil of lived experience rather than in the halls of legislation. It was absorbed, not taught. Practiced, not studied.</p>
       <p>This is the spirit BUSHIDO carries. Your Ryughi strands are not assigned to you. Your cascade is not a template handed down from above. Nobody else's BUSHIDO looks like yours — because nobody else has your strands, your vision, your particular mountain to carve through. The code was always personal. It still is.</p>
