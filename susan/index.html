@@ -4808,6 +4808,7 @@ function _editModeOutsideHandler(e){
   toggleEditMode();
 }
 let _dragId=null;
+let _dragReordered=false;
 function initKaizenDrag(){
   const ul=document.getElementById('goals-list');
   if(!ul||ul._dragInited) return;
@@ -4817,12 +4818,15 @@ function initKaizenDrag(){
     const li=e.target.closest('li[data-kaizen-id]');
     if(!li) return;
     _dragId=li.dataset.kaizenId;
+    _dragReordered=false;
     li.classList.add('dragging');
     e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',_dragId);
   });
   ul.addEventListener('dragover',e=>{
     if(!_dragId) return;
     e.preventDefault();
+    e.dataTransfer.dropEffect='move';
     const li=e.target.closest('li[data-kaizen-id]');
     ul.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
     if(li&&li.dataset.kaizenId!==_dragId) li.classList.add('drag-over');
@@ -4842,11 +4846,13 @@ function initKaizenDrag(){
     toIdx=state.kaizen.findIndex(k=>String(k.id)===String(targetId));
     const rect=li.getBoundingClientRect();
     state.kaizen.splice(e.clientY>rect.top+rect.height/2?toIdx+1:toIdx,0,item);
-    save();renderTab();
+    save();
+    _dragReordered=true;
   });
   ul.addEventListener('dragend',()=>{
     ul.querySelectorAll('.drag-over,.dragging').forEach(el=>el.classList.remove('drag-over','dragging'));
     _dragId=null;
+    if(_dragReordered){_dragReordered=false;renderTab();}
   });
 }
 
