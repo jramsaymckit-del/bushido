@@ -4846,7 +4846,7 @@ function initKaizenDrag(){
     toIdx=state.kaizen.findIndex(k=>String(k.id)===String(targetId));
     const rect=li.getBoundingClientRect();
     state.kaizen.splice(e.clientY>rect.top+rect.height/2?toIdx+1:toIdx,0,item);
-    save();
+    saveState();
     _dragReordered=true;
   });
   ul.addEventListener('dragend',()=>{
