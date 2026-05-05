@@ -428,6 +428,11 @@ body.edit-mode .goal-actions{opacity:1}
 .goal-act{cursor:pointer;font-size:14px;color:var(--ink-faint);padding:4px 5px;line-height:1;transition:color .2s;background:none;border:none;font-family:inherit;user-select:none}
 .goal-act:hover{color:var(--ink)}
 .goal-del:hover{color:var(--red)}
+.drag-handle{display:none;align-items:center;cursor:grab;color:var(--ink-faint);font-size:15px;padding:0 10px 0 0;opacity:.3;user-select:none;flex-shrink:0;letter-spacing:-1px}
+body.edit-mode .drag-handle{display:flex}
+body.edit-mode li.goal[draggable]{cursor:default}
+li.goal.dragging{opacity:.3}
+li.goal.drag-over{box-shadow:0 -2px 0 var(--red)}
 
 /* Edit mode toggle button in account bar */
 .btn-edit-mode{border:1.5px solid rgba(26,26,26,.2);color:var(--ink-faint);font-size:9px;
@@ -3410,7 +3415,8 @@ function renderGoals(){
           }).join('');
           const msRowHtml=msHtml?`<div class="ms-row">${msHtml}</div>`:'';
           const hdBullets=buildHabitDetailHtml(g);
-          return `<li class="goal ${g.done?'done':''}${strandCls}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}">
+          return `<li class="goal ${g.done?'done':''}${strandCls}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}" draggable="true">
+            <div class="drag-handle">⠿</div>
             <div class="check ${g.done?'done':''}${anim?' origami-fill':''}" onclick="toggleKaizen(${g.id})"></div>
             <div class="goal-content" onclick="if(!document.body.classList.contains('edit-mode'))toggleHabitDetail(${g.id})">
               <div class="goal-title" data-edit-id="${g.id}">${g.text}<span class="hd-hint">&#9660;</span></div>
@@ -4664,6 +4670,7 @@ document.getElementById('goals-list').addEventListener('mouseover',function(e){
 document.getElementById('goals-list').addEventListener('mouseout',function(e){
   if(e.target.closest('[data-full]')) hideHgTooltip();
 });
+initKaizenDrag();
 
 // ============ VISION DRAWER ============
 function openVisionDrawer(){
@@ -4788,6 +4795,58 @@ function toggleEditMode(){
   document.body.classList.toggle('edit-mode', editMode);
   const btn = document.getElementById('account-edit-btn');
   if(btn){ btn.textContent = editMode ? 'Done' : 'Edit'; btn.classList.toggle('active', editMode); }
+  if(editMode){
+    setTimeout(()=>{ document.addEventListener('click', _editModeOutsideHandler); }, 0);
+  } else {
+    document.removeEventListener('click', _editModeOutsideHandler);
+  }
+}
+function _editModeOutsideHandler(e){
+  if(!editMode) return;
+  if(e.target.closest('.goal-act,.btn-edit-mode,.edit-mode-bar,.drag-handle,.modal,#delete-confirm')) return;
+  toggleEditMode();
+}
+let _dragId=null;
+function initKaizenDrag(){
+  const ul=document.getElementById('goals-list');
+  if(!ul||ul._dragInited) return;
+  ul._dragInited=true;
+  ul.addEventListener('dragstart',e=>{
+    if(!editMode){e.preventDefault();return;}
+    const li=e.target.closest('li[data-kaizen-id]');
+    if(!li) return;
+    _dragId=li.dataset.kaizenId;
+    li.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  });
+  ul.addEventListener('dragover',e=>{
+    if(!_dragId) return;
+    e.preventDefault();
+    const li=e.target.closest('li[data-kaizen-id]');
+    ul.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+    if(li&&li.dataset.kaizenId!==_dragId) li.classList.add('drag-over');
+  });
+  ul.addEventListener('dragleave',e=>{
+    if(!ul.contains(e.relatedTarget)) ul.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  });
+  ul.addEventListener('drop',e=>{
+    e.preventDefault();
+    const li=e.target.closest('li[data-kaizen-id]');
+    if(!li||!_dragId||li.dataset.kaizenId===_dragId) return;
+    const targetId=li.dataset.kaizenId;
+    const fromIdx=state.kaizen.findIndex(k=>String(k.id)===String(_dragId));
+    let toIdx=state.kaizen.findIndex(k=>String(k.id)===String(targetId));
+    if(fromIdx===-1||toIdx===-1) return;
+    const [item]=state.kaizen.splice(fromIdx,1);
+    toIdx=state.kaizen.findIndex(k=>String(k.id)===String(targetId));
+    const rect=li.getBoundingClientRect();
+    state.kaizen.splice(e.clientY>rect.top+rect.height/2?toIdx+1:toIdx,0,item);
+    save();renderTab();
+  });
+  ul.addEventListener('dragend',()=>{
+    ul.querySelectorAll('.drag-over,.dragging').forEach(el=>el.classList.remove('drag-over','dragging'));
+    _dragId=null;
+  });
 }
 
 // ============ EDIT / DELETE ============
