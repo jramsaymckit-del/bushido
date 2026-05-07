@@ -1849,6 +1849,228 @@ li.goal.hd-open .habit-detail{display:block}
   font-family:'Noto Serif JP',serif;font-size:12px;
   color:var(--red);opacity:.85;line-height:1;flex-shrink:0;
 }
+
+/* ═══ EXPERIMENT: CALENDAR SYNC + SETTINGS ═════════════════════════════════ */
+
+/* Dropdown status text (e.g., "· connected") */
+.dd-status{margin-left:6px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);font-weight:400}
+
+/* Shared modal backdrop (for Settings + Calendar Sync wizard) */
+.cs-backdrop{display:none;position:fixed;inset:0;z-index:520;
+  background:rgba(26,18,8,.78);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto}
+.cs-backdrop.show{display:flex}
+.cs-modal{background:var(--scroll);max-width:680px;width:100%;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(26,18,8,.018) 28px,rgba(26,18,8,.018) 29px);
+  box-shadow:0 4px 80px rgba(0,0,0,.45);position:relative;
+  padding:56px 56px 48px;animation:fadeUp .4s ease-out;
+  max-height:calc(100vh - 80px);overflow-y:auto}
+.cs-close{position:absolute;top:20px;right:20px;background:none;border:none;
+  cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint);transition:color .2s}
+.cs-close:hover{color:var(--ink)}
+
+/* Modal header — kanji + title + subtitle */
+.cs-header{text-align:center;padding-bottom:32px;margin-bottom:32px;border-bottom:1px solid var(--edge)}
+.cs-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:var(--red);opacity:.18;letter-spacing:6px;margin-bottom:10px;line-height:1}
+.cs-eyebrow{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.cs-title{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;letter-spacing:2px;color:var(--ink);margin-bottom:8px}
+.cs-subtitle{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+
+/* Body copy */
+.cs-prose{font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.85;color:var(--ink);margin-bottom:20px}
+.cs-pull{border-left:2px solid var(--red);padding:4px 0 4px 18px;margin:24px 0;
+  font-family:'Noto Serif JP',serif;font-style:italic;font-size:14px;color:var(--ink);line-height:1.7}
+.cs-meta-list{margin:24px 0;padding:0;list-style:none}
+.cs-meta-list li{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;color:var(--ink-light);
+  padding:8px 0 8px 22px;position:relative;line-height:1.6}
+.cs-meta-list li::before{content:'·';position:absolute;left:8px;color:var(--red);font-weight:700;font-size:14px;line-height:1.2}
+
+/* Wizard progress dots */
+.cs-progress{display:flex;justify-content:center;gap:10px;margin-bottom:36px}
+.cs-progress-dot{width:6px;height:6px;border-radius:50%;background:var(--edge);transition:all .3s}
+.cs-progress-dot.active{background:var(--ink);transform:scale(1.5)}
+.cs-progress-dot.done{background:var(--red);opacity:.55}
+
+/* Wizard step container — only one visible at a time */
+.cs-step{display:none}
+.cs-step.active{display:block;animation:fadeUp .35s ease-out}
+
+/* Buttons */
+.cs-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:24px;border-top:1px solid var(--edge)}
+.cs-btn{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  padding:14px 28px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);
+  cursor:pointer;transition:all .25s;font-weight:500}
+.cs-btn:hover{background:var(--ink);color:var(--scroll)}
+.cs-btn.primary{background:var(--ink);color:var(--scroll)}
+.cs-btn.primary:hover{background:var(--red);border-color:var(--red)}
+.cs-btn.ghost{border-color:transparent;color:var(--ink-faint)}
+.cs-btn.ghost:hover{background:transparent;color:var(--ink);border-color:transparent}
+.cs-btn.connect{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:none;
+  padding:14px 32px;background:var(--white);border:1.5px solid var(--ink);color:var(--ink);display:inline-flex;align-items:center;gap:10px}
+.cs-btn.connect:hover{background:var(--ink);color:var(--scroll)}
+.cs-btn:disabled{opacity:.35;cursor:not-allowed}
+.cs-btn:disabled:hover{background:transparent;color:var(--ink)}
+
+/* Anchor question (Step 3.1) */
+.cs-anchor{text-align:center;padding:20px 0 32px}
+.cs-anchor-q{font-family:'Noto Serif JP',serif;font-size:18px;line-height:1.7;color:var(--ink);margin-bottom:32px;font-weight:400}
+.cs-time-input{font-family:'Noto Serif JP',serif;font-size:34px;font-weight:300;letter-spacing:2px;
+  color:var(--ink);background:transparent;border:none;border-bottom:1.5px solid var(--ink);
+  text-align:center;padding:8px 24px;width:560px;max-width:100%;outline:none;cursor:pointer}
+.cs-time-input::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+.cs-anchor-hint{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:24px}
+
+/* Week grid (Step 3.2) */
+.cs-week-label{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+.cs-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:32px}
+.cs-week-day{background:rgba(255,255,255,.4);padding:10px 6px;min-height:120px;border-radius:2px;display:flex;flex-direction:column;gap:6px}
+.cs-week-day-label{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);text-align:center;padding-bottom:4px;border-bottom:1px solid var(--edge)}
+.cs-chip{background:rgba(255,255,255,.7);border:1px solid var(--edge);padding:5px 6px;
+  transition:all .2s;text-align:left;border-radius:1px;display:block}
+.cs-chip:hover{border-color:var(--ink);background:rgba(204,53,41,.04)}
+.cs-chip-time-input{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;
+  color:var(--red);font-weight:500;background:transparent;border:none;padding:0;width:100%;
+  outline:none;cursor:pointer;display:block}
+.cs-chip-time-input::-webkit-calendar-picker-indicator{display:none;-webkit-appearance:none}
+.cs-chip-text{font-family:'Noto Serif JP',serif;font-size:10px;line-height:1.3;color:var(--ink);margin-top:2px;display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Monthly + Annual lists below week grid */
+.cs-list-section{margin-top:28px}
+.cs-list-section h4{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;font-weight:500}
+.cs-list-row{display:flex;justify-content:space-between;align-items:center;
+  padding:11px 14px;background:rgba(255,255,255,.4);border:1px solid var(--edge);
+  margin-bottom:6px;border-radius:1px}
+.cs-list-row-meta{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;color:var(--red);font-weight:500;min-width:90px}
+.cs-list-row-text{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink);flex:1;padding:0 16px;line-height:1.4}
+.cs-list-row input[type=time]{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--ink);
+  background:transparent;border:none;border-bottom:1px solid var(--edge);padding:4px 0;width:80px;outline:none;cursor:pointer}
+.cs-list-row input[type=time]:focus{border-color:var(--ink)}
+.cs-list-row.readonly{opacity:.78}
+
+/* Calendar Scroll editor — Step 3, annual events section */
+.cs-scroll-row{display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--edge)}
+.cs-scroll-row:last-of-type{border-bottom:none}
+.cs-scroll-month, .cs-scroll-day{font-family:'Noto Sans JP',sans-serif;font-size:11px;
+  letter-spacing:1px;background:transparent;border:1px solid var(--edge);padding:6px 8px;
+  color:var(--ink);cursor:pointer;outline:none;border-radius:1px;flex-shrink:0}
+.cs-scroll-month{width:78px}
+.cs-scroll-day{width:54px}
+.cs-scroll-month:focus, .cs-scroll-day:focus{border-color:var(--ink)}
+.cs-scroll-day.cs-day-adjusted{animation:csDayPulse .9s ease}
+@keyframes csDayPulse{
+  0%{background:rgba(204,53,41,.18);border-color:var(--red)}
+  100%{background:transparent;border-color:var(--edge)}
+}
+.cs-scroll-name{flex:1;font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink);
+  background:transparent;border:none;border-bottom:1px solid var(--edge);padding:6px 0;
+  outline:none;min-width:0}
+.cs-scroll-name:focus{border-bottom-color:var(--ink)}
+.cs-scroll-name::placeholder{color:var(--ink-faint);font-style:italic}
+.cs-scroll-delete{background:transparent;border:none;color:var(--ink-faint);cursor:pointer;
+  font-size:18px;line-height:1;padding:4px 8px;border-radius:1px;
+  transition:color .2s;flex-shrink:0}
+.cs-scroll-delete:hover{color:var(--red)}
+.cs-scroll-add{margin-top:14px;font-family:'Noto Sans JP',sans-serif;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;background:transparent;
+  border:1px dashed var(--edge);color:var(--ink-faint);padding:11px 16px;width:100%;
+  cursor:pointer;transition:all .2s;border-radius:2px}
+.cs-scroll-add:hover{border-color:var(--ink);color:var(--ink)}
+.cs-scroll-empty{font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;
+  color:var(--ink-faint);text-align:center;padding:20px 0;line-height:1.6}
+
+@media (max-width:600px){
+  .cs-scroll-row{flex-wrap:wrap;gap:6px}
+  .cs-scroll-name{flex-basis:100%;order:3}
+  .cs-scroll-delete{order:4;margin-left:auto}
+}
+
+/* Reminder dropdowns (Step 4) */
+.cs-reminder-row{display:flex;justify-content:space-between;align-items:center;
+  padding:18px 0;border-bottom:1px solid var(--edge)}
+.cs-reminder-row:last-child{border-bottom:none}
+.cs-reminder-label{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink)}
+.cs-reminder-sub{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+.cs-select{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;
+  background:transparent;border:1px solid var(--edge);padding:8px 14px;color:var(--ink);cursor:pointer;outline:none;border-radius:1px}
+.cs-select:focus{border-color:var(--ink)}
+
+/* Branching choice cards (Step 5) */
+.cs-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 24px}
+.cs-choice{padding:28px 24px;background:rgba(255,255,255,.5);border:1.5px solid var(--edge);
+  cursor:pointer;transition:all .25s;text-align:left;border-radius:2px}
+.cs-choice:hover{border-color:var(--ink);background:rgba(255,255,255,.85)}
+.cs-choice.selected{border-color:var(--red);background:var(--white)}
+.cs-choice-kanji{font-family:'Noto Serif JP',serif;font-size:22px;color:var(--red);opacity:.7;margin-bottom:14px;line-height:1}
+.cs-choice-title{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:1px}
+.cs-choice-body{font-family:'Noto Serif JP',serif;font-size:12px;line-height:1.6;color:var(--ink-light)}
+
+/* Confirm recap (Step 6) */
+.cs-recap{padding:24px 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin:24px 0}
+.cs-recap-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;
+  font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-light)}
+.cs-recap-row strong{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:400;color:var(--ink);text-transform:none;letter-spacing:0}
+
+/* Success state */
+.cs-success{text-align:center;padding:40px 20px}
+.cs-success-seal{font-family:'Noto Serif JP',serif;font-size:60px;color:var(--red);opacity:.85;margin-bottom:24px;line-height:1;animation:stampIn .6s ease-out}
+.cs-success-line{font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:14px;letter-spacing:2px}
+.cs-success-sub{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+
+/* Error / status copy used during real API calls */
+.cs-error{margin-top:18px;padding:14px 16px;background:rgba(204,53,41,.06);
+  border:1px solid rgba(204,53,41,.22);border-radius:2px;
+  font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;
+  color:var(--red);line-height:1.6;text-align:left}
+.cs-syncing{text-align:center;padding:60px 20px}
+.cs-syncing-kanji{font-family:'Noto Serif JP',serif;font-size:48px;color:var(--red);
+  opacity:.6;margin-bottom:24px;line-height:1;animation:csPulse 1.6s ease-in-out infinite}
+.cs-syncing-line{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--ink);margin-bottom:10px;letter-spacing:1px}
+.cs-syncing-sub{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint)}
+@keyframes csPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
+
+/* Connected-state panel + reset confirmation */
+.cs-connected-actions{display:flex;flex-direction:column;gap:12px;margin:32px 0 8px}
+.cs-btn-wide{width:100%;justify-content:center;text-align:center;padding:16px 28px}
+.cs-reset-confirm{margin-top:24px;padding:36px 28px;background:rgba(204,53,41,.045);
+  border:1px solid rgba(204,53,41,.22);border-radius:2px;text-align:center;animation:fadeUp .35s ease-out}
+.cs-reset-kanji{font-family:'Noto Serif JP',serif;font-size:48px;color:var(--red);opacity:.85;margin-bottom:18px;line-height:1}
+.cs-reset-question{font-family:'Noto Serif JP',serif;font-size:18px;letter-spacing:1px;color:var(--ink);margin-bottom:18px;font-weight:700}
+.cs-reset-list{font-family:'Noto Serif JP',serif;font-size:13px;line-height:1.75;color:var(--ink-light);margin-bottom:28px;padding:0 12px}
+.cs-reset-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cs-btn-danger{background:var(--red);border-color:var(--red);color:var(--white)}
+.cs-btn-danger:hover{background:var(--red-light);border-color:var(--red-light);color:var(--white)}
+.cs-meta-foot{margin-top:18px;text-align:center;font-family:'Noto Sans JP',sans-serif;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+
+/* Settings modal — single toggle */
+.cs-setting-row{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--edge)}
+.cs-setting-row:last-child{border-bottom:none}
+.cs-setting-label{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink)}
+.cs-setting-help{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;color:var(--ink-faint);margin-top:5px;line-height:1.5}
+.cs-toggle{position:relative;width:42px;height:22px;background:var(--edge);cursor:pointer;transition:background .25s;border-radius:11px;border:none;outline:none;flex-shrink:0}
+.cs-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:var(--white);border-radius:50%;transition:left .25s;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.cs-toggle.on{background:var(--ink)}
+.cs-toggle.on::after{left:23px}
+.cs-tz{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:2px;color:var(--ink-faint)}
+
+@media (max-width:600px){
+  .cs-modal{padding:40px 24px 32px}
+  .cs-week-grid{grid-template-columns:repeat(2,1fr)}
+  .cs-choice-grid{grid-template-columns:1fr}
+  .cs-time-input{font-size:30px;width:480px;max-width:100%;padding:8px 16px}
+  .cs-success-seal{font-size:48px}
+}
+
+/* /EXPERIMENT: CALENDAR SYNC + SETTINGS */
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -1862,6 +2084,9 @@ li.goal.hd-open .habit-detail{display:block}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- Google Identity Services for Calendar OAuth (loads async; csConnect waits for it). -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <script>
 // ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────────────────
 // From: Firebase Console → Project Settings → Your Apps → SDK setup → Config
@@ -1979,6 +2204,10 @@ if (FIREBASE_CONFIGURED) {
         <div class="avatar-dropdown" id="avatarDropdown">
           <div class="avatar-dd-name">James<div class="avatar-dd-sub">your bushido</div></div>
           <button class="avatar-dd-item" onclick="openManifesto()"><span class="dd-kanji">道</span>Read the Manifesto</button>
+          <!-- EXPERIMENT: CALENDAR SYNC + SETTINGS DROPDOWN ENTRIES -->
+          <button class="avatar-dd-item" id="ddCalSync" onclick="openCalSync()"><span class="dd-kanji">暦</span>Calendar Sync<span class="dd-status" id="ddCalSyncStatus"></span></button>
+          <button class="avatar-dd-item" onclick="openSettings()"><span class="dd-kanji">設</span>Settings</button>
+          <!-- /EXPERIMENT -->
           <div class="avatar-dd-divider"></div>
           <button class="avatar-dd-item dd-danger" onclick="signOutUser()"><span class="dd-kanji">出</span>Sign out</button>
         </div>
@@ -4561,7 +4790,7 @@ function saveReflection(type){
       <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
       <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
     </div>`;
-    setTimeout(()=>closeReflection(), 1800);
+    setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 1800);
   }
 }
 
@@ -6012,6 +6241,9 @@ function initFirebaseAuth(){
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app').style.display         = 'block';
       loadFirestoreState(user);
+      // Hydrate Calendar Sync state — if the user previously synced, mark them
+      // connected so 暦 clicks land on the connected-state panel.
+      if(typeof csLoadSyncState === 'function') csLoadSyncState(user);
     } else {
       // Signed out: show auth screen
       document.getElementById('auth-screen').style.display = 'flex';
@@ -6178,13 +6410,19 @@ function showDashboard(){
   setupNavSquish();
   const _preRenderTs = state.lastModified || 0;
   renderDashboard();
-  checkReflectionPrompts();
   initGridSwipe();
   updateDarkMode();
   setInterval(updateDarkMode, 60000);
-  // Legacy JSONbin sync (only when Firebase not configured)
   if(!FIREBASE_CONFIGURED){
-    loadFromCloud(_preRenderTs).then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); });
+    // JSONbin/legacy path: wait for cloud sync before checking prompts so we use
+    // the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
+    loadFromCloud(_preRenderTs)
+      .then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); })
+      .finally(() => { checkReflectionPrompts(); });
+  } else {
+    // Firebase path: Firestore data was already loaded by loadFirestoreState()
+    // before showDashboard() was called — safe to check prompts immediately.
+    checkReflectionPrompts();
   }
 }
 
@@ -7549,6 +7787,1404 @@ hiInit = function(){
     </div>
   </div>
 </div>
+
+<!-- ══════════ EXPERIMENT: SETTINGS MODAL ══════════ -->
+<div class="cs-backdrop" id="csSettingsBackdrop" onclick="if(event.target===this)closeSettings()">
+  <div class="cs-modal" style="max-width:520px">
+    <button class="cs-close" onclick="closeSettings()">✕ &nbsp;close</button>
+    <div class="cs-header">
+      <div class="cs-kanji">設</div>
+      <div class="cs-eyebrow">your bushido</div>
+      <div class="cs-title">Settings</div>
+    </div>
+
+    <div class="cs-setting-row">
+      <div style="flex:1;padding-right:24px">
+        <div class="cs-setting-label">Schedule daily practices</div>
+        <div class="cs-setting-help">Off — practices flow with the day. On — assign a specific time to each ritual.</div>
+      </div>
+      <button class="cs-toggle" id="csKaizenToggle" onclick="toggleKaizenTimes()" aria-label="Toggle scheduled times"></button>
+    </div>
+
+    <div class="cs-setting-row">
+      <div style="flex:1">
+        <div class="cs-setting-label">Time zone</div>
+        <div class="cs-setting-help" id="csTzDisplay">auto-detected</div>
+      </div>
+    </div>
+
+    <div class="cs-actions" style="border-top:none;padding-top:8px;justify-content:flex-end">
+      <button class="cs-btn ghost" onclick="closeSettings()">close</button>
+    </div>
+  </div>
+</div>
+<!-- ══════════ /EXPERIMENT: SETTINGS MODAL ══════════ -->
+
+<!-- ══════════ EXPERIMENT: CALENDAR SYNC WIZARD ══════════ -->
+<div class="cs-backdrop" id="csWizardBackdrop" onclick="if(event.target===this)closeCalSync()">
+  <div class="cs-modal">
+    <button class="cs-close" onclick="closeCalSync()">✕ &nbsp;close</button>
+
+    <div class="cs-progress">
+      <div class="cs-progress-dot" data-step="1"></div>
+      <div class="cs-progress-dot" data-step="2"></div>
+      <div class="cs-progress-dot" data-step="3"></div>
+      <div class="cs-progress-dot" data-step="4"></div>
+      <div class="cs-progress-dot" data-step="5"></div>
+      <div class="cs-progress-dot" data-step="6"></div>
+    </div>
+
+    <!-- Connected-state panel: shown when user opens 暦 after a successful sync.
+         Failsafe lives here — re-sync to refresh, or reset to disconnect cleanly. -->
+    <div id="csConnectedPanel" style="display:none">
+      <div class="cs-header">
+        <div class="cs-kanji">暦</div>
+        <div class="cs-eyebrow">calendar sync</div>
+        <div class="cs-title">Connected.</div>
+        <div class="cs-subtitle">BUSHIDO 武士道 in your Google Calendar</div>
+      </div>
+      <div class="cs-prose">Your practice is synced. Re-run the flow to update times or include new habits, or disconnect to reset everything from the ground up.</div>
+
+      <div class="cs-connected-actions">
+        <button class="cs-btn primary cs-btn-wide" onclick="csResync()">Re-sync</button>
+        <button class="cs-btn cs-btn-wide" onclick="csShowResetConfirm()">Reset &middot; disconnect</button>
+      </div>
+
+      <div id="csResetConfirm" class="cs-reset-confirm" style="display:none">
+        <div class="cs-reset-kanji">斬</div>
+        <div class="cs-reset-question">Disconnect and reset everything?</div>
+        <div class="cs-reset-list">
+          This deletes the <strong>BUSHIDO 武士道</strong> calendar from your Google account, removes every event BUSHIDO created, and severs the connection.
+          <br><br>
+          Your existing Google Calendar events are untouched. You can reconnect any time afterwards.
+        </div>
+        <div class="cs-reset-actions">
+          <button class="cs-btn ghost" onclick="csCancelReset()">No, keep it.</button>
+          <button class="cs-btn cs-btn-danger" onclick="csExecuteReset()">Yes, reset everything.</button>
+        </div>
+      </div>
+
+      <div class="cs-meta-foot" id="csConnectedMeta">last synced &middot; just now</div>
+    </div>
+
+    <!-- Resetting view — shown while csExecuteReset runs through the async
+         DELETE / revoke / Firestore-clear chain. Closes when reset is done. -->
+    <div id="csResettingView" style="display:none">
+      <div class="cs-syncing">
+        <div class="cs-syncing-kanji">解</div>
+        <div class="cs-syncing-line">Releasing the connection.</div>
+        <div class="cs-syncing-sub" id="csResettingSub">deleting BUSHIDO 武士道 calendar from Google…</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Welcome -->
+    <div class="cs-step" data-step="1">
+      <div class="cs-header">
+        <div class="cs-kanji">暦</div>
+        <div class="cs-eyebrow">calendar sync</div>
+        <div class="cs-title">Carry your practice into the day.</div>
+      </div>
+      <div class="cs-prose">A new calendar appears in your Google account: <strong>BUSHIDO 武士道</strong>. Your daily practices, weekly rituals, and the dates that matter — all of it landed where your day already lives.</div>
+      <div class="cs-pull">Reminders ring on every device you use Google Calendar on. Your existing calendars are untouched.</div>
+      <ul class="cs-meta-list">
+        <li>Daily Kaizen become recurring events at the times you set.</li>
+        <li>Shokunin practices appear weekly or monthly on their cadence.</li>
+        <li>Calendar Scroll dates land as annual all-day events.</li>
+        <li>You can disconnect any time. Everything we created comes with us.</li>
+      </ul>
+      <div class="cs-actions">
+        <button class="cs-btn ghost" onclick="closeCalSync()">cancel</button>
+        <button class="cs-btn primary" onclick="csNextStep()">begin →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Connect Google -->
+    <div class="cs-step" data-step="2">
+      <div class="cs-header">
+        <div class="cs-kanji">手</div>
+        <div class="cs-eyebrow">step 1 of 5</div>
+        <div class="cs-title">Connect your Google account.</div>
+      </div>
+      <div class="cs-prose">BUSHIDO will request permission to create and write to its own calendar. It will not read or modify any of your existing calendars or events.</div>
+      <div style="text-align:center;margin:36px 0">
+        <button class="cs-btn connect" id="csConnectBtn" onclick="csConnect()">
+          <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+            <path fill="#FBBC04" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+          </svg>
+          Continue with Google
+        </button>
+        <div class="cs-error" id="csConnectError" style="display:none"></div>
+      </div>
+      <div class="cs-actions">
+        <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+        <button class="cs-btn primary" id="csStep2Continue" onclick="csNextStep()" disabled>continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Anchor + Week + Monthly/Annual -->
+    <div class="cs-step" data-step="3">
+      <div class="cs-header">
+        <div class="cs-kanji">日</div>
+        <div class="cs-eyebrow">step 2 of 5</div>
+        <div class="cs-title">When does your day begin?</div>
+      </div>
+
+      <div class="cs-anchor">
+        <div class="cs-anchor-q">When are you typically up and about to start your day?</div>
+        <input type="time" class="cs-time-input" id="csAnchorInput" value="07:00" onchange="csAnchorChanged()" />
+        <div class="cs-anchor-hint">Everything else takes its rhythm from here. Adjust any single item below.</div>
+      </div>
+
+      <div class="cs-week-label">Your week</div>
+      <div class="cs-week-grid" id="csWeekGrid"></div>
+
+      <div class="cs-list-section" id="csMonthlySection">
+        <h4>Weekly &amp; monthly practices</h4>
+        <div id="csMonthlyList"></div>
+      </div>
+
+      <div class="cs-list-section" id="csAnnualSection">
+        <h4>Calendar Scroll &middot; annual all-day events</h4>
+        <div id="csAnnualList"></div>
+      </div>
+
+      <div class="cs-actions">
+        <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+        <button class="cs-btn primary" onclick="csNextStep()">continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Reminder timing -->
+    <div class="cs-step" data-step="4">
+      <div class="cs-header">
+        <div class="cs-kanji">鐘</div>
+        <div class="cs-eyebrow">step 3 of 5</div>
+        <div class="cs-title">When should the bell ring?</div>
+      </div>
+      <div class="cs-prose">Choose when each kind of practice reminds you. Google Calendar handles the actual notification on your phone, watch, and computer.</div>
+
+      <div style="margin:32px 0">
+        <div class="cs-reminder-row">
+          <div>
+            <div class="cs-reminder-label">Daily Kaizen</div>
+            <div class="cs-reminder-sub">your everyday ties</div>
+          </div>
+          <select class="cs-select" id="csReminderKaizen">
+            <option value="0">at the time</option>
+            <option value="5">5 min before</option>
+            <option value="15">15 min before</option>
+            <option value="30">30 min before</option>
+            <option value="-1">no reminder</option>
+          </select>
+        </div>
+        <div class="cs-reminder-row">
+          <div>
+            <div class="cs-reminder-label">Shokunin</div>
+            <div class="cs-reminder-sub">weekly and monthly rituals</div>
+          </div>
+          <select class="cs-select" id="csReminderShokunin">
+            <option value="0">at the time</option>
+            <option value="60" selected>1 hour before</option>
+            <option value="1440">1 day before</option>
+            <option value="-1">no reminder</option>
+          </select>
+        </div>
+        <div class="cs-reminder-row">
+          <div>
+            <div class="cs-reminder-label">Calendar Scroll</div>
+            <div class="cs-reminder-sub">anniversaries and dates that matter</div>
+          </div>
+          <select class="cs-select" id="csReminderScroll">
+            <option value="60">1 hour before</option>
+            <option value="1440" selected>1 day before</option>
+            <option value="10080">1 week before</option>
+            <option value="-1">no reminder</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cs-actions">
+        <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+        <button class="cs-btn primary" onclick="csNextStep()">continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Save to BUSHIDO branching -->
+    <div class="cs-step" data-step="5">
+      <div class="cs-header">
+        <div class="cs-kanji">問</div>
+        <div class="cs-eyebrow">step 4 of 5</div>
+        <div class="cs-title">Where do these times live?</div>
+      </div>
+      <div class="cs-prose">You set times for each ritual. The question now: should those times also become part of your BUSHIDO practice — visible in your dashboard — or should they live only in the calendar?</div>
+
+      <div class="cs-choice-grid">
+        <button class="cs-choice" id="csChoiceSave" onclick="csSelectChoice('save')">
+          <div class="cs-choice-kanji">心</div>
+          <div class="cs-choice-title">Save to my practice</div>
+          <div class="cs-choice-body">Times become part of each ritual. The Today view orders by time. The practice has a clock.</div>
+        </button>
+        <button class="cs-choice" id="csChoiceCal" onclick="csSelectChoice('cal')">
+          <div class="cs-choice-kanji">流</div>
+          <div class="cs-choice-title">Calendar only</div>
+          <div class="cs-choice-body">BUSHIDO state stays clean. Times exist in Google Calendar only. The practice flows with the day.</div>
+        </button>
+      </div>
+
+      <div class="cs-actions">
+        <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+        <button class="cs-btn primary" id="csStep5Continue" onclick="csNextStep()" disabled>continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 6: Confirm + Success -->
+    <div class="cs-step" data-step="6">
+      <div id="csConfirmView">
+        <div class="cs-header">
+          <div class="cs-kanji">印</div>
+          <div class="cs-eyebrow">step 5 of 5</div>
+          <div class="cs-title">Ready.</div>
+        </div>
+        <div class="cs-prose">Here's what BUSHIDO will create in your Google account when you press the seal.</div>
+
+        <div class="cs-recap">
+          <div class="cs-recap-row"><span>Calendar</span><strong id="csRecapCal">BUSHIDO 武士道</strong></div>
+          <div class="cs-recap-row"><span>Recurring events</span><strong id="csRecapEvents">— events</strong></div>
+          <div class="cs-recap-row"><span>Annual events</span><strong id="csRecapAnnual">— events</strong></div>
+          <div class="cs-recap-row"><span>Reminders</span><strong id="csRecapReminders">—</strong></div>
+          <div class="cs-recap-row"><span>Save to practice</span><strong id="csRecapSave">—</strong></div>
+        </div>
+
+        <div class="cs-actions">
+          <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+          <button class="cs-btn primary" onclick="csConfirmSync()">sync now</button>
+        </div>
+      </div>
+
+      <div id="csSyncingView" style="display:none">
+        <div class="cs-syncing">
+          <div class="cs-syncing-kanji">流</div>
+          <div class="cs-syncing-line">Carrying your practice into the day.</div>
+          <div class="cs-syncing-sub" id="csSyncingSub">creating BUSHIDO 武士道 calendar…</div>
+        </div>
+      </div>
+
+      <div id="csErrorView" style="display:none">
+        <div class="cs-header">
+          <div class="cs-kanji">⚠</div>
+          <div class="cs-eyebrow">something went wrong</div>
+          <div class="cs-title">Sync failed.</div>
+        </div>
+        <div class="cs-error" id="csErrorMessage">An unexpected error occurred.</div>
+        <div class="cs-actions" style="justify-content:center;border-top:none;padding-top:24px">
+          <button class="cs-btn ghost" onclick="csPrevStep()">← back</button>
+          <button class="cs-btn primary" onclick="csConfirmSync()">try again</button>
+        </div>
+      </div>
+
+      <div id="csSuccessView" style="display:none">
+        <div class="cs-success">
+          <div class="cs-success-seal">印</div>
+          <div class="cs-success-line">Synced.</div>
+          <div class="cs-success-sub" id="csSuccessSub">— events created in BUSHIDO 武士道</div>
+        </div>
+        <div class="cs-actions" style="justify-content:center;border-top:none;padding-top:0">
+          <button class="cs-btn primary" onclick="closeCalSync()">done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ══════════ /EXPERIMENT: CALENDAR SYNC WIZARD ══════════ -->
+
+<script>
+// ══════════ EXPERIMENT: CALENDAR SYNC + SETTINGS JS ══════════════════════════
+// Canvas-only mock state. Real version uses BUSHIDO's state.settings.kaizenTimes
+// and writes Calendar API calls instead of mocking the connect/sync.
+
+// ── Module state ─────────────────────────────────────────────────────────────
+let csKaizenTimesEnabled = false;
+let csCurrentStep = 1;
+let csConnected = false;
+let csChoice = null;
+let csChipTimes = {};      // {kaizenId: 'HH:MM'} — explicit overrides
+let csMonthlyTimes = {};   // {shokId: 'HH:MM'}
+let csHasEverSynced = false; // session var; hydrated from Firestore on auth
+let csAccessToken = null;    // OAuth access token, session-only
+let csTokenClient = null;    // Cached Google Identity Services token client
+let csCurrentCalendarId = null; // Set after sync; used by reset to delete
+let csIsSyncing = false;     // Guard against double-clicks during async work
+let csUserScrollDates = [];  // Editable Calendar Scroll annual dates: [{md, name}]
+let csScrollInited = false;  // Flag — has the auto-populate from Hiyoku run yet?
+
+// OAuth Web Client ID for the bushido-4e8ca GCP project.
+// Scope is non-sensitive (auth/calendar.app.created) — no user warning, no cap.
+const CS_OAUTH_CLIENT_ID = '904422694097-g3s8aqlf7v811q4a7058i3i710h59b8v.apps.googleusercontent.com';
+const CS_OAUTH_SCOPE = 'https://www.googleapis.com/auth/calendar.app.created';
+
+// ── Settings modal ───────────────────────────────────────────────────────────
+function openSettings(){
+  const dd = document.getElementById('avatarDropdown');
+  if(dd) dd.classList.remove('show');
+  try{
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
+    const tzEl = document.getElementById('csTzDisplay');
+    if(tzEl) tzEl.textContent = tz;
+  }catch(e){}
+  const t = document.getElementById('csKaizenToggle');
+  if(t) t.classList.toggle('on', csKaizenTimesEnabled);
+  document.getElementById('csSettingsBackdrop').classList.add('show');
+}
+function closeSettings(){
+  document.getElementById('csSettingsBackdrop').classList.remove('show');
+}
+function toggleKaizenTimes(){
+  csKaizenTimesEnabled = !csKaizenTimesEnabled;
+  const t = document.getElementById('csKaizenToggle');
+  if(t) t.classList.toggle('on', csKaizenTimesEnabled);
+}
+
+// ── Calendar Sync wizard ─────────────────────────────────────────────────────
+function openCalSync(){
+  const dd = document.getElementById('avatarDropdown');
+  if(dd) dd.classList.remove('show');
+
+  // If the user has previously completed a sync, skip the wizard and show the
+  // connected-state panel where they can re-sync or reset/disconnect.
+  if(csHasEverSynced){
+    csShowConnectedPanel();
+    document.getElementById('csWizardBackdrop').classList.add('show');
+    return;
+  }
+
+  // First-time flow — reset wizard state and show Step 1.
+  csHideConnectedPanel();
+  csCurrentStep = 1;
+  csConnected = false;
+  csChoice = null;
+  csChipTimes = {};
+  csMonthlyTimes = {};
+  document.querySelectorAll('#csWizardBackdrop .cs-step').forEach(s=>s.classList.remove('active'));
+  const first = document.querySelector('#csWizardBackdrop .cs-step[data-step="1"]');
+  if(first) first.classList.add('active');
+  csUpdateProgress();
+  const c2 = document.getElementById('csStep2Continue');
+  if(c2){ c2.disabled = true; c2.textContent = 'continue →'; }
+  const c5 = document.getElementById('csStep5Continue');
+  if(c5) c5.disabled = true;
+  document.querySelectorAll('#csWizardBackdrop .cs-choice').forEach(el=>el.classList.remove('selected'));
+  const cv = document.getElementById('csConfirmView'); if(cv) cv.style.display = 'block';
+  const sv = document.getElementById('csSuccessView'); if(sv) sv.style.display = 'none';
+  const anchor = document.getElementById('csAnchorInput'); if(anchor) anchor.value = '07:00';
+  document.getElementById('csWizardBackdrop').classList.add('show');
+}
+
+// Connected-state panel — failsafe entry. Re-sync or Reset.
+function csShowConnectedPanel(){
+  document.querySelectorAll('#csWizardBackdrop .cs-step').forEach(s=>s.classList.remove('active'));
+  const prog = document.querySelector('#csWizardBackdrop .cs-progress');
+  if(prog) prog.style.display = 'none';
+  // Hide resetting view defensively (in case a previous reset attempt left it visible).
+  const reset = document.getElementById('csResettingView');
+  if(reset) reset.style.display = 'none';
+  const panel = document.getElementById('csConnectedPanel');
+  if(panel) panel.style.display = 'block';
+  // Always start with the reset confirmation collapsed.
+  const confirmBlock = document.getElementById('csResetConfirm');
+  if(confirmBlock) confirmBlock.style.display = 'none';
+  // And clear any prior reset error message.
+  const errEl = document.getElementById('csResetError');
+  if(errEl){ errEl.textContent = ''; errEl.style.display = 'none'; }
+}
+function csHideConnectedPanel(){
+  const panel = document.getElementById('csConnectedPanel');
+  if(panel) panel.style.display = 'none';
+  const prog = document.querySelector('#csWizardBackdrop .cs-progress');
+  if(prog) prog.style.display = 'flex';
+  // Defensive: also hide the resetting view in case it was left visible
+  // from a previous session that closed mid-reset.
+  const reset = document.getElementById('csResettingView');
+  if(reset) reset.style.display = 'none';
+}
+// Show the "releasing connection" view. Hides every other panel/step so the
+// modal doesn't show stale content behind the loading kanji.
+function csShowResettingView(message){
+  const panel = document.getElementById('csConnectedPanel');
+  if(panel) panel.style.display = 'none';
+  document.querySelectorAll('#csWizardBackdrop .cs-step').forEach(s => s.classList.remove('active'));
+  const prog = document.querySelector('#csWizardBackdrop .cs-progress');
+  if(prog) prog.style.display = 'none';
+  const view = document.getElementById('csResettingView');
+  if(view) view.style.display = 'block';
+  const sub = document.getElementById('csResettingSub');
+  if(sub && message) sub.textContent = message;
+}
+function csHideResettingView(){
+  const view = document.getElementById('csResettingView');
+  if(view) view.style.display = 'none';
+}
+function csResync(){
+  // Hide the connected panel, walk through the wizard from Step 3 (we already
+  // know they're connected — no need to re-do welcome and Connect Google).
+  // KEY: preserve csChipTimes, csMonthlyTimes, the anchor input value, and
+  // csUserScrollDates — these were hydrated from Firestore on auth and
+  // represent the user's prior choices. Re-sync should start from those,
+  // not blow them away. Only csChoice resets so the user re-confirms intent.
+  csHideConnectedPanel();
+  csCurrentStep = 1;
+  csConnected = true;
+  csChoice = null;
+  document.querySelectorAll('#csWizardBackdrop .cs-step').forEach(s=>s.classList.remove('active'));
+  const c2 = document.getElementById('csStep2Continue');
+  if(c2){ c2.disabled = false; c2.textContent = 'connected · continue →'; }
+  const c5 = document.getElementById('csStep5Continue');
+  if(c5) c5.disabled = true;
+  document.querySelectorAll('#csWizardBackdrop .cs-choice').forEach(el=>el.classList.remove('selected'));
+  const cv = document.getElementById('csConfirmView'); if(cv) cv.style.display = 'block';
+  const sv = document.getElementById('csSuccessView'); if(sv) sv.style.display = 'none';
+  // Note: csAnchorInput.value is preserved — set by csLoadSyncState if there
+  // was a prior sync, otherwise the static HTML default ('07:00') stands.
+  csGotoStep(3);
+}
+function csShowResetConfirm(){
+  const confirmBlock = document.getElementById('csResetConfirm');
+  if(confirmBlock){
+    confirmBlock.style.display = 'block';
+    confirmBlock.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+function csCancelReset(){
+  const confirmBlock = document.getElementById('csResetConfirm');
+  if(confirmBlock) confirmBlock.style.display = 'none';
+}
+async function csExecuteReset(){
+  if(csIsSyncing) return; // don't reset mid-sync
+  csIsSyncing = true;
+
+  // 1. Resolve the calendar id to delete. Prefer the in-memory id from this
+  //    session; fall back to Firestore for users coming back later.
+  let calendarId = csCurrentCalendarId;
+  if(!calendarId && typeof db !== 'undefined' && typeof _currentUser !== 'undefined' && _currentUser){
+    try {
+      const doc = await db.collection('users').doc(_currentUser.uid)
+        .collection('sync').doc('calendar').get();
+      if(doc.exists){
+        const data = doc.data();
+        calendarId = data && data.calendarId;
+      }
+    } catch(e){
+      console.warn('Could not load calendarId from Firestore for reset:', e);
+    }
+  }
+
+  // 2. If we have a calendar to delete but no access token (typical on a
+  //    fresh page load — we hydrated from Firestore but never auth'd this
+  //    session), request a token now. With prompt='' Google silently issues
+  //    a new token under the existing grant; no popup, no extra consent.
+  //    Only if that fails do we surface the issue and abort the reset.
+  if(calendarId && !csAccessToken){
+    try {
+      await csRequestToken({ prompt: '' });
+    } catch(e){
+      console.warn('Could not acquire token for reset:', e);
+      csIsSyncing = false;
+      // Don't silently clear local state when the calendar is still on
+      // Google's servers — that would leave the user with an orphan calendar
+      // and no way to clean it up from BUSHIDO. Surface the problem.
+      const errCopy = 'BUSHIDO needs a fresh sign-in to delete the calendar from Google. The calendar is still in your account. Please sign in again, then try Reset.';
+      // Show via the connect-error pattern in the connected panel area.
+      // Fallback to alert() if the panel UI isn't currently rendered.
+      try {
+        let errEl = document.getElementById('csResetError');
+        if(!errEl){
+          const confirmBlock = document.getElementById('csResetConfirm');
+          if(confirmBlock){
+            errEl = document.createElement('div');
+            errEl.id = 'csResetError';
+            errEl.className = 'cs-error';
+            errEl.style.marginTop = '16px';
+            confirmBlock.appendChild(errEl);
+          }
+        }
+        if(errEl){ errEl.textContent = errCopy; errEl.style.display = 'block'; }
+        else alert(errCopy);
+      } catch(_){ alert(errCopy); }
+      return;
+    }
+  }
+
+  // From here on the user has committed; show the loading view so the
+  // button click doesn't feel dead during the multi-step async work.
+  csShowResettingView('deleting BUSHIDO 武士道 calendar from Google…');
+
+  // 3. Delete the calendar (this removes every event in one API call).
+  //    We tolerate 404 — if the user manually deleted it from Google,
+  //    we just continue with token revoke and local cleanup.
+  let deleteSucceeded = false;
+  if(calendarId && csAccessToken){
+    try {
+      await csCalApi('DELETE', `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}`);
+      deleteSucceeded = true;
+    } catch(e){
+      console.warn('Calendar delete failed (may have been removed manually):', e);
+      // Still continue — orphan calendar in Google we can't fix here, but
+      // the user has explicitly asked to disconnect, so respect that intent.
+    }
+  }
+
+  // 4. Revoke the OAuth token. Best effort — survives any single-step failure.
+  csShowResettingView('revoking access…');
+  if(csAccessToken){
+    try {
+      await fetch(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(csAccessToken)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+    } catch(e){
+      console.warn('Token revoke failed:', e);
+    }
+  }
+
+  // 5. Clear Firestore sync metadata.
+  csShowResettingView('clearing local state…');
+  if(typeof db !== 'undefined' && typeof _currentUser !== 'undefined' && _currentUser){
+    try {
+      await db.collection('users').doc(_currentUser.uid)
+        .collection('sync').doc('calendar').delete();
+    } catch(e){
+      console.warn('Sync metadata clear failed:', e);
+    }
+  }
+
+  // 6. Clear local Calendar-Sync-specific state.
+  //    Note: csKaizenTimesEnabled is NOT cleared — that's a separate practice
+  //    preference (the Settings toggle), not part of the calendar connection.
+  csHasEverSynced = false;
+  csConnected = false;
+  csChipTimes = {};
+  csMonthlyTimes = {};
+  csChoice = null;
+  csAccessToken = null;
+  csCurrentCalendarId = null;
+  csTokenClient = null;
+  // Calendar Scroll: clear user's edits AND the inited flag, so the next
+  // wizard open re-populates from HI_STATE.importantDates if they have one.
+  csUserScrollDates = [];
+  csScrollInited = false;
+
+  // 7. Clear dropdown status.
+  const status = document.getElementById('ddCalSyncStatus');
+  if(status) status.textContent = '';
+
+  csIsSyncing = false;
+  // Hide the resetting view BEFORE closing the modal so it's already in a
+  // clean state for the next open (which would show a fresh wizard).
+  csHideResettingView();
+  closeCalSync();
+}
+function closeCalSync(){
+  document.getElementById('csWizardBackdrop').classList.remove('show');
+}
+function csUpdateProgress(){
+  document.querySelectorAll('#csWizardBackdrop .cs-progress-dot').forEach(d=>{
+    const s = Number(d.dataset.step);
+    d.classList.remove('active','done');
+    if(s < csCurrentStep) d.classList.add('done');
+    else if(s === csCurrentStep) d.classList.add('active');
+  });
+}
+function csGotoStep(n){
+  const cur = document.querySelector('#csWizardBackdrop .cs-step.active');
+  if(cur) cur.classList.remove('active');
+  const next = document.querySelector(`#csWizardBackdrop .cs-step[data-step="${n}"]`);
+  if(next) next.classList.add('active');
+  csCurrentStep = n;
+  csUpdateProgress();
+  if(n === 3) csRenderWeek();
+  if(n === 6) csRenderRecap();
+  const modal = document.querySelector('#csWizardBackdrop .cs-modal');
+  if(modal) modal.scrollTo(0, 0);
+}
+function csNextStep(){ if(csCurrentStep < 6) csGotoStep(csCurrentStep + 1); }
+function csPrevStep(){ if(csCurrentStep > 1) csGotoStep(csCurrentStep - 1); }
+
+// ── Step 2: real OAuth via Google Identity Services ────────────────────────
+function csShowConnectError(message){
+  const el = document.getElementById('csConnectError');
+  if(!el) return;
+  if(message){ el.textContent = message; el.style.display = 'block'; }
+  else { el.textContent = ''; el.style.display = 'none'; }
+}
+// Promise-based token request — used by both Step 2 connect and Reset flows.
+// A fresh token client is created per request; that's the cleanest pattern
+// per Google Identity Services because the callback is single-use semantically.
+function csRequestToken(opts){
+  opts = opts || {};
+  return new Promise((resolve, reject) => {
+    if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){
+      reject(new Error('Google sign-in is still loading. Wait a moment and try again.'));
+      return;
+    }
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: CS_OAUTH_CLIENT_ID,
+      scope: CS_OAUTH_SCOPE,
+      callback: (resp) => {
+        if(resp.error){ reject(new Error(resp.error_description || resp.error)); return; }
+        csAccessToken = resp.access_token;
+        resolve(resp.access_token);
+      },
+      error_callback: (err) => {
+        reject(new Error((err && err.message) || 'cancelled'));
+      }
+    });
+    try {
+      client.requestAccessToken({ prompt: opts.prompt || '' });
+    } catch(err){
+      reject(err);
+    }
+  });
+}
+async function csConnect(){
+  csShowConnectError(null);
+  // Block Demo Mode users — without Firebase auth we can't persist sync
+  // metadata, which means they'd create orphan calendars in their Google
+  // account that BUSHIDO has no record of (Reset wouldn't be able to find
+  // them on next page load). Require a real signed-in user first.
+  if(typeof _currentUser === 'undefined' || !_currentUser){
+    csShowConnectError('Sign into BUSHIDO first (email or Google). Calendar sync needs your account so we can remember what we created.');
+    return;
+  }
+  try {
+    // First time in this session, force the consent screen so the user knows
+    // what they're agreeing to. After that, prompt='' lets Google silently
+    // issue tokens under the existing grant.
+    const promptMode = csAccessToken ? '' : 'consent';
+    await csRequestToken({ prompt: promptMode });
+    csConnected = true;
+    const btn = document.getElementById('csStep2Continue');
+    if(btn){ btn.disabled = false; btn.textContent = 'connected · continue →'; }
+    // Brief pause so the user sees the success state before auto-advancing.
+    setTimeout(()=>{ if(csCurrentStep === 2 && csConnected) csNextStep(); }, 500);
+  } catch(err){
+    csShowConnectError('Could not connect: ' + (err.message || err));
+  }
+}
+// Legacy alias kept for any stale references; safe to remove after sync.
+function csMockConnect(){ csConnect(); }
+// Initialise the token client lazily — kept for reset flow which can call
+// csRequestToken directly. Older callers using csInitTokenClient just no-op.
+function csInitTokenClient(){ return null; /* no longer used */ }
+
+// ── Step 3: Anchor + Week + Monthly + Annual ────────────────────────────────
+function csParseAnchorMin(){
+  const v = (document.getElementById('csAnchorInput')||{}).value || '07:00';
+  const parts = v.split(':').map(Number);
+  // Use isNaN, not falsy, because 0 is a legitimate hour/minute (midnight).
+  const h = isNaN(parts[0]) ? 7 : parts[0];
+  const m = isNaN(parts[1]) ? 0 : parts[1];
+  return (h * 60) + m;
+}
+function csMinToHHMM(min){
+  while(min < 0) min += 1440;
+  min %= 1440;
+  const h = String(Math.floor(min/60)).padStart(2,'0');
+  const m = String(min%60).padStart(2,'0');
+  return `${h}:${m}`;
+}
+// Returns 'fixed' (a specific slot relative to anchor) for keyword matches,
+// or 'cascade' (use the next position in the cascading sequence) otherwise.
+function csTimeBucket(text){
+  const t = (text||'').toLowerCase();
+  if(/sleep|bedtime|before bed/.test(t))        return {kind:'fixed', minsFromAnchor: 15*60};       // ~22:00
+  if(/evening prayer|wind down/.test(t))        return {kind:'fixed', minsFromAnchor: 11*60};       // ~18:00
+  if(/\bevening\b|\bnight\b/.test(t))           return {kind:'fixed', minsFromAnchor: 11*60};       // ~18:00
+  if(/dinner|supper/.test(t))                   return {kind:'fixed', minsFromAnchor: 11*60 + 30};  // ~18:30
+  if(/lunch|noon|midday/.test(t))               return {kind:'fixed', minsFromAnchor: 5*60 + 30};   // ~12:30
+  if(/afternoon/.test(t))                       return {kind:'fixed', minsFromAnchor: 7*60};        // ~14:00
+  return {kind:'cascade'};
+}
+// Pre-compute derived times for ALL kaizen items in the master list.
+// Items with explicit time-of-day keywords get fixed slots from the anchor.
+// Everything else cascades — the user's order in their kaizen list IS the
+// order of their day, so each unscheduled item is assumed ~45 min after the
+// previous unscheduled item, starting from the anchor.
+function csComputeDerivedTimes(kaizen, anchorMin){
+  const out = {};
+  let runningMin = anchorMin;
+  const CASCADE_STEP = 45;
+  kaizen.forEach((k) => {
+    const b = csTimeBucket(k.text);
+    let mins;
+    if(b.kind === 'fixed') mins = anchorMin + b.minsFromAnchor;
+    else { mins = runningMin; runningMin += CASCADE_STEP; }
+    out[k.id] = csMinToHHMM(mins);
+  });
+  return out;
+}
+function csGetKaizen(){
+  // Return state's actual array even if empty — empty means user has no daily
+  // practices, NOT that we should show DEFAULT_STATE's onboarding fixtures.
+  if(typeof state !== 'undefined' && state && Array.isArray(state.kaizen)) return state.kaizen;
+  if(typeof DEFAULT_STATE !== 'undefined' && DEFAULT_STATE && Array.isArray(DEFAULT_STATE.kaizen)) return DEFAULT_STATE.kaizen;
+  return [];
+}
+function csGetShokunin(){
+  if(typeof state !== 'undefined' && state && Array.isArray(state.shokunin)) return state.shokunin;
+  if(typeof DEFAULT_STATE !== 'undefined' && DEFAULT_STATE && Array.isArray(DEFAULT_STATE.shokunin)) return DEFAULT_STATE.shokunin;
+  return [];
+}
+// Calendar Scroll annual dates — user-editable.
+// Source priority: previous Firestore sync metadata → Hiyoku importantDates
+// → empty (user adds their own).
+// User edits in the wizard mutate csUserScrollDates directly; on sync, we
+// persist to Firestore and (for paired Hiyoku) back-write to HI_STATE.
+function csGetCalendarScroll(){
+  csEnsureScrollDates();
+  return csUserScrollDates.slice(); // return a copy so callers can't mutate
+}
+function csEnsureScrollDates(){
+  if(csScrollInited) return;
+  csScrollInited = true;
+  // If csLoadSyncState already populated from Firestore, respect that.
+  if(Array.isArray(csUserScrollDates) && csUserScrollDates.length > 0) return;
+  // Otherwise auto-populate from Hiyoku importantDates if available.
+  if(typeof HI_STATE !== 'undefined' && HI_STATE && Array.isArray(HI_STATE.importantDates) && HI_STATE.importantDates.length){
+    csUserScrollDates = HI_STATE.importantDates
+      .map(d => ({ md: d.md, name: d.name || d.label || '' }))
+      .filter(d => d.md && /^\d{2}-\d{2}$/.test(d.md));
+  } else {
+    csUserScrollDates = [];
+  }
+}
+// Snap an invalid day to the last valid day for that month.
+// Feb gets 29 to allow leap-year recurring events.
+function csClampDay(month, day){
+  const daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const max = daysInMonth[month - 1] || 31;
+  return Math.min(Math.max(1, day), max);
+}
+function csAddScrollDate(){
+  csUserScrollDates.push({ md: '01-01', name: '' });
+  csRenderCalendarScroll();
+  // Focus the new row's name input for immediate typing
+  setTimeout(() => {
+    const rows = document.querySelectorAll('#csAnnualList .cs-scroll-row');
+    const last = rows[rows.length - 1];
+    if(last){
+      const nameInput = last.querySelector('.cs-scroll-name');
+      if(nameInput) nameInput.focus();
+    }
+  }, 50);
+}
+// Escape ALL HTML special chars when rendering user-supplied strings into
+// innerHTML — name field is user input so &, <, >, " all need encoding.
+function csEscapeHtml(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function csUpdateScrollDate(idx, field, value){
+  if(idx < 0 || idx >= csUserScrollDates.length) return;
+  const d = csUserScrollDates[idx];
+  let parts = (d.md || '01-01').split('-');
+  let mo = Number(parts[0]) || 1;
+  let da = Number(parts[1]) || 1;
+  if(field === 'month'){
+    mo = Number(value) || 1;
+    const newDa = csClampDay(mo, da);
+    const dayWasClamped = (newDa !== da);
+    da = newDa;
+    d.md = `${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+    // SURGICAL update — only this row's day dropdown options regenerate.
+    // No full re-render = focus stays where the user put it AND we can
+    // visually flash the day cell when its value was auto-adjusted by the
+    // month change (so the change isn't silent).
+    csUpdateRowDayDropdown(idx, mo, da, dayWasClamped);
+    return;
+  } else if(field === 'day'){
+    da = csClampDay(mo, Number(value) || 1);
+  } else if(field === 'name'){
+    d.name = value;
+    return; // no md update, no re-render — preserve focus while typing
+  }
+  d.md = `${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+}
+function csUpdateRowDayDropdown(idx, mo, currentDay, flash){
+  const row = document.querySelector(`#csAnnualList .cs-scroll-row[data-idx="${idx}"]`);
+  if(!row) return;
+  const daySelect = row.querySelector('.cs-scroll-day');
+  if(!daySelect) return;
+  const maxDay = csClampDay(mo, 31);
+  let dayOpts = '';
+  for(let i = 1; i <= maxDay; i++){
+    dayOpts += `<option value="${i}"${i===currentDay?' selected':''}>${i}</option>`;
+  }
+  daySelect.innerHTML = dayOpts;
+  daySelect.value = String(currentDay);
+  if(flash){
+    // Brief red-tinted pulse so the user sees their day got auto-adjusted
+    // (e.g., March 31 → February clamped to 29). Self-clears after 1s.
+    daySelect.classList.add('cs-day-adjusted');
+    setTimeout(() => daySelect.classList.remove('cs-day-adjusted'), 1000);
+  }
+}
+function csDeleteScrollDate(idx){
+  if(idx < 0 || idx >= csUserScrollDates.length) return;
+  csUserScrollDates.splice(idx, 1);
+  csRenderCalendarScroll();
+}
+const CS_MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function csRenderScrollRow(idx, mo, da, name){
+  let monthOpts = '';
+  for(let i = 1; i <= 12; i++){
+    monthOpts += `<option value="${i}"${i===mo?' selected':''}>${CS_MONTH_NAMES[i-1]}</option>`;
+  }
+  let dayOpts = '';
+  const maxDay = csClampDay(mo, 31); // 28-31 depending on month
+  for(let i = 1; i <= maxDay; i++){
+    dayOpts += `<option value="${i}"${i===da?' selected':''}>${i}</option>`;
+  }
+  const safeName = csEscapeHtml(name);
+  return `<div class="cs-scroll-row" data-idx="${idx}">
+    <select class="cs-scroll-month" onchange="csUpdateScrollDate(${idx}, 'month', this.value)">${monthOpts}</select>
+    <select class="cs-scroll-day" onchange="csUpdateScrollDate(${idx}, 'day', this.value)">${dayOpts}</select>
+    <input type="text" class="cs-scroll-name" value="${safeName}"
+      placeholder="anniversary, birthday, milestone&hellip;"
+      oninput="csUpdateScrollDate(${idx}, 'name', this.value)" />
+    <button class="cs-scroll-delete" onclick="csDeleteScrollDate(${idx})" aria-label="Delete date" title="Remove this date">&times;</button>
+  </div>`;
+}
+function csRenderCalendarScroll(){
+  const annualDiv = document.getElementById('csAnnualList');
+  const annualSection = document.getElementById('csAnnualSection');
+  if(!annualDiv || !annualSection) return;
+  csEnsureScrollDates();
+  annualSection.style.display = 'block';
+  let html = '';
+  if(csUserScrollDates.length === 0){
+    html += `<div class="cs-scroll-empty">No annual dates yet. Add anniversaries, birthdays, or any date that matters.</div>`;
+  } else {
+    csUserScrollDates.forEach((d, idx) => {
+      const parts = (d.md || '01-01').split('-');
+      const mo = Number(parts[0]) || 1;
+      const da = Number(parts[1]) || 1;
+      html += csRenderScrollRow(idx, mo, da, d.name);
+    });
+  }
+  html += `<button class="cs-scroll-add" onclick="csAddScrollDate()">+ add date</button>`;
+  annualDiv.innerHTML = html;
+}
+function csKaizenRunsOnDay(k, dayIdx){
+  // dayIdx: 0=Mon ... 6=Sun
+  if(k.days === 'daily') return true;
+  if(Array.isArray(k.days)) return k.days.includes(dayIdx);
+  return false;
+}
+function csRenderWeek(){
+  const grid = document.getElementById('csWeekGrid');
+  if(!grid) return;
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const anchorMin = csParseAnchorMin();
+  const kaizen = csGetKaizen();
+  // Precompute cascading derived times for the whole kaizen list ONCE per render.
+  // This way the same habit shows the same time across every day it runs.
+  const derived = csComputeDerivedTimes(kaizen, anchorMin);
+  let html = '';
+  days.forEach((day, idx)=>{
+    html += `<div class="cs-week-day"><div class="cs-week-day-label">${day}</div>`;
+    kaizen.forEach(k=>{
+      if(csKaizenRunsOnDay(k, idx)){
+        const time = csChipTimes[k.id] || derived[k.id];
+        const short = (k.text||'').length > 22 ? (k.text.substring(0,21)+'…') : k.text;
+        const titleAttr = (k.text||'').replace(/"/g,'&quot;');
+        html += `<div class="cs-chip" title="${titleAttr}">
+          <input type="time" class="cs-chip-time-input" data-kid="${k.id}" value="${time}" onchange="csChipChanged(${k.id}, this.value)" />
+          <span class="cs-chip-text">${short}</span>
+        </div>`;
+      }
+    });
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+
+  // Weekly + Monthly Shokunin (combined section)
+  const shokunin = csGetShokunin();
+  const weekly  = shokunin.filter(s => (s.timeframe||'').toLowerCase() === 'weekly');
+  const monthly = shokunin.filter(s => (s.timeframe||'').toLowerCase() === 'monthly');
+  const monthlyDiv = document.getElementById('csMonthlyList');
+  const monthlySection = document.getElementById('csMonthlySection');
+  if(monthlyDiv && monthlySection){
+    if(weekly.length === 0 && monthly.length === 0){
+      monthlySection.style.display = 'none';
+    } else {
+      monthlySection.style.display = 'block';
+      let mhtml = '';
+      weekly.forEach(s=>{
+        const t = csMonthlyTimes[s.id] || csMinToHHMM(anchorMin + 4*60);
+        const short = (s.text||'').length > 70 ? (s.text.substring(0,69)+'…') : s.text;
+        mhtml += `<div class="cs-list-row">
+          <span class="cs-list-row-meta">Weekly</span>
+          <span class="cs-list-row-text">${short}</span>
+          <input type="time" value="${t}" onchange="csMonthlyTimeChanged(${s.id}, this.value)" />
+        </div>`;
+      });
+      monthly.forEach(s=>{
+        const t = csMonthlyTimes[s.id] || csMinToHHMM(anchorMin + 2*60);
+        const short = (s.text||'').length > 70 ? (s.text.substring(0,69)+'…') : s.text;
+        mhtml += `<div class="cs-list-row">
+          <span class="cs-list-row-meta">Monthly</span>
+          <span class="cs-list-row-text">${short}</span>
+          <input type="time" value="${t}" onchange="csMonthlyTimeChanged(${s.id}, this.value)" />
+        </div>`;
+      });
+      monthlyDiv.innerHTML = mhtml;
+    }
+  }
+
+  // Calendar Scroll — editable. Rendered by its own helper for granular updates.
+  csRenderCalendarScroll();
+}
+function csAnchorChanged(){ csRenderWeek(); }
+function csChipChanged(kaizenId, value){
+  if(!/^\d{2}:\d{2}$/.test(value)) return;
+  csChipTimes[kaizenId] = value;
+  // The same habit may appear on multiple weekdays. Sync all instances of this
+  // kaizen id so every chip across the week reflects the new time. We update
+  // input values directly rather than re-rendering, to avoid a visible flash
+  // and to preserve focus / scroll position.
+  document.querySelectorAll(`#csWeekGrid .cs-chip-time-input[data-kid="${kaizenId}"]`).forEach(el=>{
+    if(el.value !== value) el.value = value;
+  });
+}
+function csMonthlyTimeChanged(shokId, value){
+  csMonthlyTimes[shokId] = value;
+}
+
+// ── Step 5: branching choice ────────────────────────────────────────────────
+function csSelectChoice(choice){
+  csChoice = choice;
+  document.querySelectorAll('#csWizardBackdrop .cs-choice').forEach(el=>el.classList.remove('selected'));
+  const sel = document.getElementById(choice === 'save' ? 'csChoiceSave' : 'csChoiceCal');
+  if(sel) sel.classList.add('selected');
+  const btn = document.getElementById('csStep5Continue');
+  if(btn) btn.disabled = false;
+}
+
+// ── Step 6: confirm + success ──────────────────────────────────────────────
+function csCountEvents(){
+  return csGetKaizen().length + csGetShokunin().length;
+}
+// Map reminder dropdown's minutes value to a short readable label.
+function csReminderLabel(minutes){
+  const n = Number(minutes);
+  if(n < 0)   return 'off';
+  if(n === 0) return 'at time';
+  if(n < 60)  return `${n}m before`;
+  if(n === 60) return '1h before';
+  if(n < 1440) return `${n/60}h before`;
+  if(n === 1440) return '1d before';
+  if(n < 10080) return `${n/1440}d before`;
+  return '1w before';
+}
+function csRenderRecap(){
+  const ev = csCountEvents();
+  const annual = csGetCalendarScroll().length;
+  const evEl = document.getElementById('csRecapEvents');
+  const anEl = document.getElementById('csRecapAnnual');
+  const svEl = document.getElementById('csRecapSave');
+  const remEl = document.getElementById('csRecapReminders');
+  if(evEl) evEl.textContent = `${ev} recurring event${ev===1?'':'s'}`;
+  if(anEl) anEl.textContent = `${annual} annual event${annual===1?'':'s'}`;
+  if(svEl) svEl.textContent = csChoice === 'save' ? 'yes — to my practice' : 'calendar only';
+  if(remEl){
+    const k  = csReminderLabel((document.getElementById('csReminderKaizen')||{}).value);
+    const sk = csReminderLabel((document.getElementById('csReminderShokunin')||{}).value);
+    const sc = csReminderLabel((document.getElementById('csReminderScroll')||{}).value);
+    remEl.textContent = `daily ${k} · weekly ${sk} · scroll ${sc}`;
+  }
+}
+// ── Step 6 helpers — view switching ────────────────────────────────────────
+function csShowSyncingView(message){
+  document.getElementById('csConfirmView').style.display = 'none';
+  document.getElementById('csErrorView').style.display = 'none';
+  document.getElementById('csSuccessView').style.display = 'none';
+  const v = document.getElementById('csSyncingView');
+  if(v) v.style.display = 'block';
+  const sub = document.getElementById('csSyncingSub');
+  if(sub && message) sub.textContent = message;
+}
+function csShowErrorView(message){
+  document.getElementById('csConfirmView').style.display = 'none';
+  document.getElementById('csSyncingView').style.display = 'none';
+  document.getElementById('csSuccessView').style.display = 'none';
+  const v = document.getElementById('csErrorView');
+  if(v) v.style.display = 'block';
+  const m = document.getElementById('csErrorMessage');
+  if(m) m.textContent = message;
+}
+function csShowSuccessView(eventCount, failedCount){
+  document.getElementById('csConfirmView').style.display = 'none';
+  document.getElementById('csSyncingView').style.display = 'none';
+  document.getElementById('csErrorView').style.display = 'none';
+  const v = document.getElementById('csSuccessView');
+  if(v) v.style.display = 'block';
+  const sub = document.getElementById('csSuccessSub');
+  if(sub){
+    if(failedCount && failedCount > 0){
+      const total = eventCount + failedCount;
+      sub.textContent = `${eventCount} of ${total} events created — ${failedCount} failed (open browser console for details)`;
+    } else {
+      sub.textContent = `${eventCount} event${eventCount===1?'':'s'} created in BUSHIDO 武士道`;
+    }
+  }
+}
+
+// ── Calendar API helpers ────────────────────────────────────────────────────
+// Convert BUSHIDO days array (0=Mon..6=Sun) to a Calendar API RRULE string.
+function csDaysToRRule(days){
+  if(days === 'daily' || days == null) return 'RRULE:FREQ=DAILY';
+  if(!Array.isArray(days) || days.length === 0) return null;
+  const map = ['MO','TU','WE','TH','FR','SA','SU'];
+  const codes = days.map(d => map[d]).filter(Boolean);
+  if(codes.length === 0) return null;
+  return `RRULE:FREQ=WEEKLY;BYDAY=${codes.join(',')}`;
+}
+// Returns the next Date that matches the habit's days array, with the chosen time.
+function csNextOccurrenceDate(days, h, m){
+  const now = new Date();
+  if(days === 'daily' || days == null){
+    const d = new Date(now);
+    d.setHours(h, m, 0, 0);
+    if(d < now) d.setDate(d.getDate() + 1); // already passed today → start tomorrow
+    return d;
+  }
+  if(!Array.isArray(days)) { const d=new Date(now); d.setHours(h,m,0,0); return d; }
+  // JS getDay(): 0=Sun..6=Sat. BUSHIDO: 0=Mon..6=Sun. Convert.
+  for(let i = 0; i < 14; i++){
+    const candidate = new Date(now);
+    candidate.setDate(now.getDate() + i);
+    candidate.setHours(h, m, 0, 0);
+    const bushidoDay = (candidate.getDay() + 6) % 7;
+    if(days.includes(bushidoDay) && candidate > now) return candidate;
+  }
+  // Fallback: today at the chosen time
+  const fb = new Date(now); fb.setHours(h, m, 0, 0);
+  return fb;
+}
+// Calendar API expects dateTime in YYYY-MM-DDTHH:mm:ss with explicit timeZone field.
+function csToLocalISO(date){
+  const pad = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}` +
+         `T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+}
+function csReminderValueOf(selectId){
+  const el = document.getElementById(selectId);
+  if(!el) return -1;
+  const n = Number(el.value);
+  return isNaN(n) ? -1 : n;
+}
+function csReminderOverrides(reminderMins){
+  if(reminderMins < 0) return [];           // user picked "no reminder"
+  return [{ method: 'popup', minutes: reminderMins }];
+}
+function csBuildTimedEvent(summary, startDate, durationMin, tz, rrule, reminderMins){
+  const endDate = new Date(startDate);
+  endDate.setMinutes(endDate.getMinutes() + durationMin);
+  return {
+    summary,
+    start: { dateTime: csToLocalISO(startDate), timeZone: tz },
+    end:   { dateTime: csToLocalISO(endDate),   timeZone: tz },
+    recurrence: [rrule],
+    reminders: { useDefault: false, overrides: csReminderOverrides(reminderMins) }
+  };
+}
+function csBuildAllDayAnnualEvent(summary, mmdd, reminderMins){
+  const [mo, da] = mmdd.split('-').map(Number);
+  const today = new Date();
+  let year = today.getFullYear();
+  const candidate = new Date(year, mo-1, da);
+  if(candidate < today) year += 1; // already passed this year → next year
+  const start = `${year}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+  const endDate = new Date(year, mo-1, da+1);
+  const end = `${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2,'0')}-${String(endDate.getDate()).padStart(2,'0')}`;
+  return {
+    summary,
+    start: { date: start },
+    end:   { date: end },
+    recurrence: ['RRULE:FREQ=YEARLY'],
+    reminders: { useDefault: false, overrides: csReminderOverrides(reminderMins) }
+  };
+}
+function csBuildEventList(){
+  const events = [];
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+  const anchorMin = csParseAnchorMin();
+  const kaizen = csGetKaizen();
+  const shokunin = csGetShokunin();
+  const annual = csGetCalendarScroll();
+  const derived = csComputeDerivedTimes(kaizen, anchorMin);
+
+  const remKaizen = csReminderValueOf('csReminderKaizen');
+  const remShok   = csReminderValueOf('csReminderShokunin');
+  const remScroll = csReminderValueOf('csReminderScroll');
+
+  // Kaizen → recurring events with daily or weekly RRULE
+  kaizen.forEach(k => {
+    const time = csChipTimes[k.id] || derived[k.id];
+    if(!time) return;
+    const [h, m] = time.split(':').map(Number);
+    if(isNaN(h) || isNaN(m)) return;
+    const rrule = csDaysToRRule(k.days);
+    if(!rrule) return;
+    const start = csNextOccurrenceDate(k.days, h, m);
+    events.push(csBuildTimedEvent(k.text || '(untitled)', start, 30, tz, rrule, remKaizen));
+  });
+
+  // Shokunin → weekly or monthly recurring events
+  shokunin.forEach(s => {
+    const tf = (s.timeframe || '').toLowerCase();
+    let rrule;
+    if(tf === 'weekly') rrule = 'RRULE:FREQ=WEEKLY';
+    else if(tf === 'monthly') rrule = 'RRULE:FREQ=MONTHLY';
+    else return; // skip unknown timeframes (quarterly, etc.) for now
+    const time = csMonthlyTimes[s.id] || csMinToHHMM(anchorMin + (tf === 'weekly' ? 4*60 : 2*60));
+    const [h, m] = time.split(':').map(Number);
+    if(isNaN(h) || isNaN(m)) return;
+    const start = csNextOccurrenceDate(null, h, m);
+    events.push(csBuildTimedEvent(s.text || '(untitled)', start, 60, tz, rrule, remShok));
+  });
+
+  // Calendar Scroll → all-day annual events
+  annual.forEach(a => {
+    if(!a.md || !a.name) return;
+    if(!/^\d{2}-\d{2}$/.test(a.md)) return;
+    events.push(csBuildAllDayAnnualEvent(a.name, a.md, remScroll));
+  });
+
+  return events;
+}
+async function csCalApi(method, url, body){
+  const opts = {
+    method,
+    headers: { 'Authorization': 'Bearer ' + csAccessToken }
+  };
+  if(body){
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(url, opts);
+  if(!res.ok){
+    const errText = await res.text().catch(()=>'(no body)');
+    throw new Error(`${method} ${url.replace(/^https:\/\/www\.googleapis\.com/,'')} → ${res.status}: ${errText.substring(0, 240)}`);
+  }
+  // 204 No Content (e.g. DELETE) → no body
+  if(res.status === 204) return null;
+  return await res.json();
+}
+
+// ── Step 6: real Calendar API sync ─────────────────────────────────────────
+async function csConfirmSync(){
+  if(csIsSyncing) return; // guard against double-click
+  if(!csAccessToken){
+    csShowErrorView('You aren\'t connected to Google. Go back a step and reconnect.');
+    return;
+  }
+  csIsSyncing = true;
+  csShowSyncingView('creating BUSHIDO 武士道 calendar…');
+
+  try {
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+
+    // 1. Create the dedicated BUSHIDO calendar in Google.
+    const calData = await csCalApi('POST', 'https://www.googleapis.com/calendar/v3/calendars', {
+      summary: 'BUSHIDO 武士道',
+      description: 'Your daily practice, lived where your day already is. Created by BUSHIDO.',
+      timeZone: tz
+    });
+    const calendarId = calData.id;
+    csCurrentCalendarId = calendarId;
+
+    // 1b. Prune empty-name scroll dates BEFORE building the event list.
+    //     Empty names get filtered later in csBuildAllDayAnnualEvent anyway,
+    //     but pruning the in-memory array keeps Firestore + HI_STATE clean
+    //     and prevents stale empty rows showing up on next session.
+    csUserScrollDates = csUserScrollDates.filter(d =>
+      d && d.md && /^\d{2}-\d{2}$/.test(d.md) && d.name && d.name.trim()
+    );
+
+    // 2. Build the event list and post each one.
+    const events = csBuildEventList();
+    csShowSyncingView(`creating ${events.length} event${events.length===1?'':'s'}…`);
+
+    const eventIds = [];
+    const failedEvents = [];
+    const eventsBase = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`;
+    for(const ev of events){
+      try {
+        const created = await csCalApi('POST', eventsBase, ev);
+        if(created && created.id) eventIds.push(created.id);
+        else failedEvents.push({ summary: ev.summary, reason: 'no id returned' });
+      } catch(eventErr){
+        // Partial success is better than none — log and continue.
+        console.warn('Event creation failed for:', ev.summary, eventErr);
+        failedEvents.push({ summary: ev.summary, reason: (eventErr && eventErr.message) || String(eventErr) });
+      }
+    }
+
+    // 3. Persist sync metadata to Firestore (if logged in).
+    //    This is the source of truth for csHasEverSynced across reloads.
+    if(typeof db !== 'undefined' && typeof _currentUser !== 'undefined' && _currentUser){
+      try {
+        await db.collection('users').doc(_currentUser.uid)
+          .collection('sync').doc('calendar').set({
+            calendarId,
+            eventIds,
+            lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            anchorMin: csParseAnchorMin(),
+            chipTimes: csChipTimes,
+            monthlyTimes: csMonthlyTimes,
+            choice: csChoice,
+            scrollDates: csUserScrollDates.slice(),
+            reminders: {
+              kaizen:   csReminderValueOf('csReminderKaizen'),
+              shokunin: csReminderValueOf('csReminderShokunin'),
+              scroll:   csReminderValueOf('csReminderScroll')
+            }
+          }, { merge: false });
+      } catch(fsErr){
+        console.warn('Sync metadata save failed (calendar still created):', fsErr);
+      }
+    }
+
+    // 3b. Back-write Calendar Scroll edits to HI_STATE.importantDates so the
+    //     partner sees the same dates in their My Hiyoku tab. Best-effort —
+    //     only runs for paired Hiyoku users.
+    //
+    //     Identity matching is two-stage to preserve ids + tags through
+    //     edits:
+    //       1. Exact match (md + name) — unchanged entries keep everything.
+    //       2. md-only match — renamed entries keep id + tag, just update
+    //          the name. Without this, every rename would generate a new
+    //          id and default the tag, losing partner-side notes/links.
+    //       3. No match — genuinely new entry, new id with default tag.
+    try {
+      if(typeof HI_STATE !== 'undefined' && HI_STATE && Array.isArray(HI_STATE.importantDates)){
+        const byMdName = new Map();
+        const byMd     = new Map();
+        HI_STATE.importantDates.forEach(d => {
+          if(!d || !d.md) return;
+          if(d.name) byMdName.set(`${d.md}|${d.name}`, d);
+          // First entry on a given md wins for the rename-fallback lookup.
+          if(!byMd.has(d.md)) byMd.set(d.md, d);
+        });
+        HI_STATE.importantDates = csUserScrollDates
+          .filter(d => d && d.md)
+          .map(d => {
+            const exact = byMdName.get(`${d.md}|${d.name}`);
+            if(exact) return exact;                    // unchanged
+            const sameMd = byMd.get(d.md);
+            if(sameMd) return { ...sameMd, name: d.name }; // rename — keep id+tag
+            return {                                    // genuinely new
+              id: 'cs_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+              md: d.md,
+              name: d.name,
+              tag: 'milestone'
+            };
+          });
+        // Push to cloud so the partner sees the change in their Hiyoku.
+        if(typeof hiPushToCloud === 'function') hiPushToCloud();
+      }
+    } catch(hiErr){
+      console.warn('Hiyoku importantDates back-write failed (calendar still synced):', hiErr);
+    }
+
+    // 4. Apply the practice-level setting if the user chose to save times.
+    if(csChoice === 'save') csKaizenTimesEnabled = true;
+
+    // 5. Mark connected and update dropdown so future opens land on connected panel.
+    csHasEverSynced = true;
+    const status = document.getElementById('ddCalSyncStatus');
+    if(status) status.textContent = '· connected';
+
+    // 6. Show success — surface partial-failure count if any events failed.
+    csShowSuccessView(eventIds.length, failedEvents.length);
+
+  } catch(err){
+    console.error('Calendar sync error:', err);
+    csShowErrorView('Sync failed: ' + (err && err.message ? err.message : String(err)) +
+                    '\n\nNothing was changed in your Google Calendar. You can try again or go back.');
+  } finally {
+    csIsSyncing = false;
+  }
+}
+
+// ── Hydrate sync state from Firestore on auth ──────────────────────────────
+// Called from the onAuthStateChanged listener once `_currentUser` is set.
+// If the user has a previous sync metadata doc, mark them as connected so
+// the next 暦 click goes straight to the connected-state panel.
+async function csLoadSyncState(user){
+  if(!user || typeof db === 'undefined') return;
+  try {
+    const doc = await db.collection('users').doc(user.uid)
+      .collection('sync').doc('calendar').get();
+    if(doc.exists){
+      const data = doc.data();
+      if(data && data.calendarId){
+        csHasEverSynced = true;
+        csCurrentCalendarId = data.calendarId;
+        // Hydrate user's Calendar Scroll edits from previous sync.
+        if(Array.isArray(data.scrollDates)){
+          csUserScrollDates = data.scrollDates
+            .map(d => ({ md: d.md, name: d.name || '' }))
+            .filter(d => d.md && /^\d{2}-\d{2}$/.test(d.md));
+          csScrollInited = true; // don't override with Hiyoku state on first render
+        }
+        // Hydrate other prior wizard choices so Re-sync starts where they left off.
+        if(data.chipTimes && typeof data.chipTimes === 'object') csChipTimes = data.chipTimes;
+        if(data.monthlyTimes && typeof data.monthlyTimes === 'object') csMonthlyTimes = data.monthlyTimes;
+        if(typeof data.anchorMin === 'number'){
+          const h = Math.floor(data.anchorMin / 60);
+          const m = data.anchorMin % 60;
+          const anchorInput = document.getElementById('csAnchorInput');
+          if(anchorInput){
+            anchorInput.value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+          }
+        }
+        const status = document.getElementById('ddCalSyncStatus');
+        if(status) status.textContent = '· connected';
+      }
+    } else {
+      // No sync metadata — make sure we don't show stale "connected" status
+      // from a previous session.
+      csHasEverSynced = false;
+      csCurrentCalendarId = null;
+      const status = document.getElementById('ddCalSyncStatus');
+      if(status) status.textContent = '';
+    }
+  } catch(err){
+    console.warn('Could not hydrate Calendar Sync state from Firestore:', err);
+  }
+}
+
+// Esc closes whichever Calendar Sync / Settings modal is open. Wizard takes
+// precedence if somehow both are showing (shouldn't happen by normal user
+// flow, but covers programmatic edge cases).
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  const wiz = document.getElementById('csWizardBackdrop');
+  const set = document.getElementById('csSettingsBackdrop');
+  if(wiz && wiz.classList.contains('show')){ closeCalSync(); return; }
+  if(set && set.classList.contains('show')){ closeSettings(); return; }
+});
+
+// ══════════ /EXPERIMENT: CALENDAR SYNC + SETTINGS JS
+</script>
 
 </body>
 </html>
