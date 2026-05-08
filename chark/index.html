@@ -2071,6 +2071,26 @@ li.goal.hd-open .habit-detail{display:block}
 }
 
 /* /EXPERIMENT: CALENDAR SYNC + SETTINGS */
+/* Subtle red accent on the user's own card so it's findable at a glance
+   without being loud — matches the BUSHIDO red used elsewhere for accents. */
+.clan-card.is-own{border-color:rgba(204,53,41,.3);box-shadow:0 0 0 1px rgba(204,53,41,.12)}
+.clan-card.shinobi.is-own{border-color:rgba(204,53,41,.4)}
+.clan-you-badge{display:inline-block;margin-left:8px;padding:2px 8px;
+  font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;background:var(--red);color:var(--white);
+  border-radius:2px;vertical-align:middle;font-weight:700}
+.clan-card.shinobi .clan-you-badge{background:rgba(204,53,41,.85);color:rgba(254,252,248,.95)}
+/* Practice continuance milestone seal — kanji shown beside member name on
+   clan cards and exp-rows. Color set inline from PRACTICE_MILESTONES.col
+   (or .light for shinobi cards). */
+.clan-member-name .clan-milestone-seal{display:inline-block;margin-left:9px;
+  font-family:'Noto Serif JP',serif;font-size:18px;font-weight:400;
+  vertical-align:middle;line-height:1;opacity:.9;letter-spacing:0}
+.clan-exp-name + .clan-milestone-seal,
+.clan-exp-name .clan-milestone-seal,
+#clan-my-milestone-seal .clan-milestone-seal{display:inline-block;margin-left:6px;
+  font-family:'Noto Serif JP',serif;font-size:13px;
+  vertical-align:middle;line-height:1;opacity:.85}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -3945,6 +3965,22 @@ function updateClanMomentum(){
   const mt=document.getElementById('clan-my-today');
   const mb=document.getElementById('clan-my-bars');
   if(!ms||!mt||!mb) return;
+  // Refresh own Active Warriors card so seals, today's count, and strand
+  // rates stay live as the user ticks habits and seals reflections — without
+  // waiting for the 5-minute clan poll. Inexpensive: just rebuilds card HTML.
+  if(typeof renderClanCards === 'function') renderClanCards();
+  // Update the milestone seal in James's static exp-row at the top of My Clan
+  // tab. Seal lights immediately when a new continuance milestone is earned.
+  const milestoneSlot = document.getElementById('clan-my-milestone-seal');
+  if(milestoneSlot && typeof renderMilestoneSeal === 'function' && typeof PRACTICE_MILESTONES !== 'undefined'){
+    let highest = 0;
+    if(state.practiceStamps){
+      PRACTICE_MILESTONES.forEach(function(m){
+        if(state.practiceStamps['ps-'+m.days] && m.days > highest) highest = m.days;
+      });
+    }
+    milestoneSlot.innerHTML = renderMilestoneSeal({practiceMilestoneDays: highest}, false);
+  }
   const mn=document.getElementById('clan-my-name');
   if(mn) mn.textContent=state.name||'You';
   const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
@@ -4771,6 +4807,9 @@ function saveReflection(type){
   if(!state.reflections) state.reflections=[];
   state.reflections.push(entry);
   saveState();
+  // Refresh own clan card so the 週/月 seal lights up immediately rather
+  // than waiting for the next kaizen tick or tab change to trigger render.
+  if(typeof renderClanCards === 'function') renderClanCards();
   if(type==='annual'){
     // Pivot moment — seal transitions into EOY review invitation
     c.innerHTML=`<div style="text-align:center;padding:48px 0">
@@ -5902,47 +5941,70 @@ function computeStrandRates(){
   return rates;
 }
 
+// Build the data shape that goes into /clan/{uid} \u2014 used by both
+// writeClanSummary (to push to Firestore) and renderClanCards (to render
+// the user's own card without a Firestore round-trip). Single source of
+// truth so the user's own card matches exactly what others see.
+function buildOwnClanData(){
+  var isShinobi = _visMode === 'shinobi';
+  var maxStreak = state.kaizen && state.kaizen.length
+    ? Math.max.apply(null, state.kaizen.map(function(k){return k.streak||0;}))
+    : 0;
+  var weekDays = computeWeekRates();
+  var tidx = (new Date().getDay()+6)%7;
+  var wStart = getWeekStart(0);
+  var wStartStr = getDateStr(wStart);
+  var wEnd = new Date(wStart); wEnd.setDate(wStart.getDate()+6);
+  var wEndStr = getDateStr(wEnd);
+  var nowDate = new Date();
+  var mStr = nowDate.getFullYear()+'-'+((nowDate.getMonth()+1)<10?'0':'')+(nowDate.getMonth()+1);
+  var weekReflect  = (state.reflections||[]).some(function(r){return r.type==='weekly' && r.date>=wStartStr && r.date<=wEndStr;});
+  var monthReflect = (state.reflections||[]).some(function(r){return r.type==='monthly' && r.date && r.date.startsWith(mStr);});
+  var todayHabits = (state.kaizen||[]).filter(function(k){return habitOnDay(k, tidx);});
+  var todayDone = todayHabits.filter(function(k){return k.done;}).length;
+  var ni = document.getElementById('clan-name-input');
+  var clanName = (ni && ni.value.trim()) || state.clanName || 'McKitrick Clan';
+  // Highest earned practice continuance milestone (Continuance/Tempering/
+  // Forging/.../The Way). Surfaced on the clan card next to the user's
+  // name so other members see the achievement. Just the days threshold —
+  // the renderer looks up the kanji/name/colour from PRACTICE_MILESTONES
+  // locally, keeping the Firestore doc lean.
+  var highestMilestoneDays = 0;
+  if(typeof PRACTICE_MILESTONES !== 'undefined' && state.practiceStamps){
+    PRACTICE_MILESTONES.forEach(function(m){
+      if(state.practiceStamps['ps-' + m.days] && m.days > highestMilestoneDays){
+        highestMilestoneDays = m.days;
+      }
+    });
+  }
+  return {
+    name:       state.name || 'Warrior',
+    streak:     maxStreak,
+    todayRate:  weekDays[tidx] || 0,
+    weekDays:   weekDays,
+    clanName:   clanName,
+    shinobi:    isShinobi,
+    todayDone:  todayDone,
+    todayTotal: todayHabits.length,
+    habitCount: (state.kaizen||[]).length,
+    strands:    (state.strands||[]).slice(0,5),
+    strandRates: isShinobi ? [] : computeStrandRates(),
+    crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
+    goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
+    weekReflect: weekReflect,
+    monthReflect: monthReflect,
+    practiceMilestoneDays: highestMilestoneDays
+  };
+}
+
 // Write a compact summary of this user's progress to /clan/{uid}
 // Called on every saveStateToFirestore() and on first sign-in.
 async function writeClanSummary(user){
   if(!FIREBASE_CONFIGURED||!user) return;
-  var isShinobi=_visMode==='shinobi';
   try{
-    var maxStreak=state.kaizen&&state.kaizen.length
-      ? Math.max.apply(null,state.kaizen.map(function(k){return k.streak||0;}))
-      : 0;
-    var weekDays=computeWeekRates();
-    var tidx=(new Date().getDay()+6)%7;
-    var today=getDateStr(new Date());
-    var wStart=getWeekStart(0);
-    var wStartStr=getDateStr(wStart);
-    var wEnd=new Date(wStart);wEnd.setDate(wStart.getDate()+6);var wEndStr=getDateStr(wEnd);
-    var nowDate=new Date();var mStr=nowDate.getFullYear()+'-'+((nowDate.getMonth()+1)<10?'0':'')+(nowDate.getMonth()+1);
-    var weekReflect=(state.reflections||[]).some(function(r){return r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr;});
-    var monthReflect=(state.reflections||[]).some(function(r){return r.type==='monthly'&&r.date&&r.date.startsWith(mStr);});
-    var todayIdx2=(new Date().getDay()+6)%7;
-    var todayHabits=state.kaizen.filter(function(k){return habitOnDay(k,todayIdx2);});
-    var todayDone=todayHabits.filter(function(k){return k.done;}).length;
-    var ni=document.getElementById('clan-name-input');
-    var clanName=(ni&&ni.value.trim())||state.clanName||'McKitrick Clan';
-    await db.collection('clan').doc(user.uid).set({
-      name:       state.name||'Warrior',
-      streak:     maxStreak,
-      todayRate:  weekDays[tidx]||0,
-      weekDays:   weekDays,
-      clanName:   clanName,
-      shinobi:    isShinobi,
-      todayDone:  todayDone,
-      todayTotal: todayHabits.length,
-      habitCount: state.kaizen.length,
-      strands:    (state.strands||[]).slice(0,5),
-      strandRates: isShinobi?[]:computeStrandRates(),
-      crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
-      goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
-      weekReflect: weekReflect,
-      monthReflect: monthReflect,
-      updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
-    });
+    var data = buildOwnClanData();
+    data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    await db.collection('clan').doc(user.uid).set(data);
   }catch(e){ console.warn('Clan write failed:',e); }
 }
 
@@ -5981,7 +6043,7 @@ function renderClanRows(){
   var members=[];
   Object.keys(_clanCache).forEach(function(uid){
     var d=_clanCache[uid];
-    if(d) members.push({name:d.name,streak:d.streak||0,todayRate:d.todayRate||0,weekDays:d.weekDays||[0,0,0,0,0,0,0],isYou:false});
+    if(d) members.push({name:d.name,streak:d.streak||0,todayRate:d.todayRate||0,weekDays:d.weekDays||[0,0,0,0,0,0,0],practiceMilestoneDays:d.practiceMilestoneDays||0,isYou:false});
   });
 
   // Sort cache members by streak descending
@@ -6017,7 +6079,7 @@ function renderClanRows(){
     var todayStr=tTotal>0?(tDone+'/'+tTotal):(tDone||'—');
     return '<div class="clan-exp-row">'
       +'<div><div class="clan-exp-streak">'+(m.streak||0)+'</div><div class="clan-exp-streak-lbl">days</div></div>'
-      +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+m.name+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+m.name+renderMilestoneSeal(m, false)+'</div>'
       +'<div class="clan-exp-bars">'+bHtml+'</div></div>'
       +'<div class="clan-exp-today"><div class="clan-exp-today-num">'+todayStr+'</div>'
       +'<div class="clan-exp-today-lbl">today</div></div>'
@@ -6100,6 +6162,21 @@ function updateClanPerfFromCache(){
   if(scoreEl) scoreEl.textContent=(totalPossible>0?(totalDone+'/'+totalPossible):(totalDone||'—'));
 }
 // Render full Active Warriors cards from _clanCache (replaces static HTML)
+// Render a small kanji seal next to a member's name showing their highest
+// earned practice continuance milestone (e.g., 道 = "The Way" at 365 days).
+// Returns empty string if member has no earned milestones. Light/colour
+// variant chosen by caller via `useDarkBackground` so the kanji is readable
+// on the appropriate card style (samurai = light bg, shinobi = dark bg).
+function renderMilestoneSeal(member, useDarkBackground){
+  if(!member || !member.practiceMilestoneDays) return '';
+  if(typeof PRACTICE_MILESTONES === 'undefined') return '';
+  var pm = PRACTICE_MILESTONES.find(function(m){return m.days === member.practiceMilestoneDays;});
+  if(!pm) return '';
+  var color = useDarkBackground ? (pm.light || pm.col) : pm.col;
+  var title = pm.name + ' · ' + pm.days + ' day' + (pm.days===1?'':'s');
+  return '<span class="clan-milestone-seal" style="color:' + color + '" title="' + title + '">' + pm.kanji + '</span>';
+}
+
 function renderClanCards(){
   var wrap=document.getElementById('clan-active-warriors');
   if(!wrap) return;
@@ -6107,6 +6184,18 @@ function renderClanCards(){
   var COLORS=['--s0','--s1','--s2','--s3','--s4'];
   var members=Object.keys(_clanCache).map(function(uid){return _clanCache[uid];});
   members.sort(function(a,b){return (b.streak||0)-(a.streak||0);});
+  // Prepend the user's own card so they can see their own seals, strands,
+  // crafts, goals — same as everyone else. Without this, Active Warriors
+  // is asymmetric: every other clan member shown but never yourself, and
+  // your own week/month reflection seals never light anywhere visible.
+  // Built from local state via buildOwnClanData() (no Firestore round-trip).
+  if(typeof state !== 'undefined' && state && (state.kaizen || state.strands)){
+    try {
+      var ownData = buildOwnClanData();
+      ownData.isOwn = true; // marker for the "you" badge
+      members.unshift(ownData);
+    } catch(e){ console.warn('Could not build own clan card:', e); }
+  }
   wrap.innerHTML=members.map(function(m){
     var initial=(m.name||'?')[0].toUpperCase();
     var avatarColor='var('+COLORS[initial.charCodeAt(0)%5]+')';
@@ -6129,11 +6218,11 @@ function renderClanCards(){
       var st=Math.min(m.streak||0,7);
       for(var d=0;d<7;d++) streakDots+='<span style="opacity:'+(d<st?'1':'.2')+'">●</span>';
       var craftCount=(m.crafts||[]).length;
-      return '<div class="clan-card shinobi">'
+      return '<div class="clan-card shinobi'+(m.isOwn?' is-own':'')+'">'
         +'<div class="clan-card-header">'
         +'<div class="clan-member-id">'
         +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
-        +'<div><div class="clan-member-name">'+m.name+'</div>'
+        +'<div><div class="clan-member-name">'+m.name+renderMilestoneSeal(m, true)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
         +'<div class="clan-member-sub">Moving in the shadows</div></div></div>'
         +'<div class="clan-view-badge">Shinobi View</div></div>'
         +'<div class="shin-strand-row">'+emberHtml+'</div>'
@@ -6175,11 +6264,11 @@ function renderClanCards(){
           +'<div class="cg-pct">'+pct+'%</div></div>';
       }).join('');
       var strandSub=strands.map(function(s){return s.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).join(' \u00b7 ');
-      return '<div class="clan-card samurai-card">'
+      return '<div class="clan-card samurai-card'+(m.isOwn?' is-own':'')+'">'
         +'<div class="clan-card-header">'
         +'<div class="clan-member-id">'
         +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
-        +'<div><div class="clan-member-name">'+m.name+'</div>'
+        +'<div><div class="clan-member-name">'+m.name+renderMilestoneSeal(m, false)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
         +'<div class="clan-member-sub">'+strandSub+'</div></div></div>'
         +'<div class="clan-view-badge">Samurai View</div></div>'
         +(strandHtml?'<div class="clan-strand-row">'+strandHtml+'</div>':'')
@@ -6409,10 +6498,20 @@ function showDashboard(){
   document.getElementById('dashboard').classList.add('active');
   setupNavSquish();
   const _preRenderTs = state.lastModified || 0;
+  // Restore the user's clan visibility mode from saved state BEFORE rendering.
+  // Without this, _visMode would default to 'samurai' on page load even for
+  // users who chose Shinobi — and the cascade of renderDashboard → renderClanCards
+  // would render their own card with the wrong visibility before setVis ran.
+  if(state.visMode === 'shinobi' || state.visMode === 'samurai'){
+    _visMode = state.visMode;
+  }
   renderDashboard();
   initGridSwipe();
   updateDarkMode();
   setInterval(updateDarkMode, 60000);
+  // Update the Samurai/Shinobi pill UI to match the restored mode.
+  // persist:false because we're just painting the UI — state.visMode is already correct.
+  setVis(_visMode, { persist: false });
   if(!FIREBASE_CONFIGURED){
     // JSONbin/legacy path: wait for cloud sync before checking prompts so we use
     // the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
@@ -6527,7 +6626,14 @@ function switchPrimary(name){
   window.scrollTo({top:0, behavior:'instant'});
 }
 
-function setVis(force){
+// Set the user's clan-visibility mode. Two callers:
+//   1. User clicks the Samurai/Shinobi pill → force=='samurai' or 'shinobi'
+//      AND we want to persist + propagate the change to the clan.
+//   2. Initial load — restoring from state.visMode → persist=false, just
+//      paint the UI without saving back (no-op write, but cleaner intent).
+function setVis(force, opts){
+  opts = opts || {};
+  const persist = (opts.persist !== false); // default true for click handler
   if(force==='samurai'||force==='shinobi') _visMode=force;
   else _visMode=(_visMode==='samurai'?'shinobi':'samurai');
   const sSam = document.getElementById('clan-vis-samurai');
@@ -6541,6 +6647,16 @@ function setVis(force){
     if(sSam){ sSam.style.background='transparent'; sSam.style.color='rgba(255,255,255,.3)'; sSam.style.fontWeight='400'; }
     if(sShi){ sShi.style.background='#4A3F5C'; sShi.style.color='rgba(255,255,255,.85)'; sShi.style.fontWeight='700'; }
     if(hint){ hint.textContent='your clan sees only shadow'; hint.style.color='rgba(139,123,170,.55)'; }
+  }
+  if(persist){
+    // Persist the user's choice so it survives reload AND propagates to the
+    // /clan/{uid} doc that other clan members read. Without this, toggling
+    // was a local-only no-op — other members never saw the change.
+    state.visMode = _visMode;
+    if(typeof saveState === 'function') saveState();
+    // Re-render the user's own Active Warriors card so the visual switches
+    // immediately (Samurai card ↔ Shinobi card) without waiting for a poll.
+    if(typeof renderClanCards === 'function') renderClanCards();
   }
 }
 
@@ -7644,6 +7760,7 @@ hiInit = function(){
               <div style="min-width:0;overflow:hidden">
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:3px">
                   <span class="clan-exp-name" id="clan-my-name" style="margin:0;flex-shrink:0">—</span>
+                  <span id="clan-my-milestone-seal" style="flex-shrink:0"></span>
                   <span class="clan-you" style="flex-shrink:0">you</span>
                   <span id="clan-my-badge" class="ps-badge" style="display:none"></span>
                   <!-- Samurai / Shinobi two-state pill -->
