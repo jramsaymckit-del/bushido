@@ -2091,6 +2091,516 @@ li.goal.hd-open .habit-detail{display:block}
 #clan-my-milestone-seal .clan-milestone-seal{display:inline-block;margin-left:6px;
   font-family:'Noto Serif JP',serif;font-size:13px;
   vertical-align:middle;line-height:1;opacity:.85}
+
+/* ═══ SEASONAL REVIEW CSS ════════════════════════════════════════════════════ */
+
+.sr-banner {
+  margin: 0 0 0 0;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  animation: fadeUp .4s ease;
+}
+.sr-banner-left { flex: 1; }
+.sr-banner-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 28px;
+  color: var(--ink);
+  opacity: .18;
+  float: right;
+  margin-left: 12px;
+  line-height: 1;
+}
+.sr-banner-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.sr-banner-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--ink-light);
+  font-style: italic;
+  line-height: 1.6;
+}
+.sr-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Modal backdrop */
+.sr-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,26,0.55);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.sr-backdrop.show { display: flex; }
+
+/* Modal shell */
+.sr-modal {
+  background: var(--scroll);
+  width: 100%;
+  max-width: 600px;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 2px;
+  animation: fadeUp .3s ease;
+  position: relative;
+}
+.sr-modal-header {
+  padding: 36px 40px 0;
+  text-align: center;
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 28px;
+}
+.sr-modal-header .sr-season-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 48px;
+  color: var(--ink);
+  opacity: .12;
+  display: block;
+  margin-bottom: 8px;
+}
+.sr-modal-header .sr-label {
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.sr-modal-header .sr-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.7;
+}
+.sr-modal-body { padding: 28px 40px 36px; }
+
+/* Phase indicators */
+.sr-phases {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.sr-phase-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--edge);
+  opacity: 1;
+  transition: all .3s;
+}
+.sr-phase-dot.active { opacity: 1; background: var(--red); }
+.sr-phase-dot.done { background: rgba(204,53,41,0.3); }
+
+/* Phase panels */
+.sr-phase { display: none; }
+.sr-phase.active { display: block; animation: fadeUp .35s ease; }
+
+/* Phase 1 — Stats */
+.sr-section-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+.sr-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--edge);
+}
+.sr-stat-row:last-child { border-bottom: none; }
+.sr-stat-strand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+.sr-stat-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--ink);
+  opacity: .6;
+  width: 28px;
+  text-align: center;
+}
+.sr-stat-name {
+  font-size: 12px;
+  color: var(--ink-light);
+  letter-spacing: .5px;
+}
+.sr-stat-bar-wrap {
+  flex: 1;
+  height: 5px;
+  background: rgba(204,53,41,0.1);
+  border-radius: 3px;
+  margin: 0 16px;
+  overflow: hidden;
+}
+.sr-stat-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: rgba(204,53,41,0.3);
+  transition: width .6s ease;
+}
+.sr-stat-bar.high { background: var(--red); opacity: 1; }
+.sr-stat-pct {
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 1px;
+  min-width: 32px;
+  text-align: right;
+}
+.sr-overall {
+  margin-bottom: 24px;
+}
+.sr-overall-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+.sr-overall-bar-wrap {
+  width: 100%;
+  height: 48px;
+  background: rgba(204,53,41,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.sr-overall-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--red);
+  width: 0%;
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 14px;
+  position: relative;
+}
+.sr-overall-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+.sr-callout {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* Phase 2 — Reflection accordion */
+.sr-strand-block {
+  border-bottom: 1px solid var(--edge);
+  padding: 18px 0;
+}
+.sr-strand-block:last-of-type { border-bottom: none; }
+.sr-strand-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.sr-strand-head .sr-stat-kanji { opacity: .5; }
+.sr-strand-head .sr-stat-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+.sr-prompt {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-style: italic;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.sr-rating-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sr-rating-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: 1.5px solid var(--edge);
+  background: rgba(245,240,232,0.6);
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: all .2s;
+}
+.sr-rating-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--white); }
+.sr-rating-btn.selected-advancing { border-color: #3D6B5F; background: rgba(61,107,95,0.09); color: #3D6B5F; font-weight: 700; }
+.sr-rating-btn.selected-holding   { border-color: #8A7A5A; background: rgba(138,122,90,0.09); color: #8A7A5A; font-weight: 700; }
+.sr-rating-btn.selected-falling   { border-color: var(--red); background: rgba(204,53,41,0.07); color: var(--red); font-weight: 700; }
+.sr-note-input {
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--edge);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  padding: 8px 0;
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+  min-height: 44px;
+}
+.sr-note-input::placeholder { color: var(--ink-faint); opacity: .45; font-style: italic; }
+.sr-note-input:focus { border-bottom-color: var(--ink); }
+.sr-closing-block {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--edge);
+}
+.sr-closing-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+/* Phase 3 — Summary + handoff */
+.sr-summary-block {
+  margin-bottom: 20px;
+}
+.sr-summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--edge);
+}
+.sr-summary-row:last-child { border-bottom: none; }
+.sr-summary-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  color: var(--ink);
+  opacity: .45;
+  width: 24px;
+  text-align: center;
+  margin-top: 2px;
+}
+.sr-summary-right { flex: 1; }
+.sr-summary-rating {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.sr-summary-rating.advancing { color: #3D6B5F; }
+.sr-summary-rating.holding   { color: #8A7A5A; }
+.sr-summary-rating.falling    { color: var(--red); }
+.sr-summary-note {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+  line-height: 1.5;
+}
+.sr-season-lesson {
+  background: rgba(255,255,255,0.55);
+  border-radius: 2px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+}
+.sr-season-lesson .sr-section-label { margin-bottom: 8px; }
+.sr-season-lesson-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.7;
+}
+.sr-handoff-block {
+  text-align: center;
+  padding: 24px 20px;
+  border-top: 1px solid var(--edge);
+}
+.sr-handoff-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--ink-light);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+/* Modal footer */
+.sr-modal-footer {
+  padding: 0 40px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Ensō opening animation ───────────────────────────────────────────────── */
+#srEnsoOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  background: var(--scroll);
+  opacity: 0;
+}
+#srEnsoSvg {
+  width: 320px;
+  height: 320px;
+  position: absolute;
+  overflow: visible;
+}
+#srEnsoPath {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.80;
+  stroke-dasharray: 950;
+  stroke-dashoffset: 950;
+}
+/* Sheen layer — inner highlight of a loaded brush */
+#srEnsoSheen {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.20;
+  stroke-dasharray: 950;
+  stroke-dashoffset: 950;
+}
+/* Brush sweeps the circle — nearly closes, leaving only the natural ensō gap */
+@keyframes srEnsoDraw {
+  0%   { stroke-dashoffset: 950; }
+  100% { stroke-dashoffset: 8;   }
+}
+#srEnsoKanji {
+  position: absolute;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 92px;
+  font-weight: 200;
+  color: var(--ink);
+  opacity: 0;
+  letter-spacing: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+@keyframes srKanjiBreath {
+  0%   { opacity: 0;    transform: scale(0.78); }
+  60%  { opacity: 0.28; transform: scale(1.04); }
+  100% { opacity: 0.22; transform: scale(1);    }
+}
+/* ── /Ensō opening animation ──────────────────────────────────────────────── */
+
+/* ── Dark mode overrides ─��────────────────────────────────────────────────── */
+body.dark .sr-banner {
+  background: #2A2218;
+  border-color: rgba(255,255,255,0.07);
+}
+body.dark .sr-modal {
+  background: #221C14;
+}
+body.dark .sr-modal-header {
+  border-bottom-color: rgba(255,255,255,0.07);
+}
+body.dark .sr-backdrop {
+  background: rgba(8,6,4,0.78);
+}
+body.dark .sr-overall-bar-wrap {
+  background: rgba(204,53,41,0.18);
+}
+body.dark .sr-stat-bar-wrap {
+  background: rgba(204,53,41,0.14);
+}
+body.dark .sr-stat-bar {
+  background: rgba(204,53,41,0.4);
+}
+body.dark .sr-stat-row {
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+body.dark .sr-rating-btn {
+  background: #2A2218;
+  border-color: rgba(255,255,255,0.1);
+}
+body.dark .sr-rating-btn:hover {
+  background: #342C20;
+  border-color: rgba(255,255,255,0.25);
+  color: var(--ink);
+}
+body.dark .sr-rating-btn.selected-advancing {
+  background: rgba(61,107,95,0.15);
+  border-color: #3D6B5F;
+}
+body.dark .sr-rating-btn.selected-holding {
+  background: rgba(138,122,90,0.15);
+  border-color: #8A7A5A;
+}
+body.dark .sr-note-input {
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+body.dark .sr-note-input:focus {
+  border-bottom-color: rgba(255,255,255,0.3);
+}
+body.dark .sr-strand-block {
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+body.dark .sr-closing-block {
+  border-top-color: rgba(255,255,255,0.06);
+}
+body.dark .sr-summary-row {
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+body.dark .sr-season-lesson {
+  background: #2A2218;
+}
+body.dark .sr-handoff-block {
+  border-top-color: rgba(255,255,255,0.06);
+}
+body.dark .sr-phase-dot {
+  background: #3A3020;
+}
+/* ── /Dark mode overrides ─────────────────────────────────────────────────── */
+
+/* ═══ /SEASONAL REVIEW CSS ═══════════════════════════════════════════════════ */
+
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -2478,6 +2988,19 @@ if (FIREBASE_CONFIGURED) {
     <!-- Greeting (date now lives natively in Kaizen scroll) -->
     <div class="greeting-bar" id="greeting-display"></div>
 
+    <!-- Seasonal Review banner — shown by srInitBanner() when season changes -->
+    <div class="sr-banner" id="srBanner" style="display:none;margin-bottom:0;">
+      <div class="sr-banner-left">
+        <span class="sr-banner-kanji" id="srBannerKanji">季</span>
+        <div class="sr-banner-label" id="srBannerLabel">Season · Month Year</div>
+        <div class="sr-banner-text">The season has changed. It's time to look back.</div>
+      </div>
+      <div class="sr-banner-actions">
+        <button class="btn btn-ghost" onclick="srSnooze()" style="font-size:11px;letter-spacing:1px;">Later</button>
+        <button class="btn" onclick="srOpenModal()" style="font-size:11px;letter-spacing:1px;">Begin</button>
+      </div>
+    </div>
+
     <!-- Week strip (Kaizen only) -->
     <div class="week-strip" id="week-strip"></div>
 
@@ -2610,6 +3133,115 @@ if (FIREBASE_CONFIGURED) {
     </div>
   </div>
 
+
+
+  <!-- ═══ SEASONAL REVIEW MODAL + ENSŌ OVERLAY ══════════════════════════════ -->
+  <!-- Seasonal Review Modal -->
+  <div class="sr-backdrop" id="srBackdrop">
+    <div class="sr-modal" id="srModal">
+  
+      <!-- Header -->
+      <div class="sr-modal-header">
+        <span class="sr-season-kanji">秋</span>
+        <div class="sr-label">Autumn Review · 90 Days</div>
+        <div class="sr-title">The season has changed.<br>It's time to look back and see how far you've come.</div>
+      </div>
+  
+      <div class="sr-modal-body">
+  
+        <!-- Phase dots -->
+        <div class="sr-phases">
+          <div class="sr-phase-dot active" id="srDot0"></div>
+          <div class="sr-phase-dot" id="srDot1"></div>
+          <div class="sr-phase-dot" id="srDot2"></div>
+        </div>
+  
+        <!-- ── Phase 1: The Reading ── -->
+        <div class="sr-phase active" id="srPhase0">
+          <!-- Populated by srBuildPhase0() on each open -->
+        </div>
+  
+        <!-- ── Phase 2: The Reflection ── -->
+        <div class="sr-phase" id="srPhase1">
+          <!-- Populated by srBuildPhase1() on each open -->
+        </div>
+  
+              <!-- ── Phase 3: The Handoff ── -->
+        <div class="sr-phase" id="srPhase2">
+          <div class="sr-section-label" id="srSummaryLabel">Autumn · Summary</div>
+  
+          <div class="sr-summary-block" id="srSummaryContent">
+            <!-- Populated by JS -->
+          </div>
+  
+          <div class="sr-season-lesson" id="srLessonDisplay" style="display:none;">
+            <div class="sr-section-label">What this season revealed</div>
+            <div class="sr-season-lesson-text" id="srLessonText"></div>
+          </div>
+  
+          <div class="sr-handoff-block">
+            <div class="sr-handoff-text">Schedule a review with James.<br>and we will refine your Bushido</div>
+  
+            <!-- State A: button (default) -->
+            <div id="srHandoffBtn">
+              <button class="btn" onclick="srSchedule()" style="letter-spacing:2px;font-size:11px;padding:12px 32px;">Schedule Review</button>
+            </div>
+  
+            <!-- State B: inline date/time picker (calendar connected) -->
+            <div id="srDatePicker" style="display:none;animation:fadeUp .3s ease;">
+              <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;font-weight:700;">Pick a time</div>
+              <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                <input type="date" id="srPickDate" style="flex:1;min-width:140px;background:none;border:none;border-bottom:1.5px solid var(--edge);font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--ink);padding:8px 0;outline:none;">
+                <input type="time" id="srPickTime" value="10:00" style="width:100px;background:none;border:none;border-bottom:1.5px solid var(--edge);font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--ink);padding:8px 0;outline:none;">
+              </div>
+              <div style="display:flex;gap:10px;justify-content:center;">
+                <button class="btn btn-ghost" onclick="srCancelPicker()" style="font-size:11px;">Cancel</button>
+                <button class="btn" id="srConfirmBtn" onclick="srConfirmSchedule()" style="letter-spacing:2px;font-size:11px;padding:10px 28px;">Add to Calendar →</button>
+              </div>
+              <div id="srCalStatus" style="font-size:11px;color:var(--ink-faint);margin-top:12px;min-height:18px;font-style:italic;"></div>
+            </div>
+  
+            <!-- State C: calendar not connected — guide, don't bypass -->
+            <div id="srNoCalendar" style="display:none;animation:fadeUp .3s ease;">
+              <div style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.6;margin-bottom:14px;">Scheduling with James is part of completing the Seasonal Review.<br>Connect Google Calendar in Settings, then return here to finish.</div>
+              <button class="btn btn-ghost" onclick="srClose()" style="font-size:11px;letter-spacing:1px;">Go to Settings</button>
+            </div>
+          </div>
+        </div>
+  
+      </div><!-- /sr-modal-body -->
+  
+      <!-- Footer nav -->
+      <div class="sr-modal-footer">
+        <button class="btn btn-ghost" id="srBackBtn" onclick="srBack()" style="display:none;font-size:11px;letter-spacing:1px;">← Back</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-ghost" onclick="srClose()" style="font-size:11px;letter-spacing:1px;">Close</button>
+        <button class="btn" id="srNextBtn" onclick="srNext()" style="font-size:11px;letter-spacing:2px;">Continue →</button>
+      </div>
+  
+    </div><!-- /sr-modal -->
+  </div><!-- /sr-backdrop -->
+  
+  <!-- Ensō Opening Overlay -->
+  <div id="srEnsoOverlay">
+    <svg id="srEnsoSvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Ink displacement: gives the stroke a calligraphic, brush-on-paper quality -->
+        <filter id="srInkFx" x="-8%" y="-8%" width="116%" height="116%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.022 0.038" numOctaves="2" seed="17" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <!-- Organic ensō: slightly oval, asymmetric — right side wider (brush pressure), gap at top -->
+      <g filter="url(#srInkFx)">
+        <path id="srEnsoPath"  d="M 204,58 C 294,50 366,118 360,205 C 354,292 282,360 196,357 C 110,354 42,284 44,198 C 46,116 114,60 168,56"/>
+        <path id="srEnsoSheen" d="M 204,58 C 294,50 366,118 360,205 C 354,292 282,360 196,357 C 110,354 42,284 44,198 C 46,116 114,60 168,56"/>
+      </g>
+    </svg>
+    <div id="srEnsoKanji">春</div>
+  </div>
+  <!-- ═══ /SEASONAL REVIEW ══════════════════════════════════════════════════ -->
+
 </div>
 
 <script>
@@ -2741,6 +3373,8 @@ let state = {
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
+  lastSeasonalReview: null,
+  srSnoozeUntil: null,
   nextId: 100,
   travelMode: false,
 };
@@ -3569,6 +4203,7 @@ function habitOnDay(k, d){
 // ============ DASHBOARD ============
 function renderDashboard(){
   checkDailyReset();
+  srInitBanner();
   // Ryughi strands
   const rd=document.getElementById('ryughi-display');
   rd.innerHTML=state.strands.map((s,i)=>{
@@ -9301,6 +9936,477 @@ document.addEventListener('keydown', function(e){
 });
 
 // ══════════ /EXPERIMENT: CALENDAR SYNC + SETTINGS JS
+
+// ══════════ SEASONAL REVIEW JS ════════════════════════════════════════════════
+
+function srGetState() { return state; }
+function srSaveState() { saveState(); }
+
+// ── Season utilities ──────────────────────────────────────────────────────────
+var SR_SEASON_NAMES  = {spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter'};
+var SR_SEASON_KANJI  = {spring:'春',summer:'夏',autumn:'秋',winter:'冬'};
+
+function srGetCurrentSeason() {
+  var m = new Date().getMonth();
+  if (m >= 2 && m <= 4) return 'spring';
+  if (m >= 5 && m <= 7) return 'summer';
+  if (m >= 8 && m <= 10) return 'autumn';
+  return 'winter';
+}
+function srGetSeasonKanji() { return SR_SEASON_KANJI[srGetCurrentSeason()]; }
+function srGetSeasonLabel() {
+  var now = new Date();
+  return SR_SEASON_NAMES[srGetCurrentSeason()] + ' · '
+       + now.toLocaleString('en-GB',{month:'long'}) + ' ' + now.getFullYear();
+}
+function srGetSeasonKey() {
+  return srGetCurrentSeason() + '-' + new Date().getFullYear();
+}
+
+// ── Review gate ───────────────────────────────────────────────────────────────
+function srShouldShowReview() {
+  var s = srGetState();
+  if (s.lastSeasonalReview === srGetSeasonKey()) return false;  // done this season
+  if (s.srSnoozeUntil && new Date(s.srSnoozeUntil) > new Date()) return false; // snoozed
+  return true;
+}
+
+function srInitBanner() {
+  var banner = document.querySelector('.sr-banner');
+  if (!banner) return;
+  if (!srShouldShowReview()) { banner.style.display = 'none'; return; }
+  banner.style.display = '';
+  var lbl = document.getElementById('srBannerLabel');
+  var k   = document.getElementById('srBannerKanji');
+  if (lbl) lbl.textContent = srGetSeasonLabel();
+  if (k)   k.textContent   = srGetSeasonKanji();
+}
+
+// ── Stats: pull from completionLog ────────────────────────────────────────────
+function srCalcStats(days) {
+  days = days || 90;
+  var s      = srGetState();
+  var today  = new Date();
+  var cutoff = new Date(today); cutoff.setDate(today.getDate() - days);
+  var habits = (s.kaizens || []).filter(function(h){ return !h.retired; });
+  if (!habits.length) return {overall:0, byStrand:{}, daysTracked:0};
+
+  var log = s.completionLog || {};
+  var daysTracked = 0, totalDone = 0, doneByStrand = {};
+
+  Object.keys(log).forEach(function(ds) {
+    var d = new Date(ds);
+    if (d < cutoff || d > today) return;
+    daysTracked++;
+    (log[ds] || []).forEach(function(id) {
+      totalDone++;
+      var h; for (var i=0;i<habits.length;i++){if(habits[i].id===id){h=habits[i];break;}}
+      if (h) { var sid = h.strandId||'s0'; doneByStrand[sid]=(doneByStrand[sid]||0)+1; }
+    });
+  });
+
+  if (!daysTracked) return {overall:0, byStrand:{}, daysTracked:0};
+
+  var overall = Math.min(100, Math.round((totalDone/(habits.length*daysTracked))*100));
+  var byStrand = {};
+  (s.strands||[]).forEach(function(_,i){
+    var sid = 's'+i;
+    var sh  = habits.filter(function(h){return h.strandId===sid;});
+    var sp  = sh.length * daysTracked;
+    byStrand[sid] = sp > 0 ? Math.min(100, Math.round(((doneByStrand[sid]||0)/sp)*100)) : 0;
+  });
+  return {overall:overall, byStrand:byStrand, daysTracked:daysTracked};
+}
+
+function srGetCallout(overall, byStrand) {
+  var vals = Object.keys(byStrand).map(function(k){return byStrand[k];});
+  var low  = vals.length ? Math.min.apply(null,vals) : 0;
+  if (overall >= 72) return 'The habits held this season. One strand may still be calling for attention.';
+  if (overall >= 50) return 'Steady ground. Some strands held better than others.';
+  if ((overall - low) > 30) return 'One strand carried the season. The others are asking for your attention.';
+  return 'A harder season. That is exactly what this review is for.';
+}
+
+// ── Phase builders ────────────────────────────────────────────────────────────
+function srBuildPhase0() {
+  var stats   = srCalcStats(90);
+  var s       = srGetState();
+  var strands = s.strands || [];
+  var overall = stats.overall;
+
+  var html = '<div class="sr-section-label">The Reading · Past '
+           + stats.daysTracked + ' Days</div>';
+  html += '<div class="sr-overall">'
+        + '<div class="sr-overall-label">Overall Completion</div>'
+        + '<div class="sr-overall-bar-wrap">'
+        + '<div class="sr-overall-bar" id="srOverallBar" style="width:0%">'
+        + '<span class="sr-overall-num" id="srOverallNum">' + overall + '%</span>'
+        + '</div></div></div>';
+  html += '<div class="sr-callout">'
+        + srEscape(srGetCallout(overall, stats.byStrand)) + '</div>';
+
+  strands.forEach(function(strand, i) {
+    var pct = stats.byStrand['s'+i] !== undefined ? stats.byStrand['s'+i] : 0;
+    html += '<div class="sr-stat-row">'
+           + '<div class="sr-stat-strand">'
+           + '<span class="sr-stat-kanji">' + strand.kanji + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strand.name) + '</span>'
+           + '</div>'
+           + '<div class="sr-stat-bar-wrap">'
+           + '<div class="sr-stat-bar' + (pct>=65?' high':'') + '" style="width:'+pct+'%"></div>'
+           + '</div>'
+           + '<div class="sr-stat-pct">' + pct + '%</div></div>';
+  });
+
+  document.getElementById('srPhase0').innerHTML = html;
+  var bar = document.getElementById('srOverallBar');
+  if (bar) setTimeout(function(){ bar.style.width = overall+'%'; }, 120);
+}
+
+var SR_PROMPTS = {
+  spring: [
+    'What are you planting this season that wasn\'t here before?',
+    'Where do you feel the most forward momentum right now?',
+    'The body wakes from winter. What has stirred in you?',
+    'What is this work asking of you that you haven\'t given yet?',
+    'Who are you growing toward this season?'
+  ],
+  summer: [
+    'At full heat — are you building toward something, or burning through it?',
+    'What has reached its fullest expression in you this season?',
+    'Summer asks the body for everything. What have you given?',
+    'What has come to fruition? What is still unripe?',
+    'Love and faith are tested in abundance. Where are yours?'
+  ],
+  autumn: [
+    'This season, did your efforts feel rooted — or were you in motion for its own sake?',
+    'What has taken root in you this season that will last?',
+    'Autumn strips what isn\'t essential. What remains?',
+    'Has this area asked more of you than you\'ve given it?',
+    'Who has received your best this season? Who has received your remainder?'
+  ],
+  winter: [
+    'What have you built that will stand without you tending it?',
+    'What wisdom has hardened into bone this year?',
+    'The warrior rests in winter. What is the quality of your rest?',
+    'What unfinished work do you carry into the cold?',
+    'Who needs more of you this winter?'
+  ]
+};
+
+function srBuildPhase1() {
+  var s       = srGetState();
+  var strands = s.strands || [];
+  var prompts = SR_PROMPTS[srGetCurrentSeason()] || SR_PROMPTS.autumn;
+
+  var html = '<div class="sr-section-label">The Reflection</div>';
+  strands.forEach(function(strand, i) {
+    var prompt = prompts[i] || prompts[0];
+    html += '<div class="sr-strand-block">'
+           + '<div class="sr-strand-head">'
+           + '<span class="sr-stat-kanji">' + strand.kanji + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strand.name) + '</span>'
+           + '</div>'
+           + '<div class="sr-prompt">' + srEscape(prompt) + '</div>'
+           + '<div class="sr-rating-row">'
+           + '<button class="sr-rating-btn" onclick="srRate(this,\'advancing\')" data-strand="'+i+'">Advancing</button>'
+           + '<button class="sr-rating-btn" onclick="srRate(this,\'holding\')"   data-strand="'+i+'">Holding</button>'
+           + '<button class="sr-rating-btn" onclick="srRate(this,\'falling\')"   data-strand="'+i+'">Falling</button>'
+           + '</div>'
+           + '<textarea class="sr-note-input" placeholder="A word or two is enough…" data-strand="'+i+'" rows="2"></textarea>'
+           + '</div>';
+  });
+  html += '<div class="sr-closing-block">'
+        + '<div class="sr-closing-label">What has this season revealed?</div>'
+        + '<textarea class="sr-note-input" id="srSeasonLesson" placeholder="Write freely. This belongs to you." rows="3" style="font-size:13px;"></textarea>'
+        + '</div>';
+
+  document.getElementById('srPhase1').innerHTML = html;
+}
+
+// ── Completion ────────────────────────────────────────────────────────────────
+function srMarkComplete() {
+  var s = srGetState();
+  s.lastSeasonalReview = srGetSeasonKey();
+  s.srSnoozeUntil      = null;
+  srSaveState();
+  var banner = document.querySelector('.sr-banner');
+  if (banner) {
+    banner.style.transition = 'opacity .4s';
+    banner.style.opacity    = '0';
+    setTimeout(function(){ banner.style.display='none'; }, 400);
+  }
+}
+
+// ── Gmail token ───────────────────────────────────────────────────────────────
+var srEmailToken = null;
+var SR_GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
+var SR_JAMES_EMAIL = 'jramsaymckit@gmail.com';
+
+function srRequestGmailToken() {
+  return new Promise(function(resolve, reject) {
+    if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+      reject(new Error('Google sign-in not loaded')); return;
+    }
+    var client = google.accounts.oauth2.initTokenClient({
+      client_id: CS_OAUTH_CLIENT_ID,
+      scope: SR_GMAIL_SCOPE,
+      callback: function(resp) {
+        if (resp.error) { reject(new Error(resp.error_description||resp.error)); return; }
+        srEmailToken = resp.access_token; resolve(resp.access_token);
+      },
+      error_callback: function(err){ reject(new Error((err&&err.message)||'cancelled')); }
+    });
+    client.requestAccessToken({prompt:''});
+  });
+}
+
+async function srSendNotificationEmail(dateVal, timeVal) {
+  if (!srEmailToken) await srRequestGmailToken();
+  var s        = srGetState();
+  var userName = (s && s.name) ? s.name : 'A BUSHIDO user';
+  var season   = srGetSeasonLabel();
+  var lines    = (s.strands||[]).map(function(strand,i){
+    var r = srState.ratings[i] ? srState.ratings[i].toUpperCase() : '—';
+    var n = srState.notes[i]   ? ' — ' + srState.notes[i] : '';
+    return strand.kanji + ' ' + strand.name + ': ' + r + n;
+  }).join('\n');
+  if (srState.seasonLesson) lines += '\n\nSeason: ' + srState.seasonLesson;
+
+  var bodyText = [
+    userName + ' has completed their ' + season + ' and wants to schedule a review with you.',
+    '', 'Proposed time: ' + dateVal + ' at ' + timeVal,
+    '', '— Reflection summary —', lines,
+    '', 'Sent automatically from BUSHIDO 武士道'
+  ].join('\n');
+
+  var raw = [
+    'To: ' + SR_JAMES_EMAIL,
+    'Subject: 武士道 Review Request — ' + userName,
+    'Content-Type: text/plain; charset=utf-8', 'MIME-Version: 1.0', '', bodyText
+  ].join('\r\n');
+  var encoded = btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+
+  var res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method:'POST',
+    headers:{'Authorization':'Bearer '+srEmailToken,'Content-Type':'application/json'},
+    body: JSON.stringify({raw:encoded})
+  });
+  if (!res.ok) {
+    var err = await res.text().catch(function(){return '';});
+    throw new Error('Gmail send failed: '+res.status+' '+err.substring(0,120));
+  }
+  return await res.json();
+}
+
+// ── Review state ──────────────────────────────────────────────────────────────
+var srState = {phase:0, ratings:{}, notes:{}, seasonLesson:''};
+
+// ── Open / close ──────────────────────────────────────────────────────────────
+function srOpenModal() {
+  srState = {phase:0, ratings:{}, notes:{}, seasonLesson:''};
+  srBuildPhase0();
+  srBuildPhase1();
+
+  // Sync season into modal header + Phase 2 label
+  var hKanji  = document.querySelector('#srModal .sr-season-kanji');
+  var hLabel  = document.querySelector('#srModal .sr-label');
+  var p2Label = document.getElementById('srSummaryLabel');
+  var seasonName = SR_SEASON_NAMES[srGetCurrentSeason()];
+  if (hKanji)  hKanji.textContent  = srGetSeasonKanji();
+  if (hLabel)  hLabel.textContent  = seasonName + ' Review · 90 Days';
+  if (p2Label) p2Label.textContent = seasonName + ' · Summary';
+
+  srShowPhase(0);
+  document.body.style.overflow = 'hidden';
+
+  // Ensō animation
+  var overlay = document.getElementById('srEnsoOverlay');
+  var path    = document.getElementById('srEnsoPath');
+  var sheen   = document.getElementById('srEnsoSheen');
+  var kanji   = document.getElementById('srEnsoKanji');
+
+  kanji.textContent = srGetSeasonKanji();
+  path.style.transition = ''; path.style.animation = 'none'; path.style.strokeDashoffset = '950';
+  if (sheen){ sheen.style.animation='none'; sheen.style.strokeDashoffset='950'; }
+  kanji.style.animation = 'none'; kanji.style.opacity = '0';
+  overlay.style.transition = ''; overlay.style.opacity = '0'; overlay.style.display = 'flex';
+  overlay.offsetHeight;
+
+  overlay.style.transition = 'opacity 0.32s ease'; overlay.style.opacity = '1';
+  setTimeout(function(){
+    path.style.animation = 'srEnsoDraw 1.6s cubic-bezier(0.28,0.0,0.08,1.0) forwards';
+    if (sheen) sheen.style.animation = 'srEnsoDraw 1.6s cubic-bezier(0.28,0.0,0.08,1.0) 0.08s forwards';
+  }, 100);
+  setTimeout(function(){ kanji.style.animation = 'srKanjiBreath 0.75s ease forwards'; }, 700);
+  setTimeout(function(){
+    overlay.style.transition = 'opacity 0.42s ease'; overlay.style.opacity = '0';
+    document.getElementById('srBackdrop').classList.add('show');
+  }, 1880);
+  setTimeout(function(){
+    overlay.style.display='none'; overlay.style.transition=''; overlay.style.opacity='0';
+    path.style.animation=''; path.style.strokeDashoffset='950';
+    if(sheen){sheen.style.animation='';sheen.style.strokeDashoffset='950';}
+    kanji.style.animation=''; kanji.style.opacity='0';
+  }, 2360);
+}
+
+function srClose() {
+  var overlay = document.getElementById('srEnsoOverlay');
+  if (overlay) overlay.style.display = 'none';
+  document.getElementById('srBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function srSnooze() {
+  // Defers 3 days — banner re-surfaces automatically; review cannot be skipped forever
+  var s = srGetState();
+  var d = new Date(); d.setDate(d.getDate()+3);
+  s.srSnoozeUntil = d.toISOString().split('T')[0];
+  srSaveState();
+  var banner = document.querySelector('.sr-banner');
+  if (banner){ banner.style.transition='opacity .4s'; banner.style.opacity='0';
+    setTimeout(function(){banner.style.display='none';},400); }
+}
+
+function srShowPhase(n) {
+  srState.phase = n;
+  [0,1,2].forEach(function(i){
+    var p=document.getElementById('srPhase'+i); var d=document.getElementById('srDot'+i);
+    if(p) p.classList.toggle('active',i===n);
+    if(d) d.classList.toggle('active',i===n);
+  });
+  var bb=document.getElementById('srBackBtn'); var nb=document.getElementById('srNextBtn');
+  if(bb) bb.style.display = n>0 ? 'block':'none';
+  if(nb) nb.style.display = n<2 ? 'block':'none';
+  var modal=document.getElementById('srModal'); if(modal) modal.scrollTop=0;
+}
+
+function srNext() {
+  if (srState.phase === 1) {
+    if (Object.keys(srState.ratings).length === 0) {
+      var firstRow = document.querySelector('.sr-rating-row');
+      if (firstRow){ firstRow.style.animation='none'; firstRow.offsetHeight; firstRow.style.animation='shake .3s ease'; }
+      return;
+    }
+    srCollectReflection();
+    srBuildSummary();
+    srMarkComplete(); // Reflection done = season marked complete
+  }
+  if (srState.phase < 2) srShowPhase(srState.phase+1);
+}
+
+function srBack(){ if(srState.phase>0) srShowPhase(srState.phase-1); }
+
+function srRate(btn, rating) {
+  var row = btn.parentElement;
+  row.querySelectorAll('.sr-rating-btn').forEach(function(b){b.className='sr-rating-btn';});
+  btn.classList.add('selected-'+rating);
+  srState.ratings[btn.getAttribute('data-strand')] = rating;
+}
+
+function srCollectReflection() {
+  document.querySelectorAll('.sr-note-input[data-strand]').forEach(function(ta){
+    srState.notes[ta.getAttribute('data-strand')] = ta.value.trim();
+  });
+  var lesson = document.getElementById('srSeasonLesson');
+  srState.seasonLesson = lesson ? lesson.value.trim() : '';
+}
+
+function srBuildSummary() {
+  var s = srGetState();
+  var html = '';
+  (s.strands||[]).forEach(function(strand,i){
+    var rating = srState.ratings[i]||'holding';
+    var note   = srState.notes[i]  ||'';
+    html += '<div class="sr-summary-row">'
+           + '<div class="sr-summary-kanji">'+strand.kanji+'</div>'
+           + '<div class="sr-summary-right">'
+           + '<div class="sr-summary-rating '+rating+'">'+rating.toUpperCase()+'</div>'
+           + (note?'<div class="sr-summary-note">'+srEscape(note)+'</div>':'')
+           + '</div></div>';
+  });
+  document.getElementById('srSummaryContent').innerHTML = html;
+  var lessonEl=document.getElementById('srLessonDisplay');
+  var lessonTx=document.getElementById('srLessonText');
+  if(srState.seasonLesson){ lessonTx.textContent=srState.seasonLesson; lessonEl.style.display='block'; }
+  else { lessonEl.style.display='none'; }
+}
+
+function srSchedule() {
+  var isConnected = (typeof csConnected !== 'undefined' && csConnected)
+                 || (typeof csCurrentCalendarId !== 'undefined' && csCurrentCalendarId);
+  document.getElementById('srHandoffBtn').style.display = 'none';
+  if (isConnected) {
+    var d = new Date(); var days = (8-d.getDay())%7||7; d.setDate(d.getDate()+days);
+    document.getElementById('srPickDate').value = d.toISOString().split('T')[0];
+    document.getElementById('srDatePicker').style.display = 'block';
+  } else {
+    document.getElementById('srNoCalendar').style.display = 'block';
+  }
+}
+
+function srCancelPicker() {
+  document.getElementById('srDatePicker').style.display  = 'none';
+  document.getElementById('srNoCalendar').style.display  = 'none';
+  document.getElementById('srHandoffBtn').style.display  = 'block';
+}
+
+async function srConfirmSchedule() {
+  var dateVal = document.getElementById('srPickDate').value;
+  var timeVal = document.getElementById('srPickTime').value||'10:00';
+  var status  = document.getElementById('srCalStatus');
+  var btn     = document.getElementById('srConfirmBtn');
+  if(!dateVal){ status.textContent='Pick a date first.'; return; }
+  btn.disabled=true; btn.textContent='Adding…'; status.textContent='';
+  try {
+    if(typeof csAccessToken==='undefined'||!csAccessToken){
+      status.textContent='Reconnecting to Google…'; await csRequestToken({prompt:''});
+    }
+    var tz    = Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC';
+    var start = dateVal+'T'+timeVal+':00';
+    var endDate = new Date(start); endDate.setHours(endDate.getHours()+1);
+    var endStr  = endDate.toISOString().replace(/\.\d{3}Z$/,'');
+    var s = srGetState();
+    var desc = 'BUSHIDO Seasonal Review — '+srGetSeasonLabel()+'\n\n';
+    (s.strands||[]).forEach(function(strand,i){
+      var r=srState.ratings[i]||'—'; var n=srState.notes[i]||'';
+      desc+=strand.kanji+' '+strand.name+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
+    });
+    if(srState.seasonLesson) desc+='Season lesson: '+srState.seasonLesson;
+    var calId = (typeof csCurrentCalendarId!=='undefined'&&csCurrentCalendarId)?csCurrentCalendarId:'primary';
+    await csCalApi('POST','https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events',{
+      summary:'武士道 Review with James', description:desc.trim(),
+      start:{dateTime:start,timeZone:tz}, end:{dateTime:endStr,timeZone:tz}
+    });
+    status.textContent='Event added. Notifying James…';
+    try {
+      await srSendNotificationEmail(dateVal,timeVal);
+      btn.textContent='✓ Done'; btn.style.opacity='.6';
+      status.textContent='Added to your calendar · Email sent to James';
+    } catch(emailErr) {
+      btn.textContent='✓ Calendar Added'; btn.style.opacity='.6';
+      status.textContent='Calendar event added. Email failed: '+((emailErr&&emailErr.message)||emailErr);
+    }
+    setTimeout(function(){srClose();},2400);
+  } catch(err){
+    btn.disabled=false; btn.textContent='Add to Calendar →';
+    status.textContent='Could not add event: '+((err&&err.message)||err);
+  }
+}
+
+function srEscape(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+
+// Close on backdrop click
+document.getElementById('srBackdrop').addEventListener('click',function(e){
+  if(e.target===this) srClose();
+});
+
+// ══════════ /SEASONAL REVIEW JS ═══════════════════════════════════════════════
+
 </script>
 
 </body>
