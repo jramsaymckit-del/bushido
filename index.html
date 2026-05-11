@@ -2603,11 +2603,13 @@ body.dark .sr-phase-dot {
 
 
 /* ── STRAND ARMS ─────────────────────────────────────────────── */
-.sa-strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px}
-.sa-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;opacity:.9;transition:opacity .2s}
+.sa-strip{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center;margin-top:16px;overflow:visible}
+.sa-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;opacity:.9;transition:opacity .2s;flex:0 0 auto}
 .sa-item:hover{opacity:1}
-.sa-svg{width:76px;height:76px;overflow:visible}
-.sa-name{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);text-align:center}
+.sa-item.sa-active{opacity:1}
+.sa-item.sa-faded{opacity:.2}
+.sa-svg{width:58px;height:58px;overflow:visible}
+.sa-name{font-family:'Noto Serif JP',sans-serif;font-size:10px;color:var(--ink-faint);text-align:center;opacity:.7}
 /* /STRAND ARMS */
 </style>
 
@@ -4245,7 +4247,7 @@ function renderStrandArms(){
   var KANJI=['志','史','鍛','匠','愛'];
   var CSS_V=['--s0','--s1','--s2','--s3','--s4'];
   var SEEDS=[0.30,-0.40,0.25,-0.35,0.45,-0.28,0.38,-0.42];
-  var CX=40,CY=40,SEAL_R=14,ARM_FROM=17,ARM_MAX=22,ARM_MIN=3,MAX_STK=30;
+  var CX=29,CY=29,SEAL_R=10,ARM_FROM=12,ARM_MAX=16,ARM_MIN=2,MAX_STK=30;
   var cs=getComputedStyle(document.documentElement);
   var colors=CSS_V.map(function(v){return cs.getPropertyValue(v).trim();});
   el.innerHTML=(state.strands||[]).map(function(name,si){
@@ -4279,14 +4281,14 @@ function renderStrandArms(){
       var d='M'+rx.toFixed(1)+' '+ry.toFixed(1)+' C'+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+tx.toFixed(1)+' '+ty.toFixed(1);
       arms+='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+sw.toFixed(1)+'" opacity="'+opacity.toFixed(2)+'" stroke-linecap="round"/>';
     });
-    var shortName=name.split(' ')[0];
-    return '<div class="sa-item" onclick="setStrandFilter(event,'+si+')" title="'+name+'">'+
-      '<svg class="sa-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">'+
+    var activeCls=_filterStrandIdx===null?'':(_filterStrandIdx===si?' sa-active':' sa-faded');
+    return '<div class="sa-item'+activeCls+'" onclick="setStrandFilter(event,'+si+')" title="'+name+'">'+
+      '<svg class="sa-svg" viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">'+
         arms+
         '<circle cx="'+CX+'" cy="'+CY+'" r="'+SEAL_R+'" fill="rgba(255,255,255,0.6)" stroke="'+color+'" stroke-width="1" opacity="0.5"/>'+
-        '<text x="'+CX+'" y="'+(CY+5)+'" text-anchor="middle" font-family="Noto Serif JP,serif" font-size="14" fill="'+color+'" opacity="0.82">'+kanji+'</text>'+
+        '<text x="'+CX+'" y="'+(CY+4)+'" text-anchor="middle" font-family="Noto Serif JP,serif" font-size="11" fill="'+color+'" opacity="0.82">'+kanji+'</text>'+
       '</svg>'+
-      '<div class="sa-name">'+shortName+'</div>'+
+      '<div class="sa-name">'+kanji+'</div>'+
     '</div>';
   }).join('');
 }
@@ -4296,17 +4298,6 @@ function renderDashboard(){
   srInitBanner();
   // Ryughi strands
   renderStrandArms();
-  const rd=document.getElementById('ryughi-display');
-  rd.innerHTML=state.strands.map((s,i)=>{
-    const ms=state.milestones5yr[i]||'';
-    const msShort=ms.length>58?ms.substring(0,55)+'\u2026':ms;
-    return `<div class="strand-row">
-      <span class="ryughi-strand${_filterStrandIdx===i?' strand-active':''}" onclick="setStrandFilter(event,${i})">${s}</span>
-      ${ms?`<div class="strand-ms">${msShort}</div>`:''}
-    </div>`;
-  }).join('');
-  // Date (now rendered natively inside Kaizen scroll via buildKaizenGrid)
-  const greet=document.getElementById('greeting-display');
   if(greet) greet.textContent=getGreeting();
   const ws=document.getElementById('week-strip');
   if(ws) ws.style.display='none'; // superseded by inline grid
@@ -5988,11 +5979,10 @@ function handleTravelBackdrop(e){
 function setStrandFilter(e,idx){
   e.stopPropagation(); // prevent doc click from clearing immediately
   _filterStrandIdx=(_filterStrandIdx===idx)?null:idx;
-  // Fade non-active strands
-  document.querySelectorAll('.strand-row').forEach((row,i)=>{
-    row.style.opacity=_filterStrandIdx!==null&&i!==_filterStrandIdx?'0.25':'';
+  document.querySelectorAll('.sa-item').forEach(function(el,i){
+    el.classList.toggle('sa-active',_filterStrandIdx!==null&&i===_filterStrandIdx);
+    el.classList.toggle('sa-faded', _filterStrandIdx!==null&&i!==_filterStrandIdx);
   });
-  // Switch to Kaizen if filtering
   if(_filterStrandIdx!==null&&currentTab!=='kaizen') switchTab('kaizen');
   else renderGoals();
   updateStreak();
@@ -6000,7 +5990,7 @@ function setStrandFilter(e,idx){
 
 function clearStrandFilter(){
   _filterStrandIdx=null;
-  document.querySelectorAll('.strand-row').forEach(row=>row.style.opacity='');
+  document.querySelectorAll('.sa-item').forEach(function(el){el.classList.remove('sa-active','sa-faded');});
   renderGoals();
   updateStreak();
 }
