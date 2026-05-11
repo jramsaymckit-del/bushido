@@ -3383,7 +3383,7 @@ let state = {
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   lastSeasonalReview: null,
-  srSnoozeUntil: null,
+  srSnoozeUntil: '2026-05-31',
   nextId: 100,
   travelMode: false,
 };
@@ -6325,7 +6325,7 @@ function checkCelebrations(){
 
 // ============ CLOUD SYNC (JSONbin.io) ============
 // Credentials stored separately — never in the state or HTML source
-const SYNC_CFG_KEY = 'bushido_sync_config';
+const SYNC_CFG_KEY = 'bushido_sync_config_mam';
 
 function getSyncConfig(){
   try{
@@ -10050,34 +10050,39 @@ function srInitBanner() {
 function srCalcStats(days) {
   days = days || 90;
   var s      = srGetState();
-  var today  = new Date();
-  var cutoff = new Date(today); cutoff.setDate(today.getDate() - days);
-  var habits = (s.kaizens || []).filter(function(h){ return !h.retired; });
+  var today  = new Date(); today.setHours(23,59,59,999);
+  var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days); cutoff.setHours(0,0,0,0);
+  var habits = (s.kaizen || []);
   if (!habits.length) return {overall:0, byStrand:{}, daysTracked:0};
-
+  // Build habitId → strand index via cascade
+  var habitStrand = {};
+  habits.forEach(function(k){
+    var shok = (s.shokunin||[]).find(function(sh){return Number(sh.id)===Number(k.parentShok);});
+    if (!shok) return;
+    var goal = (s.annualGoals||[]).find(function(g){return Number(g.id)===Number(shok.parentAnnual);});
+    if (!goal) return;
+    habitStrand[k.id] = Number(goal.parentMs);
+  });
   var log = s.completionLog || {};
   var daysTracked = 0, totalDone = 0, doneByStrand = {};
-
   Object.keys(log).forEach(function(ds) {
-    var d = new Date(ds);
+    var d = new Date(ds + 'T12:00:00');
     if (d < cutoff || d > today) return;
     daysTracked++;
     (log[ds] || []).forEach(function(id) {
       totalDone++;
-      var h; for (var i=0;i<habits.length;i++){if(habits[i].id===id){h=habits[i];break;}}
-      if (h) { var sid = h.strandId||'s0'; doneByStrand[sid]=(doneByStrand[sid]||0)+1; }
+      var si = habitStrand[id];
+      if (si !== undefined) { var sk='s'+si; doneByStrand[sk]=(doneByStrand[sk]||0)+1; }
     });
   });
-
   if (!daysTracked) return {overall:0, byStrand:{}, daysTracked:0};
-
   var overall = Math.min(100, Math.round((totalDone/(habits.length*daysTracked))*100));
   var byStrand = {};
   (s.strands||[]).forEach(function(_,i){
-    var sid = 's'+i;
-    var sh  = habits.filter(function(h){return h.strandId===sid;});
-    var sp  = sh.length * daysTracked;
-    byStrand[sid] = sp > 0 ? Math.min(100, Math.round(((doneByStrand[sid]||0)/sp)*100)) : 0;
+    var sk = 's'+i;
+    var sh = habits.filter(function(k){ return habitStrand[k.id]===i; });
+    var sp = sh.length * daysTracked;
+    byStrand[sk] = sp > 0 ? Math.min(100, Math.round(((doneByStrand[sk]||0)/sp)*100)) : 0;
   });
   return {overall:overall, byStrand:byStrand, daysTracked:daysTracked};
 }
@@ -10097,6 +10102,7 @@ function srBuildPhase0() {
   var s       = srGetState();
   var strands = s.strands || [];
   var overall = stats.overall;
+  var SR_KANJI=['志','史','鍛','匠','愛'];
 
   var html = '<div class="sr-section-label">The Reading · Past '
            + stats.daysTracked + ' Days</div>';
@@ -10113,8 +10119,8 @@ function srBuildPhase0() {
     var pct = stats.byStrand['s'+i] !== undefined ? stats.byStrand['s'+i] : 0;
     html += '<div class="sr-stat-row">'
            + '<div class="sr-stat-strand">'
-           + '<span class="sr-stat-kanji">' + strand.kanji + '</span>'
-           + '<span class="sr-stat-name">'  + srEscape(strand.name) + '</span>'
+           + '<span class="sr-stat-kanji">' + (SR_KANJI[i]||'') + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strand) + '</span>'
            + '</div>'
            + '<div class="sr-stat-bar-wrap">'
            + '<div class="sr-stat-bar' + (pct>=65?' high':'') + '" style="width:'+pct+'%"></div>'
@@ -10162,14 +10168,15 @@ function srBuildPhase1() {
   var s       = srGetState();
   var strands = s.strands || [];
   var prompts = SR_PROMPTS[srGetCurrentSeason()] || SR_PROMPTS.autumn;
+  var SR_KANJI=['志','史','鍛','匠','愛'];
 
   var html = '<div class="sr-section-label">The Reflection</div>';
   strands.forEach(function(strand, i) {
     var prompt = prompts[i] || prompts[0];
     html += '<div class="sr-strand-block">'
            + '<div class="sr-strand-head">'
-           + '<span class="sr-stat-kanji">' + strand.kanji + '</span>'
-           + '<span class="sr-stat-name">'  + srEscape(strand.name) + '</span>'
+           + '<span class="sr-stat-kanji">' + (SR_KANJI[i]||'') + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strand) + '</span>'
            + '</div>'
            + '<div class="sr-prompt">' + srEscape(prompt) + '</div>'
            + '<div class="sr-rating-row">'
@@ -10233,7 +10240,8 @@ async function srSendNotificationEmail(dateVal, timeVal) {
   var lines    = (s.strands||[]).map(function(strand,i){
     var r = srState.ratings[i] ? srState.ratings[i].toUpperCase() : '—';
     var n = srState.notes[i]   ? ' — ' + srState.notes[i] : '';
-    return strand.kanji + ' ' + strand.name + ': ' + r + n;
+    var SR_KANJI=['志','史','鍛','匠','愛'];
+    return (SR_KANJI[i]||'') + ' ' + strand + ': ' + r + n;
   }).join('\n');
   if (srState.seasonLesson) lines += '\n\nSeason: ' + srState.seasonLesson;
 
@@ -10379,12 +10387,13 @@ function srCollectReflection() {
 
 function srBuildSummary() {
   var s = srGetState();
+  var SR_KANJI=['志','史','鍛','匠','愛'];
   var html = '';
   (s.strands||[]).forEach(function(strand,i){
     var rating = srState.ratings[i]||'holding';
     var note   = srState.notes[i]  ||'';
     html += '<div class="sr-summary-row">'
-           + '<div class="sr-summary-kanji">'+strand.kanji+'</div>'
+           + '<div class="sr-summary-kanji">'+(SR_KANJI[i]||'')+'</div>'
            + '<div class="sr-summary-right">'
            + '<div class="sr-summary-rating '+rating+'">'+rating.toUpperCase()+'</div>'
            + (note?'<div class="sr-summary-note">'+srEscape(note)+'</div>':'')
@@ -10435,7 +10444,7 @@ async function srConfirmSchedule() {
     var desc = 'BUSHIDO Seasonal Review — '+srGetSeasonLabel()+'\n\n';
     (s.strands||[]).forEach(function(strand,i){
       var r=srState.ratings[i]||'—'; var n=srState.notes[i]||'';
-      desc+=strand.kanji+' '+strand.name+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
+      desc+=(SR_KANJI_C[i]||'')+' '+strand+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
     });
     if(srState.seasonLesson) desc+='Season lesson: '+srState.seasonLesson;
     var calId = (typeof csCurrentCalendarId!=='undefined'&&csCurrentCalendarId)?csCurrentCalendarId:'primary';
