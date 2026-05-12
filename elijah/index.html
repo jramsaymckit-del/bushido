@@ -10582,37 +10582,39 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
            rcLoz(cx,cy,dx,dy,len*0.24, hw*1.00,col,night?0.80:0.62);
   }
 
-  function rcStar(pos,night){
+  function rcStar(pos,night,selected){
     var cx=pos.x,cy=pos.y,isN=pos.isNorth,st=pos.strand,origIdx=pos.origIdx;
-    var col=night?'#ece8e0':'#cc2020';
     var hn0=st.habits.length;
     var health=hn0>0?(st.habits.reduce(function(a,h){ return a+Math.min(h.s,RC_MAX_STK)/RC_MAX_STK; },0)/hn0):0;
-    var gLBase=isN?22:14,gLTop=isN?56:36;
-    var gL=gLBase+health*(gLTop-gLBase);
-    var hw=(isN?1.4:0.9)+health*(isN?1.2:0.8);
-    var fs=isN?17:12,aF=isN?7:5,aMax=isN?18:11;
+    // Selected always glows red regardless of mode
+    var col=selected?'#cc2020':(night?'#ece8e0':'#cc2020');
+    var nFill=selected?'#cc2020':(night?'#ece8e0':'#aa1818');
+    var ga=selected?' filter="url(#rcNeon)"':(night?' filter="url(#rcGlow)"':'');
     var inn='';
-    [0,Math.PI/2,Math.PI,3*Math.PI/2].forEach(function(a){ inn+=rcSpike(cx,cy,a,gL,hw,col,night); });
-    st.habits.forEach(function(h,hi){
-      var a=(2*Math.PI/hn0)*hi-Math.PI/2;
-      var str=Math.min(h.s,RC_MAX_STK),ratio=str/RC_MAX_STK;
-      var len=str===0?2:2+ratio*aMax,op=str===0?0.10:0.20+ratio*0.55,sw=str===0?0.6:0.7+ratio*1.6;
-      var rx=cx+Math.cos(a)*aF,ry=cy+Math.sin(a)*aF;
-      var tx=cx+Math.cos(a)*(aF+len),ty=cy+Math.sin(a)*(aF+len);
-      var gf=night?' filter="url(#rcGlow)"':'';
-      inn+='<line x1="'+rx.toFixed(1)+'" y1="'+ry.toFixed(1)+'" x2="'+tx.toFixed(1)+'" y2="'+ty.toFixed(1)+
-           '" stroke="'+col+'" stroke-width="'+sw.toFixed(1)+'" opacity="'+op.toFixed(2)+'" stroke-linecap="round"'+gf+'/>';
-    });
-    var ga=night?' filter="url(#rcGlow)"':'';
-    inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(isN?2.4:1.6)+'" fill="'+col+'" opacity="'+(night?0.95:0.88)+'"'+ga+'/>';
-    var textCol=night?'#ece8e0':'#cc2020';
-    inn+='<text x="'+cx.toFixed(1)+'" y="'+(cy+fs*0.40).toFixed(1)+'" text-anchor="middle"'+
-         ' font-family="Noto Serif JP,serif" font-size="'+fs+'" fill="'+textCol+'" opacity="'+(isN?0.80:0.68)+'">'+st.kanji+'</text>';
-    var lDist=gL+13,ly=(isN||cy>=RC_SCY)?cy+lDist:cy-lDist+2;
-    var nFill=night?'#ece8e0':'#aa1818';
-    inn+='<text x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
-         ' font-family="Noto Sans JP,sans-serif" font-size="7" fill="'+nFill+'" letter-spacing="1.2">'+st.name+'</text>';
-    inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(gL+8)+'" fill="transparent" style="cursor:pointer;"/>';
+
+    if(night){
+      // Dark mode: glowing star spikes
+      var gLBase=isN?22:14,gLTop=isN?56:36;
+      var gL=gLBase+health*(gLTop-gLBase);
+      var hw=(isN?1.4:0.9)+health*(isN?1.2:0.8);
+      [0,Math.PI/2,Math.PI,3*Math.PI/2].forEach(function(a){ inn+=rcSpike(cx,cy,a,gL,hw,col); });
+      inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(isN?2.4:1.6)+'" fill="'+col+'" opacity="0.95"'+ga+'/>';
+      var lDist=gL+13,ly=(isN||cy>=RC_SCY)?cy+lDist:cy-lDist+2;
+      inn+='<text x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
+           ' font-family="Noto Sans JP,sans-serif" font-size="7" fill="'+nFill+'" letter-spacing="1.2">'+st.name+'</text>';
+      inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(gL+8)+'" fill="transparent" style="cursor:pointer;"/>';
+    } else {
+      // Light mode: kanji symbol, opacity driven by streak health
+      var op=selected?'1':(0.12+health*0.78).toFixed(2);
+      var fs=isN?34:26;
+      inn+='<text x="'+cx.toFixed(1)+'" y="'+(cy+fs*0.36).toFixed(1)+'" text-anchor="middle"'+
+           ' font-family="Noto Serif JP,serif" font-size="'+fs+'" fill="'+col+'" opacity="'+op+'"'+ga+'>'+st.kanji+'</text>';
+      var ly=cy+fs*0.5+14;
+      inn+='<text x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
+           ' font-family="Noto Sans JP,sans-serif" font-size="7" fill="'+nFill+'" letter-spacing="1.5" opacity="'+(selected?'0.8':Math.max(0.18,health*0.6).toFixed(2))+'">'+st.name+'</text>';
+      inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="26" fill="transparent" style="cursor:pointer;"/>';
+    }
+
     return '<g class="rcStarG" data-origidx="'+origIdx+'" onclick="event.stopPropagation();rcClick('+origIdx+')" style="transition:opacity 0.4s ease;">'+inn+'</g>';
   }
 
