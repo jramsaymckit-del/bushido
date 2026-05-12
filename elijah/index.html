@@ -2986,13 +2986,15 @@ if (FIREBASE_CONFIGURED) {
 
     <!-- Ryughi -->
     <section class="ryughi-section">
-      <div class="ryughi-header-click" onclick="openVisionDrawer()">
-        <div class="ryughi-label">Your Ryughi</div>
+      <div class="ryughi-header-click" onclick="toggleVisionDrawer(event)">
+        <div class="ryughi-label">My Ryughi</div>
         <div class="ryughi-kanji">流儀</div>
       </div>
       <div class="ryughi-braid" id="ryughi-display"></div>
       <div id="strand-arms-strip"></div>
-
+      <div style="font-family:'Noto Serif JP',serif;font-size:12px;letter-spacing:3px;color:var(--ink-faint);margin-top:20px;opacity:.4">千里の道も一歩から</div>
+      <div style="font-size:10px;letter-spacing:2px;color:var(--ink-faint);margin-top:4px;opacity:.3">even a journey of a thousand ri begins with a single step</div>
+      <div id="ryughiDrawer"><div id="ryughiDrawerInner"></div></div>
     </section>
     <div class="divider"></div>
 
@@ -5631,28 +5633,44 @@ document.getElementById('goals-list').addEventListener('mouseout',function(e){
 initKaizenDrag();
 
 // ============ VISION DRAWER ============
-function openVisionDrawer(){
-  const m=document.getElementById('reflect-modal');
-  const c=document.getElementById('reflect-content');
-  m.classList.add('active');
-  c.innerHTML=`
-    <div class="modal-kanji" style="opacity:.07">流儀</div>
-    <div class="modal-title">Your North Star</div>
-    <div class="modal-sub" style="margin-bottom:36px">the vision that makes the path worth walking</div>
-    <div style="font-family:'Noto Serif JP',serif;font-size:14px;font-style:italic;line-height:2;
-      color:var(--ink-light);margin-bottom:40px;border-left:2px solid rgba(204,53,41,.2);padding-left:20px">
-      ${state.tenYearVision||'<span style="opacity:.3">Your ten-year vision lives here.</span>'}
-    </div>
-    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:20px;opacity:.6">五年 — five years in motion</div>
-    ${state.milestones5yr.map((ms,i)=>`
-      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:flex-start">
-        <span style="font-family:'Noto Serif JP',serif;font-size:16px;color:var(--red);opacity:.25;min-width:16px;margin-top:3px">${i+1}</span>
-        <span style="font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);line-height:1.8;font-style:italic">${ms}</span>
-      </div>`).join('')}
-    <div class="form-actions" style="margin-top:32px">
-      <button class="btn-ghost btn" onclick="closeReflection()">close</button>
-    </div>`;
+var _visionDrawerOpen=false;
+function toggleVisionDrawer(e){
+  if(e) e.stopPropagation();
+  const drawer=document.getElementById('ryughiDrawer');
+  const inner=document.getElementById('ryughiDrawerInner');
+  if(!drawer||!inner) return;
+  _visionDrawerOpen=!_visionDrawerOpen;
+  if(_visionDrawerOpen){
+    inner.innerHTML=`
+      <div style="padding:24px 0 8px;border-top:1px solid rgba(26,18,16,.08);margin-top:16px">
+        <div id="ryughiConstellation" style="margin:0 auto 20px;display:flex;justify-content:center;"></div>
+        <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;line-height:2;
+          color:var(--ink-light);margin-bottom:32px;border-left:2px solid rgba(204,53,41,.2);padding-left:18px">
+          ${state.tenYearVision||'<span style="opacity:.3">Your ten-year vision lives here.</span>'}
+        </div>
+        <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:16px;opacity:.6">Five Year Milestones</div>
+        ${state.milestones5yr.map((ms,i)=>`
+          <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
+            <span style="font-family:'Noto Serif JP',serif;font-size:15px;color:var(--red);opacity:.22;min-width:14px;margin-top:2px">${i+1}</span>
+            <span style="font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink-light);line-height:1.8;font-style:italic">${ms}</span>
+          </div>`).join('')}
+      </div>`;
+    if(typeof renderRyughiConstellation==='function') renderRyughiConstellation();
+    drawer.classList.add('open');
+  } else {
+    drawer.classList.remove('open');
+    setTimeout(function(){ inner.innerHTML=''; },700);
+  }
 }
+// Close vision drawer on any click that isn't a star or ensō (those stopPropagation already)
+document.addEventListener('click',function(){
+  if(!_visionDrawerOpen) return;
+  var drawer=document.getElementById('ryughiDrawer');
+  var inner=document.getElementById('ryughiDrawerInner');
+  if(drawer) drawer.classList.remove('open');
+  _visionDrawerOpen=false;
+  if(inner) setTimeout(function(){ inner.innerHTML=''; },700);
+});
 
 // ============ GREETING ============
 function getGreeting(){
@@ -10469,6 +10487,269 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
 
 // ══════════ /SEASONAL REVIEW JS ═══════════════════════════════════════════════
 
+</script>
+
+<script>
+// ── RYUGHI CONSTELLATION ─────────────────────────────────────────────────
+(function(){
+  var KANJI_MAP={
+    'Capital and Building':'志',
+    'The Ancient World':'史',
+    "The Warrior's Body":'鍛',
+    'Creative Mastery':'匠',
+    'Faith and Love':'愛'
+  };
+  var RC_SCX=160,RC_SCY=148,RC_RADIUS=108,RC_MAX_STK=30;
+  var RC_ENSO_PATH='M 160.0,90.0 C 194.8,86.9 222.6,113.2 220.3,146.8 C 218.0,180.5 190.2,206.8 156.9,205.6 C 123.7,204.5 97.4,177.4 98.1,144.1 C 98.9,112.4 125.2,90.8 146.1,89.2';
+  var RC_DASH=367,RC_DASH_END=3;
+
+  if(!document.getElementById('rcAnimSt')){
+    var _sa=document.createElement('style');
+    _sa.id='rcAnimSt';
+    _sa.textContent=
+      '@keyframes rcDraw{from{stroke-dashoffset:'+RC_DASH+'}to{stroke-dashoffset:'+RC_DASH_END+'}}'+
+      '@keyframes rcUndraw{from{stroke-dashoffset:'+RC_DASH_END+'}to{stroke-dashoffset:'+RC_DASH+'}}'+
+      '@keyframes rcScrollUnroll{from{clip-path:inset(0 0 100% 0 round 2px);opacity:0}20%{opacity:1}to{clip-path:inset(0 0 0% 0 round 2px);opacity:1}}'+
+      '.rc-scroll-unroll{animation:rcScrollUnroll 0.75s cubic-bezier(0.16,1.0,0.3,1.0) forwards}'+
+      '#ryughiDrawer{display:grid;grid-template-rows:0fr;transition:grid-template-rows 0.65s cubic-bezier(0.16,1,0.3,1)}'+
+      '#ryughiDrawer.open{grid-template-rows:1fr}'+
+      '#ryughiDrawerInner{overflow:hidden}';
+    document.head.appendChild(_sa);
+  }
+
+  function rcKanji(n){ return KANJI_MAP[n]||n.charAt(0); }
+
+  function rcHabits(){
+    var out=(state.strands||[]).map(function(){ return []; });
+    (state.kaizen||[]).forEach(function(k){
+      var sh=(state.shokunin||[]).find(function(s){ return Number(s.id)===Number(k.parentShok); });
+      if(!sh) return;
+      var ag=(state.annualGoals||[]).find(function(a){ return Number(a.id)===Number(sh.parentAnnual); });
+      if(!ag) return;
+      var si=typeof ag.parentMs!=='undefined'?Number(ag.parentMs):-1;
+      if(si>=0&&si<out.length) out[si].push(k);
+    });
+    return out;
+  }
+
+  function rcStreak(id){
+    if(!state.completionLog) return 0;
+    var now=new Date(),n=0;
+    for(var d=0;d<30;d++){
+      var dd=new Date(now); dd.setDate(dd.getDate()-d);
+      var key=dd.toISOString().slice(0,10);
+      var arr=state.completionLog[key];
+      if(arr&&arr.indexOf(id)!==-1) n++;
+    }
+    return n;
+  }
+
+  function rcWeekly(days){
+    if(days==='daily') return 7;
+    if(Array.isArray(days)) return days.length;
+    return 1;
+  }
+
+  function rcSort(arr){
+    var s=arr.map(function(st,i){ return {st:st,origIdx:i}; }),mi=0;
+    s.forEach(function(o,i){ if(o.st.weeklyFreq>s[mi].st.weeklyFreq) mi=i; });
+    var top=s.splice(mi,1)[0]; s.unshift(top); return s;
+  }
+
+  function rcPos(sorted){
+    var n=sorted.length;
+    return sorted.map(function(o,i){
+      var a=(2*Math.PI/n)*i-Math.PI/2;
+      var x=RC_SCX+RC_RADIUS*Math.cos(a),y=RC_SCY+RC_RADIUS*Math.sin(a);
+      if(n===5&&i===2) x+=12;
+      if(n===5&&i===3) x-=12;
+      return {x:x,y:y,strand:o.st,origIdx:o.origIdx,isNorth:i===0,idx:i};
+    });
+  }
+
+  function rcLoz(cx,cy,dx,dy,len,hw,col,op){
+    var px=-dy*hw,py=dx*hw;
+    var bx=cx-dx*len*0.18,by=cy-dy*len*0.18,tx=cx+dx*len,ty=cy+dy*len;
+    var d='M '+bx.toFixed(1)+' '+by.toFixed(1)+
+          ' L '+(cx+px).toFixed(1)+' '+(cy+py).toFixed(1)+
+          ' L '+tx.toFixed(1)+' '+ty.toFixed(1)+
+          ' L '+(cx-px).toFixed(1)+' '+(cy-py).toFixed(1)+' Z';
+    return '<path d="'+d+'" fill="'+col+'" opacity="'+op.toFixed(2)+'"/>';
+  }
+
+  function rcSpike(cx,cy,angle,len,hw,col,night){
+    var dx=Math.cos(angle),dy=Math.sin(angle);
+    return rcLoz(cx,cy,dx,dy,len,      hw*0.55,col,night?0.18:0.12)+
+           rcLoz(cx,cy,dx,dy,len*0.52, hw*0.82,col,night?0.42:0.30)+
+           rcLoz(cx,cy,dx,dy,len*0.24, hw*1.00,col,night?0.80:0.62);
+  }
+
+  function rcStar(pos,night){
+    var cx=pos.x,cy=pos.y,isN=pos.isNorth,st=pos.strand,origIdx=pos.origIdx;
+    var col=night?'#ece8e0':'#cc2020';
+    var hn0=st.habits.length;
+    var health=hn0>0?(st.habits.reduce(function(a,h){ return a+Math.min(h.s,RC_MAX_STK)/RC_MAX_STK; },0)/hn0):0;
+    var gLBase=isN?22:14,gLTop=isN?56:36;
+    var gL=gLBase+health*(gLTop-gLBase);
+    var hw=(isN?1.4:0.9)+health*(isN?1.2:0.8);
+    var fs=isN?17:12,aF=isN?7:5,aMax=isN?18:11;
+    var inn='';
+    [0,Math.PI/2,Math.PI,3*Math.PI/2].forEach(function(a){ inn+=rcSpike(cx,cy,a,gL,hw,col,night); });
+    st.habits.forEach(function(h,hi){
+      var a=(2*Math.PI/hn0)*hi-Math.PI/2;
+      var str=Math.min(h.s,RC_MAX_STK),ratio=str/RC_MAX_STK;
+      var len=str===0?2:2+ratio*aMax,op=str===0?0.10:0.20+ratio*0.55,sw=str===0?0.6:0.7+ratio*1.6;
+      var rx=cx+Math.cos(a)*aF,ry=cy+Math.sin(a)*aF;
+      var tx=cx+Math.cos(a)*(aF+len),ty=cy+Math.sin(a)*(aF+len);
+      var gf=night?' filter="url(#rcGlow)"':'';
+      inn+='<line x1="'+rx.toFixed(1)+'" y1="'+ry.toFixed(1)+'" x2="'+tx.toFixed(1)+'" y2="'+ty.toFixed(1)+
+           '" stroke="'+col+'" stroke-width="'+sw.toFixed(1)+'" opacity="'+op.toFixed(2)+'" stroke-linecap="round"'+gf+'/>';
+    });
+    var ga=night?' filter="url(#rcGlow)"':'';
+    inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(isN?2.4:1.6)+'" fill="'+col+'" opacity="'+(night?0.95:0.88)+'"'+ga+'/>';
+    var textCol=night?'#ece8e0':'#cc2020';
+    inn+='<text x="'+cx.toFixed(1)+'" y="'+(cy+fs*0.40).toFixed(1)+'" text-anchor="middle"'+
+         ' font-family="Noto Serif JP,serif" font-size="'+fs+'" fill="'+textCol+'" opacity="'+(isN?0.80:0.68)+'">'+st.kanji+'</text>';
+    var lDist=gL+13,ly=(isN||cy>=RC_SCY)?cy+lDist:cy-lDist+2;
+    var nFill=night?'#ece8e0':'#aa1818';
+    inn+='<text x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
+         ' font-family="Noto Sans JP,sans-serif" font-size="7" fill="'+nFill+'" letter-spacing="1.2">'+st.name+'</text>';
+    inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(gL+8)+'" fill="transparent" style="cursor:pointer;"/>';
+    return '<g class="rcStarG" data-origidx="'+origIdx+'" onclick="event.stopPropagation();rcClick('+origIdx+')" style="transition:opacity 0.4s ease;">'+inn+'</g>';
+  }
+
+  function _rcDefs(night){
+    return '<defs>'+
+      '<filter id="rcGlow" x="-100%" y="-100%" width="300%" height="300%">'+
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b"/>'+
+        '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>'+
+      '</filter>'+
+      '<filter id="rcNeon" x="-150%" y="-150%" width="400%" height="400%">'+
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="9" result="w"/>'+
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="t"/>'+
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="c"/>'+
+        '<feMerge><feMergeNode in="w"/><feMergeNode in="t"/><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>'+
+      '</filter>'+
+      '<filter id="rcInk" x="-20%" y="-20%" width="140%" height="140%">'+
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="b"/>'+
+        '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>'+
+      '</filter>'+
+    '</defs>';
+  }
+
+  function _rcEnso(cx,cy,night,visible){
+    var glow=night?' filter="url(#rcNeon)"':'';
+    var ghostOp=night?'0.35':'0.50';
+    var sw=night?7:11;
+    var swSheen=night?2:3;
+    var dashOff=visible?RC_DASH_END:RC_DASH;
+    var op=visible?'1':'0';
+    var ghost='<path id="rcEnsoGhost" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+sw+'" fill="none"'+
+              ' stroke-linecap="round" opacity="'+ghostOp+'"'+
+              ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+RC_DASH_END+'"'+
+              ' style="transition:opacity 0.4s ease;"'+glow+'/>';
+    var main='<path id="rcEnsoPath" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+sw+'" fill="none"'+
+             ' stroke-linecap="round" stroke-linejoin="round" opacity="'+op+'"'+
+             ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+dashOff+'"'+glow+'/>';
+    var sheen='<path id="rcEnsoSheen" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+swSheen+'" fill="none"'+
+              ' stroke-linecap="round" opacity="'+(visible?'0.22':'0')+'"'+
+              ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+dashOff+'"'+glow+'/>';
+    return ghost+main+sheen;
+  }
+
+  function _rcHitArea(cx,cy){
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="62" fill="transparent" style="cursor:pointer" onclick="event.stopPropagation();rcToggle(event)"/>';
+  }
+
+  function _rcRenderExpanded(){
+    var el=document.getElementById('ryughiConstellation');
+    if(!el||!state||!state.strands||!state.strands.length) return;
+    var night=document.body.classList.contains('dark');
+    var hc=rcHabits();
+    var strands=state.strands.map(function(name,i){
+      var wf=hc[i].reduce(function(acc,k){ return acc+rcWeekly(k.days); },0);
+      return {kanji:rcKanji(name),name:name,weeklyFreq:wf,habits:hc[i].map(function(k){ return {s:rcStreak(k.id)}; })};
+    });
+    var sorted=rcSort(strands),pos=rcPos(sorted);
+    var bg=night?'<rect width="320" height="300" fill="#08080f" rx="4"/>':'';
+    var bgS='';
+    if(night){
+      var seed=77;
+      for(var b=0;b<50;b++){
+        seed=((seed*1664525+1013904223)>>>0);
+        var bx=(seed%300)+10;
+        seed=((seed*1664525+1013904223)>>>0);
+        var by2=(seed%280)+10;
+        seed=((seed*1664525+1013904223)>>>0);
+        var br=0.25+(seed%10)/10*0.75,bop=0.08+(seed%10)/10*0.25;
+        bgS+='<circle cx="'+bx+'" cy="'+by2+'" r="'+br.toFixed(1)+'" fill="#e8dcc8" opacity="'+bop.toFixed(2)+'"/>';
+      }
+    }
+    var strs='';
+    pos.forEach(function(p){ strs+=rcStar(p,night); });
+    el.innerHTML='<svg id="rcSvg" width="480" height="450" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" style="display:block;">'+
+      _rcDefs(night)+bg+bgS+_rcEnso(RC_SCX,RC_SCY,night,false)+strs+_rcHitArea(RC_SCX,RC_SCY)+'</svg>';
+    el.querySelectorAll('.rcStarG').forEach(function(s){
+      var oi=Number(s.dataset.origidx);
+      s.style.opacity=(_filterStrandIdx!==null&&oi!==_filterStrandIdx)?'0.18':'1';
+    });
+  }
+
+  window.renderRyughiConstellation=function(){
+    var el=document.getElementById('ryughiConstellation');
+    if(!el) return;
+    if(el.querySelectorAll('.rcStarG').length){
+      rcUpdateStarOpacities(); return;
+    }
+    _rcRenderExpanded();
+  };
+
+  window.rcToggle=function(e){
+    if(e) e.stopPropagation();
+    var el=document.getElementById('ryughiConstellation');
+    if(!el) return;
+    var ghost=el.querySelector('#rcEnsoGhost');
+    if(ghost) ghost.style.opacity='0';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      var main=el.querySelector('#rcEnsoPath'),sheen=el.querySelector('#rcEnsoSheen');
+      if(main){
+        main.style.opacity='0.88'; main.style.strokeDashoffset=String(RC_DASH);
+        main.style.animation='none'; void main.offsetWidth;
+        main.style.animation='rcDraw 2.8s cubic-bezier(0.28,0.0,0.08,1.0) forwards';
+      }
+      if(sheen){
+        sheen.style.opacity='0.22'; sheen.style.strokeDashoffset=String(RC_DASH);
+        sheen.style.animation='none'; void sheen.offsetWidth;
+        sheen.style.animation='rcDraw 2.8s cubic-bezier(0.28,0.0,0.08,1.0) 0.08s forwards';
+      }
+    }); });
+  };
+
+  window.rcUpdateStarOpacities=function(){
+    var el=document.getElementById('ryughiConstellation');
+    if(!el) return;
+    el.querySelectorAll('.rcStarG').forEach(function(s){
+      var oi=Number(s.dataset.origidx);
+      s.style.opacity=(_filterStrandIdx!==null&&oi!==_filterStrandIdx)?'0.18':'1';
+    });
+  };
+
+  window.rcClick=function(origIdx){
+    _filterStrandIdx=(_filterStrandIdx===origIdx)?null:origIdx;
+    rcUpdateStarOpacities();
+    if(_filterStrandIdx!==null){
+      if(typeof currentTab!=='undefined'&&currentTab!=='kaizen'&&typeof switchTab==='function') switchTab('kaizen');
+      else if(typeof renderGoals==='function') renderGoals();
+    } else {
+      if(typeof renderGoals==='function') renderGoals();
+    }
+    if(typeof updateStreak==='function') updateStreak();
+    document.querySelectorAll('.strand-row').forEach(function(row,i){
+      row.style.opacity=(_filterStrandIdx!==null&&i!==_filterStrandIdx)?'0.25':'';
+    });
+  };
+
+})();
 </script>
 
 </body>
