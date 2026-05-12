@@ -10543,7 +10543,7 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     document.head.appendChild(_sa);
   }
 
-  function rcKanji(n){ return KANJI_MAP[n]||n.charAt(0); }
+  function rcKanji(n){ var k=n.replace(/[''ʼ]/g,"'"); return KANJI_MAP[k]||KANJI_MAP[n]||n.charAt(0); }
 
   function rcHabits(){
     var out=(state.strands||[]).map(function(){ return []; });
@@ -10687,6 +10687,23 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     return '<circle cx="'+cx+'" cy="'+cy+'" r="62" fill="transparent" style="cursor:pointer" onclick="event.stopPropagation();rcToggle(event)"/>';
   }
 
+  // Red hanko seal 流儀 — shown in center in dark mode (no ensō)
+  function _rcSeal(cx,cy){
+    var hw=19,hh=22;
+    var x=(cx-hw).toFixed(1),y=(cy-hh).toFixed(1);
+    var w=(hw*2).toFixed(1),h=(hh*2).toFixed(1);
+    var bg='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="#7a1010" rx="2" opacity="0.92"/>'+
+           '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="none" stroke="#cc2020" stroke-width="1.8" rx="2"/>'+
+           '<rect x="'+(cx-hw+3).toFixed(1)+'" y="'+(cy-hh+3).toFixed(1)+
+           '" width="'+(hw*2-6).toFixed(1)+'" height="'+(hh*2-6).toFixed(1)+
+           '" fill="none" stroke="rgba(220,120,120,0.35)" stroke-width="0.7" rx="1"/>';
+    var k='<text x="'+cx.toFixed(1)+'" y="'+(cy-2).toFixed(1)+'" text-anchor="middle"'+
+          ' font-family="Noto Serif JP,serif" font-size="17" fill="rgba(248,238,228,0.90)">流</text>'+
+          '<text x="'+cx.toFixed(1)+'" y="'+(cy+18).toFixed(1)+'" text-anchor="middle"'+
+          ' font-family="Noto Serif JP,serif" font-size="17" fill="rgba(248,238,228,0.90)">儀</text>';
+    return '<g id="rcSeal" transform="rotate(-7,'+cx.toFixed(1)+','+cy.toFixed(1)+')" filter="url(#rcNeon)" opacity="0.88">'+bg+k+'</g>';
+  }
+
   function _rcRenderExpanded(){
     var el=document.getElementById('ryughiConstellation');
     if(!el||!state||!state.strands||!state.strands.length) return;
@@ -10712,9 +10729,9 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
       }
     }
     var strs='';
-    pos.forEach(function(p){ strs+=rcStar(p,night); });
+    pos.forEach(function(p){ strs+=rcStar(p,night,p.origIdx===_filterStrandIdx); });
     el.innerHTML='<svg id="rcSvg" width="480" height="450" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" style="display:block;">'+
-      _rcDefs(night)+bg+bgS+_rcEnso(RC_SCX,RC_SCY,night,false)+strs+_rcHitArea(RC_SCX,RC_SCY)+'</svg>';
+      _rcDefs(night)+bg+bgS+(night?'':_rcEnso(RC_SCX,RC_SCY,night,false)+_rcHitArea(RC_SCX,RC_SCY))+strs+'</svg>';
     el.querySelectorAll('.rcStarG').forEach(function(s){
       var oi=Number(s.dataset.origidx);
       s.style.opacity=(_filterStrandIdx!==null&&oi!==_filterStrandIdx)?'0.18':'1';
@@ -10724,9 +10741,6 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
   window.renderRyughiConstellation=function(){
     var el=document.getElementById('ryughiConstellation');
     if(!el) return;
-    if(el.querySelectorAll('.rcStarG').length){
-      rcUpdateStarOpacities(); return;
-    }
     _rcRenderExpanded();
   };
 
@@ -10762,7 +10776,7 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
 
   window.rcClick=function(origIdx){
     _filterStrandIdx=(_filterStrandIdx===origIdx)?null:origIdx;
-    rcUpdateStarOpacities();
+    _rcRenderExpanded();
     if(_filterStrandIdx!==null){
       if(typeof currentTab!=='undefined'&&currentTab!=='kaizen'&&typeof switchTab==='function') switchTab('kaizen');
       else if(typeof renderGoals==='function') renderGoals();
