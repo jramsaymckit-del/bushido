@@ -423,8 +423,8 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
 .check.origami-fill{animation:origamiCheck 480ms cubic-bezier(.25,.46,.45,.94) both}
 
 /* Edit / delete actions */
-.goal-actions{display:flex;gap:6px;align-items:flex-start;padding-top:4px;opacity:0;transition:opacity .2s;flex-shrink:0}
-body.edit-mode .goal-actions{opacity:1}
+.goal-actions{display:flex;gap:6px;align-items:flex-start;padding-top:4px;opacity:0;transition:opacity .2s;flex-shrink:0;pointer-events:none}
+body.edit-mode .goal-actions{opacity:1;pointer-events:auto}
 .goal-act{cursor:pointer;font-size:14px;color:var(--ink-faint);padding:4px 5px;line-height:1;transition:color .2s;background:none;border:none;font-family:inherit;user-select:none}
 .goal-act:hover{color:var(--ink)}
 .goal-del:hover{color:var(--red)}
@@ -5982,6 +5982,7 @@ function clearStrandFilter(){
   document.querySelectorAll('.sa-item').forEach(function(el){el.classList.remove('sa-active','sa-faded');});
   renderGoals();
   updateStreak();
+  if(_visionDrawerOpen&&typeof renderRyughiConstellation==='function') renderRyughiConstellation();
 }
 
 // ============ COMPLETION CELEBRATIONS ============
@@ -10761,6 +10762,10 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     if(typeof updateStreak==='function') updateStreak();
     document.querySelectorAll('.strand-row').forEach(function(row,i){
       row.style.opacity=(_filterStrandIdx!==null&&i!==_filterStrandIdx)?'0.25':'';
+    });
+    document.querySelectorAll('.sa-item').forEach(function(el,i){
+      el.classList.toggle('sa-active',_filterStrandIdx!==null&&i===_filterStrandIdx);
+      el.classList.toggle('sa-faded',_filterStrandIdx!==null&&i!==_filterStrandIdx);
     });
   };
 
