@@ -10673,14 +10673,14 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     var swSheen=night?2:3;
     var dashOff=visible?RC_DASH_END:RC_DASH;
     var op=visible?'1':'0';
-    var ghost='<path id="rcEnsoGhost" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+sw+'" fill="none"'+
+    var ghost='<path id="rcEnsoGhost" d="'+RC_ENSO_PATH+'" stroke="var(--ink)" stroke-width="'+sw+'" fill="none"'+
               ' stroke-linecap="round" opacity="'+ghostOp+'"'+
               ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+RC_DASH_END+'"'+
               ' style="transition:opacity 0.4s ease;"'+glow+'/>';
-    var main='<path id="rcEnsoPath" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+sw+'" fill="none"'+
+    var main='<path id="rcEnsoPath" d="'+RC_ENSO_PATH+'" stroke="var(--ink)" stroke-width="'+sw+'" fill="none"'+
              ' stroke-linecap="round" stroke-linejoin="round" opacity="'+op+'"'+
              ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+dashOff+'"'+glow+'/>';
-    var sheen='<path id="rcEnsoSheen" d="'+RC_ENSO_PATH+'" stroke="#cc2020" stroke-width="'+swSheen+'" fill="none"'+
+    var sheen='<path id="rcEnsoSheen" d="'+RC_ENSO_PATH+'" stroke="var(--ink)" stroke-width="'+swSheen+'" fill="none"'+
               ' stroke-linecap="round" opacity="'+(visible?'0.22':'0')+'"'+
               ' stroke-dasharray="'+RC_DASH+'" stroke-dashoffset="'+dashOff+'"'+glow+'/>';
     return ghost+main+sheen;
