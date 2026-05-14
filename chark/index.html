@@ -10545,7 +10545,15 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     document.head.appendChild(_sa);
   }
 
-  function rcKanji(n){ var k=n.replace(/[''ʼ]/g,"'"); return KANJI_MAP[k]||KANJI_MAP[n]||n.charAt(0); }
+  var RC_KANJI_IDX=['志','史','鍛','匠','愛'];
+  function rcNorm(s){ return s.replace(/[''ʼ''ʼ]/g,"'").trim(); }
+  function rcKanji(n,idx){
+    var nk=rcNorm(n);
+    if(KANJI_MAP[nk]) return KANJI_MAP[nk];
+    for(var key in KANJI_MAP){ if(rcNorm(key)===nk) return KANJI_MAP[key]; }
+    if(typeof idx==='number'&&RC_KANJI_IDX[idx]) return RC_KANJI_IDX[idx];
+    return n.charAt(0);
+  }
 
   function rcHabits(){
     var out=(state.strands||[]).map(function(){ return []; });
@@ -10715,7 +10723,7 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     var hc=rcHabits();
     var strands=state.strands.map(function(name,i){
       var wf=hc[i].reduce(function(acc,k){ return acc+rcWeekly(k.days); },0);
-      return {kanji:rcKanji(name),name:name,weeklyFreq:wf,habits:hc[i].map(function(k){ return {s:rcStreak(k.id)}; })};
+      return {kanji:rcKanji(name,i),name:name,weeklyFreq:wf,habits:hc[i].map(function(k){ return {s:rcStreak(k.id)}; })};
     });
     var sorted=rcSort(strands),pos=rcPos(sorted);
     var bg=night?'<rect width="320" height="300" fill="#08080f" rx="4"/>':'';
