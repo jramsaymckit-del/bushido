@@ -1,5 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- ═══ BUSHIDO — SECTION INDEX ═══════════════════════════════════════════
+  CSS
+    Core Styles ........................ line 33
+    Kakejiku Date Header .............. line 106
+    Stats Box ......................... line 219
+    Reflection Prompts ................ line 239
+    Habit Grid (Kaizen week) .......... line 263
+    Month Calendar (Shokunin) ......... line 289
+    Year View (Ikigai) ................ line 325
+    Kakejiku Hanging Scroll ........... line 342
+    Travel Mode ....................... line 514
+    Completion Celebrations ........... line 590
+    Milestone Stamps .................. line 650
+    Floating Seal Overlay ............. line 693
+    Practice Stamp Ceremony ........... line 727
+    Dark Mode (auto 9PM) .............. line 773
+    Account Bar & Avatar .............. line 807
+    Manifesto Overlay ................. line 847
+    Primary Nav ....................... line 908
+    Hiyoku CSS ........................ line 956
+    Pairing UI CSS .................... line 1184
+    Clan Panel ........................ line 1251
+    Clan Expanded Cards ............... line 1333
+    Auth Screen CSS ................... line 1404
+    Migration Overlay CSS ............. line 1477
+    Streak System ..................... line 1491
+    Responsive ≤640px ................. line 1586
+    Responsive ≤480px ................. line 1625
+    Habit Detail CSS .................. line 1792
+    Day Journal CSS ................... line 1812
+    Calendar Sync + Settings CSS ...... line 1857
+    Seasonal Review CSS ............... line 2099
+    Strand Arms CSS ................... line 2609
+
+  HTML
+    Firebase CDN ...................... line 2620
+    Firebase Config ................... line 2635
+    Auth Screen ....................... line 2662
+    Migration Overlay ................. line 2721
+    App Shell (onboarding + dashboard). line ~2740
+    Hiyoku Panel HTML ................. line 8334
+    Settings Modal HTML ............... line 8673
+    Calendar Sync Wizard HTML ......... line 8705
+
+  JAVASCRIPT
+    Persistence ....................... line 3263
+    Default State ..................... line 3298
+    State ............................. line 3400
+    Proverb Engine .................... line 3430
+    Onboarding ........................ line 3581
+    Daily Reset ....................... line 3795
+    Calendar Helpers .................. line 3853
+    Week Strip ........................ line 4261
+    Dashboard ......................... line 4273
+    Strand Arms JS .................... line 4275
+    Habit Detail (bullets + WHY) ...... line 4543
+    Actions ........................... line 4642
+    Add Goal .......................... line 4806
+    Stats Box ......................... line 4844
+    Reflection Prompts ................ line 4925
+    Year-End Review ................... line 5005
+    Habit Grid Tooltip ................ line 5393
+    Daily Notes ....................... line 5408
+    Reflection Cascade Helpers ........ line 5417
+    Reflection ........................ line 5470
+    Vision Drawer ..................... line 5693
+    Greeting .......................... line 5733
+    Origami Animation ................. line 5750
+    Milestone Stamps .................. line 5753
+    Practice Milestones ............... line 5764
+    Animation Queue ................... line 5790
+    Avatar Dropdown ................... line 5801
+    Manifesto Overlay ................. line 5812
+    Edit Mode ......................... line 5826
+    Edit / Delete ..................... line 5892
+    Strand Filter ..................... line 5967
+    Travel Mode ....................... line 5971
+    Completion Celebrations ........... line 6047
+    Cloud Sync (JSONbin) .............. line 6392
+    Export / Import ................... line 6562
+    Dark Mode ......................... line 6596
+    Grid Swipe Navigation ............. line 6602
+    Firebase Auth ..................... line 6654
+    Clan Data Layer ................... line 6658
+    Init .............................. line 7060
+    Migration ......................... line 7109
+    Firestore Load / Save ............. line 7208
+    Auth UI (sign-in/up/out) .......... line 7304
+    Platform Shell .................... line 7380
+    Hiyoku State + Render ............. line 7449
+    Couples Firebase Module ........... line 7990
+    Pairing UI Handlers ............... line 8205
+    Pair Line Rendering ............... line 8285
+    Hiyoku Cloud Push Hooks ........... line 8299
+    Calendar Sync + Settings JS ....... line 8986
+    Seasonal Review JS ................ line 10070
+    Ryughi Constellation .............. line 10552
+  ═══════════════════════════════════════════════════════════════════════ -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7239,24 +7337,31 @@ function showDashboard(){
   if(state.visMode === 'shinobi' || state.visMode === 'samurai'){
     _visMode = state.visMode;
   }
-  renderDashboard();
-  initGridSwipe();
-  updateDarkMode();
-  setInterval(updateDarkMode, 60000);
-  // Update the Samurai/Shinobi pill UI to match the restored mode.
-  // persist:false because we're just painting the UI — state.visMode is already correct.
-  setVis(_visMode, { persist: false });
-  if(!FIREBASE_CONFIGURED){
-    // JSONbin/legacy path: wait for cloud sync before checking prompts so we use
-    // the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
-    loadFromCloud(_preRenderTs)
-      .then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); })
-      .finally(() => { checkReflectionPrompts(); });
-  } else {
-    // Firebase path: Firestore data was already loaded by loadFirestoreState()
-    // before showDashboard() was called — safe to check prompts immediately.
-    checkReflectionPrompts();
-  }
+  // Use requestAnimationFrame so the browser paints the now-visible #dashboard
+  // container BEFORE we populate it. Without this, iOS Safari batches the
+  // display:none→block transition and the innerHTML write into the same frame,
+  // causing the fadeUp animation on .goal items to fire at opacity:0 and never
+  // complete, leaving habits invisible until the user switches tabs.
+  requestAnimationFrame(function(){
+    renderDashboard();
+    initGridSwipe();
+    updateDarkMode();
+    setInterval(updateDarkMode, 60000);
+    // Update the Samurai/Shinobi pill UI to match the restored mode.
+    // persist:false because we're just painting the UI — state.visMode is already correct.
+    setVis(_visMode, { persist: false });
+    if(!FIREBASE_CONFIGURED){
+      // JSONbin/legacy path: wait for cloud sync before checking prompts so we use
+      // the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
+      loadFromCloud(_preRenderTs)
+        .then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); })
+        .finally(() => { checkReflectionPrompts(); });
+    } else {
+      // Firebase path: Firestore data was already loaded by loadFirestoreState()
+      // before showDashboard() was called — safe to check prompts immediately.
+      checkReflectionPrompts();
+    }
+  });
 }
 
 async function saveStateToFirestore(){
