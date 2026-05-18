@@ -4582,11 +4582,6 @@ function renderGoals(){
               <span class="shr-k">${s.kanji}</span><span class="shr-l">${s.name}</span>
             </div>${j<2?'<div class="shr-c"></div>':''}`).join('')}</div>
           <div class="pbar"><div class="pfill ${si>=2?'red':''}" style="width:${g.progress}%"></div></div>
-          <div class="plabel">${g.progress}% \u2014 ${SHR[si].name}: ${SHR[si].meaning}</div>
-          <div class="pctrl">
-            <button class="pbtn" onclick="adjProg(${g.id},-5)">\u2212</button>
-            <button class="pbtn" onclick="adjProg(${g.id},5)">+</button>
-          </div>
         </div>
         <div class="goal-actions">
           <button class="goal-act" onclick="startEdit('shokunin',${g.id})">✎</button>
