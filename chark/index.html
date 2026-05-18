@@ -4542,7 +4542,7 @@ function renderGoals(){
       const childKaizens=state.kaizen.filter(k=>k.parentShok==g.id);
       const activeStreaks=childKaizens.filter(k=>k.streak>0).length;
       return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.05}s" data-shok-id="${g.id}">
-        <div class="check ${g.done?'done':''}" onclick="toggleShok(${g.id})"></div>
+        <div class="check ${g.done?'done':''}"></div>
         <div class="goal-content">
           <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
           <div class="goal-meta">
@@ -4774,7 +4774,7 @@ function toggleIkigai(id){
 
 function adjProg(id,delta){
   const g=state.shokunin.find(s=>s.id===id);
-  if(g){g.progress=Math.max(0,Math.min(100,g.progress+delta));if(g.progress>=100)g.done=true;saveState();renderTab();}
+  if(g){g.progress=Math.max(0,Math.min(100,g.progress+delta));g.done=g.progress>=100;saveState();renderTab();}
 }
 
 function updateStreak(){
