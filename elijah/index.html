@@ -4396,7 +4396,8 @@ function renderDashboard(){
   srInitBanner();
   // Ryughi strands
   renderStrandArms();
-  if(greet) greet.textContent=getGreeting();
+  const greetEl=document.getElementById('greeting-display');
+  if(greetEl) greetEl.textContent=getGreeting();
   const ws=document.getElementById('week-strip');
   if(ws) ws.style.display='none'; // superseded by inline grid
   renderTab();
