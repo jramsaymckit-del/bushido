@@ -353,6 +353,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   text-transform:uppercase;color:var(--red);border:1px solid var(--red);background:none;
   padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
 .reflect-nudge-btn:hover{background:var(--red);color:var(--white)}
+.reflect-nudge.review-card{border-color:rgba(204,53,41,.08);border-left-color:rgba(204,53,41,.25)}
+.reflect-nudge.review-card .reflect-nudge-text{opacity:.7}
+.reflect-nudge.review-card .reflect-nudge-btn{border-color:rgba(204,53,41,.3);color:var(--ink-faint)}
+.reflect-nudge.review-card .reflect-nudge-btn:hover{background:none;color:var(--red);border-color:var(--red)}
+.reflect-textarea.reflect-readonly{border-bottom-color:rgba(204,53,41,.2);opacity:.6;cursor:default;resize:none}
+.reflect-review-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.55;display:block;text-align:center;margin-bottom:24px}
 
 /* ===== HABIT GRID (Kaizen week view) ===== */
 .hg-wrap{margin-bottom:8px}
@@ -891,6 +897,7 @@ body.dark .stats-row{border-bottom-color:rgba(255,255,255,.04)}
 body.dark .stats-cols{border-bottom-color:rgba(255,255,255,.08)}
 body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06)}
 body.dark .reflect-nudge{border-color:rgba(204,53,41,.25);border-left-color:var(--red)}
+body.dark .reflect-nudge.review-card{border-color:rgba(204,53,41,.12);border-left-color:rgba(204,53,41,.4)}
 body.dark .add-trigger:hover{opacity:.5}
 body.dark .hanko{border-color:var(--red)}
 
@@ -4548,6 +4555,7 @@ function renderGoals(){
     if(needsAnnualReflection()) nudgeHtml+=buildReflectionNudgeCard('annual');
     else if(isAnnualReviewMonth11()) nudgeHtml+=buildReflectionNudgeCard('annual-preview');
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
+    else{ const wkr=getReviewableWeeklyReflection(); if(wkr) nudgeHtml+=buildReflectionNudgeCard('weekly-review',wkr); }
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
     list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+noteHtml+buildKaizenGrid()+nudgeHtml;
     reApplyHabitDetails();
@@ -5035,6 +5043,31 @@ function needsWeeklyReflection(){
   );
 }
 
+function getReviewableWeeklyReflection(){
+  // Returns {entry, editable} for the most recent sealed weekly reflection
+  // within the last 14 days, or null if none. Drives the "Review" nudge card.
+  const wStart=getWeekStart(0),wEnd=new Date(wStart);
+  wEnd.setDate(wStart.getDate()+6);
+  const wStartStr=getDateStr(wStart),wEndStr=getDateStr(wEnd);
+  const sorted=(state.reflections||[])
+    .filter(r=>r.type==='weekly')
+    .sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length) return null;
+  const latest=sorted[0];
+  // Within this week's Mon–Sun window → editable
+  if(latest.date>=wStartStr&&latest.date<=wEndStr) return {entry:latest,editable:true};
+  // Monday grace day: last week's window still editable
+  if(todayIdx()===0){
+    const pStart=getWeekStart(-1),pEnd=new Date(pStart);
+    pEnd.setDate(pStart.getDate()+6);
+    if(latest.date>=getDateStr(pStart)&&latest.date<=getDateStr(pEnd)) return {entry:latest,editable:true};
+  }
+  // Past entry within 14 days → read-only
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
+  if(latest.date>=getDateStr(cutoff)) return {entry:latest,editable:false};
+  return null;
+}
+
 function needsMonthlyReflection(){
   const today=new Date();
   const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
@@ -5466,11 +5499,22 @@ function checkReflectionPrompts(){
   }
 }
 
-function buildReflectionNudgeCard(type){
+function buildReflectionNudgeCard(type,data){
   if(type==='weekly') return `<div class="reflect-nudge">
     <span class="reflect-nudge-text">the week is closing. seal your reflection.</span>
     <button class="reflect-nudge-btn" onclick="showReflection('weekly')">週 &nbsp;reflect</button>
   </div>`;
+  if(type==='weekly-review'){
+    const {entry,editable}=data;
+    const refDate=new Date(entry.date+'T12:00:00');
+    const wMon=new Date(refDate);wMon.setDate(refDate.getDate()-((refDate.getDay()+6)%7));
+    const wSun=new Date(wMon);wSun.setDate(wMon.getDate()+6);
+    const range=wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+wSun.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return `<div class="reflect-nudge review-card">
+      <span class="reflect-nudge-text">週 ${range} · sealed</span>
+      <button class="reflect-nudge-btn" onclick="showReflectionReview(${editable})">review</button>
+    </div>`;
+  }
   if(type==='annual') return `<div class="reflect-nudge" style="border-left-width:3px">
     <span class="reflect-nudge-text">your year is ending. seal your Ikigai reflection to unlock the Year-End Review.</span>
     <button class="reflect-nudge-btn" onclick="showReflection('annual')">年 &nbsp;reflect</button>
@@ -5762,6 +5806,83 @@ function showReflection(type){
 
 function closeReflection(){
   document.getElementById('reflect-modal').classList.remove('active');
+}
+
+function showReflectionReview(editable){
+  // Opens the weekly reflection modal pre-populated with the existing sealed entry.
+  // editable=true → current week, user can edit and re-seal.
+  // editable=false → past week, read-only display.
+  const rv=getReviewableWeeklyReflection();
+  if(!rv) return;
+  const entry=rv.entry;
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+  // Week date range label
+  const refDate=new Date(entry.date+'T12:00:00');
+  const wMon=new Date(refDate);wMon.setDate(refDate.getDate()-((refDate.getDay()+6)%7));
+  const wSun=new Date(wMon);wSun.setDate(wMon.getDate()+6);
+  const range=wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+wSun.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  const ro=editable?'':'readonly';
+  const roClass=editable?'':' reflect-readonly';
+  // Weakest craft label from saved entry id
+  const craftEl=(()=>{
+    const craft=(state.shokunin||[]).find(s=>s.id===entry.weakCraft);
+    if(!craft) return '';
+    return `<div style="margin-bottom:24px;padding:12px 18px;border-left:2px solid rgba(204,53,41,.15)">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);opacity:.6;margin-bottom:4px">${craft.text.substring(0,45)}</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);opacity:.7">was the quietest craft that week.</div>
+    </div>`;
+  })();
+  const safeVal=v=>(v||'').replace(/"/g,'&quot;');
+  c.innerHTML=`
+    <div class="modal-kanji">職人</div>
+    <div class="modal-title">Weekly Reflection</div>
+    <div class="modal-sub">${range}</div>
+    <div class="reflect-review-badge">${editable?'sealed · edit and re-seal until next week':'past week · sealed'}</div>
+    ${craftEl}
+    ${entry.whatGotInWay!==undefined?`
+    <div class="reflect-q">
+      <div class="reflect-label">what got in the way?</div>
+      <textarea class="reflect-textarea${roClass}" id="rev-q1" ${ro}>${entry.whatGotInWay||''}</textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">what would showing up look like?</div>
+      <textarea class="reflect-textarea${roClass}" id="rev-q2" ${ro}>${entry.showingUp||''}</textarea>
+    </div>`:''}
+    <div class="reflect-q">
+      <div class="reflect-label">the week in one thought</div>
+      <textarea class="reflect-textarea${roClass}" id="rev-notes" ${ro}>${entry.notes||''}</textarea>
+    </div>
+    <div class="reflect-q" style="margin-top:32px;padding-top:28px;border-top:1px solid rgba(0,0,0,.06)">
+      <div class="reflect-label">${editable?'one intention for the week ahead':'intention set for the week ahead'}</div>
+      <input id="rev-intention" class="reflect-textarea${roClass}" style="min-height:auto;resize:none;display:block" value="${safeVal(entry.intention)}" ${ro}>
+    </div>
+    <div class="form-actions">
+      ${editable
+        ?`<button class="btn btn-ghost" onclick="closeReflection()">close</button>
+          <button class="btn" onclick="resealReflection('${entry.date}',${entry.ts||0})">Re-seal</button>`
+        :`<button class="btn" onclick="closeReflection()">close</button>`}
+    </div>`;
+}
+
+function resealReflection(date,ts){
+  // Update the existing weekly entry in-place (matched by date+ts), save, show seal screen.
+  const c=document.getElementById('reflect-content');
+  const idx=(state.reflections||[]).findIndex(r=>r.type==='weekly'&&r.date===date&&(ts?r.ts===ts:true));
+  if(idx===-1) return;
+  const entry=state.reflections[idx];
+  if(c.querySelector('#rev-q1'))  entry.whatGotInWay=c.querySelector('#rev-q1').value.trim();
+  if(c.querySelector('#rev-q2'))  entry.showingUp=c.querySelector('#rev-q2').value.trim();
+  if(c.querySelector('#rev-notes')) entry.notes=c.querySelector('#rev-notes').value;
+  if(c.querySelector('#rev-intention')) entry.intention=c.querySelector('#rev-intention').value.trim();
+  saveState();
+  c.innerHTML=`<div style="text-align:center;padding:56px 0">
+    <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
+  </div>`;
+  setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 1800);
 }
 
 // Close modal on overlay click
