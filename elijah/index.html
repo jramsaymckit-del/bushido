@@ -2128,6 +2128,7 @@ li.goal.hd-open .habit-detail{display:block}
 .cs-success-seal{font-family:'Noto Serif JP',serif;font-size:60px;color:var(--red);opacity:.85;margin-bottom:24px;line-height:1;animation:stampIn .6s ease-out}
 .cs-success-line{font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:14px;letter-spacing:2px}
 .cs-success-sub{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+@keyframes stampIn{0%{opacity:0;transform:scale(0)}60%{opacity:1;transform:scale(1.15)}80%{transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
 
 /* Error / status copy used during real API calls */
 .cs-error{margin-top:18px;padding:14px 16px;background:rgba(204,53,41,.06);
@@ -7441,6 +7442,7 @@ async function loadFirestoreState(user){
   }
 }
 
+let _darkModeTimer = null;
 function showDashboard(){
   document.getElementById('onboard').classList.remove('active');
   document.getElementById('dashboard').classList.add('active');
@@ -7462,7 +7464,8 @@ function showDashboard(){
     renderDashboard();
     initGridSwipe();
     updateDarkMode();
-    setInterval(updateDarkMode, 60000);
+    clearInterval(_darkModeTimer);
+    _darkModeTimer = setInterval(updateDarkMode, 60000);
     // Update the Samurai/Shinobi pill UI to match the restored mode.
     // persist:false because we're just painting the UI — state.visMode is already correct.
     setVis(_visMode, { persist: false });
@@ -10697,10 +10700,11 @@ async function srConfirmSchedule() {
     var endDate = new Date(start); endDate.setHours(endDate.getHours()+1);
     var endStr  = endDate.toISOString().replace(/\.\d{3}Z$/,'');
     var s = srGetState();
+    var SR_KANJI=['志','史','鍛','匠','愛'];
     var desc = 'BUSHIDO Seasonal Review — '+srGetSeasonLabel()+'\n\n';
     (s.strands||[]).forEach(function(strand,i){
       var r=srState.ratings[i]||'—'; var n=srState.notes[i]||'';
-      desc+=(SR_KANJI_C[i]||'')+' '+strand+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
+      desc+=(SR_KANJI[i]||'')+' '+strand+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
     });
     if(srState.seasonLesson) desc+='Season lesson: '+srState.seasonLesson;
     var calId = (typeof csCurrentCalendarId!=='undefined'&&csCurrentCalendarId)?csCurrentCalendarId:'primary';
