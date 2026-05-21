@@ -429,6 +429,25 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-clan .sh-shelf-native{border-bottom-color:rgba(0,0,0,.07)}
 .kk-outer.cal-clan .sh-shelf-lbl{color:rgba(204,53,41,.4)}
 .kk-outer.cal-clan .wk-sealed{color:var(--red)}
+.kk-outer.cal-clan .kk-date-header{border-bottom-color:rgba(204,53,41,.12)}
+.kk-outer.cal-clan .kk-date-text{color:rgba(204,53,41,.65)}
+.kk-outer.cal-clan .kk-streak-whisper{color:rgba(204,53,41,.5)}
+.kk-outer.cal-clan .hg-nav-btn{color:rgba(204,53,41,.35)}
+.kk-outer.cal-clan .hg-nav-btn:hover{color:rgba(204,53,41,.8)}
+.kk-outer.cal-clan .hg-week-label{color:rgba(204,53,41,.45)}
+.kk-outer.cal-clan .hg-header{background:rgba(204,53,41,.04)}
+.kk-outer.cal-clan .hg-row{border-bottom-color:rgba(204,53,41,.06)}
+.kk-outer.cal-clan .hg-day-head{color:rgba(204,53,41,.4)}
+.kk-outer.cal-clan .hg-day-head.is-today{color:var(--red)}
+.kk-outer.cal-clan .hg-label{color:rgba(204,53,41,.6)}
+/* clan cell circles — red on white */
+.kk-outer.cal-clan .hg-cell.hg-off{background:transparent}
+.kk-outer.cal-clan .hg-cell.hg-today-col:not(.hg-off){background:rgba(204,53,41,.05)}
+.kk-outer.cal-clan .hg-cell.hg-done::after{background:var(--red)}
+.kk-outer.cal-clan .hg-cell.hg-done:hover::after{background:var(--red-light)}
+.kk-outer.cal-clan .hg-cell.hg-miss::after{border-color:rgba(204,53,41,.25)}
+.kk-outer.cal-clan .hg-cell.hg-miss:hover::after{border-color:rgba(204,53,41,.6)}
+.kk-outer.cal-clan .hg-cell.hg-future::after{border-color:rgba(204,53,41,.1)}
 .kk-outer.cal-samurai{filter:drop-shadow(0 10px 28px rgba(140,20,10,.35)) drop-shadow(0 2px 6px rgba(140,20,10,.2))}
 .kk-outer.cal-samurai .kk-body{background-color:#B52016;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.2),inset -4px 0 14px rgba(0,0,0,.12),0 12px 40px rgba(140,20,10,.3),0 4px 12px rgba(0,0,0,.2)}
 .kk-outer.cal-samurai .kk-body::before{display:none}
@@ -505,6 +524,21 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-shinobi .hg-cell.hg-off{background:transparent}
 .kk-outer.cal-shinobi .hg-cell.hg-today-col:not(.hg-off){background:rgba(255,255,255,.03)}
 .kk-outer.cal-shinobi .ycal-cell.ycal-today{outline-color:rgba(254,252,248,.55)}
+/* Shinobi Kaizen grid — base text glow */
+.kk-outer.cal-shinobi .kk-date-header{border-bottom-color:rgba(254,252,248,.06)}
+.kk-outer.cal-shinobi .kk-date-text{color:rgba(254,252,248,.55);text-shadow:0 0 10px rgba(204,53,41,.2)}
+.kk-outer.cal-shinobi .kk-streak-whisper{text-shadow:0 0 8px rgba(204,53,41,.28)}
+.kk-outer.cal-shinobi .hg-nav-btn{color:rgba(254,252,248,.25);text-shadow:0 0 8px rgba(204,53,41,.15)}
+.kk-outer.cal-shinobi .hg-nav-btn:hover{color:rgba(254,252,248,.7);text-shadow:0 0 12px rgba(204,53,41,.35)}
+.kk-outer.cal-shinobi .hg-week-label{color:rgba(254,252,248,.32);text-shadow:0 0 10px rgba(204,53,41,.18)}
+.kk-outer.cal-shinobi .hg-header{background:rgba(0,0,0,.2)}
+.kk-outer.cal-shinobi .hg-row{border-bottom-color:rgba(254,252,248,.04)}
+.kk-outer.cal-shinobi .hg-day-head{color:rgba(254,252,248,.32);text-shadow:0 0 8px rgba(204,53,41,.14)}
+.kk-outer.cal-shinobi .hg-day-head.is-today{color:var(--red);text-shadow:0 0 10px rgba(204,53,41,.5)}
+.kk-outer.cal-shinobi .hg-label{color:rgba(254,252,248,.5);text-shadow:0 0 8px rgba(204,53,41,.12)}
+/* Shinobi — all-done column enhanced glow */
+.kk-outer.cal-shinobi .hg-day-head.hg-col-complete{color:rgba(254,252,248,.75);text-shadow:0 0 10px rgba(204,53,41,.5),0 0 22px rgba(204,53,41,.25)}
+.kk-outer.cal-shinobi .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(204,53,41,.7),0 0 12px rgba(204,53,41,.4)}
 .mcal-num{font-size:9px;color:rgba(255,255,255,.6);line-height:1}
 .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
 .mcal-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5px;padding-top:2px;max-width:100%}
@@ -4213,6 +4247,13 @@ function buildKaizenGrid(){
   </div>`;
 
   const _calThemeCls_kz=(state.calThemeKaizen||'default')==='default'?'':('cal-'+(state.calThemeKaizen||'default'));
+  const completeDays=days.map((d,i)=>{
+    const dStr=getDateStr(d);
+    if(dStr>todayStr)return false;
+    const scheduled=habits.filter(k=>habitOnDay(k,i));
+    if(!scheduled.length)return false;
+    return scheduled.every(k=>isHabitDoneOnDate(k.id,dStr));
+  });
   let html=`<div class="hg-wrap">
     <div class="kk-outer ${_calThemeCls_kz}">
       <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
@@ -4229,7 +4270,7 @@ function buildKaizenGrid(){
         <div class="hg-label-cell"></div>
         ${days.map((d,i)=>{
           const isT=isCurrentWeek&&i===todayDayIdx;
-          return `<div class="hg-day-head${isT?' is-today':''}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
+          return `<div class="hg-day-head${isT?' is-today':''}${completeDays[i]?' hg-col-complete':''}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
         }).join('')}
       </div>
       ${habits.map(k=>{
@@ -4246,7 +4287,7 @@ function buildKaizenGrid(){
             let cls='hg-cell';
             if(!scheduled){cls+=' hg-off';}
             else if(isFuture){cls+=' hg-future';}
-            else if(done){cls+=' hg-done';}
+            else if(done){cls+=' hg-done';if(completeDays[i])cls+=' hg-col-complete';}
             else{cls+=' hg-miss';}
             if(isT&&scheduled)cls+=' hg-today-col';
             const clickable=scheduled&&!isFuture;
