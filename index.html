@@ -515,6 +515,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .wk-sealed{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--red);opacity:.75;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
 .wk-sealed:hover{opacity:1}
 .wk-sealed.is-open{opacity:1;transform:scale(1.15)}
+.wk-sealed-month{font-size:15px;letter-spacing:0;color:rgba(204,53,41,.45)}
+.wk-sealed-month:hover{color:rgba(204,53,41,.75)}
+.wk-sealed-month.is-open{color:rgba(204,53,41,.75)}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
 .mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
@@ -4348,7 +4351,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
         <div class="mcal-nav">
           <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
           <span class="mcal-title">${monthName}</span>
-          ${monthRef?`<span class="wk-sealed${_monthReflectExpanded?' is-open':''}" onclick="toggleMonthReflect(event)" title="monthly reflection" style="margin-right:6px">月</span>`:'<span style="width:20px;display:inline-block"></span>'}
+          ${monthRef?`<span class="wk-sealed wk-sealed-month${_monthReflectExpanded?' is-open':''}" onclick="toggleMonthReflect(event)" title="monthly reflection" style="margin-right:6px">月</span>`:'<span style="width:20px;display:inline-block"></span>'}
           <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
         </div>
         <div class="mcal-grid">
