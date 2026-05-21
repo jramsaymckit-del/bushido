@@ -405,14 +405,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-clan{filter:drop-shadow(0 6px 18px rgba(0,0,0,.10)) drop-shadow(0 1px 4px rgba(0,0,0,.07))}
 .kk-outer.cal-clan .kk-body{background-color:#FFFFFF;background-image:none;box-shadow:0 0 0 1px rgba(204,53,41,.1),0 2px 12px rgba(0,0,0,.06)}
 .kk-outer.cal-clan .kk-body::before{display:none}
-.kk-outer.cal-clan .mcal-nav-btn{color:rgba(26,18,16,.3)}
+.kk-outer.cal-clan .mcal-nav-btn{color:rgba(204,53,41,.4)}
 .kk-outer.cal-clan .mcal-nav-btn:hover{color:var(--red)}
 .kk-outer.cal-clan .mcal-nav-btn:disabled{opacity:.15}
-.kk-outer.cal-clan .mcal-title{color:rgba(26,18,16,.4)}
-.kk-outer.cal-clan .mcal-dh{color:rgba(26,18,16,.28)}
+.kk-outer.cal-clan .mcal-title{color:rgba(204,53,41,.55)}
+.kk-outer.cal-clan .mcal-dh{color:rgba(204,53,41,.4)}
 .kk-outer.cal-clan .mcal-cell{background:rgba(0,0,0,.025)}
 .kk-outer.cal-clan .mcal-cell.mcal-empty{background:transparent}
-.kk-outer.cal-clan .mcal-num{color:rgba(26,18,16,.5)}
+.kk-outer.cal-clan .mcal-num{color:rgba(204,53,41,.65)}
 .kk-outer.cal-clan .mcal-cell.mcal-today .mcal-num{color:var(--red)}
 .kk-outer.cal-clan .mcal-cell.mcal-future{opacity:.2}
 .kk-outer.cal-clan .mcal-dot{background:var(--red)}
@@ -425,9 +425,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-clan .exp-text{color:rgba(26,18,16,.65)}
 .kk-outer.cal-clan .exp-intention .exp-label{color:rgba(204,53,41,.5)}
 .kk-outer.cal-clan .exp-intention .exp-text{color:rgba(26,18,16,.8)}
-.kk-outer.cal-clan .mcal-note-mark{color:rgba(26,18,16,.35)}
+.kk-outer.cal-clan .mcal-note-mark{color:rgba(204,53,41,.45)}
 .kk-outer.cal-clan .sh-shelf-native{border-bottom-color:rgba(0,0,0,.07)}
-.kk-outer.cal-clan .sh-shelf-lbl{color:rgba(26,18,16,.3)}
+.kk-outer.cal-clan .sh-shelf-lbl{color:rgba(204,53,41,.4)}
 .kk-outer.cal-clan .wk-sealed{color:var(--red)}
 .kk-outer.cal-samurai{filter:drop-shadow(0 10px 28px rgba(140,20,10,.35)) drop-shadow(0 2px 6px rgba(140,20,10,.2))}
 .kk-outer.cal-samurai .kk-body{background-color:#B52016;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.2),inset -4px 0 14px rgba(0,0,0,.12),0 12px 40px rgba(140,20,10,.3),0 4px 12px rgba(0,0,0,.2)}
@@ -459,6 +459,52 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-samurai .wk-sealed{color:rgba(254,252,248,.65)}
 .kk-outer.cal-samurai .wk-sealed:hover{color:rgba(254,252,248,.95)}
 .kk-outer.cal-samurai .wk-sealed.is-open{color:rgba(254,252,248,.95)}
+.kk-outer.cal-samurai .hg-cell.hg-done::after{background:rgba(254,252,248,.85)}
+.kk-outer.cal-samurai .hg-cell.hg-done:hover::after{background:#FEFCF8}
+.kk-outer.cal-samurai .hg-cell.hg-miss:hover::after{border-color:rgba(254,252,248,.35)}
+.kk-outer.cal-samurai .hg-cell.hg-off{background:transparent}
+.kk-outer.cal-samurai .hg-cell.hg-today-col:not(.hg-off){background:transparent}
+.kk-outer.cal-samurai .hg-cell.hg-miss::after{border-color:rgba(254,252,248,.2)}
+.kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(254,252,248,.08)}
+.kk-outer.cal-samurai .ycal-cell.ycal-today{outline-color:rgba(254,252,248,.7)}
+/* Shinobi calendar theme */
+.kk-outer.cal-shinobi .kk-body{background-color:#1a1a2e;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.4),inset -4px 0 14px rgba(0,0,0,.3),0 12px 40px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.25)}
+.kk-outer.cal-shinobi .kk-body::before{display:none}
+.kk-outer.cal-shinobi .mcal-nav-btn{color:rgba(254,252,248,.28)}
+.kk-outer.cal-shinobi .mcal-nav-btn:hover{color:rgba(254,252,248,.8)}
+.kk-outer.cal-shinobi .mcal-nav-btn:disabled{opacity:.15}
+.kk-outer.cal-shinobi .mcal-title{color:rgba(254,252,248,.38);text-shadow:0 0 10px rgba(204,53,41,.18)}
+.kk-outer.cal-shinobi .mcal-dh{color:rgba(254,252,248,.2);text-shadow:0 0 8px rgba(204,53,41,.12)}
+.kk-outer.cal-shinobi .mcal-cell{background:rgba(255,255,255,.04)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-empty{background:transparent}
+.kk-outer.cal-shinobi .mcal-num{color:rgba(254,252,248,.55);text-shadow:0 0 8px rgba(204,53,41,.15)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-today .mcal-num{color:#FEFCF8;font-weight:700;text-shadow:0 0 10px rgba(204,53,41,.35)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-today{outline-color:rgba(254,252,248,.55)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-future{opacity:.2}
+.kk-outer.cal-shinobi .mcal-dot{background:var(--red)}
+.kk-outer.cal-shinobi .mcal-dots.all-done .mcal-dot{opacity:1;box-shadow:0 0 3px rgba(204,53,41,.7),0 0 7px rgba(204,53,41,.4)}
+.kk-outer.cal-shinobi .wk-dot{background:rgba(254,252,248,.12)}
+.kk-outer.cal-shinobi .mcal-expansion{border-top:1px solid rgba(254,252,248,.07)}
+.kk-outer.cal-shinobi .mcal-expand-inner{background:rgba(0,0,0,.2)}
+.kk-outer.cal-shinobi .exp-range{color:rgba(254,252,248,.28)}
+.kk-outer.cal-shinobi .exp-label{color:rgba(254,252,248,.28)}
+.kk-outer.cal-shinobi .exp-text{color:rgba(254,252,248,.72)}
+.kk-outer.cal-shinobi .exp-intention .exp-label{color:rgba(254,252,248,.45)}
+.kk-outer.cal-shinobi .exp-intention .exp-text{color:rgba(254,252,248,.9)}
+.kk-outer.cal-shinobi .mcal-note-mark{color:rgba(254,252,248,.38)}
+.kk-outer.cal-shinobi .sh-shelf-native{border-bottom-color:rgba(254,252,248,.08)}
+.kk-outer.cal-shinobi .sh-shelf-lbl{color:rgba(254,252,248,.3)}
+.kk-outer.cal-shinobi .wk-sealed{color:rgba(254,252,248,.6)}
+.kk-outer.cal-shinobi .wk-sealed:hover{color:rgba(254,252,248,.95)}
+.kk-outer.cal-shinobi .wk-sealed.is-open{color:rgba(254,252,248,.95)}
+.kk-outer.cal-shinobi .hg-cell.hg-done::after{background:var(--red);box-shadow:0 0 4px rgba(204,53,41,.6)}
+.kk-outer.cal-shinobi .hg-cell.hg-done:hover::after{background:var(--red-light);box-shadow:0 0 6px rgba(204,53,41,.8)}
+.kk-outer.cal-shinobi .hg-cell.hg-miss::after{border-color:rgba(254,252,248,.18)}
+.kk-outer.cal-shinobi .hg-cell.hg-miss:hover::after{border-color:rgba(254,252,248,.4)}
+.kk-outer.cal-shinobi .hg-cell.hg-future::after{border-color:rgba(254,252,248,.07)}
+.kk-outer.cal-shinobi .hg-cell.hg-off{background:transparent}
+.kk-outer.cal-shinobi .hg-cell.hg-today-col:not(.hg-off){background:rgba(255,255,255,.03)}
+.kk-outer.cal-shinobi .ycal-cell.ycal-today{outline-color:rgba(254,252,248,.55)}
 .mcal-num{font-size:9px;color:rgba(255,255,255,.6);line-height:1}
 .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
 .mcal-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5px;padding-top:2px;max-width:100%}
@@ -4426,6 +4472,8 @@ function buildYearView(){
   const arcHtml=arcNarr?('<div class="ik-arc-native"><div class="ik-arc-label-sm">'+year+' \u2014 the arc</div><div class="ik-arc-narrative">'+arcNarr+'</div></div>'):'';
 
   const _calThemeCls_ik=(state.calThemeIkigai||'default')==='default'?'':('cal-'+(state.calThemeIkigai||'default'));
+  const _ykSamurai=(state.calThemeIkigai||'default')==='samurai';
+  const _ykShinobi=(state.calThemeIkigai||'default')==='shinobi';
   let html=`<div class="kk-outer ${_calThemeCls_ik}">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
     <div class="kk-rod"></div>
@@ -4469,7 +4517,7 @@ function buildYearView(){
       else {
         // Continuous heatmap: alpha scales with completion rate
         const alpha=pct===0?0.07:Math.max(0.18,pct*0.90);
-        ycalInline=` style="background:rgba(204,53,41,${alpha.toFixed(2)})"`;
+        ycalInline=(_ykSamurai||_ykShinobi)?` style="background:rgba(254,252,248,${alpha.toFixed(2)})"`:` style="background:rgba(204,53,41,${alpha.toFixed(2)})"`;
         if(pct>=1) cls+=' ycal-full';
         else if(pct>0) cls+=' ycal-partial';
         else cls+=' ycal-miss';
@@ -9095,14 +9143,7 @@ hiInit = function(){
             <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('all','default')">Navy</button>
             <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('all','clan')">White</button>
             <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('all','samurai')">Red</button>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;color:var(--ink-faint);letter-spacing:.5px">Shokunin</span>
-          <div class="cs-cal-pills" id="csCalTheme-shokunin">
-            <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('shokunin','default')">Navy</button>
-            <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('shokunin','clan')">White</button>
-            <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('shokunin','samurai')">Red</button>
+            <button class="cs-cal-pill" data-theme="shinobi" onclick="setCalTheme('all','shinobi')">Black</button>
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -9111,6 +9152,16 @@ hiInit = function(){
             <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('kaizen','default')">Navy</button>
             <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('kaizen','clan')">White</button>
             <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('kaizen','samurai')">Red</button>
+            <button class="cs-cal-pill" data-theme="shinobi" onclick="setCalTheme('kaizen','shinobi')">Black</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--ink-faint);letter-spacing:.5px">Shokunin</span>
+          <div class="cs-cal-pills" id="csCalTheme-shokunin">
+            <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('shokunin','default')">Navy</button>
+            <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('shokunin','clan')">White</button>
+            <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('shokunin','samurai')">Red</button>
+            <button class="cs-cal-pill" data-theme="shinobi" onclick="setCalTheme('shokunin','shinobi')">Black</button>
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -9119,6 +9170,7 @@ hiInit = function(){
             <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('ikigai','default')">Navy</button>
             <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('ikigai','clan')">White</button>
             <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('ikigai','samurai')">Red</button>
+            <button class="cs-cal-pill" data-theme="shinobi" onclick="setCalTheme('ikigai','shinobi')">Black</button>
           </div>
         </div>
       </div>
