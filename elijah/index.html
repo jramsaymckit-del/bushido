@@ -4245,7 +4245,7 @@ function buildKaizenGrid(){
     ${maxSt>1?`<span class="kk-streak-whisper">\u00b7 day ${maxSt}</span>`:''}
   </div>`;
 
-  const _calThemeCls_kz=(state.calThemeKaizen||'default')==='default'?'':('cal-'+(state.calThemeKaizen||'default'));
+  const _calThemeCls_kz=(()=>{const _t=_effectiveCalTheme(state.calThemeKaizen);return _t==='default'?'':('cal-'+_t);})();
   const completeDays=days.map((d,i)=>{
     const dStr=getDateStr(d);
     if(dStr>todayStr)return false;
@@ -4364,7 +4364,7 @@ function buildMonthCal(){
   var shelfHtml='<div class="sh-shelf-native"><div class="sh-shelf-lbl">Milestones of continuance</div><div class="sh-shelf">'+stampsHtml+'</div></div>';
 
     const _calThemeKey=currentTab==='shokunin'?'calThemeShokunin':'calThemeKaizen';
-  const _calTheme=(state[_calThemeKey]||'default');
+  const _calTheme=_effectiveCalTheme(state[_calThemeKey]);
   const _calThemeCls=_calTheme==='default'?'':('cal-'+_calTheme);
 let html=`<div class="kk-outer ${_calThemeCls}">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
@@ -4497,9 +4497,9 @@ function buildYearView(){
   }
   const arcHtml=arcNarr?('<div class="ik-arc-native"><div class="ik-arc-label-sm">'+year+' \u2014 the arc</div><div class="ik-arc-narrative">'+arcNarr+'</div></div>'):'';
 
-  const _calThemeCls_ik=(state.calThemeIkigai||'default')==='default'?'':('cal-'+(state.calThemeIkigai||'default'));
-  const _ykSamurai=(state.calThemeIkigai||'default')==='samurai';
-  const _ykShinobi=(state.calThemeIkigai||'default')==='shinobi';
+  const _calThemeCls_ik=(()=>{const _t=_effectiveCalTheme(state.calThemeIkigai);return _t==='default'?'':('cal-'+_t);})();
+  const _ykSamurai=_effectiveCalTheme(state.calThemeIkigai)==='samurai';
+  const _ykShinobi=_effectiveCalTheme(state.calThemeIkigai)==='shinobi';
   let html=`<div class="kk-outer ${_calThemeCls_ik}">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
     <div class="kk-rod"></div>
@@ -7036,9 +7036,21 @@ function importState(e){
 }
 
 // ============ DARK MODE ============
+// Returns the theme to actually render — auto-swaps clan→shinobi when body.dark is active.
+// State is never mutated; this is display-layer only.
+function _effectiveCalTheme(t){
+  return (t||'default')==='clan'&&document.body.classList.contains('dark')?'shinobi':(t||'default');
+}
+
 function updateDarkMode(){
   const h=new Date().getHours();
-  document.body.classList.toggle('dark', h>=21||h<6);
+  const isDark=h>=21||h<6;
+  const wasDark=document.body.classList.contains('dark');
+  document.body.classList.toggle('dark',isDark);
+  if(isDark!==wasDark){
+    const clanActive=['calThemeShokunin','calThemeKaizen','calThemeIkigai'].some(k=>(state[k]||'default')==='clan');
+    if(clanActive&&typeof renderGoals==='function') renderGoals();
+  }
 }
 
 // ============ GRID SWIPE NAVIGATION ============
