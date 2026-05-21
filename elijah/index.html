@@ -2145,6 +2145,19 @@ li.goal.hd-open .habit-detail{display:block}
 .cs-cal-pill{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;border:1px solid var(--ink-faint);background:transparent;color:var(--ink-faint);cursor:pointer;transition:all .15s}
 .cs-cal-pill:hover{border-color:var(--red);color:var(--red)}
 .cs-cal-pill.active{background:var(--red);border-color:var(--red);color:var(--white)}
+/* Theme-coordinated pill colours */
+.cs-cal-pill[data-theme="default"]{background:rgba(26,40,90,.15);border-color:rgba(26,40,90,.35);color:rgba(180,200,255,.6)}
+.cs-cal-pill[data-theme="default"]:hover{background:rgba(26,40,90,.35);border-color:rgba(26,40,90,.6);color:#FEFCF8}
+.cs-cal-pill[data-theme="default"].active{background:#1a2860;border-color:#1a2860;color:#FEFCF8}
+.cs-cal-pill[data-theme="clan"]{background:rgba(254,252,248,.12);border-color:rgba(254,252,248,.35);color:rgba(254,252,248,.55)}
+.cs-cal-pill[data-theme="clan"]:hover{background:rgba(254,252,248,.28);border-color:rgba(254,252,248,.7);color:#FEFCF8}
+.cs-cal-pill[data-theme="clan"].active{background:#FEFCF8;border-color:#FEFCF8;color:var(--red)}
+.cs-cal-pill[data-theme="samurai"]{background:rgba(181,32,22,.1);border-color:rgba(181,32,22,.35);color:rgba(204,53,41,.65)}
+.cs-cal-pill[data-theme="samurai"]:hover{background:rgba(181,32,22,.22);border-color:rgba(181,32,22,.6);color:#CC3529}
+.cs-cal-pill[data-theme="samurai"].active{background:#B52016;border-color:#B52016;color:#FEFCF8}
+.cs-cal-pill[data-theme="shinobi"]{background:rgba(26,26,46,.25);border-color:rgba(100,100,160,.22);color:rgba(180,180,220,.4)}
+.cs-cal-pill[data-theme="shinobi"]:hover{background:rgba(26,26,46,.5);border-color:rgba(100,100,160,.4);color:rgba(220,220,255,.8)}
+.cs-cal-pill[data-theme="shinobi"].active{background:#1a1a2e;border-color:rgba(100,100,160,.45);color:#FEFCF8}
 .cs-btn.connect{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:none;
   padding:14px 32px;background:var(--white);border:1.5px solid var(--ink);color:var(--ink);display:inline-flex;align-items:center;gap:10px}
 .cs-btn.connect:hover{background:var(--ink);color:var(--scroll)}
