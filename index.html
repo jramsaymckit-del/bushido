@@ -4721,14 +4721,12 @@ function renderGoals(){
 
   } else if(currentTab==='shokunin'){
     const items=state.shokunin;
-    if(!items.length){list.innerHTML=emptyState()+addTriggerHtml()+buildMonthCal();return;}
-    list.innerHTML=items.map((g,i)=>{
-      const si=getShrIdx(g.progress);
+    if(!items.length){list.innerHTML=buildMonthCal()+emptyState()+addTriggerHtml();return;}
+    const _shokunin_crafts_html=items.map((g,i)=>{
       const parent=state.annualGoals.find(a=>a.id==g.parentAnnual);
       const childKaizens=state.kaizen.filter(k=>k.parentShok==g.id);
       const activeStreaks=childKaizens.filter(k=>k.streak>0).length;
-      return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.05}s" data-shok-id="${g.id}">
-        <div class="check ${g.done?'done':''}"></div>
+      return `<li class="goal" style="animation-delay:${i*.05}s" data-shok-id="${g.id}">
         <div class="goal-content">
           <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
           <div class="goal-meta">
@@ -4736,20 +4734,12 @@ function renderGoals(){
             ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
             ${activeStreaks?`<span class="goal-streak">${activeStreaks} active habit${activeStreaks>1?'s':''}</span>`:''}
           </div>
-          <div class="shr">${SHR.map((s,j)=>`
-            <div class="shr-s ${j<si?'past':''} ${j===si?'active':''}">
-              <span class="shr-k">${s.kanji}</span><span class="shr-l">${s.name}</span>
-            </div>${j<2?'<div class="shr-c"></div>':''}`).join('')}</div>
-          <div class="pbar"><div class="pfill ${si>=2?'red':''}" style="width:${g.progress}%"></div></div>
-        </div>
-        <div class="goal-actions">
-          <button class="goal-act" onclick="startEdit('shokunin',${g.id})">✎</button>
-          <button class="goal-act goal-del" onclick="confirmDelete('shokunin',${g.id})">×</button>
         </div>
         </li>`;
-    }).join('')+addTriggerHtml()+buildMonthCal();
+    }).join('');
+    list.innerHTML=buildMonthCal()+_shokunin_crafts_html+addTriggerHtml();
 
-  } else {
+    } else {
     const items=state.annualGoals;
     if(!items.length){list.innerHTML=emptyState()+addTriggerHtml()+buildYearView();return;}
     list.innerHTML=items.map((g,i)=>{
