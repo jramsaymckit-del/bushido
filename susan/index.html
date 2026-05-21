@@ -2936,7 +2936,7 @@ if (FIREBASE_CONFIGURED) {
           <div class="avatar-dd-name">James<div class="avatar-dd-sub">your bushido</div></div>
           <button class="avatar-dd-item" onclick="openManifesto()"><span class="dd-kanji">道</span>Read the Manifesto</button>
           <!-- EXPERIMENT: CALENDAR SYNC + SETTINGS DROPDOWN ENTRIES -->
-          <button class="avatar-dd-item" id="ddCalSync" onclick="openCalSync()"><span class="dd-kanji">暦</span>Calendar Sync<span class="dd-status" id="ddCalSyncStatus"></span></button>
+          <button class="avatar-dd-item" id="ddCalSync" onclick="openCalSync()"><span class="dd-kanji">暦</span>Google Calendar Sync<span class="dd-status" id="ddCalSyncStatus"></span></button>
           <button class="avatar-dd-item" onclick="openSettings()"><span class="dd-kanji">設</span>Settings</button>
           <!-- /EXPERIMENT -->
           <div class="avatar-dd-divider"></div>
@@ -4150,8 +4150,9 @@ function buildKaizenGrid(){
     ${maxSt>1?`<span class="kk-streak-whisper">\u00b7 day ${maxSt}</span>`:''}
   </div>`;
 
+  const _calThemeCls_kz=(state.calThemeKaizen||'default')==='default'?'':('cal-'+(state.calThemeKaizen||'default'));
   let html=`<div class="hg-wrap">
-    <div class="kk-outer">
+    <div class="kk-outer ${_calThemeCls_kz}">
       <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
       <div class="kk-rod"></div>
       <div class="kk-body">
@@ -4394,7 +4395,8 @@ function buildYearView(){
   }
   const arcHtml=arcNarr?('<div class="ik-arc-native"><div class="ik-arc-label-sm">'+year+' \u2014 the arc</div><div class="ik-arc-narrative">'+arcNarr+'</div></div>'):'';
 
-  let html=`<div class="kk-outer">
+  const _calThemeCls_ik=(state.calThemeIkigai||'default')==='default'?'':('cal-'+(state.calThemeIkigai||'default'));
+  let html=`<div class="kk-outer ${_calThemeCls_ik}">
     <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
     <div class="kk-rod"></div>
     <div class="kk-body">
@@ -9081,6 +9083,14 @@ hiInit = function(){
             <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('kaizen','samurai')">Red</button>
           </div>
         </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--ink-faint);letter-spacing:.5px">Ikigai</span>
+          <div class="cs-cal-pills" id="csCalTheme-ikigai">
+            <button class="cs-cal-pill" data-theme="default" onclick="setCalTheme('ikigai','default')">Navy</button>
+            <button class="cs-cal-pill" data-theme="clan"    onclick="setCalTheme('ikigai','clan')">White</button>
+            <button class="cs-cal-pill" data-theme="samurai" onclick="setCalTheme('ikigai','samurai')">Red</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -9423,10 +9433,13 @@ function setCalTheme(cal, theme){
   if(cal==='all'){
     state.calThemeShokunin=theme;
     state.calThemeKaizen=theme;
+    state.calThemeIkigai=theme;
   } else if(cal==='shokunin'){
     state.calThemeShokunin=theme;
-  } else {
+  } else if(cal==='kaizen'){
     state.calThemeKaizen=theme;
+  } else {
+    state.calThemeIkigai=theme;
   }
   saveState();
   renderGoals();
@@ -9434,19 +9447,19 @@ function setCalTheme(cal, theme){
 }
 
 function _syncCalThemePills(){
-  ['shokunin','kaizen'].forEach(function(cal){
-    var theme=cal==='shokunin'?(state.calThemeShokunin||'default'):(state.calThemeKaizen||'default');
+  var themeMap={shokunin:(state.calThemeShokunin||'default'),kaizen:(state.calThemeKaizen||'default'),ikigai:(state.calThemeIkigai||'default')};
+  ['shokunin','kaizen','ikigai'].forEach(function(cal){
     var row=document.getElementById('csCalTheme-'+cal);
     if(!row) return;
     row.querySelectorAll('.cs-cal-pill').forEach(function(p){
-      p.classList.toggle('active', p.dataset.theme===theme);
+      p.classList.toggle('active', p.dataset.theme===themeMap[cal]);
     });
   });
   var allRow=document.getElementById('csCalTheme-all');
   if(allRow){
-    var both=state.calThemeShokunin===state.calThemeKaizen?state.calThemeShokunin:null;
+    var allSame=themeMap.shokunin===themeMap.kaizen&&themeMap.kaizen===themeMap.ikigai?themeMap.shokunin:null;
     allRow.querySelectorAll('.cs-cal-pill').forEach(function(p){
-      p.classList.toggle('active', p.dataset.theme===both);
+      p.classList.toggle('active', p.dataset.theme===allSame);
     });
   }
 }
