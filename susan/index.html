@@ -404,6 +404,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
 .mcal-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5px;padding-top:2px;max-width:100%}
 .mcal-dot{width:3px;height:3px;border-radius:50%;background:var(--red);opacity:.55;flex-shrink:0}
+.mcal-dots.all-done .mcal-dot{opacity:.9;box-shadow:0 0 3px rgba(204,53,41,.55),0 0 6px rgba(204,53,41,.25)}
 /* Week reflection indicator */
 .wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
 .wk-sealed{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--red);opacity:.75;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
@@ -618,10 +619,10 @@ body.edit-mode .edit-mode-bar{display:flex}
   font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;
   text-transform:uppercase;color:var(--ink-faint);transition:border-color .2s,color .2s,background .2s}
 .travel-toggle-btn:hover{border-color:var(--ink-light);color:var(--ink-light)}
-.travel-toggle-btn.active{background:#2a4a6b;border-color:#2a4a6b;color:var(--white)}
+.travel-toggle-btn.active{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .travel-toggle-btn span:first-child{font-variant-emoji:text;font-family:'Noto Sans JP',sans-serif}
 .travel-banner{display:flex;align-items:center;justify-content:space-between;
-  background:#2a4a6b;color:var(--white);padding:8px 14px;border-radius:2px;
+  background:var(--navy);color:var(--white);padding:8px 14px;border-radius:2px;
   margin-bottom:16px;font-size:9px;letter-spacing:2px;text-transform:uppercase}
 .travel-banner a{font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.55);
   cursor:pointer;text-decoration:underline;text-underline-offset:2px}
@@ -636,7 +637,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 .travel-modal{background:var(--white);border:1px solid var(--edge);border-radius:2px;
   width:100%;max-width:460px;max-height:88vh;overflow-y:auto;animation:fadeUp .22s ease}
 .travel-modal-top{padding:24px 22px 0;text-align:center}
-.travel-modal-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:#2a4a6b;margin-bottom:6px}
+.travel-modal-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:var(--navy);margin-bottom:6px}
 .travel-modal-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;
   color:var(--ink-light);margin-bottom:14px}
 .travel-modal-copy{font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;
@@ -653,7 +654,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 .tmh-tick{width:20px;height:20px;border:1px solid var(--edge);border-radius:1px;
   display:flex;align-items:center;justify-content:center;font-size:11px;
   color:#2a4a6b;flex-shrink:0;transition:background .15s,border-color .15s}
-.tmh-row.sel .tmh-tick{background:#2a4a6b;border-color:#2a4a6b;color:var(--white)}
+.tmh-row.sel .tmh-tick{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .tmh-text{font-size:13px;color:var(--ink);flex:1}
 .tmh-days{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint)}
 .travel-modal-err{font-size:10px;color:var(--red);letter-spacing:1px;
@@ -723,10 +724,11 @@ body.edit-mode .edit-mode-bar{display:flex}
   display:inline-flex;align-items:center;justify-content:center;
   width:24px;height:24px;border-radius:3px;border:2px solid currentColor;
   font-family:'Noto Serif JP',serif;font-weight:900;font-size:11px;
-  transform:rotate(-4deg);flex-shrink:0;cursor:default;
+  transform:rotate(-4deg);flex-shrink:0;cursor:pointer;
   position:relative;transition:transform .2s;
 }
 .ms:hover{transform:rotate(-4deg) scale(1.18)}
+.ms:active{transform:rotate(-4deg) scale(.92)}
 .ms.pending{opacity:0;pointer-events:none}
 .ms.tier-30 {color:#3D6B5F;border-color:rgba(61,107,95,.5)}
 .ms.tier-100{color:#8BBECF;border-color:rgba(139,190,207,.5)}
@@ -746,6 +748,17 @@ body.edit-mode .edit-mode-bar{display:flex}
   100%{opacity:1;transform:rotate(-4deg) scale(1)}
 }
 .ms.land{animation:stampLand .55s cubic-bezier(.25,.46,.45,.94) forwards}
+
+/* ===== MILESTONE COPY TOAST ===== */
+.ms-copy-toast{
+  position:fixed;bottom:88px;left:50%;transform:translateX(-50%);
+  font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
+  color:var(--white);letter-spacing:.4px;line-height:1.65;text-align:center;
+  padding:10px 20px;border-radius:2px;max-width:280px;
+  pointer-events:none;z-index:500;
+  opacity:0;transition:opacity .25s ease;
+}
+.ms-copy-toast.show{opacity:1}
 
 /* ===== FLOATING SEAL OVERLAY ===== */
 #seal-overlay{
@@ -853,6 +866,15 @@ body.edit-mode .edit-mode-bar{display:flex}
 @keyframes psGoldPulse{
   0%,100%{filter:drop-shadow(0 0 28px rgba(201,169,75,.6)) drop-shadow(0 0 56px rgba(201,169,75,.3))}
   50%    {filter:drop-shadow(0 0 52px rgba(201,169,75,1.0)) drop-shadow(0 0 96px rgba(201,169,75,.6))}
+}
+#ps-overlay.ps-samurai #ps-large{
+  animation:psSamuraiPulse 1.4s ease-in-out infinite !important;
+  border-color:var(--red) !important;
+  color:var(--red) !important;
+}
+@keyframes psSamuraiPulse{
+  0%,100%{filter:drop-shadow(0 0 28px rgba(204,53,41,.65)) drop-shadow(0 0 56px rgba(204,53,41,.35))}
+  50%    {filter:drop-shadow(0 0 56px rgba(204,53,41,1.0)) drop-shadow(0 0 100px rgba(204,53,41,.6))}
 }
 
 #proverb-overlay{display:none;position:fixed;inset:0;z-index:200;pointer-events:none;
@@ -3948,7 +3970,13 @@ function getWeekStart(offset){
 }
 
 function navigateWeek(delta){weekOffset+=delta;renderGoals();}
-function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;renderGoals();}
+let _monthReflectExpanded=false;
+function toggleMonthReflect(e){
+  e.stopPropagation();
+  _monthReflectExpanded=!_monthReflectExpanded;
+  renderGoals();
+}
+function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;_monthReflectExpanded=false;renderGoals();}
 var _dayNoteOpen=null;
 function openDayNote(dateStr){
   var todayStr=getDateStr();
@@ -4132,6 +4160,8 @@ function buildMonthCal(){
   const startOffset=(firstDay.getDay()+6)%7;
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const todayStr=getDateStr();
+  // Monthly reflection for this calendar month
+  const monthRef=getMonthlyReflection(year,month);
 
   // Build flat cell array then split into week rows
   const cells=[];
@@ -4156,9 +4186,12 @@ function buildMonthCal(){
     var cls='sh-stamp'+(isActive?' earned':' future');
     var dot=isActive?'<div class="sh-earned-dot'+(landing?' land':'')+'" style="background:'+s.col+';box-shadow:0 0 6px '+s.col+'"></div>':'';
     var displayCol=s.light||s.col;
-    var kanjiStyle=isActive?'color:'+displayCol+';opacity:1':'';
-    var daysStyle=isActive?'color:'+displayCol+';opacity:.75':'';
-    stampsHtml+='<div id="ps-stamp-'+s.days+'" class="'+cls+'">'
+    // 750-day shinobi stamp: black kanji directly on navy — hidden in darkness
+    var isShinobi=s.col==='#1A1A1A';
+    var kanjiStyle=isActive?(isShinobi?'color:#000000;opacity:.55':'color:'+displayCol+';opacity:1'):'';
+    var daysStyle=isActive?(isShinobi?'color:#000000;opacity:.4':'color:'+displayCol+';opacity:.75'):'';
+    var clickAttr=isActive?' onclick="showPsCopy('+s.days+')" style="cursor:pointer"':'';
+    stampsHtml+='<div id="ps-stamp-'+s.days+'" class="'+cls+'"'+clickAttr+'>'
       +dot+'<span class="sh-kanji" style="'+kanjiStyle+'">'+s.kanji+'</span>'
       +'<span class="sh-days" style="'+daysStyle+'">'+s.days+'<br>days</span></div>';
   });
@@ -4172,6 +4205,7 @@ function buildMonthCal(){
         <div class="mcal-nav">
           <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
           <span class="mcal-title">${monthName}</span>
+          ${monthRef?`<span class="wk-sealed${_monthReflectExpanded?' is-open':''}" onclick="toggleMonthReflect(event)" title="monthly reflection" style="margin-right:6px">月</span>`:'<span style="width:20px;display:inline-block"></span>'}
           <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
         </div>
         <div class="mcal-grid">
@@ -4223,7 +4257,8 @@ function buildMonthCal(){
       if(isFuture) cls+=' mcal-future';
 
       // N dots = habits done that day
-      const dotHtml=done.length?`<div class="mcal-dots">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
+      const allDone=scheduled.length>0&&done.length===scheduled.length;
+      const dotHtml=done.length?`<div class="mcal-dots${allDone?' all-done':''}">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
       const hasNote=!isFuture&&!!((state.dailyNotes||{})[cell.dateStr]);
       if(hasNote) cls+=' has-note';
       const noteMarkHtml=hasNote?`<span class="mcal-note-mark">省</span>`:'';
@@ -4245,6 +4280,23 @@ function buildMonthCal(){
         <div class="mcal-expand-inner" onclick="event.stopPropagation()">
           <div class="exp-range">${rangeStr}</div>
           ${fields.join('')}${intentionHtml}
+        </div>
+      </div>`;
+    }
+  }
+
+  // Monthly reflection panel — shown below all week rows when 月 is tapped
+  if(monthRef){
+    const mFields=[];
+    if(monthRef.working)  mFields.push(`<div class="exp-field"><div class="exp-label">what is working</div><div class="exp-text">${monthRef.working}</div></div>`);
+    if(monthRef.changing) mFields.push(`<div class="exp-field"><div class="exp-label">what needs to change</div><div class="exp-text">${monthRef.changing}</div></div>`);
+    if(monthRef.shifting) mFields.push(`<div class="exp-field"><div class="exp-label">what is shifting</div><div class="exp-text">${monthRef.shifting}</div></div>`);
+    if(monthRef.notes)    mFields.push(`<div class="exp-field"><div class="exp-label">notes</div><div class="exp-text">${monthRef.notes}</div></div>`);
+    if(mFields.length){
+      html+=`<div class="mcal-expansion${_monthReflectExpanded?' open':''}">
+        <div class="mcal-expand-inner" onclick="event.stopPropagation()">
+          <div class="exp-range" style="letter-spacing:2px;font-size:9px;text-transform:uppercase;opacity:.55">月 · ${monthName} · monthly reflection</div>
+          ${mFields.join('')}
         </div>
       </div>`;
     }
@@ -4477,18 +4529,6 @@ function renderGoals(){
           const freq=g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
           const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
           const strandCls=strandLinkedIds!==null?(strandLinkedIds.has(g.id)?' strand-glow':' strand-faint'):'';
-          const stamps=(state.milestoneStamps||{});
-          const msHtml=MILESTONES.filter(m=>{
-            const k=`${g.id}-${m.days}`;
-            return stamps[k]||_msPending[k];
-          }).map(m=>{
-            const k=`${g.id}-${m.days}`;
-            const isPending=_msPending[k]&&!stamps[k];
-            const isLand   =_msLand[k];
-            return `<span class="ms ${m.css}${isPending?' pending':''}${isLand?' land':''}"
-              id="ms-${g.id}-${m.days}" data-tip="${m.tip}">${m.kanji}</span>`;
-          }).join('');
-          const msRowHtml=msHtml?`<div class="ms-row">${msHtml}</div>`:'';
           const hdBullets=buildHabitDetailHtml(g);
           return `<li class="goal ${g.done?'done':''}${strandCls}" style="animation-delay:${i*.04}s" data-kaizen-id="${g.id}" draggable="true">
             <div class="drag-handle">⠿</div>
@@ -4498,7 +4538,6 @@ function renderGoals(){
               <div class="goal-meta">
                 <span class="goal-tf">${freq}</span>
                 ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
-                ${msRowHtml}
               </div>
             </div>
             <div class="goal-actions">
@@ -5947,6 +5986,54 @@ const MILESTONES=[
 function msGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
 
 // ============ PRACTICE MILESTONES (overall streak continuance) ============
+let _msCopyTimer=null;
+function showMsCopy(el,days){
+  const m=MILESTONES.find(x=>x.days==days);
+  if(!m) return;
+  let toast=document.getElementById('ms-copy-toast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='ms-copy-toast';
+    toast.className='ms-copy-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent=m.copy;
+  toast.style.background=m.col;
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  if(_msCopyTimer) clearTimeout(_msCopyTimer);
+  _msCopyTimer=setTimeout(()=>toast.classList.remove('show'),2800);
+}
+
+// ============ PRACTICE STAMP COPY TOAST ============
+function showPsCopy(days){
+  const m=PRACTICE_MILESTONES.find(x=>x.days==days);
+  if(!m) return;
+  const earners=state.kaizen
+    .map(k=>({text:k.text,best:Math.max(k.streak||0,k.bestStreak||0)}))
+    .filter(k=>k.best>=days)
+    .sort((a,b)=>b.best-a.best);
+  const earnerHtml=earners.length
+    ? '<div style="margin-top:8px;font-family:\'Noto Sans JP\',sans-serif;font-size:10px;letter-spacing:1px;opacity:.8;line-height:1.7">'
+      +earners.map(k=>k.text+' &mdash; '+k.best+' days').join('<br>')+'</div>'
+    : '';
+  let toast=document.getElementById('ms-copy-toast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='ms-copy-toast';
+    toast.className='ms-copy-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML=m.copy+earnerHtml;
+  toast.style.background=m.col;
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  if(_msCopyTimer) clearTimeout(_msCopyTimer);
+  _msCopyTimer=setTimeout(()=>toast.classList.remove('show'),3500);
+}
+
 const PRACTICE_MILESTONES=[
   {days:7,   kanji:'\u7d99', name:'Continuance', col:'#3D4A52', light:'#8FAAB8', glow:'rgba(61,74,82,VAL)',
    copy:'You are shaping yourself like iron.'},
@@ -5963,6 +6050,13 @@ const PRACTICE_MILESTONES=[
   {days:365, kanji:'\u9053', name:'The Way',     col:'#C9A94B', light:'#E8CF80', glow:'rgba(201,169,75,VAL)',
    copy:'A full year. Congratulations. You are on your way to becoming your truest self.',
    gold:true},
+  {days:500, kanji:'\u6975', name:'Pinnacle',    col:'#8C8F96', light:'#D0D2D8', glow:'rgba(140,143,150,VAL)',
+   copy:'Five hundred days. You are no longer practising discipline \u2014 you are it.'},
+  {days:750, kanji:'\u9b42', name:'Spirit',      col:'#1A1A1A', light:'#9A9A9A', glow:'rgba(26,26,26,VAL)',
+   copy:'Seven hundred and fifty days. Iron has become steel. The practice has become your soul.'},
+  {days:1000,kanji:'\u6b66', name:'Samurai',     col:'#CC3529', light:'#E85045', glow:'rgba(204,53,41,VAL)',
+   copy:'One thousand days. \u6b66\u58eb. This is what you are.',
+   samurai:true},
 ];
 function psGlowStr(m,alpha){return m.glow.replace('VAL',alpha);}
 
@@ -6446,13 +6540,14 @@ function earnPracticeStamp(milestone){
   copyEl.style.animation   ='none';
   copyEl.style.opacity     ='0';
 
-  if(milestone.gold) overlay.classList.add('ps-gold'); else overlay.classList.remove('ps-gold');
+  if(milestone.gold)    overlay.classList.add('ps-gold');    else overlay.classList.remove('ps-gold');
+  if(milestone.samurai) overlay.classList.add('ps-samurai'); else overlay.classList.remove('ps-samurai');
   overlay.classList.add('active');
   void largeSt.offsetWidth;
 
   largeSt.style.animation='msStampIn .55s cubic-bezier(.25,.46,.45,.94) forwards';
   setTimeout(()=>{
-    largeSt.style.animation=milestone.gold?'psGoldPulse 1.6s ease-in-out infinite':'msGlowFloat 2.4s ease-in-out infinite';
+    largeSt.style.animation=milestone.samurai?'psSamuraiPulse 1.4s ease-in-out infinite':milestone.gold?'psGoldPulse 1.6s ease-in-out infinite':'msGlowFloat 2.4s ease-in-out infinite';
     largeSt.style.filter   =`drop-shadow(0 0 20px ${psGlowStr(milestone,'.55')}) drop-shadow(0 0 40px ${psGlowStr(milestone,'.3')})`;
     if(titleEl) titleEl.style.animation='copyFadeIn .5s ease forwards';
     copyEl.style.animation ='copyFadeIn .5s ease forwards';
@@ -6472,7 +6567,7 @@ function earnPracticeStamp(milestone){
     const destRect=destEl?destEl.getBoundingClientRect():null;
 
     setTimeout(()=>{
-      overlay.classList.remove('active','ps-gold');
+      overlay.classList.remove('active','ps-gold','ps-samurai');
 
       if(destRect&&destRect.width>0){
         const LARGE_PX=120,SMALL_PX=22;
@@ -8781,7 +8876,7 @@ hiInit = function(){
     <div class="travel-modal-err" id="travelModalErr">Select at least one core practice to continue</div>
     <div class="travel-modal-footer">
       <button class="btn btn-ghost" style="flex:1;font-size:9px;letter-spacing:3px;padding:11px" onclick="cancelTravelSetup()">Cancel</button>
-      <button class="btn" style="flex:2;font-size:9px;letter-spacing:3px;padding:11px;background:#2a4a6b;border-color:#2a4a6b;color:var(--white)" onclick="confirmTravelSetup()">Set Travel Practices</button>
+      <button class="btn" style="flex:2;font-size:9px;letter-spacing:3px;padding:11px;background:var(--navy);border-color:var(--navy);color:var(--white)" onclick="confirmTravelSetup()">Set Travel Practices</button>
     </div>
   </div>
 </div>
@@ -8801,6 +8896,7 @@ hiInit = function(){
       <div class="m-pull">You don't need more will. You need more flow. You need to take daily action, making progress on your path, until the groove becomes a canyon.</div>
       <p>BUSHIDO is not a productivity system. It's a way of life. It doesn't reduce your life to a dashboard, a metric, a mere record of output. It represents something larger: the habit IS the goal, the daily reflection and the private journal are the self-improvements. Everything is woven together not as a mechanism to be tuned, but as a practice to be inhabited.</p>
       <p>Bushido was created out of the belief that YOU don't exist solely to achieve what you want to or should achieve, but that meaning is found in pursuing your truest self and striving to become that. You were never lacking focus, will, or ability. You were lacking a structure that would give shape to your flow and allow you to cut through the mountain. Bushido is the striving, it is the honing, and it is the path. Bushido is the dripping water that pierces stone.</p>
+      <p style="font-style:italic;">Vision gives meaning to goals. Goals give direction to craft. Craft gives form to daily habit.</p>
       <div class="m-pull" style="text-align:center; border-left:none; padding-left:0; font-size:17px; letter-spacing:1px; margin-top:40px; margin-bottom:0;">Progress comes from process.</div>
     </div>
     <div class="m-proverb">
