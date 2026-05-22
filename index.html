@@ -2953,6 +2953,112 @@ body.dark .sr-phase-dot {
 .sa-svg{width:58px;height:58px;overflow:visible}
 .sa-name{font-family:'Noto Serif JP',sans-serif;font-size:10px;color:var(--ink-faint);text-align:center;opacity:.7}
 /* /STRAND ARMS */
+
+/* ── CLAN CALENDAR — modal infrastructure ──────────────────────────────── */
+/* Backdrop modal */
+.cn-backdrop{display:none;position:fixed;inset:0;z-index:520;
+  background:rgba(26,18,8,.78);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto}
+.cn-backdrop.show{display:flex}
+.cn-modal{background:var(--scroll);max-width:560px;width:100%;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(26,18,8,.018) 28px,rgba(26,18,8,.018) 29px);
+  box-shadow:0 4px 80px rgba(0,0,0,.45);position:relative;
+  padding:56px 56px 48px;animation:fadeUp .4s ease-out;
+  max-height:calc(100vh - 80px);overflow-y:auto}
+.cn-close{position:absolute;top:20px;right:20px;background:none;border:none;
+  cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint);transition:color .2s}
+.cn-close:hover{color:var(--ink)}
+.cn-header{text-align:center;padding-bottom:32px;margin-bottom:32px;border-bottom:1px solid var(--edge)}
+.cn-kanji{font-family:'Noto Serif JP',serif;font-size:36px;color:var(--red);
+  opacity:.18;letter-spacing:6px;margin-bottom:10px;line-height:1}
+.cn-eyebrow{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.cn-title{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;
+  letter-spacing:2px;color:var(--ink);margin-bottom:8px}
+/* Form fields */
+.cn-field{margin-bottom:24px}
+.cn-field-label{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;display:block}
+.cn-field-input{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--ink);
+  background:transparent;border:none;border-bottom:1.5px solid var(--ink);
+  padding:8px 0;width:100%;outline:none}
+.cn-field-input:focus{border-bottom-color:var(--red)}
+.cn-field-input::placeholder{color:var(--ink-faint);font-style:italic}
+.cn-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin-top:36px;padding-top:24px;border-top:1px solid var(--edge)}
+.cn-btn{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;padding:14px 28px;border:1.5px solid var(--ink);
+  background:transparent;color:var(--ink);cursor:pointer;transition:all .25s;font-weight:500}
+.cn-btn:hover{background:var(--ink);color:var(--scroll)}
+.cn-btn.primary{background:var(--ink);color:var(--scroll)}
+.cn-btn.primary:hover{background:var(--red);border-color:var(--red)}
+.cn-btn.ghost{border-color:transparent;color:var(--ink-faint)}
+.cn-btn.ghost:hover{background:transparent;color:var(--ink);border-color:transparent}
+.cn-btn:disabled{opacity:.35;cursor:not-allowed}
+.cn-btn:disabled:hover{background:transparent;color:var(--ink)}
+.cn-error{margin-top:16px;padding:12px 14px;background:rgba(204,53,41,.06);
+  border:1px solid rgba(204,53,41,.22);border-radius:2px;
+  font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;
+  color:var(--red);line-height:1.6;text-align:left}
+/* ── CLAN CALENDAR — panel ─────────────────────────────────────────────── */
+/* White/snow surface + red accents — matches the clan tab, no parchment. */
+.cn-cal-panel{background:var(--white);border:1px solid rgba(204,53,41,.14);
+  border-radius:2px;padding:22px 24px 10px}
+.cn-cal-add{display:block;width:100%;margin-bottom:6px;
+  font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--red);background:transparent;
+  border:1px dashed rgba(204,53,41,.32);border-radius:2px;padding:13px;
+  cursor:pointer;transition:background .2s,border-color .2s}
+.cn-cal-add:hover{background:rgba(204,53,41,.05);border-color:var(--red)}
+.cn-cal-empty{text-align:center;font-family:'Noto Serif JP',serif;font-style:italic;
+  font-size:13px;color:var(--ink-faint);line-height:1.7;padding:22px 10px 14px}
+.cn-cal-nudge{text-align:center;font-family:'Noto Serif JP',serif;font-size:13px;
+  font-style:italic;color:var(--red);margin:14px 0 18px;letter-spacing:.3px}
+.cn-cal-nudge strong{font-style:normal;font-weight:700}
+.cn-cal-line{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;
+  padding:15px 2px;border-bottom:1px solid rgba(204,53,41,.09)}
+.cn-cal-line:last-child{border-bottom:none}
+.cn-cal-when{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:700;
+  color:var(--red);min-width:64px;white-space:nowrap;letter-spacing:.3px;padding-top:1px}
+.cn-cal-body{flex:1;min-width:170px}
+.cn-cal-title{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink);line-height:1.45}
+.cn-cal-meta{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--ink-faint);margin-top:4px;line-height:1.5}
+.cn-cal-tag{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--red);opacity:.5;flex-shrink:0;padding-top:3px}
+.cn-cal-rsvp{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.cn-cal-btn{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;padding:8px 13px;border:1px solid var(--ink);
+  background:transparent;color:var(--ink);cursor:pointer;transition:all .2s}
+.cn-cal-btn:hover{background:var(--ink);color:var(--white)}
+.cn-cal-btn.accept{border-color:var(--red);color:var(--red)}
+.cn-cal-btn.accept:hover{background:var(--red);color:var(--white)}
+.cn-cal-state{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;flex-shrink:0}
+.cn-cal-state.in{color:var(--red)}
+.cn-cal-state.out{color:var(--ink-faint)}
+.cn-cal-link{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ink-faint);background:none;border:none;
+  cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+.cn-cal-link:hover{color:var(--red)}
+.cn-cal-link.req{display:inline-block;margin-top:8px}
+.cn-cal-removal{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:8px;
+  padding:8px 11px;background:rgba(204,53,41,.05);border:1px solid rgba(204,53,41,.18);
+  border-radius:2px;font-family:'Noto Sans JP',sans-serif;font-size:9px;
+  letter-spacing:.8px;color:var(--red)}
+.cn-cal-removal .cn-cal-link{color:var(--red)}
+.cn-cal-removal .cn-cal-link:hover{color:var(--ink)}
+.cn-cal-seg{display:flex}
+.cn-cal-seg-btn{flex:1;font-family:'Noto Sans JP',sans-serif;font-size:9px;
+  letter-spacing:2px;text-transform:uppercase;padding:12px;cursor:pointer;
+  border:1px solid var(--ink);background:transparent;color:var(--ink-faint);
+  transition:all .2s}
+.cn-cal-seg-btn:first-child{border-right:none}
+.cn-cal-seg-btn.active{background:var(--ink);color:var(--scroll)}
+.cn-cal-seg-hint{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;
+  color:var(--ink-faint);line-height:1.6;margin-top:10px}
+/* /CLAN CALENDAR */
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -7336,6 +7442,7 @@ async function loadClanData(){
     renderClanRows();
     renderClanCards();
     updateClanPerfFromCache();
+    if(typeof cnCalSubscribe === 'function') cnCalSubscribe();
   }catch(e){ console.warn('Clan load failed:',e); }
 }
 
@@ -9105,6 +9212,12 @@ hiInit = function(){
 
       <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
       <div id="clan-active-warriors"></div>
+
+      <!-- ══════════ CLAN CALENDAR ══════════ -->
+      <div class="divider"></div>
+      <div class="clan-section-label">Clan Calendar</div>
+      <div id="clan-calendar-mount"></div>
+      <!-- ══════════ /CLAN CALENDAR ══════════ -->
 
       <!-- CLAN CLOSED NOTE -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
@@ -11470,6 +11583,429 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
 
 })();
 </script>
+
+<script>
+// ══════════ CLAN CALENDAR JS ══════════════════════════════════════════════════
+// A shared dated panel inside each clan tab. Two event kinds:
+//   • recurring — annual MM-DD dates, no RSVP (birthdays, anniversaries).
+//   • oneoff    — specific YYYY-MM-DD events with per-member Accept/Decline RSVP.
+// Plus a request-removal flow.
+
+// ── Event store ──────────────────────────────────────────────────────────────
+// Production: events live in Firestore at clanCalendar/{clanId}; cnCalEvents is
+// the local cache the onSnapshot listener fills.
+const CN_CAL_CLAN_ID = 'mckitrick';   // the single family clan (multi-clan: later)
+let cnCalEvents = {};
+let cnCalUnsub  = null;               // Firestore listener unsubscribe handle
+
+// ── Add-modal state ──────────────────────────────────────────────────────────
+let cnCalKind = 'recurring';   // 'recurring' | 'oneoff'
+
+// ── Firestore ────────────────────────────────────────────────────────────────
+// True only when Firebase is live AND a user is signed in (i.e. production).
+function cnCalFirestoreOn(){
+  return (typeof FIREBASE_CONFIGURED !== 'undefined' && FIREBASE_CONFIGURED)
+      && (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.uid)
+      && (typeof db !== 'undefined' && db) ? true : false;
+}
+// Subscribe to the shared clan-calendar doc — onSnapshot drives every render.
+function cnCalSubscribe(){
+  if(!cnCalFirestoreOn()) return;
+  if(cnCalUnsub){ try{ cnCalUnsub(); }catch(e){} cnCalUnsub = null; }
+  cnCalUnsub = db.collection('clanCalendar').doc(CN_CAL_CLAN_ID).onSnapshot(
+    function(snap){
+      const data = (snap && snap.exists) ? (snap.data() || {}) : {};
+      cnCalEvents[CN_CAL_CLAN_ID] = Array.isArray(data.events) ? data.events : [];
+      cnCalRender();
+    },
+    function(err){ console.warn('Clan calendar listener failed:', err); }
+  );
+}
+// Push the whole events array back to Firestore.
+function cnCalSaveToFirestore(){
+  if(!cnCalFirestoreOn()) return;
+  try{
+    db.collection('clanCalendar').doc(CN_CAL_CLAN_ID).set({
+      events: cnCalCurrentEvents(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(e){ console.warn('Clan calendar save failed:', e); });
+  }catch(e){ console.warn('Clan calendar save failed:', e); }
+}
+// Mutations call this: render optimistically, then persist.
+function cnCalCommit(){
+  cnCalRender();
+  cnCalSaveToFirestore();
+}
+
+// ── Identity / clan helpers ──────────────────────────────────────────────────
+const CN_CAL_NAMES = { james:'James', chark:'Chark', susan:'Mam',
+                       antonella:'Antonella', elijah:'Elijah' };
+function cnCalName(uid){
+  if(!uid) return 'Someone';
+  if(typeof _currentUser !== 'undefined' && _currentUser && uid === _currentUser.uid)
+    return (typeof state !== 'undefined' && state && state.name) ? state.name : 'You';
+  if(typeof _clanCache !== 'undefined' && _clanCache && _clanCache[uid] && _clanCache[uid].name)
+    return _clanCache[uid].name;
+  return CN_CAL_NAMES[uid] || 'Warrior';
+}
+function cnCalMe(){
+  if(cnCalFirestoreOn()) return _currentUser.uid;
+  return 'james';
+}
+function cnCalClanMembers(){
+  if(cnCalFirestoreOn()){
+    const others = (typeof _clanCache !== 'undefined' && _clanCache) ? Object.keys(_clanCache) : [];
+    return [_currentUser.uid].concat(others);
+  }
+  return Object.keys(CN_CAL_NAMES);
+}
+function cnCalCurrentEvents(){
+  if(!cnCalEvents[CN_CAL_CLAN_ID]) cnCalEvents[CN_CAL_CLAN_ID] = [];
+  return cnCalEvents[CN_CAL_CLAN_ID];
+}
+function cnCalFind(id){ return cnCalCurrentEvents().find(e => e.id === id); }
+function cnCalEsc(s){
+  return (typeof csEscapeHtml === 'function')
+    ? csEscapeHtml(s)
+    : String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Date helpers (self-contained — no Hiyoku dependency) ─────────────────────
+const CN_CAL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function cnCalToday(){ const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function cnCalDaysUntil(str){
+  const today = cnCalToday();
+  let target;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(str)){
+    const p = str.split('-').map(Number);
+    target = new Date(p[0], p[1]-1, p[2]);
+  } else if(/^\d{2}-\d{2}$/.test(str)){
+    const p = str.split('-').map(Number);
+    target = new Date(today.getFullYear(), p[0]-1, p[1]);
+    if(target < today) target = new Date(today.getFullYear()+1, p[0]-1, p[1]);
+  } else { return 9999; }
+  return Math.round((target - today) / 86400000);
+}
+function cnCalFmt(str){
+  const m = /^(?:\d{4}-)?(\d{2})-(\d{2})$/.exec(str);
+  if(!m) return str;
+  return CN_CAL_MONTHS[parseInt(m[1],10)-1] + ' ' + parseInt(m[2],10);
+}
+function cnCalEventDateStr(ev){ return ev.type === 'recurring' ? ev.startMd : ev.startDate; }
+function cnCalEventWhenLabel(ev){
+  const a = cnCalEventDateStr(ev);
+  const b = ev.type === 'recurring' ? ev.endMd : ev.endDate;
+  return b ? (cnCalFmt(a) + ' – ' + cnCalFmt(b)) : cnCalFmt(a);
+}
+function cnCalIsPast(ev){
+  if(ev.type !== 'oneoff') return false;
+  const ref = ev.endDate || ev.startDate;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ref)) return false;
+  const p = ref.split('-').map(Number);
+  return new Date(p[0], p[1]-1, p[2]) < cnCalToday();
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function cnCalRender(){
+  const mount = document.getElementById('clan-calendar-mount');
+  if(!mount) return;
+  const me = cnCalMe();
+  const events = cnCalCurrentEvents()
+    .filter(e => !cnCalIsPast(e))
+    .slice()
+    .sort((a,b) => cnCalDaysUntil(cnCalEventDateStr(a)) - cnCalDaysUntil(cnCalEventDateStr(b)));
+
+  let html = '<div class="cn-cal-panel">';
+  html += '<button type="button" class="cn-cal-add" onclick="cnCalOpenAdd()">+  add to the calendar</button>';
+
+  if(events.length === 0){
+    html += '<div class="cn-cal-empty">No dates yet. Add a birthday the clan should hold — '
+          + 'or propose something to gather for.</div></div>';
+    mount.innerHTML = html;
+    return;
+  }
+
+  const soonest = cnCalDaysUntil(cnCalEventDateStr(events[0]));
+  if(soonest <= 30){
+    const w = soonest < 0 ? 'now' : soonest === 0 ? 'today'
+            : soonest === 1 ? 'tomorrow' : 'in ' + soonest + ' days';
+    html += '<div class="cn-cal-nudge"><strong>' + cnCalEsc(events[0].title) + '</strong> — ' + w + '.</div>';
+  }
+
+  events.forEach(ev => { html += cnCalRenderLine(ev, me); });
+  html += '</div>';
+  mount.innerHTML = html;
+}
+
+function cnCalRenderLine(ev, me){
+  let h = '<div class="cn-cal-line">';
+  h += '<div class="cn-cal-when">' + cnCalEventWhenLabel(ev) + '</div>';
+  h += '<div class="cn-cal-body">';
+  h += '<div class="cn-cal-title">' + cnCalEsc(ev.title) + '</div>';
+
+  if(ev.type === 'recurring'){
+    h += '<div class="cn-cal-meta">every year &middot; added by ' + cnCalEsc(cnCalName(ev.createdBy)) + '</div>';
+  } else {
+    const r = ev.rsvps || {};
+    const total = Object.keys(r).length;
+    const inCount = Object.keys(r).filter(k => r[k] === 'accepted').length;
+    let meta = 'proposed by ' + cnCalEsc(cnCalName(ev.createdBy)) + ' &middot; ' + inCount + ' of ' + total + ' in';
+    if(ev.note) meta += ' &middot; ' + cnCalEsc(ev.note);
+    h += '<div class="cn-cal-meta">' + meta + '</div>';
+  }
+
+  if(ev.removalRequest){
+    h += cnCalRenderRemoval(ev, me);
+  } else {
+    h += '<button type="button" class="cn-cal-link req" onclick="cnCalRequestRemoval(\'' + ev.id + '\')">request removal</button>';
+  }
+  h += '</div>';   // /cn-cal-body
+
+  if(ev.type === 'recurring'){
+    h += '<div class="cn-cal-tag">every year</div>';
+  } else {
+    h += cnCalRenderRsvp(ev, me);
+  }
+  h += '</div>';   // /cn-cal-line
+  return h;
+}
+
+function cnCalRenderRsvp(ev, me){
+  const status = (ev.rsvps && ev.rsvps[me]) || 'pending';
+  let h = '<div class="cn-cal-rsvp">';
+  if(status === 'accepted'){
+    h += '<span class="cn-cal-state in">&#10003; you&rsquo;re in</span>';
+    h += '<button type="button" class="cn-cal-link" onclick="cnCalChange(\'' + ev.id + '\')">change</button>';
+  } else if(status === 'declined'){
+    h += '<span class="cn-cal-state out">you declined</span>';
+    h += '<button type="button" class="cn-cal-link" onclick="cnCalChange(\'' + ev.id + '\')">change</button>';
+  } else {
+    h += '<button type="button" class="cn-cal-btn accept" onclick="cnCalRsvp(\'' + ev.id + '\',\'accepted\')">accept</button>';
+    h += '<button type="button" class="cn-cal-btn" onclick="cnCalRsvp(\'' + ev.id + '\',\'declined\')">decline</button>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function cnCalRenderRemoval(ev, me){
+  const rr = ev.removalRequest;
+  const canResolve = (me === ev.createdBy);
+  const selfRequest = (rr.by === ev.createdBy);
+  let h = '<div class="cn-cal-removal">';
+  h += '<span>&#9873; ' + (selfRequest
+        ? 'Remove this date?'
+        : 'Removal requested by ' + cnCalEsc(cnCalName(rr.by))) + '</span>';
+  if(canResolve){
+    h += '<button type="button" class="cn-cal-link" onclick="cnCalResolveRemoval(\'' + ev.id + '\',\'remove\')">remove it</button>';
+    h += '<button type="button" class="cn-cal-link" onclick="cnCalResolveRemoval(\'' + ev.id + '\',\'keep\')">keep it</button>';
+  } else if(me === rr.by){
+    h += '<button type="button" class="cn-cal-link" onclick="cnCalWithdrawRemoval(\'' + ev.id + '\')">withdraw request</button>';
+  }
+  h += '</div>';
+  return h;
+}
+
+// ── RSVP actions ─────────────────────────────────────────────────────────────
+function cnCalRsvp(id, decision){
+  const ev = cnCalFind(id);
+  if(!ev || ev.type !== 'oneoff') return;
+  if(decision !== 'accepted' && decision !== 'declined') return;
+  if(!ev.rsvps) ev.rsvps = {};
+  ev.rsvps[cnCalMe()] = decision;
+  cnCalCommit();
+}
+function cnCalChange(id){
+  const ev = cnCalFind(id);
+  if(!ev || ev.type !== 'oneoff') return;
+  if(!ev.rsvps) ev.rsvps = {};
+  ev.rsvps[cnCalMe()] = 'pending';
+  cnCalCommit();
+}
+
+// ── Request-removal flow ──────────────────────────────────────────────────────
+function cnCalRequestRemoval(id){
+  const ev = cnCalFind(id);
+  if(!ev || ev.removalRequest) return;          // guard: one pending request at a time
+  ev.removalRequest = { by: cnCalMe(), at: new Date().toISOString() };
+  cnCalCommit();
+}
+function cnCalResolveRemoval(id, action){
+  const ev = cnCalFind(id);
+  if(!ev || !ev.removalRequest) return;
+  if(cnCalMe() !== ev.createdBy) return;         // guard: only the event's creator resolves
+  if(action === 'remove'){
+    const list = cnCalCurrentEvents();
+    const idx = list.findIndex(e => e.id === id);
+    if(idx !== -1) list.splice(idx, 1);
+  } else {
+    delete ev.removalRequest;
+  }
+  cnCalCommit();
+}
+function cnCalWithdrawRemoval(id){
+  const ev = cnCalFind(id);
+  if(!ev || !ev.removalRequest) return;
+  if(ev.removalRequest.by !== cnCalMe()) return;   // guard: requester only
+  delete ev.removalRequest;
+  cnCalCommit();
+}
+
+// ── Add-event modal ──────────────────────────────────────────────────────────
+function cnCalOpenAdd(){
+  const bd = document.getElementById('cnCalBackdrop');
+  if(!bd || bd.classList.contains('show')) return;   // guard: already open
+  cnCalSetKind('recurring');
+  ['cnCalTitle','cnCalStart','cnCalEnd','cnCalNote'].forEach(function(id){
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const err = document.getElementById('cnCalError');
+  if(err){ err.style.display = 'none'; err.textContent = ''; }
+  cnCalValidateAdd();
+  bd.classList.add('show');
+  setTimeout(function(){ const t = document.getElementById('cnCalTitle'); if(t) t.focus(); }, 50);
+}
+function cnCalCloseAdd(){
+  const bd = document.getElementById('cnCalBackdrop');
+  if(bd) bd.classList.remove('show');
+}
+function cnCalSetKind(kind){
+  cnCalKind = (kind === 'oneoff') ? 'oneoff' : 'recurring';
+  const segR = document.getElementById('cnCalSegRecurring');
+  const segO = document.getElementById('cnCalSegOneoff');
+  if(segR) segR.classList.toggle('active', cnCalKind === 'recurring');
+  if(segO) segO.classList.toggle('active', cnCalKind === 'oneoff');
+  const hint = document.getElementById('cnCalSegHint');
+  if(hint) hint.textContent = (cnCalKind === 'recurring')
+    ? 'A date that repeats every year — a birthday, an anniversary. The clan simply sees it.'
+    : 'A one-off event — a trip, a gathering. The clan can accept or decline.';
+  const dateLabel = document.getElementById('cnCalDateLabel');
+  if(dateLabel) dateLabel.textContent = (cnCalKind === 'recurring') ? 'Date — repeats yearly' : 'Start date';
+  const endField = document.getElementById('cnCalEndField');
+  const noteField = document.getElementById('cnCalNoteField');
+  if(endField) endField.style.display = (cnCalKind === 'oneoff') ? '' : 'none';
+  if(noteField) noteField.style.display = (cnCalKind === 'oneoff') ? '' : 'none';
+  cnCalValidateAdd();
+}
+function cnCalValidateAdd(){
+  const btn = document.getElementById('cnCalAddBtn');
+  if(!btn) return;
+  const titleEl = document.getElementById('cnCalTitle');
+  const startEl = document.getElementById('cnCalStart');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const start = startEl ? startEl.value : '';
+  btn.disabled = !(title.length >= 2 && start);
+}
+function cnCalSubmitAdd(){
+  const err = document.getElementById('cnCalError');
+  function fail(msg){ if(err){ err.textContent = msg; err.style.display = 'block'; } }
+  if(err){ err.style.display = 'none'; err.textContent = ''; }
+
+  const titleEl = document.getElementById('cnCalTitle');
+  const startEl = document.getElementById('cnCalStart');
+  const endEl   = document.getElementById('cnCalEnd');
+  const noteEl  = document.getElementById('cnCalNote');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const start = startEl ? startEl.value : '';
+  const end   = endEl ? endEl.value : '';
+  const note  = noteEl ? noteEl.value.trim() : '';
+
+  if(title.length < 2){ fail('Give the date a title.'); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(start)){ fail('Pick a date.'); return; }
+
+  const me = cnCalMe();
+  const id = 'ce_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  let ev;
+  if(cnCalKind === 'recurring'){
+    ev = { id:id, type:'recurring', title:title, startMd:start.slice(5),
+           createdBy:me, createdAt:new Date().toISOString() };
+  } else {
+    if(end){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(end)){ fail('That end date looks wrong.'); return; }
+      if(end < start){ fail('The end date falls before the start date.'); return; }
+    }
+    const rsvps = {};
+    cnCalClanMembers().forEach(function(uid){ rsvps[uid] = (uid === me) ? 'accepted' : 'pending'; });
+    rsvps[me] = 'accepted';                       // the proposer is always in
+    ev = { id:id, type:'oneoff', title:title, startDate:start,
+           createdBy:me, createdAt:new Date().toISOString(), rsvps:rsvps };
+    if(end) ev.endDate = end;
+    if(note) ev.note = note;
+  }
+  cnCalCurrentEvents().push(ev);
+  cnCalCloseAdd();
+  cnCalCommit();
+}
+
+// ── Esc closes the add-event modal ───────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  const bd = document.getElementById('cnCalBackdrop');
+  if(bd && bd.classList.contains('show')) cnCalCloseAdd();
+});
+
+// ── Init: render empty panel on load (Firestore path driven by loadClanData) ─
+(function(){
+  function _cnCalInitEmpty(){
+    if(!cnCalFirestoreOn()) cnCalRender();
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(_cnCalInitEmpty, 140); });
+  } else { setTimeout(_cnCalInitEmpty, 140); }
+})();
+// ══════════ /CLAN CALENDAR JS ═════════════════════════════════════════════════
+</script>
+
+<!-- ══════════ CLAN CALENDAR — ADD EVENT MODAL ══════════ -->
+<div class="cn-backdrop" id="cnCalBackdrop" onclick="if(event.target===this)cnCalCloseAdd()">
+  <div class="cn-modal" style="max-width:520px">
+    <button class="cn-close" onclick="cnCalCloseAdd()">✕ &nbsp;close</button>
+    <div class="cn-header">
+      <div class="cn-kanji">暦</div>
+      <div class="cn-eyebrow">clan calendar</div>
+      <div class="cn-title">Mark a date.</div>
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label">What kind of date</label>
+      <div class="cn-cal-seg">
+        <button type="button" class="cn-cal-seg-btn active" id="cnCalSegRecurring" onclick="cnCalSetKind('recurring')">recurring</button>
+        <button type="button" class="cn-cal-seg-btn" id="cnCalSegOneoff" onclick="cnCalSetKind('oneoff')">one-off</button>
+      </div>
+      <div class="cn-cal-seg-hint" id="cnCalSegHint">A date that repeats every year — a birthday, an anniversary. The clan simply sees it.</div>
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label">Title</label>
+      <input type="text" class="cn-field-input" id="cnCalTitle" maxlength="60" spellcheck="false"
+             placeholder="Maryann's birthday" oninput="cnCalValidateAdd()" />
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label" id="cnCalDateLabel">Date — repeats yearly</label>
+      <input type="date" class="cn-field-input" id="cnCalStart" onchange="cnCalValidateAdd()" />
+    </div>
+
+    <div class="cn-field" id="cnCalEndField" style="display:none">
+      <label class="cn-field-label">End date (optional)</label>
+      <input type="date" class="cn-field-input" id="cnCalEnd" onchange="cnCalValidateAdd()" />
+    </div>
+
+    <div class="cn-field" id="cnCalNoteField" style="display:none">
+      <label class="cn-field-label">Note (optional)</label>
+      <input type="text" class="cn-field-input" id="cnCalNote" maxlength="100" spellcheck="false"
+             placeholder="a line for the clan" />
+    </div>
+
+    <div class="cn-error" id="cnCalError" style="display:none"></div>
+
+    <div class="cn-actions">
+      <button class="cn-btn ghost" onclick="cnCalCloseAdd()">cancel</button>
+      <button class="cn-btn primary" id="cnCalAddBtn" onclick="cnCalSubmitAdd()" disabled>add to calendar</button>
+    </div>
+  </div>
+</div>
+<!-- ══════════ /CLAN CALENDAR — ADD EVENT MODAL ══════════ -->
 
 </body>
 </html>
