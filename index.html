@@ -634,6 +634,86 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .ycal-cell.ycal-miss{background:rgba(245,240,232,.1)}
 .ycal-cell.ycal-today{outline:1.5px solid var(--red);outline-offset:0}
 
+/* ── Ikigai Planning Calendar — milestones ─────────────────────────────── */
+/* Goal chip strip — light/parchment context, on each annual goal */
+.ipc-goal-ms{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+.ipc-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 6px;
+  border:1px solid rgba(0,0,0,.1);border-radius:2px;background:rgba(255,255,255,.45)}
+.ipc-chip.done{opacity:.55}
+.ipc-chip-dot{width:11px;height:11px;border:1.5px solid var(--ink-faint);border-radius:50%;
+  background:transparent;cursor:pointer;flex-shrink:0;padding:0;transition:border-color .2s,background .2s}
+.ipc-chip-dot:hover{border-color:var(--red)}
+.ipc-chip-dot.done{background:var(--red);border-color:var(--red)}
+.ipc-chip-body{display:inline-flex;align-items:baseline;gap:6px;background:none;border:none;
+  cursor:pointer;padding:0}
+.ipc-chip-text{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink)}
+.ipc-chip.done .ipc-chip-text{text-decoration:line-through}
+.ipc-chip-due{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--red);white-space:nowrap}
+.ipc-ms-add{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ink-faint);background:none;
+  border:1px dashed rgba(0,0,0,.18);border-radius:2px;padding:5px 10px;cursor:pointer;
+  transition:border-color .2s,color .2s}
+.ipc-ms-add:hover{border-color:var(--red);color:var(--red)}
+/* Day-cell milestone markers on the year grid */
+/* personal = red | clan milestone = white/snow | obligation = gold */
+.ipc-mil-day{cursor:pointer;position:relative}
+.ipc-mil-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:5px;height:5px;border-radius:50%;border:1.5px solid var(--red);background:transparent;
+  box-shadow:0 0 0 1px rgba(10,18,35,.6)}
+.ipc-mil-dot.done{background:var(--red)}
+.ipc-mil-dot.clan-ms{background:#F5F2ED;border-color:#F5F2ED;box-shadow:0 0 0 1px rgba(10,18,35,.5)}
+.ipc-mil-dot.obligation{background:#C9A94B;border-color:#C9A94B}
+/* Multi-day span throughlines */
+.ipc-span-full,.ipc-span-tail{position:absolute;top:50%;height:2px;transform:translateY(-50%);border-radius:1px;pointer-events:none}
+.ipc-span-full{left:0;right:0}
+.ipc-span-tail.right{left:50%;right:0}
+.ipc-span-tail.left{right:50%;left:0}
+.ipc-span-full,.ipc-span-tail{background:var(--red);opacity:.55}
+.ipc-span-full.clan-ms,.ipc-span-tail.clan-ms{background:#F5F2ED;opacity:.6}
+.ipc-span-full.obligation,.ipc-span-tail.obligation{background:#C9A94B;opacity:.65}
+.ipc-mil-day.ipc-mil-selected{outline:1.5px solid var(--red);outline-offset:0}
+.ipc-mil-day.ipc-mil-sel-clan-ms{outline-color:#F5F2ED}
+.ipc-mil-day.ipc-mil-sel-obligation{outline-color:#C9A94B}
+/* The reveal drawer — rolls open inside the kakejiku scroll */
+.ipc-reveal{display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .5s cubic-bezier(.16,1,.3,1);margin-top:14px}
+.ipc-reveal.open{grid-template-rows:1fr}
+.ipc-reveal-clip{overflow:hidden;min-height:0}
+.ipc-reveal-head{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0 6px;border-top:1px solid rgba(255,255,255,.1)}
+.ipc-reveal-head span{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:#C9A94B}
+.ipc-reveal-x{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:rgba(255,255,255,.35);background:none;border:none;cursor:pointer;padding:0}
+.ipc-reveal-x:hover{color:rgba(255,255,255,.85)}
+.ipc-reveal-month{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--red);margin:14px 0 2px}
+.ipc-reveal-empty{text-align:center;font-family:'Noto Serif JP',serif;font-style:italic;
+  font-size:12px;color:rgba(255,255,255,.32);padding:14px 0;line-height:1.6}
+.ipc-reveal-row{display:flex;align-items:center;gap:10px;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+.ipc-reveal-row.done{opacity:.5}
+.ipc-reveal-check{width:12px;height:12px;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;
+  background:transparent;cursor:pointer;flex-shrink:0;padding:0;transition:border-color .2s,background .2s}
+.ipc-reveal-check:hover{border-color:var(--red)}
+.ipc-reveal-check.done{background:var(--red);border-color:var(--red)}
+.ipc-reveal-day{font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--red);
+  min-width:18px;text-align:center;flex-shrink:0}
+.ipc-reveal-body{flex:1;display:flex;align-items:baseline;gap:10px;background:none;border:none;
+  cursor:pointer;text-align:left;padding:0;min-width:0}
+.ipc-reveal-text{font-family:'Noto Serif JP',serif;font-size:13px;color:rgba(255,255,255,.85);
+  flex:1;min-width:0;line-height:1.45}
+.ipc-reveal-row.done .ipc-reveal-text{text-decoration:line-through}
+.ipc-reveal-goal{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:rgba(255,255,255,.32);flex-shrink:0;max-width:36%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ipc-rollopen{display:block;width:100%;margin-top:10px;font-family:'Noto Sans JP',sans-serif;
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);
+  background:none;border:1px solid rgba(255,255,255,.12);border-radius:2px;padding:9px;
+  cursor:pointer;transition:border-color .2s,color .2s}
+.ipc-rollopen:hover{border-color:var(--red);color:var(--red)}
+
 /* ===== KAKEJIKU — Hanging Scroll Wrapper ===== */
 .kk-outer{display:flex;flex-direction:column;align-items:stretch;margin-bottom:28px;
   filter:drop-shadow(0 10px 28px rgba(10,18,35,.35)) drop-shadow(0 2px 6px rgba(10,18,35,.20))}
@@ -2132,6 +2212,24 @@ li.goal.hd-open .habit-detail{display:block}
   font-family:'Noto Serif JP',serif;font-size:6px;color:var(--scroll);opacity:.7;
   line-height:1;margin-top:1px;display:block;
 }
+/* ── Milestone / obligation day ───────────────────────────────────── */
+.mcal-cell.skn-ms-day{cursor:pointer;position:relative}
+.mcal-cell.skn-ms-day:hover{background:rgba(255,255,255,.07)}
+/* clan (white bg) — hover needs a dark tint instead */
+.kk-outer.cal-clan .mcal-cell.skn-ms-day:hover{background:rgba(0,0,0,.05)}
+.mcal-skn-pips{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);display:flex;gap:2px;align-items:center}
+.mcal-skn-cpip{width:3px;height:3px;border-radius:50%;flex-shrink:0}
+/* ── Shokunin day-expansion panel ────────────────────────────────── */
+.mcal-skn-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mcal-skn-item:last-child{border-bottom:none}
+.mcal-skn-pip{flex-shrink:0;width:5px;height:5px;border-radius:50%;margin-top:4px}
+.mcal-skn-body{display:flex;flex-direction:column;gap:1px;min-width:0}
+.mcal-skn-text{font-family:'Noto Serif JP',serif;font-size:11px;color:var(--scroll);opacity:.9;line-height:1.4}
+.mcal-skn-type{font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.45;color:var(--scroll)}
+/* clan (white bg) — expansion text needs dark ink, not cream */
+.kk-outer.cal-clan .mcal-skn-item{border-bottom-color:rgba(0,0,0,.07)}
+.kk-outer.cal-clan .mcal-skn-text{color:var(--ink);opacity:1}
+.kk-outer.cal-clan .mcal-skn-type{color:var(--ink-faint);opacity:1}
 #day-note-overlay{
   display:none;position:fixed;inset:0;z-index:200;
   background:rgba(15,13,10,.55);backdrop-filter:blur(2px);
@@ -3055,6 +3153,27 @@ body.dark .sr-phase-dot {
 .cn-cal-seg-btn.active{background:var(--ink);color:var(--scroll)}
 .cn-cal-seg-hint{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;
   color:var(--ink-faint);line-height:1.6;margin-top:10px}
+/* ── CLAN → IKIGAI PROMPT ───────────────────────────────────────────────── */
+.cn-cal-ik-prompt{margin-top:10px;padding:12px 14px;
+  background:rgba(204,53,41,.04);border:1px solid rgba(204,53,41,.14);border-radius:2px}
+.cn-cal-ik-q{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;
+  color:var(--ink);margin-bottom:10px;line-height:1.5}
+.cn-cal-ik-row{display:flex;flex-wrap:wrap;gap:6px}
+.cn-cal-ik-opt{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;padding:7px 12px;border:1px solid var(--ink);
+  background:transparent;color:var(--ink);cursor:pointer;transition:all .2s}
+.cn-cal-ik-opt:hover{background:var(--ink);color:var(--white)}
+.cn-cal-ik-opt.ik-ms{border-color:var(--red);color:var(--red)}
+.cn-cal-ik-opt.ik-ms:hover{background:var(--red);color:var(--white)}
+.cn-cal-ik-opt.ik-skip{border-color:transparent;color:var(--ink-faint)}
+.cn-cal-ik-opt.ik-skip:hover{background:transparent;border-color:transparent;color:var(--ink)}
+.cn-cal-ik-done{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--red);margin-top:6px;display:block}
+.cn-cal-ik-link{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ink-faint);background:none;border:none;
+  cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;margin-top:4px}
+.cn-cal-ik-link:hover{color:var(--red)}
+.cn-cal-ik-status{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 /* /CLAN CALENDAR */
 </style>
 
@@ -3838,6 +3957,8 @@ const DEFAULT_STATE = {
   calThemeShokunin: 'default',  // 'default' | 'clan' | 'samurai'
   calThemeIkigai: 'default',     // 'default' | 'clan' | 'samurai'
   calThemeKaizen: 'default',    // 'default' | 'clan' | 'samurai'
+  clanMilestones: [],          // clan events added to Ikigai as milestones
+  clanObligations: [],         // clan events added to Ikigai as obligations
   yearStartDate: null,       // set on first onboarding completion, used for anniversary mode
 };
 
@@ -4323,7 +4444,7 @@ function toggleMonthReflect(e){
   _monthReflectExpanded=!_monthReflectExpanded;
   renderGoals();
 }
-function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;_monthReflectExpanded=false;renderGoals();}
+function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;_expandedSknDay=null;_monthReflectExpanded=false;renderGoals();}
 var _dayNoteOpen=null;
 function openDayNote(dateStr){
   var todayStr=getDateStr();
@@ -4505,6 +4626,51 @@ function toggleWeekExpand(e,wStartStr){
   renderGoals();
 }
 
+let _expandedSknDay=null; // YYYY-MM-DD of the milestone/obligation day currently expanded
+
+function toggleSknDay(dateStr){
+  _expandedSknDay=(_expandedSknDay===dateStr)?null:dateStr;
+  renderGoals();
+}
+
+// Colour for a milestone kind, adjusted for calendar skin background
+function sknKindColour(kind, calTheme){
+  const theme=calTheme||'default';
+  if(kind==='clan-ms' && theme==='clan') return '#1A1A1A';
+  if((kind==='personal'||kind==='done') && theme==='samurai') return '#1A1A1A';
+  return (typeof ipcKindColour==='function')?ipcKindColour(kind):'var(--red)';
+}
+
+function sknDayExpandHtml(dateStr, calTheme){
+  const list=(typeof ipcMilestonesOnDay==='function')?ipcMilestonesOnDay(dateStr):[];
+  if(!list.length) return '';
+  const p=(typeof ipcParseDue==='function')?ipcParseDue(dateStr):null;
+  const headKind=(typeof ipcDayDotKind==='function')?ipcDayDotKind(list):'personal';
+  const headCol=sknKindColour(headKind,calTheme);
+  const headLabel=p?(IPC_MONTHS[p.month]+' '+p.day):dateStr;
+  let rows='';
+  list.forEach(function(it){
+    const isClanMs=(it.goal===null && it.ms.kind==='milestone');
+    const isOb=(it.goal===null && it.ms.kind==='obligation');
+    const pipCol=isClanMs?sknKindColour('clan-ms',calTheme):isOb?'#C9A94B':sknKindColour('personal',calTheme);
+    const typeLabel=isClanMs?'clan milestone':isOb?'clan obligation':'personal milestone';
+    const goalCtx=(!isClanMs&&!isOb&&it.goal)?(ipcEsc(it.goal.text)+' &middot; '):'';
+    rows+=`<div class="mcal-skn-item">
+      <span class="mcal-skn-pip" style="background:${pipCol}"></span>
+      <div class="mcal-skn-body">
+        <span class="mcal-skn-text">${ipcEsc(it.ms.text)}</span>
+        <span class="mcal-skn-type">${goalCtx}${typeLabel}</span>
+      </div>
+    </div>`;
+  });
+  return `<div class="mcal-expansion open">
+    <div class="mcal-expand-inner" onclick="event.stopPropagation()">
+      <div class="exp-range" style="color:${headCol}">${headLabel}</div>
+      ${rows}
+    </div>
+  </div>`;
+}
+
 function buildMonthCal(){
   const now=new Date();
   const ref=new Date(now.getFullYear(),now.getMonth()+calMonthOffset,1);
@@ -4619,12 +4785,35 @@ let html=`<div class="kk-outer ${_calThemeCls}">
       const dotHtml=done.length?`<div class="mcal-dots${allDone?' all-done':''}">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
       const hasNote=!isFuture&&!!((state.dailyNotes||{})[cell.dateStr]);
       if(hasNote) cls+=' has-note';
-      const noteMarkHtml=hasNote?`<span class="mcal-note-mark">省</span>`:'';
-      const clickAttr=hasNote?` onclick="openDayNote('${cell.dateStr}')"`:'';
-      return `<div class="${cls}"${clickAttr}><span class="mcal-num">${cell.day}</span>${dotHtml}${noteMarkHtml}</div>`;
+      // milestone / obligation pips
+      const _sknMils=(typeof ipcMilestonesOnDay==='function')?ipcMilestonesOnDay(cell.dateStr):[];
+      let clickAttr='';
+      let noteMarkHtml=hasNote?`<span class="mcal-note-mark">省</span>`:'';
+      let _pipHtml='';
+      if(_sknMils.length){
+        cls+=' skn-ms-day';
+        const _hasPersonal=_sknMils.some(function(x){ return x.goal!==null; });
+        const _hasClanMs=_sknMils.some(function(x){ return x.goal===null&&x.ms.kind==='milestone'; });
+        const _hasOb=_sknMils.some(function(x){ return x.ms.kind==='obligation'; });
+        let _pips='';
+        if(_hasPersonal) _pips+=`<span class="mcal-skn-cpip" style="background:${sknKindColour('personal',_calTheme)}"></span>`;
+        if(_hasClanMs)   _pips+=`<span class="mcal-skn-cpip" style="background:${sknKindColour('clan-ms',_calTheme)}"></span>`;
+        if(_hasOb)       _pips+=`<span class="mcal-skn-cpip" style="background:#C9A94B"></span>`;
+        _pipHtml=`<div class="mcal-skn-pips">${_pips}</div>`;
+        clickAttr=` onclick="toggleSknDay('${cell.dateStr}')"`;
+        if(hasNote) noteMarkHtml=`<span class="mcal-note-mark" onclick="event.stopPropagation();openDayNote('${cell.dateStr}')">省</span>`;
+      } else if(hasNote){
+        clickAttr=` onclick="openDayNote('${cell.dateStr}')"`;
+      }
+      return `<div class="${cls}"${clickAttr}><span class="mcal-num">${cell.day}</span>${dotHtml}${noteMarkHtml}${_pipHtml}</div>`;
     }).join('');
 
     html+=`<div class="mcal-week-row">${wkHtml}${dayCells}</div>`;
+
+    // Milestone/obligation day expansion — inserted for the week containing the expanded day
+    if(_expandedSknDay && _expandedSknDay>=wStartStr && _expandedSknDay<=wEndStr){
+      html+=sknDayExpandHtml(_expandedSknDay,_calTheme);
+    }
 
     // Expansion panel — only rendered when reflection exists
     if(reflection){
@@ -4737,14 +4926,321 @@ function buildYearView(){
         else if(pct>0) cls+=' ycal-partial';
         else cls+=' ycal-miss';
       }
-      html+=`<div class="${cls}"${ycalInline}></div>`;
+      let _milInner='', _milClick='';
+      const _dayMils=(typeof ipcMilestonesOnDay==='function')?ipcMilestonesOnDay(dStr):[];
+      if(_dayMils.length){
+        cls+=' ipc-mil-day';
+        const _kind=(typeof ipcDayDotKind==='function')?ipcDayDotKind(_dayMils):'personal';
+        if(typeof ipcRevealMode!=='undefined'&&ipcRevealMode==='day'&&ipcRevealDate===dStr) cls+=' ipc-mil-selected ipc-mil-sel-'+_kind;
+        const _dotCls='ipc-mil-dot'+(_kind!=='personal'?' '+_kind:'');
+        const _spanMs=_dayMils.find(function(x){ return x.ms.endDate && x.ms.endDate!==x.ms.due; });
+        let _isStart=false,_isMid=false,_isEnd=false;
+        if(_spanMs){
+          _isStart=(dStr===_spanMs.ms.due);
+          _isEnd=(dStr===_spanMs.ms.endDate);
+          _isMid=(!_isStart&&!_isEnd);
+        }
+        if(_isMid){
+          _milInner='<span class="ipc-span-full '+_kind+'"></span>';
+        } else if(_isStart){
+          _milInner='<span class="'+_dotCls+'"></span><span class="ipc-span-tail right '+_kind+'"></span>';
+        } else if(_isEnd){
+          _milInner='<span class="ipc-span-tail left '+_kind+'"></span><span class="'+_dotCls+'"></span>';
+        } else {
+          _milInner='<span class="'+_dotCls+'"></span>';
+        }
+        _milClick=' onclick="ipcRevealDay(\''+dStr+'\')"';
+      }
+      html+=`<div class="${cls}"${ycalInline}${_milClick}>${_milInner}</div>`;
     }
     html+=`</div></div>`;
   }
 
-  html+=`</div></div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
+  html+=`</div></div>`+(typeof ipcRenderRevealDrawer==='function'?ipcRenderRevealDrawer():'')+`</div></div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
+
+// ══════════ IKIGAI PLANNING CALENDAR JS ═════════════════════════════════════
+// Milestones on annual goals, living on the year view. Each annual goal carries
+// a `milestones` array: { id, text, due:'YYYY-MM-DD', done }. Milestones show as
+// dots on the day cells; clicking a day rolls the kakejiku scroll open to
+// reveal it. A roll-open control reveals the whole year's plan.
+
+let ipcEditGoalId = null;   // goal the milestone modal is operating on
+let ipcEditMsId   = null;   // milestone id being edited; null = add mode
+let ipcRevealMode = null;   // null (drawer shut) | 'day' | 'all'
+let ipcRevealDate = null;   // 'YYYY-MM-DD' when ipcRevealMode === 'day'
+
+const IPC_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function ipcEsc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ipcGoalById(id){ return (state.annualGoals||[]).find(function(g){ return g.id===id; }); }
+function ipcParseDue(due){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(due||'');
+  if(!m) return null;
+  return { year:parseInt(m[1],10), month:parseInt(m[2],10)-1, day:parseInt(m[3],10) };
+}
+function ipcFmtDue(due){
+  const p=ipcParseDue(due);
+  return p ? (IPC_MONTHS[p.month]+' '+p.day) : '';
+}
+function ipcDueSort(a,b){ return (a.due<b.due)?-1:((a.due>b.due)?1:0); }
+// every milestone for the displayed year, flattened with its goal
+function ipcAllMilestones(){
+  const yr=String(new Date().getFullYear());
+  const out=[];
+  (state.annualGoals||[]).forEach(function(g){
+    (g.milestones||[]).forEach(function(ms){
+      if(typeof ms.due==='string' && ms.due.slice(0,4)===yr) out.push({ ms:ms, goal:g });
+    });
+  });
+  // clan milestones (shared clan events, no annualGoal attachment)
+  (state.clanMilestones||[]).forEach(function(cm){
+    if(typeof cm.due==='string' && cm.due.slice(0,4)===yr) out.push({ ms:cm, goal:null });
+  });
+  // obligations (clan events, no goal)
+  (state.clanObligations||[]).forEach(function(ob){
+    if(typeof ob.due==='string' && ob.due.slice(0,4)===yr) out.push({ ms:ob, goal:null });
+  });
+  out.sort(function(a,b){ return ipcDueSort(a.ms,b.ms); });
+  return out;
+}
+// milestones falling on a specific YYYY-MM-DD — supports multi-day spans via endDate
+function ipcOnDay(ms, dStr){
+  if(ms.due === dStr) return true;
+  if(ms.endDate && dStr >= ms.due && dStr <= ms.endDate) return true;
+  return false;
+}
+function ipcMilestonesOnDay(dStr){
+  const out=[];
+  (state.annualGoals||[]).forEach(function(g){
+    (g.milestones||[]).forEach(function(ms){ if(ipcOnDay(ms,dStr)) out.push({ ms:ms, goal:g }); });
+  });
+  (state.clanMilestones||[]).forEach(function(cm){
+    if(ipcOnDay(cm,dStr)) out.push({ ms:cm, goal:null });
+  });
+  (state.clanObligations||[]).forEach(function(ob){
+    if(ipcOnDay(ob,dStr)) out.push({ ms:ob, goal:null });
+  });
+  return out;
+}
+function ipcDayDotKind(dayMils){
+  if(!dayMils || !dayMils.length) return 'personal';
+  if(dayMils.some(function(x){ return x.ms.source==='clan' && x.ms.kind==='milestone'; })) return 'clan-ms';
+  if(dayMils.some(function(x){ return x.ms.kind==='obligation'; })) return 'obligation';
+  if(dayMils.every(function(x){ return x.ms.done; })) return 'done';
+  return 'personal';
+}
+
+// ── Goal strip — milestone chips on each annual goal <li> ───────────────────
+function ipcGoalStripHtml(g){
+  const ms=(g.milestones||[]).slice().sort(ipcDueSort);
+  let h='<div class="ipc-goal-ms">';
+  ms.forEach(function(m){
+    h+='<span class="ipc-chip'+(m.done?' done':'')+'">'
+      +'<button type="button" class="ipc-chip-dot'+(m.done?' done':'')+'" title="mark done" onclick="ipcToggleDone('+g.id+',\''+m.id+'\')"></button>'
+      +'<button type="button" class="ipc-chip-body" onclick="ipcOpenMilestone('+g.id+',\''+m.id+'\')">'
+      +'<span class="ipc-chip-text">'+ipcEsc(m.text)+'</span>'
+      +'<span class="ipc-chip-due">'+ipcEsc(ipcFmtDue(m.due))+'</span>'
+      +'</button></span>';
+  });
+  h+='<button type="button" class="ipc-ms-add" onclick="ipcOpenMilestone('+g.id+',null)">+ milestone</button>';
+  h+='</div>';
+  return h;
+}
+
+// ── The reveal drawer — rolls open inside the kakejiku scroll ────────────────
+function ipcRenderRevealDrawer(){
+  const open=ipcRevealMode!==null;
+  let h='<div class="ipc-reveal'+(open?' open':'')+'" id="ipcReveal">'
+       +'<div class="ipc-reveal-clip"><div class="ipc-reveal-inner" id="ipcRevealInner">'
+       +ipcRenderRevealContent()+'</div></div></div>';
+  h+='<button type="button" class="ipc-rollopen" id="ipcRollOpen" onclick="ipcRevealAll()">'
+    +(ipcRevealMode==='all'?'roll up':'unroll the year')+'</button>';
+  return h;
+}
+function ipcRevealRow(it,showDay){
+  const p=ipcParseDue(it.ms.due);
+  const isClanMs=(it.goal===null && it.ms.kind==='milestone');
+  const isObligation=(it.goal===null && it.ms.kind==='obligation');
+  const isDone=it.ms.done||false;
+  let h='<div class="ipc-reveal-row'+(isDone?' done':'')+'">';
+  if(isClanMs){
+    h+=(showDay?'<span class="ipc-reveal-day">'+(p?p.day:'')+'</span>':'');
+    h+='<div class="ipc-reveal-body">'
+      +'<span class="ipc-reveal-text">'+ipcEsc(it.ms.text)+'</span>'
+      +'<span class="ipc-reveal-goal" style="color:#9B8B7A">clan milestone</span>'
+      +'</div>';
+  } else if(isObligation){
+    h+=(showDay?'<span class="ipc-reveal-day">'+(p?p.day:'')+'</span>':'');
+    h+='<div class="ipc-reveal-body">'
+      +'<span class="ipc-reveal-text">'+ipcEsc(it.ms.text)+'</span>'
+      +'<span class="ipc-reveal-goal" style="color:#C9A94B">clan obligation</span>'
+      +'</div>';
+  } else {
+    const goalLabel=it.ms.source==='clan'
+      ? ipcEsc(it.goal.text)+' <span style="opacity:.5">&middot; clan</span>'
+      : ipcEsc(it.goal.text);
+    h+='<button type="button" class="ipc-reveal-check'+(isDone?' done':'')+'" title="mark done" onclick="ipcToggleDone('+it.goal.id+',\''+it.ms.id+'\')"></button>'
+      +(showDay?'<span class="ipc-reveal-day">'+(p?p.day:'')+'</span>':'')
+      +'<button type="button" class="ipc-reveal-body" onclick="ipcOpenMilestone('+it.goal.id+',\''+it.ms.id+'\')">'
+      +'<span class="ipc-reveal-text">'+ipcEsc(it.ms.text)+'</span>'
+      +'<span class="ipc-reveal-goal">'+goalLabel+'</span>'
+      +'</button>';
+  }
+  h+='</div>';
+  return h;
+}
+function ipcKindColour(kind){
+  if(kind==='clan-ms') return '#F5F2ED';
+  if(kind==='obligation') return '#C9A94B';
+  return 'var(--red)';
+}
+function ipcRenderRevealContent(){
+  if(ipcRevealMode==='day'){
+    const p=ipcParseDue(ipcRevealDate);
+    const list=ipcMilestonesOnDay(ipcRevealDate);
+    const _headKind=list.length?(typeof ipcDayDotKind==='function'?ipcDayDotKind(list):'personal'):'personal';
+    const _headCol=ipcKindColour(_headKind);
+    let h='<div class="ipc-reveal-head"><span style="color:'+_headCol+'">'+(p?IPC_MONTHS[p.month]+' '+p.day:'')+'</span>'
+         +'<button type="button" class="ipc-reveal-x" onclick="ipcRevealClose()">close</button></div>';
+    if(!list.length){ h+='<div class="ipc-reveal-empty">Nothing on this day.</div>'; return h; }
+    list.forEach(function(it){ h+=ipcRevealRow(it,false); });
+    return h;
+  }
+  if(ipcRevealMode==='all'){
+    const all=ipcAllMilestones();
+    let h='<div class="ipc-reveal-head"><span>the year\'s plan</span>'
+         +'<button type="button" class="ipc-reveal-x" onclick="ipcRevealClose()">close</button></div>';
+    if(!all.length){ h+='<div class="ipc-reveal-empty">No milestones yet. Break a goal onto the year.</div>'; return h; }
+    let curMonth=-1;
+    all.forEach(function(it){
+      const p=ipcParseDue(it.ms.due);
+      if(p && p.month!==curMonth){ curMonth=p.month; h+='<div class="ipc-reveal-month">'+IPC_MONTHS[curMonth]+'</div>'; }
+      h+=ipcRevealRow(it,true);
+    });
+    return h;
+  }
+  return '';
+}
+function ipcRefreshReveal(){
+  const dr=document.getElementById('ipcReveal');
+  const inner=document.getElementById('ipcRevealInner');
+  const btn=document.getElementById('ipcRollOpen');
+  if(inner) inner.innerHTML=ipcRenderRevealContent();
+  if(dr) dr.classList.toggle('open', ipcRevealMode!==null);
+  if(btn) btn.textContent=(ipcRevealMode==='all'?'roll up':'unroll the year');
+  document.querySelectorAll('.ycal-cell.ipc-mil-selected').forEach(function(c){ c.classList.remove('ipc-mil-selected'); });
+  if(ipcRevealMode==='day' && ipcRevealDate){
+    document.querySelectorAll('.ipc-mil-day').forEach(function(c){
+      const oc=c.getAttribute('onclick')||'';
+      if(oc.indexOf("'"+ipcRevealDate+"'")>-1) c.classList.add('ipc-mil-selected');
+    });
+  }
+}
+function ipcRevealDay(dStr){
+  if(ipcRevealMode==='day' && ipcRevealDate===dStr){ ipcRevealClose(); return; }
+  ipcRevealMode='day'; ipcRevealDate=dStr;
+  ipcRefreshReveal();
+}
+function ipcRevealAll(){
+  if(ipcRevealMode==='all'){ ipcRevealClose(); return; }
+  ipcRevealMode='all'; ipcRevealDate=null;
+  ipcRefreshReveal();
+}
+function ipcRevealClose(){
+  ipcRevealMode=null; ipcRevealDate=null;
+  ipcRefreshReveal();
+}
+
+// ── Milestone actions ───────────────────────────────────────────────────────
+function ipcToggleDone(goalId,msId){
+  const g=ipcGoalById(goalId);
+  if(!g||!g.milestones) return;
+  const ms=g.milestones.find(function(m){ return m.id===msId; });
+  if(!ms) return;
+  ms.done=!ms.done;
+  saveState();
+  renderTab();
+}
+function ipcOpenMilestone(goalId,msId){
+  const bd=document.getElementById('ipcMsBackdrop');
+  if(!bd) return;
+  ipcEditGoalId=goalId;
+  ipcEditMsId=msId||null;
+  const g=ipcGoalById(goalId);
+  const titleEl=document.getElementById('ipcMsModalTitle');
+  const textEl=document.getElementById('ipcMsText');
+  const dateEl=document.getElementById('ipcMsDate');
+  const removeEl=document.getElementById('ipcMsRemove');
+  const err=document.getElementById('ipcMsError');
+  if(err){ err.style.display='none'; err.textContent=''; }
+  if(ipcEditMsId&&g){
+    const ms=(g.milestones||[]).find(function(m){ return m.id===ipcEditMsId; });
+    if(titleEl) titleEl.textContent='Edit milestone';
+    if(textEl) textEl.value=ms?ms.text:'';
+    if(dateEl) dateEl.value=(ms&&ms.due)?ms.due:'';
+    if(removeEl) removeEl.style.display='';
+  } else {
+    if(titleEl) titleEl.textContent='New milestone';
+    if(textEl) textEl.value='';
+    if(dateEl) dateEl.value='';
+    if(removeEl) removeEl.style.display='none';
+  }
+  bd.classList.add('show');
+  setTimeout(function(){ if(textEl) textEl.focus(); },50);
+}
+function ipcCloseMilestone(){
+  const bd=document.getElementById('ipcMsBackdrop');
+  if(bd) bd.classList.remove('show');
+  ipcEditGoalId=null;
+  ipcEditMsId=null;
+}
+function ipcSubmitMilestone(){
+  const err=document.getElementById('ipcMsError');
+  function fail(msg){ if(err){ err.textContent=msg; err.style.display='block'; } }
+  if(err){ err.style.display='none'; err.textContent=''; }
+  const g=ipcGoalById(ipcEditGoalId);
+  if(!g){ ipcCloseMilestone(); renderTab(); return; }
+  const textEl=document.getElementById('ipcMsText');
+  const dateEl=document.getElementById('ipcMsDate');
+  const text=(textEl?textEl.value:'').trim();
+  const date=(dateEl?dateEl.value:'').trim();
+  if(text.length<2){ fail('Give the milestone a few words.'); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){ fail('Pick a date for the milestone.'); return; }
+  if(!g.milestones) g.milestones=[];
+  if(ipcEditMsId){
+    const ms=g.milestones.find(function(m){ return m.id===ipcEditMsId; });
+    if(ms){ ms.text=text; ms.due=date; }
+  } else {
+    g.milestones.push({ id:'ms_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      text:text, due:date, done:false });
+  }
+  saveState();
+  ipcCloseMilestone();
+  renderTab();
+}
+function ipcRemoveMilestone(){
+  const g=ipcGoalById(ipcEditGoalId);
+  if(g&&ipcEditMsId&&g.milestones){
+    g.milestones=g.milestones.filter(function(m){ return m.id!==ipcEditMsId; });
+    saveState();
+  }
+  ipcCloseMilestone();
+  renderTab();
+}
+
+// Esc closes the milestone modal first, otherwise the reveal drawer
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  const bd=document.getElementById('ipcMsBackdrop');
+  if(bd&&bd.classList.contains('show')){ ipcCloseMilestone(); return; }
+  if(ipcRevealMode!==null) ipcRevealClose();
+});
+// ══════════ /IKIGAI PLANNING CALENDAR JS ════════════════════════════════════
 
 // ============ WEEK STRIP ============
 function habitOnDay(k, d){
@@ -4972,6 +5468,7 @@ function renderGoals(){
           </div>
           <div class="pbar"><div class="pfill" style="width:${avgProg}%"></div></div>
           <div class="plabel">${avgProg}% (avg. of linked Shokunin goals)</div>
+          ${typeof ipcGoalStripHtml==='function'?ipcGoalStripHtml(g):''}
         </div>
         <div class="goal-actions">
           <button class="goal-act" onclick="startEdit('annual',${g.id})">✎</button>
@@ -11774,6 +12271,21 @@ function cnCalRenderRsvp(ev, me){
   if(status === 'accepted'){
     h += '<span class="cn-cal-state in">&#10003; you&rsquo;re in</span>';
     h += '<button type="button" class="cn-cal-link" onclick="cnCalChange(\'' + ev.id + '\')">change</button>';
+    // Ikigai prompt or link
+    const hasEntry = typeof cnCalIkigaiHasEntry === 'function' && cnCalIkigaiHasEntry(ev.id);
+    if(typeof cnCalIkigaiPending !== 'undefined' && cnCalIkigaiPending === ev.id && !hasEntry){
+      h += cnCalIkigaiPromptHtml(ev);
+    } else if(!hasEntry){
+      h += '<button type="button" class="cn-cal-ik-link" onclick="cnCalIkigaiOpen(\'' + ev.id + '\')">add to ikigai ↗</button>';
+    } else {
+      const info = typeof cnCalIkigaiCurrentKind === 'function' ? cnCalIkigaiCurrentKind(ev.id) : null;
+      const kindLabel = info ? (info.kind === 'milestone' ? 'milestone' : 'obligation') : '';
+      h += '<div class="cn-cal-ik-status">'
+        + '<span class="cn-cal-ik-done">&#10003;&nbsp;in your calendar'
+        + (kindLabel ? ' &middot; ' + kindLabel : '') + '</span>'
+        + '<button type="button" class="cn-cal-ik-link" onclick="cnCalIkigaiChange(\'' + ev.id + '\')">change</button>'
+        + '</div>';
+    }
   } else if(status === 'declined'){
     h += '<span class="cn-cal-state out">you declined</span>';
     h += '<button type="button" class="cn-cal-link" onclick="cnCalChange(\'' + ev.id + '\')">change</button>';
@@ -11782,6 +12294,16 @@ function cnCalRenderRsvp(ev, me){
     h += '<button type="button" class="cn-cal-btn" onclick="cnCalRsvp(\'' + ev.id + '\',\'declined\')">decline</button>';
   }
   h += '</div>';
+  return h;
+}
+function cnCalIkigaiPromptHtml(ev){
+  let h = '<div class="cn-cal-ik-prompt">';
+  h += '<div class="cn-cal-ik-q">Add this to your Ikigai calendar?</div>';
+  h += '<div class="cn-cal-ik-row">';
+  h += '<button type="button" class="cn-cal-ik-opt ik-ms" onclick="cnCalIkigaiSelectKind(\'' + ev.id + '\',\'milestone\')">clan milestone</button>';
+  h += '<button type="button" class="cn-cal-ik-opt" onclick="cnCalIkigaiSelectKind(\'' + ev.id + '\',\'obligation\')">obligation</button>';
+  h += '<button type="button" class="cn-cal-ik-opt ik-skip" onclick="cnCalIkigaiSkip()">skip</button>';
+  h += '</div></div>';
   return h;
 }
 
@@ -11811,6 +12333,11 @@ function cnCalRsvp(id, decision){
   if(!ev.rsvps) ev.rsvps = {};
   ev.rsvps[cnCalMe()] = decision;
   cnCalCommit();
+  // on accept, open the Ikigai prompt immediately (unless already added)
+  if(decision === 'accepted' && typeof cnCalIkigaiHasEntry === 'function' && !cnCalIkigaiHasEntry(id)){
+    cnCalIkigaiPending = id;
+    cnCalRender();
+  }
 }
 function cnCalChange(id){
   const ev = cnCalFind(id);
@@ -11951,6 +12478,112 @@ document.addEventListener('keydown', function(e){
   } else { setTimeout(_cnCalInitEmpty, 140); }
 })();
 // ══════════ /CLAN CALENDAR JS ═════════════════════════════════════════════════
+
+// ── Clan Calendar → Ikigai integration ──────────────────────────────────────
+let cnCalIkigaiPending = null;   // evId currently showing the prompt
+
+function cnCalIkigaiHasEntry(clanEventId){
+  if(!state) return false;
+  const inClanMs = (state.clanMilestones||[]).some(function(cm){
+    return cm.clanEventId === clanEventId;
+  });
+  const inObs = (state.clanObligations||[]).some(function(ob){
+    return ob.clanEventId === clanEventId;
+  });
+  return inClanMs || inObs;
+}
+
+function cnCalIkigaiOpen(evId){
+  cnCalIkigaiPending = evId;
+  cnCalRender();
+}
+
+function cnCalIkigaiSelectKind(evId, kind){
+  if(kind === 'obligation'){
+    cnCalIkigaiAddObligation(evId);
+    return;
+  }
+  cnCalIkigaiAddClanMilestone(evId);
+}
+
+function cnCalIkigaiAddClanMilestone(evId){
+  const ev = cnCalFind(evId);
+  if(!ev) return;
+  if(!state.clanMilestones) state.clanMilestones = [];
+  const msId = 'cm_' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+  const entry = {
+    id: msId,
+    text: ev.title,
+    due: ev.startDate,
+    done: false,
+    source: 'clan',
+    clanEventId: evId,
+    kind: 'milestone'
+  };
+  if(ev.endDate) entry.endDate = ev.endDate;
+  state.clanMilestones.push(entry);
+  cnCalIkigaiPending = null;
+  if(typeof saveState === 'function') saveState();
+  if(typeof renderTab === 'function' && typeof currentTab !== 'undefined' && currentTab === 'ikigai') renderTab();
+  cnCalRender();
+}
+
+function cnCalIkigaiAddObligation(evId){
+  const ev = cnCalFind(evId);
+  if(!ev) return;
+  if(!state.clanObligations) state.clanObligations = [];
+  const obId = 'ob_' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+  const entry = {
+    id: obId,
+    text: ev.title,
+    due: ev.startDate,
+    clanEventId: evId,
+    kind: 'obligation'
+  };
+  if(ev.endDate) entry.endDate = ev.endDate;
+  state.clanObligations.push(entry);
+  cnCalIkigaiPending = null;
+  if(typeof saveState === 'function') saveState();
+  if(typeof renderTab === 'function' && typeof currentTab !== 'undefined' && currentTab === 'ikigai') renderTab();
+  cnCalRender();
+}
+
+function cnCalIkigaiSkip(){
+  cnCalIkigaiPending = null;
+  cnCalRender();
+}
+
+function cnCalIkigaiCurrentKind(clanEventId){
+  if(!state) return null;
+  for(let i=0; i<(state.clanMilestones||[]).length; i++){
+    if(state.clanMilestones[i].clanEventId === clanEventId)
+      return { kind:'milestone' };
+  }
+  for(let i=0; i<(state.clanObligations||[]).length; i++){
+    if(state.clanObligations[i].clanEventId === clanEventId)
+      return { kind:'obligation' };
+  }
+  return null;
+}
+
+function cnCalIkigaiChange(evId){
+  cnCalRemoveIkigaiEntries(evId);
+  cnCalIkigaiPending = evId;
+  cnCalRender();
+}
+
+function cnCalRemoveIkigaiEntries(clanEventId){
+  if(!state) return;
+  state.clanMilestones = (state.clanMilestones||[]).filter(function(cm){
+    return cm.clanEventId !== clanEventId;
+  });
+  state.clanObligations = (state.clanObligations||[]).filter(function(ob){
+    return ob.clanEventId !== clanEventId;
+  });
+  if(typeof saveState === 'function') saveState();
+  if(typeof ipcRefreshReveal === 'function') ipcRefreshReveal();
+}
+// ── /Clan Calendar → Ikigai integration ─────────────────────────────────────
 </script>
 
 <!-- ══════════ CLAN CALENDAR — ADD EVENT MODAL ══════════ -->
@@ -12003,6 +12636,38 @@ document.addEventListener('keydown', function(e){
   </div>
 </div>
 <!-- ══════════ /CLAN CALENDAR — ADD EVENT MODAL ══════════ -->
+
+<!-- ══════════ IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
+<div class="cn-backdrop" id="ipcMsBackdrop" onclick="if(event.target===this)ipcCloseMilestone()">
+  <div class="cn-modal" style="max-width:460px">
+    <button class="cn-close" onclick="ipcCloseMilestone()">✕ &nbsp;close</button>
+    <div class="cn-header">
+      <div class="cn-kanji">標</div>
+      <div class="cn-eyebrow">ikigai · milestone</div>
+      <div class="cn-title" id="ipcMsModalTitle">New milestone</div>
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label">Milestone</label>
+      <input type="text" class="cn-field-input" id="ipcMsText" maxlength="80" spellcheck="false"
+             placeholder="lease secured" />
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label">Date</label>
+      <input type="date" class="cn-field-input" id="ipcMsDate" />
+    </div>
+
+    <div class="cn-error" id="ipcMsError" style="display:none"></div>
+
+    <div class="cn-actions">
+      <button class="cn-btn ghost" id="ipcMsRemove" onclick="ipcRemoveMilestone()" style="display:none">remove</button>
+      <button class="cn-btn ghost" onclick="ipcCloseMilestone()">cancel</button>
+      <button class="cn-btn primary" onclick="ipcSubmitMilestone()">save</button>
+    </div>
+  </div>
+</div>
+<!-- ══════════ /IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
 
 </body>
 </html>
