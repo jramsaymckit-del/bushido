@@ -3192,6 +3192,52 @@ body.dark .sr-phase-dot {
 .cn-cal-ik-link:hover{color:var(--red)}
 .cn-cal-ik-status{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 /* /CLAN CALENDAR */
+.cn-cal-more{font-size:10px;letter-spacing:2px;color:var(--ink-faint);
+  text-align:center;padding:10px 0 2px;font-family:'Noto Sans JP',sans-serif}
+
+/* ═══ CLAN YEAR CALENDAR ═══════════════════════════════════════════════════ */
+.cnyc-wrap{padding:20px 18px 18px}
+.cnyc-year-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(254,252,248,.3);text-align:center;margin-bottom:16px;
+  font-family:'Noto Serif JP',serif}
+.cnyc-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-bottom:18px;padding:0 1px}
+.cnyc-legend-item{display:flex;align-items:center;gap:5px}
+.cnyc-legend-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cnyc-legend-name{font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(254,252,248,.45);font-family:'Noto Sans JP',sans-serif}
+.cnyc-months{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:640px){.cnyc-months{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.cnyc-months{grid-template-columns:repeat(2,1fr)}}
+.cnyc-mname{font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(254,252,248,.32);margin-bottom:4px;text-align:center}
+.cnyc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cnyc-cell{aspect-ratio:1;border-radius:1px;background:rgba(254,252,248,.04);
+  position:relative;overflow:visible}
+.cnyc-cell.cnyc-empty{background:transparent}
+.cnyc-cell.cnyc-today{outline:1.5px solid rgba(204,53,41,.55);outline-offset:0}
+.cnyc-cell.cnyc-has-event{cursor:pointer}
+.cnyc-cell.cnyc-has-event:hover{background:rgba(254,252,248,.09)}
+.cnyc-cell.cnyc-selected{outline:1.5px solid rgba(254,252,248,.4);outline-offset:0}
+.cnyc-pips{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  display:flex;gap:1.5px;align-items:center}
+.cnyc-pip{width:3px;height:3px;border-radius:50%;flex-shrink:0}
+.cnyc-reveal{margin-top:12px;padding:12px 10px;
+  background:rgba(0,0,0,.28);
+  border-top:1px solid rgba(254,252,248,.07);
+  border-bottom:1px solid rgba(254,252,248,.07);
+  border-radius:2px}
+.cnyc-reveal-date{font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(254,252,248,.35);margin-bottom:10px;
+  font-family:'Noto Sans JP',sans-serif}
+.cnyc-reveal-item{display:flex;align-items:flex-start;gap:9px;
+  padding:6px 0;border-bottom:1px solid rgba(254,252,248,.05)}
+.cnyc-reveal-item:last-child{border-bottom:none}
+.cnyc-reveal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.cnyc-reveal-meta{font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(254,252,248,.38);margin-bottom:2px;font-family:'Noto Sans JP',sans-serif}
+.cnyc-reveal-text{font-family:'Noto Serif JP',serif;font-size:12px;
+  color:rgba(254,252,248,.82);line-height:1.5}
+/* /CLAN YEAR CALENDAR */
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -9703,6 +9749,12 @@ hiInit = function(){
       <div id="clan-calendar-mount"></div>
       <!-- ══════════ /CLAN CALENDAR ══════════ -->
 
+      <!-- ══════════ CLAN YEAR CALENDAR ══════════ -->
+      <div class="divider"></div>
+      <div class="clan-section-label">Clan Year</div>
+      <div id="cn-year-cal-mount"></div>
+      <!-- ══════════ /CLAN YEAR CALENDAR ══════════ -->
+
       <!-- CLAN CLOSED NOTE -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
         <div style="font-size:22px;color:rgba(204,53,41,.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
@@ -12195,10 +12247,12 @@ function cnCalRender(){
   const mount = document.getElementById('clan-calendar-mount');
   if(!mount) return;
   const me = cnCalMe();
-  const events = cnCalCurrentEvents()
+  const allEvents = cnCalCurrentEvents()
     .filter(e => !cnCalIsPast(e))
     .slice()
     .sort((a,b) => cnCalDaysUntil(cnCalEventDateStr(a)) - cnCalDaysUntil(cnCalEventDateStr(b)));
+  const events = allEvents.slice(0, 3);   // show only 3 soonest
+  const hiddenCount = Math.max(0, allEvents.length - 3);
 
   let html = '<div class="cn-cal-panel">';
   html += '<button type="button" class="cn-cal-add" onclick="cnCalOpenAdd()">+  add to the calendar</button>';
@@ -12218,6 +12272,11 @@ function cnCalRender(){
   }
 
   events.forEach(ev => { html += cnCalRenderLine(ev, me); });
+  if(hiddenCount > 0){
+    html += '<div class="cn-cal-more">'
+          + hiddenCount + ' more in Clan Year &darr;'
+          + '</div>';
+  }
   html += '</div>';
   mount.innerHTML = html;
 }
@@ -12467,7 +12526,245 @@ document.addEventListener('keydown', function(e){
     document.addEventListener('DOMContentLoaded', function(){ setTimeout(_cnCalInitEmpty, 140); });
   } else { setTimeout(_cnCalInitEmpty, 140); }
 })();
-// ══════════ /CLAN CALENDAR JS ═════════════════════════════════════════════════
+// ══════════ /CLAN CALENDAR JS ═════════════════════════════════════════════
+// ══════════ CLAN YEAR CALENDAR JS ═════════════════════════════════════════════
+// A single dark year-view inside the Clan section. Every clan member's
+// milestones appear as coloured dots; clan events (trips, gatherings) in gold.
+//
+// Canvas demo: CN_YEAR_MOCK supplies per-member milestones. Production path:
+// read from Firestore /users/{uid}/publicMilestones (not yet built).
+
+// ── Member colours ────────────────────────────────────────────────────────────────────
+const CN_YEAR_COLOURS = {
+  james:     '#CC3529',   // samurai red
+  elijah:    '#4A8F6A',   // warrior green
+  chark:     '#3A6B99',   // shokunin blue
+  susan:     '#9A6B8F',   // quiet violet — Mam
+  antonella: '#D4874A'    // warm amber
+};
+const CN_YEAR_OB_COLOUR  = '#C9A94B';   // clan event gold — matches Ikigai pips
+const CN_YEAR_MONTHS_SH  = ['Jan','Feb','Mar','Apr','May','Jun',
+                             'Jul','Aug','Sep','Oct','Nov','Dec'];
+const CN_YEAR_MEMBER_ORDER = ['james','elijah','chark','susan','antonella'];
+
+// ── Milestone data ───────────────────────────────────────────────────────────────────
+// Production: replace with Firestore read from /users/{uid}/publicMilestones.
+// Each entry: { text: string, due: 'YYYY-MM-DD', endDate?: 'YYYY-MM-DD' }
+// For now this is populated from each user's own state when available,
+// falling back to an empty array. The Firestore shared-milestones feature
+// is a future build — canvas demo uses CN_YEAR_MOCK for preview.
+const CN_YEAR_MOCK = {
+  james:     [],
+  elijah:    [],
+  chark:     [],
+  susan:     [],
+  antonella: []
+};
+
+// ── State ────────────────────────────────────────────────────────────────────────────
+let _cnYcRevealDate = null;
+
+// ── Helpers ────────────────────────────────────────────────────────────────────────
+function cnYcTodayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-'
+       + String(d.getMonth()+1).padStart(2,'0') + '-'
+       + String(d.getDate()).padStart(2,'0');
+}
+
+// Build map: dateStr → { uid: [{text,kind},...], '_ob': [{text,kind},...] }
+function cnYcBuildByDate(year){
+  const byDate = {};
+  function add(dateStr, uid, item){
+    if(!byDate[dateStr]) byDate[dateStr] = {};
+    if(!byDate[dateStr][uid]) byDate[dateStr][uid] = [];
+    byDate[dateStr][uid].push(item);
+  }
+
+  // 1. Personal milestones — current user's own goals feed 'james'
+  //    Other members: populated from CN_YEAR_MOCK (empty in production until
+  //    shared-milestones Firestore feature is built)
+  const selfUid = (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.uid)
+                ? _currentUser.uid : 'james';
+  // Self: pull from live state.goals milestones
+  if(typeof state !== 'undefined' && state){
+    (state.goals||[]).forEach(function(g){
+      (g.milestones||[]).forEach(function(ms){
+        if(!ms.due) return;
+        if(parseInt(ms.due.slice(0,4),10) !== year) return;
+        add(ms.due, selfUid, { text: ms.text, kind: 'milestone' });
+      });
+    });
+    // Also include clanMilestones the user has added from clan events
+    (state.clanMilestones||[]).forEach(function(cm){
+      if(!cm.due) return;
+      if(parseInt(cm.due.slice(0,4),10) !== year) return;
+      add(cm.due, selfUid, { text: cm.text, kind: 'milestone' });
+    });
+  }
+  // Other members from mock (canvas) or future Firestore read
+  CN_YEAR_MEMBER_ORDER.forEach(function(uid){
+    if(uid === selfUid) return;   // already handled above
+    const mils = CN_YEAR_MOCK[uid] || [];
+    mils.forEach(function(ms){
+      if(!ms.due || parseInt(ms.due.slice(0,4),10) !== year) return;
+      add(ms.due, uid, { text: ms.text, kind: 'milestone' });
+    });
+  });
+
+  // 2. Clan events — one-off events with ≥1 accepted RSVP show as gold
+  if(typeof cnCalCurrentEvents === 'function'){
+    cnCalCurrentEvents().forEach(function(ev){
+      if(ev.type !== 'oneoff') return;
+      const rsvps = ev.rsvps || {};
+      const anyAccepted = Object.keys(rsvps).some(function(u){ return rsvps[u] === 'accepted'; });
+      if(!anyAccepted) return;
+      const dateStr = ev.startDate;
+      if(!dateStr || parseInt(dateStr.slice(0,4),10) !== year) return;
+      if(ev.endDate && ev.endDate !== ev.startDate){
+        let cur = new Date(ev.startDate + 'T00:00:00');
+        const end = new Date(ev.endDate + 'T00:00:00');
+        while(cur <= end){
+          const ds = cur.getFullYear() + '-'
+                   + String(cur.getMonth()+1).padStart(2,'0') + '-'
+                   + String(cur.getDate()).padStart(2,'0');
+          if(parseInt(ds.slice(0,4),10) === year) add(ds, '_ob', { text: ev.title, kind: 'clan-event' });
+          cur.setDate(cur.getDate()+1);
+        }
+      } else {
+        add(dateStr, '_ob', { text: ev.title, kind: 'clan-event' });
+      }
+    });
+  }
+
+  return byDate;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────────────
+function cnYearCalBuild(){
+  const mount = document.getElementById('cn-year-cal-mount');
+  if(!mount) return;
+
+  const year = new Date().getFullYear();
+  const todayStr = cnYcTodayStr();
+  const byDate = cnYcBuildByDate(year);
+
+  let html = '<div class="kk-outer cal-shinobi">'
+           + '<div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>'
+           + '<div class="kk-rod"></div>'
+           + '<div class="kk-body">'
+           + '<div class="cnyc-wrap">';
+
+  // Legend
+  html += '<div class="cnyc-legend">';
+  CN_YEAR_MEMBER_ORDER.forEach(function(uid){
+    const col  = CN_YEAR_COLOURS[uid] || '#888';
+    const name = (typeof CN_CAL_NAMES !== 'undefined' && CN_CAL_NAMES[uid]) ? CN_CAL_NAMES[uid] : uid;
+    html += '<div class="cnyc-legend-item">'
+          + '<span class="cnyc-legend-dot" style="background:' + col + '"></span>'
+          + '<span class="cnyc-legend-name">' + name + '</span>'
+          + '</div>';
+  });
+  html += '<div class="cnyc-legend-item">'
+        + '<span class="cnyc-legend-dot" style="background:' + CN_YEAR_OB_COLOUR + '"></span>'
+        + '<span class="cnyc-legend-name">Clan Event</span>'
+        + '</div>';
+  html += '</div>';
+
+  html += '<div class="cnyc-year-label">' + year + '</div>';
+  html += '<div class="cnyc-months">';
+
+  for(let m = 0; m < 12; m++){
+    const firstDay = new Date(year, m, 1);
+    const lastDay  = new Date(year, m+1, 0);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    html += '<div class="cnyc-month">';
+    html += '<div class="cnyc-mname">' + CN_YEAR_MONTHS_SH[m] + '</div>';
+    html += '<div class="cnyc-grid">';
+    for(let i = 0; i < startOffset; i++){
+      html += '<div class="cnyc-cell cnyc-empty"></div>';
+    }
+    for(let day = 1; day <= lastDay.getDate(); day++){
+      const dStr = year + '-'
+                 + String(m+1).padStart(2,'0') + '-'
+                 + String(day).padStart(2,'0');
+      const dateData   = byDate[dStr] || {};
+      const hasData    = Object.keys(dateData).length > 0;
+      const isToday    = (dStr === todayStr);
+      const isSelected = (_cnYcRevealDate === dStr);
+      let cls = 'cnyc-cell';
+      if(isToday)    cls += ' cnyc-today';
+      if(hasData)    cls += ' cnyc-has-event';
+      if(isSelected) cls += ' cnyc-selected';
+      let pipsHtml = '';
+      if(hasData){
+        let pips = '';
+        CN_YEAR_MEMBER_ORDER.forEach(function(uid){
+          if(dateData[uid]) pips += '<span class="cnyc-pip" style="background:' + (CN_YEAR_COLOURS[uid]||'#888') + '"></span>';
+        });
+        if(dateData['_ob']) pips += '<span class="cnyc-pip" style="background:' + CN_YEAR_OB_COLOUR + '"></span>';
+        pipsHtml = '<div class="cnyc-pips">' + pips + '</div>';
+      }
+      const clickAttr = hasData ? ' onclick="cnYearCalReveal(\'' + dStr + '\')"'  : '';
+      html += '<div class="' + cls + '"' + clickAttr + '>' + pipsHtml + '</div>';
+    }
+    html += '</div></div>';   // /cnyc-grid /cnyc-month
+  }
+
+  html += '</div>';   // /cnyc-months
+
+  // Reveal panel — full width below all months
+  if(_cnYcRevealDate){
+    const dateData = byDate[_cnYcRevealDate] || {};
+    if(Object.keys(dateData).length) html += cnYcRevealHtml(_cnYcRevealDate, dateData);
+  }
+
+  html += '</div>'          // /cnyc-wrap
+        + '</div>'          // /kk-body
+        + '<div class="kk-rod kk-rod-btm"></div>'
+        + '</div>';         // /kk-outer
+
+  mount.innerHTML = html;
+}
+
+function cnYcRevealHtml(dateStr, dateData){
+  const parts = dateStr.split('-');
+  const d = new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+  const label = d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+  let h = '<div class="cnyc-reveal">';
+  h += '<div class="cnyc-reveal-date">' + label + '</div>';
+  if(dateData['_ob']){
+    dateData['_ob'].forEach(function(item){
+      h += '<div class="cnyc-reveal-item">';
+      h += '<span class="cnyc-reveal-dot" style="background:' + CN_YEAR_OB_COLOUR + '"></span>';
+      h += '<div><div class="cnyc-reveal-meta">clan event</div>';
+      h += '<div class="cnyc-reveal-text">' + (typeof cnCalEsc==='function'?cnCalEsc(item.text):item.text) + '</div></div></div>';
+    });
+  }
+  CN_YEAR_MEMBER_ORDER.forEach(function(uid){
+    if(!dateData[uid]) return;
+    const col  = CN_YEAR_COLOURS[uid] || '#888';
+    const name = (typeof CN_CAL_NAMES !== 'undefined' && CN_CAL_NAMES[uid]) ? CN_CAL_NAMES[uid] : uid;
+    dateData[uid].forEach(function(item){
+      h += '<div class="cnyc-reveal-item">';
+      h += '<span class="cnyc-reveal-dot" style="background:' + col + '"></span>';
+      h += '<div><div class="cnyc-reveal-meta">' + (typeof cnCalEsc==='function'?cnCalEsc(name):name) + '</div>';
+      h += '<div class="cnyc-reveal-text">' + (typeof cnCalEsc==='function'?cnCalEsc(item.text):item.text) + '</div></div></div>';
+    });
+  });
+  h += '</div>';
+  return h;
+}
+
+function cnYearCalReveal(dateStr){
+  _cnYcRevealDate = (_cnYcRevealDate === dateStr) ? null : dateStr;
+  cnYearCalBuild();
+}
+
+function cnYearCalInit(){
+  cnYearCalBuild();
+}
+// ══════════ /CLAN YEAR CALENDAR JS ═════════════════════════════════════════════════
 
 // ── Clan Calendar → Ikigai integration ──────────────────────────────────────
 let cnCalIkigaiPending = null;   // evId currently showing the prompt
