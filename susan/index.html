@@ -551,6 +551,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer:not([class*="cal-"]) .kk-date-text{color:rgba(255,255,255,.75)}
 .kk-outer:not([class*="cal-"]) .hg-week-label{color:rgba(255,255,255,.55)}
 .kk-outer:not([class*="cal-"]) .mcal-title{color:rgba(255,255,255,.65)}
+/* Seals + day dots — white on navy */
+.kk-outer:not([class*="cal-"]) .wk-sealed{color:rgba(255,255,255,.65)}
+.kk-outer:not([class*="cal-"]) .wk-sealed:hover{color:rgba(255,255,255,.95)}
+.kk-outer:not([class*="cal-"]) .wk-sealed.is-open{color:rgba(255,255,255,.95)}
+.kk-outer:not([class*="cal-"]) .wk-sealed-prev{color:rgba(255,255,255,.4)}
+.kk-outer:not([class*="cal-"]) .wk-sealed-prev:hover{color:rgba(255,255,255,.8)}
+.kk-outer:not([class*="cal-"]) .mcal-dot{background:rgba(255,255,255,.5)}
+.kk-outer:not([class*="cal-"]) .mcal-dots.all-done .mcal-dot{background:rgba(255,255,255,.85);box-shadow:0 0 3px rgba(255,255,255,.4),0 0 6px rgba(255,255,255,.18)}
 .kk-outer:not([class*="cal-"]) .sh-shelf-lbl{color:rgba(255,255,255,.65)}
 .kk-outer:not([class*="cal-"]) .ik-arc-label-sm{color:rgba(255,255,255,.65)}
 .kk-outer:not([class*="cal-"]) .ycal-year-label{color:rgba(255,255,255,.55)}
@@ -604,6 +612,15 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .wk-sealed-month{font-size:15px;letter-spacing:0;color:rgba(204,53,41,.45)}
 .wk-sealed-month:hover{color:rgba(204,53,41,.75)}
 .wk-sealed-month.is-open{color:rgba(204,53,41,.75)}
+/* prev-month reflection seal — dimmer twin, always red-visible */
+.wk-sealed-prev{font-size:11px;opacity:.5;color:rgba(204,53,41,.65)}
+.wk-sealed-prev:hover{opacity:.85;color:rgba(204,53,41,.9)}
+.kk-outer.cal-clan .wk-sealed-prev{color:var(--red);opacity:.55}
+.kk-outer.cal-clan .wk-sealed-prev:hover{opacity:1}
+.kk-outer.cal-samurai .wk-sealed-prev{color:rgba(254,252,248,.55);opacity:1}
+.kk-outer.cal-samurai .wk-sealed-prev:hover{color:rgba(254,252,248,.9)}
+.kk-outer.cal-shinobi .wk-sealed-prev{color:rgba(204,53,41,.55);opacity:1}
+.kk-outer.cal-shinobi .wk-sealed-prev:hover{color:rgba(204,53,41,.95)}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
 .mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
@@ -4651,6 +4668,11 @@ function buildMonthCal(){
   const todayStr=getDateStr();
   // Monthly reflection for this calendar month
   const monthRef=getMonthlyReflection(year,month);
+  // Previous month reflection seal (lookback)
+  const prevMD=new Date(now.getFullYear(),now.getMonth()+calMonthOffset-1,1);
+  const prevYear=prevMD.getFullYear(),prevMonth=prevMD.getMonth();
+  const prevMonthRef=getMonthlyReflection(prevYear,prevMonth);
+  const prevMonthShort=prevMD.toLocaleDateString('en-GB',{month:'short'});
 
   // Build flat cell array then split into week rows
   const cells=[];
@@ -4697,7 +4719,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
         <div class="mcal-nav">
           <button class="mcal-nav-btn" onclick="navigateMonth(-1)">&#8249;</button>
           <span class="mcal-title">${monthName}</span>
-          ${monthRef?`<span class="wk-sealed wk-sealed-month${_monthReflectExpanded?' is-open':''}" onclick="toggleMonthReflect(event)" title="monthly reflection" style="margin-right:6px">月</span>`:'<span style="width:20px;display:inline-block"></span>'}
+          <span style="display:flex;align-items:center;gap:3px">${prevMonthRef?`<span class="wk-sealed wk-sealed-prev" onclick="openMonthReflect(${prevYear},${prevMonth})" title="${prevMonthShort} · monthly reflection">月</span>`:''  }${monthRef?`<span class="wk-sealed wk-sealed-month${_monthReflectExpanded?' is-open':''}" onclick="toggleMonthReflect(event)" title="monthly reflection">月</span>`:'<span style="width:20px;display:inline-block"></span>'}</span>
           <button class="mcal-nav-btn" onclick="navigateMonth(1)"${calMonthOffset===0?' disabled':''}>&#8250;</button>
         </div>
         <div class="mcal-grid">
