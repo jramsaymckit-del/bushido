@@ -8005,6 +8005,7 @@ async function loadClanData(){
     renderClanCards();
     updateClanPerfFromCache();
     if(typeof cnCalSubscribe === 'function') cnCalSubscribe();
+    if(typeof cnYearCalBuild === 'function') cnYearCalBuild();
   }catch(e){ console.warn('Clan load failed:',e); }
 }
 
@@ -9202,6 +9203,9 @@ window.switchPrimary = function(name){
   if(name === 'hiyoku' && !_hiNoticeShownThisSession){
     _hiNoticeShownThisSession = true;
     setTimeout(hiCheckNotice, 350);
+  }
+  if(name === 'clan'){
+    setTimeout(function(){ if(typeof cnYearCalBuild === 'function') cnYearCalBuild(); }, 50);
   }
 };
 
