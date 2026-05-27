@@ -3371,10 +3371,8 @@ if (FIREBASE_CONFIGURED) {
         <div class="avatar-dropdown" id="avatarDropdown">
           <div class="avatar-dd-name">James<div class="avatar-dd-sub">your bushido</div></div>
           <button class="avatar-dd-item" onclick="openManifesto()"><span class="dd-kanji">道</span>Read the Manifesto</button>
-          <!-- EXPERIMENT: CALENDAR SYNC + SETTINGS DROPDOWN ENTRIES -->
           <button class="avatar-dd-item" id="ddCalSync" onclick="openCalSync()"><span class="dd-kanji">暦</span>Google Calendar Sync<span class="dd-status" id="ddCalSyncStatus"></span></button>
           <button class="avatar-dd-item" onclick="openSettings()"><span class="dd-kanji">設</span>Settings</button>
-          <!-- /EXPERIMENT -->
           <div class="avatar-dd-divider"></div>
           <button class="avatar-dd-item dd-danger" onclick="signOutUser()"><span class="dd-kanji">出</span>Sign out</button>
         </div>
@@ -7627,6 +7625,21 @@ async function syncToCloud(){
   }catch(e){ setSyncStatus('error'); }
 }
 
+// Minimum shape a real BUSHIDO state must have. Guards the destructive
+// Object.assign paths (import / cloud-load) against {}, truncated files,
+// or another app's backup silently wiping the plan.
+function isValidStateShape(obj){
+  return !!obj && typeof obj === 'object' && !Array.isArray(obj)
+    && Array.isArray(obj.strands) && Array.isArray(obj.kaizen);
+}
+
+// Snapshot of the live state taken immediately before each destructive
+// overwrite (cloud-load / file-import). Recoverable if the overwrite turns
+// out to be bad.
+function saveLastKnownGood(){
+  try{ localStorage.setItem('bushido_last_known_good', JSON.stringify(state)); }catch(e){}
+}
+
 async function loadFromCloud(compareTimestamp){
   const{binId,masterKey}=getSyncConfig();
   if(!binId||!masterKey) return false;
@@ -7645,11 +7658,14 @@ async function loadFromCloud(compareTimestamp){
     } else {
       cloud=record;
     }
+    // Reject a corrupt or non-BUSHIDO cloud record before it can overwrite the plan.
+    if(!isValidStateShape(cloud)){ setSyncStatus('error'); return false; }
     // Use the pre-render snapshot timestamp if provided — prevents startup saves
     // (checkCelebrations etc.) from inflating lastModified and falsely making local
     // look newer than a phone/other-device cloud state.
     const localTs=compareTimestamp!==undefined?compareTimestamp:(state.lastModified||0);
     if((cloud.lastModified||0)>localTs){
+      saveLastKnownGood();
       Object.assign(state,cloud);
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
@@ -7741,6 +7757,11 @@ function importState(e){
   reader.onload=evt=>{
     try{
       const imported=JSON.parse(evt.target.result);
+      if(!isValidStateShape(imported)){
+        alert('That file isn\'t a valid BUSHIDO backup — your plan was not changed.');
+        return;
+      }
+      saveLastKnownGood();
       Object.assign(state,imported);
       localStorage.setItem(PROD_KEY,JSON.stringify(state));
       // Brief confirmation
@@ -12584,30 +12605,31 @@ function cnYcBuildByDate(year){
     byDate[dateStr][uid].push(item);
   }
 
-  // 1. Personal milestones — current user's own goals feed 'james'
-  //    Other members: populated from CN_YEAR_MOCK (empty in production until
-  //    shared-milestones Firestore feature is built)
-  const selfUid = (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.uid)
-                ? _currentUser.uid : 'james';
-  // Self: pull from live state.goals milestones
+  // 1. Personal milestones — derive member ID from PROD_KEY so it always
+  //    matches CN_YEAR_MEMBER_ORDER ('james', 'elijah', etc.) regardless of
+  //    Firebase UID. Falls back to 'james' if PROD_KEY is unavailable.
+  const selfMemberId = (typeof PROD_KEY !== 'undefined' && PROD_KEY)
+    ? PROD_KEY.replace('bushido_','').replace('_permanent','')
+    : 'james';
+  // Self: pull from live state.annualGoals milestones
   if(typeof state !== 'undefined' && state){
-    (state.goals||[]).forEach(function(g){
+    (state.annualGoals||[]).forEach(function(g){
       (g.milestones||[]).forEach(function(ms){
         if(!ms.due) return;
         if(parseInt(ms.due.slice(0,4),10) !== year) return;
-        add(ms.due, selfUid, { text: ms.text, kind: 'milestone' });
+        add(ms.due, selfMemberId, { text: ms.text, kind: 'milestone' });
       });
     });
     // Also include clanMilestones the user has added from clan events
     (state.clanMilestones||[]).forEach(function(cm){
       if(!cm.due) return;
       if(parseInt(cm.due.slice(0,4),10) !== year) return;
-      add(cm.due, selfUid, { text: cm.text, kind: 'milestone' });
+      add(cm.due, selfMemberId, { text: cm.text, kind: 'milestone' });
     });
   }
-  // Other members from mock (canvas) or future Firestore read
+  // Other members from mock (canvas) or future Firestore shared-milestones read
   CN_YEAR_MEMBER_ORDER.forEach(function(uid){
-    if(uid === selfUid) return;   // already handled above
+    if(uid === selfMemberId) return;   // already handled above
     const mils = CN_YEAR_MOCK[uid] || [];
     mils.forEach(function(ms){
       if(!ms.due || parseInt(ms.due.slice(0,4),10) !== year) return;
