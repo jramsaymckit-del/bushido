@@ -12673,24 +12673,45 @@ function cnYcBuildByDate(year){
   // 2. Clan events — one-off events with ≥1 accepted RSVP show as gold
   if(typeof cnCalCurrentEvents === 'function'){
     cnCalCurrentEvents().forEach(function(ev){
-      if(ev.type !== 'oneoff') return;
-      const rsvps = ev.rsvps || {};
-      const anyAccepted = Object.keys(rsvps).some(function(u){ return rsvps[u] === 'accepted'; });
-      if(!anyAccepted) return;
-      const dateStr = ev.startDate;
-      if(!dateStr || parseInt(dateStr.slice(0,4),10) !== year) return;
-      if(ev.endDate && ev.endDate !== ev.startDate){
-        let cur = new Date(ev.startDate + 'T00:00:00');
-        const end = new Date(ev.endDate + 'T00:00:00');
-        while(cur <= end){
-          const ds = cur.getFullYear() + '-'
-                   + String(cur.getMonth()+1).padStart(2,'0') + '-'
-                   + String(cur.getDate()).padStart(2,'0');
-          if(parseInt(ds.slice(0,4),10) === year) add(ds, '_ob', { text: ev.title, kind: 'clan-event' });
-          cur.setDate(cur.getDate()+1);
+      // One-off events: show if at least one member accepted
+      if(ev.type === 'oneoff'){
+        const rsvps = ev.rsvps || {};
+        const anyAccepted = Object.keys(rsvps).some(function(u){ return rsvps[u] === 'accepted'; });
+        if(!anyAccepted) return;
+        const dateStr = ev.startDate;
+        if(!dateStr || parseInt(dateStr.slice(0,4),10) !== year) return;
+        if(ev.endDate && ev.endDate !== ev.startDate){
+          let cur = new Date(ev.startDate + 'T00:00:00');
+          const end = new Date(ev.endDate + 'T00:00:00');
+          while(cur <= end){
+            const ds = cur.getFullYear() + '-'
+                     + String(cur.getMonth()+1).padStart(2,'0') + '-'
+                     + String(cur.getDate()).padStart(2,'0');
+            if(parseInt(ds.slice(0,4),10) === year) add(ds, '_ob', { text: ev.title, kind: 'clan-event' });
+            cur.setDate(cur.getDate()+1);
+          }
+        } else {
+          add(dateStr, '_ob', { text: ev.title, kind: 'clan-event' });
         }
-      } else {
-        add(dateStr, '_ob', { text: ev.title, kind: 'clan-event' });
+        return;
+      }
+      // Recurring events (birthdays, anniversaries): resolve MM-DD to this year
+      if(ev.type === 'recurring' && ev.startMd){
+        const dateStr = year + '-' + ev.startMd;
+        if(ev.endMd && ev.endMd !== ev.startMd){
+          let cur = new Date(dateStr + 'T00:00:00');
+          const endDate = new Date(year + '-' + ev.endMd + 'T00:00:00');
+          if(endDate < cur) endDate.setFullYear(endDate.getFullYear()+1);
+          while(cur <= endDate){
+            const ds = cur.getFullYear() + '-'
+                     + String(cur.getMonth()+1).padStart(2,'0') + '-'
+                     + String(cur.getDate()).padStart(2,'0');
+            if(parseInt(ds.slice(0,4),10) === year) add(ds, '_ob', { text: ev.title, kind: 'clan-event' });
+            cur.setDate(cur.getDate()+1);
+          }
+        } else {
+          add(dateStr, '_ob', { text: ev.title, kind: 'clan-event' });
+        }
       }
     });
   }
