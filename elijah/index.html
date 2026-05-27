@@ -7943,6 +7943,21 @@ function buildOwnClanData(){
       }
     });
   }
+  // PROD_KEY-derived friendly member ID — lets Clan Year match
+  // this user's _clanCache entry to their slot in CN_YEAR_MEMBER_ORDER.
+  var memberId = (typeof PROD_KEY !== 'undefined' && PROD_KEY)
+    ? PROD_KEY.replace('bushido_','').replace('_permanent','')
+    : '';
+  // Lean milestone list for Clan Year Calendar — just due + text.
+  var annualMilestones = [];
+  (state.annualGoals||[]).forEach(function(g){
+    (g.milestones||[]).forEach(function(ms){
+      if(ms.due && ms.text) annualMilestones.push({ due: ms.due, text: ms.text });
+    });
+  });
+  (state.clanMilestones||[]).forEach(function(cm){
+    if(cm.due && cm.text) annualMilestones.push({ due: cm.due, text: cm.text });
+  });
   return {
     name:       state.name || 'Warrior',
     streak:     maxStreak,
@@ -7957,9 +7972,11 @@ function buildOwnClanData(){
     strandRates: isShinobi ? [] : computeStrandRates(),
     crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
     goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
-    weekReflect: weekReflect,
+    weekReflect:  weekReflect,
     monthReflect: monthReflect,
-    practiceMilestoneDays: highestMilestoneDays
+    practiceMilestoneDays: highestMilestoneDays,
+    memberId:         memberId,
+    annualMilestones: annualMilestones
   };
 }
 
@@ -12633,10 +12650,19 @@ function cnYcBuildByDate(year){
       add(cm.due, selfMemberId, { text: cm.text, kind: 'milestone' });
     });
   }
-  // Other members from mock (canvas) or future Firestore shared-milestones read
+  // Other members — read from _clanCache (populated by loadClanData from /clan/{uid}).
+  // Each clan doc now carries memberId + annualMilestones written by writeClanSummary().
+  // Falls back to CN_YEAR_MOCK (canvas demo / offline) if cache is empty.
   CN_YEAR_MEMBER_ORDER.forEach(function(uid){
     if(uid === selfMemberId) return;   // already handled above
-    const mils = CN_YEAR_MOCK[uid] || [];
+    // Find this member's cache entry by their PROD_KEY-derived memberId field
+    var cacheEntry = null;
+    if(typeof _clanCache !== 'undefined' && _clanCache){
+      Object.keys(_clanCache).forEach(function(firebaseUid){
+        if((_clanCache[firebaseUid]||{}).memberId === uid) cacheEntry = _clanCache[firebaseUid];
+      });
+    }
+    const mils = (cacheEntry && cacheEntry.annualMilestones) || CN_YEAR_MOCK[uid] || [];
     mils.forEach(function(ms){
       if(!ms.due || parseInt(ms.due.slice(0,4),10) !== year) return;
       add(ms.due, uid, { text: ms.text, kind: 'milestone' });
