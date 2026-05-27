@@ -6559,6 +6559,37 @@ function getLastWeekIntention(){
   return ref?ref.intention:null;
 }
 
+function playEnsoMoment(kanji){
+  // Reuses the existing seasonal review #srEnsoOverlay — same SVG, different kanji.
+  // Lighter timing than EOY (1.4s draw vs 1.6s) to match the weekly/monthly scale.
+  var overlay = document.getElementById('srEnsoOverlay');
+  var path    = document.getElementById('srEnsoPath');
+  var sheen   = document.getElementById('srEnsoSheen');
+  var k       = document.getElementById('srEnsoKanji');
+  if(!overlay || !path || !k) return;
+  k.textContent = kanji;
+  path.style.transition=''; path.style.animation='none'; path.style.strokeDashoffset='950';
+  if(sheen){ sheen.style.animation='none'; sheen.style.strokeDashoffset='950'; }
+  k.style.animation='none'; k.style.opacity='0';
+  overlay.style.transition=''; overlay.style.opacity='0'; overlay.style.display='flex';
+  overlay.offsetHeight; // force reflow
+  overlay.style.transition='opacity 0.32s ease'; overlay.style.opacity='1';
+  setTimeout(function(){
+    path.style.animation='srEnsoDraw 1.4s cubic-bezier(0.28,0.0,0.08,1.0) forwards';
+    if(sheen) sheen.style.animation='srEnsoDraw 1.4s cubic-bezier(0.28,0.0,0.08,1.0) 0.08s forwards';
+  }, 100);
+  setTimeout(function(){ k.style.animation='srKanjiBreath 0.75s ease forwards'; }, 600);
+  setTimeout(function(){
+    overlay.style.transition='opacity 0.45s ease'; overlay.style.opacity='0';
+  }, 1650);
+  setTimeout(function(){
+    overlay.style.display='none'; overlay.style.transition=''; overlay.style.opacity='0';
+    path.style.animation=''; path.style.strokeDashoffset='950';
+    if(sheen){ sheen.style.animation=''; sheen.style.strokeDashoffset='950'; }
+    k.style.animation=''; k.style.opacity='0';
+    k.textContent='春'; // restore 春 (spring/EOY default)
+  }, 2150);
+}
 function saveReflection(type){
   const c=document.getElementById('reflect-content');
   // On Monday grace day, anchor weekly reflections to the prior Sunday (last day of the
@@ -6612,7 +6643,8 @@ function saveReflection(type){
       <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
       <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
     </div>`;
-    setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 1800);
+    playEnsoMoment(type==='weekly'?'週':'月');
+    setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 2600);
   }
 }
 
