@@ -3193,13 +3193,18 @@ body.dark .sr-phase-dot {
 .cn-cal-ik-status{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 /* /CLAN CALENDAR */
 .cn-cal-more{font-size:10px;letter-spacing:2px;color:var(--ink-faint);
-  text-align:center;padding:10px 0 2px;font-family:'Noto Sans JP',sans-serif}
+  text-align:center;padding:10px 0 2px;font-family:'Noto Sans JP',sans-serif;
+  cursor:pointer;transition:color .2s}
+.cn-cal-more:hover{color:var(--ink)}
 
 /* ═══ CLAN YEAR CALENDAR ═══════════════════════════════════════════════════ */
 .cnyc-wrap{padding:20px 18px 18px}
+.cnyc-year-header{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px}
 .cnyc-year-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;
-  color:rgba(254,252,248,.3);text-align:center;margin-bottom:16px;
+  color:rgba(254,252,248,.3);text-align:center;
   font-family:'Noto Serif JP',serif}
+.cnyc-nav-btn{font-size:16px;padding:0 4px;line-height:1;opacity:.55}
+.cnyc-nav-btn:hover{opacity:1}
 .cnyc-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-bottom:18px;padding:0 1px}
 .cnyc-legend-item{display:flex;align-items:center;gap:5px}
 .cnyc-legend-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -12298,7 +12303,7 @@ function cnCalRender(){
 
   events.forEach(ev => { html += cnCalRenderLine(ev, me); });
   if(hiddenCount > 0){
-    html += '<div class="cn-cal-more">'
+    html += '<div class="cn-cal-more" onclick="cnCalScrollToYear()">'
           + hiddenCount + ' more in Clan Year &darr;'
           + '</div>';
   }
@@ -12588,6 +12593,7 @@ const CN_YEAR_MOCK = {
 
 // ── State ────────────────────────────────────────────────────────────────────────────
 let _cnYcRevealDate = null;
+let _cnYcYear = new Date().getFullYear();
 
 // ── Helpers ────────────────────────────────────────────────────────────────────────
 function cnYcTodayStr(){
@@ -12688,11 +12694,23 @@ function cnYcBuildByDate(year){
 }
 
 // ── Render ───────────────────────────────────────────────────────────────────────────
+function cnCalScrollToYear(){
+  const mount = document.getElementById('cn-year-cal-mount');
+  if(!mount) return;
+  mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Brief highlight pulse on the scroll wrapper
+  const wrap = mount.querySelector('.cnyc-wrap');
+  if(wrap){
+    wrap.style.transition = 'background .15s';
+    wrap.style.background = 'rgba(201,169,75,.08)';
+    setTimeout(function(){ wrap.style.background = ''; }, 800);
+  }
+}
 function cnYearCalBuild(){
   const mount = document.getElementById('cn-year-cal-mount');
   if(!mount) return;
 
-  const year = new Date().getFullYear();
+  const year = _cnYcYear;
   const todayStr = cnYcTodayStr();
   const byDate = cnYcBuildByDate(year);
 
@@ -12718,7 +12736,11 @@ function cnYearCalBuild(){
         + '</div>';
   html += '</div>';
 
-  html += '<div class="cnyc-year-label">' + year + '</div>';
+  html += '<div class="cnyc-year-header">'
+         + '<button class="mcal-nav-btn cnyc-nav-btn" onclick="cnYcNavYear(-1)">&#8249;</button>'
+         + '<span class="cnyc-year-label">' + year + '</span>'
+         + '<button class="mcal-nav-btn cnyc-nav-btn" onclick="cnYcNavYear(1)">&#8250;</button>'
+         + '</div>';
   html += '<div class="cnyc-months">';
 
   for(let m = 0; m < 12; m++){
@@ -12805,6 +12827,11 @@ function cnYcRevealHtml(dateStr, dateData){
 
 function cnYearCalReveal(dateStr){
   _cnYcRevealDate = (_cnYcRevealDate === dateStr) ? null : dateStr;
+  cnYearCalBuild();
+}
+function cnYcNavYear(delta){
+  _cnYcYear += delta;
+  _cnYcRevealDate = null;
   cnYearCalBuild();
 }
 
