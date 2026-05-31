@@ -3246,7 +3246,7 @@ body.dark .sr-phase-dot {
 
 /* Past done cells — muted dot so only today stands out */
 .hg-cell.hg-done:not(.hg-today-col)::after {
-  background: rgba(204,53,41,.22);
+  background: rgba(204,53,41,.22) !important;
 }
 /* Past miss cells — keep faint, but slightly more visible so done/miss are still readable */
 .hg-cell.hg-miss:not(.hg-today-col)::after {
@@ -8063,6 +8063,12 @@ async function loadClanData(){
   }catch(e){ console.warn('Clan load failed:',e); }
 }
 
+// XSS-safe display of Firestore-sourced names (protects against injected HTML in m.name / partner names)
+function escapeHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // Replace static member rows with dynamic rows from _clanCache
 function renderClanRows(){
   var wrap=document.getElementById('clan-exp-members');
@@ -8108,7 +8114,7 @@ function renderClanRows(){
     var todayStr=tTotal>0?(tDone+'/'+tTotal):(tDone||'—');
     return '<div class="clan-exp-row">'
       +'<div><div class="clan-exp-streak">'+(m.streak||0)+'</div><div class="clan-exp-streak-lbl">days</div></div>'
-      +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+m.name+renderMilestoneSeal(m, false)+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="clan-exp-name">'+escapeHtml(m.name)+renderMilestoneSeal(m, false)+'</div>'
       +'<div class="clan-exp-bars">'+bHtml+'</div></div>'
       +'<div class="clan-exp-today"><div class="clan-exp-today-num">'+todayStr+'</div>'
       +'<div class="clan-exp-today-lbl">today</div></div>'
@@ -8251,7 +8257,7 @@ function renderClanCards(){
         +'<div class="clan-card-header">'
         +'<div class="clan-member-id">'
         +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
-        +'<div><div class="clan-member-name">'+m.name+renderMilestoneSeal(m, true)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
+        +'<div><div class="clan-member-name">'+escapeHtml(m.name)+renderMilestoneSeal(m, true)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
         +'<div class="clan-member-sub">Moving in the shadows</div></div></div>'
         +'<div class="clan-view-badge">Shinobi View</div></div>'
         +'<div class="shin-strand-row">'+emberHtml+'</div>'
@@ -8297,7 +8303,7 @@ function renderClanCards(){
         +'<div class="clan-card-header">'
         +'<div class="clan-member-id">'
         +'<div class="clan-avatar" style="background:'+avatarColor+'"><span>'+initial+'</span></div>'
-        +'<div><div class="clan-member-name">'+m.name+renderMilestoneSeal(m, false)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
+        +'<div><div class="clan-member-name">'+escapeHtml(m.name)+renderMilestoneSeal(m, false)+(m.isOwn?'<span class="clan-you-badge">you</span>':'')+'</div>'
         +'<div class="clan-member-sub">'+strandSub+'</div></div></div>'
         +'<div class="clan-view-badge">Samurai View</div></div>'
         +(strandHtml?'<div class="clan-strand-row">'+strandHtml+'</div>':'')
@@ -8887,14 +8893,14 @@ function hiRenderCalendarTab(){
   let html = '';
   if(next && next.when <= 30){
     const when = next.when===0 ? 'today' : next.when===1 ? 'tomorrow' : `in ${next.when} days`;
-    html += `<div class="hi-cal-nudge-line"><strong>${next.name}</strong> &mdash; ${when}.</div>`;
+    html += `<div class="hi-cal-nudge-line"><strong>${escapeHtml(next.name)}</strong> &mdash; ${when}.</div>`;
   }
   html += all.map(d => {
     const note = hiNoteIconHTML(d.id, d.name);
     return `
       <div class="hi-date-line">
         <div class="hi-date-when">${d.display}</div>
-        <div class="hi-date-name">${d.name}</div>
+        <div class="hi-date-name">${escapeHtml(d.name)}</div>
         <div class="hi-date-tag ${d.tag==='commitment'?'commitment':''}">${d.tag}</div>
         ${note}
       </div>`;
@@ -9125,7 +9131,7 @@ function hiRenderPlanActions(){
   if(plan.sealedAt || _hiPlanMode==='view'){
     // view-only
   } else if(_hiPlanMode === 'draft'){
-    html += `<button class="hi-plan-btn solid" onclick="hiPlanSaveDraft()">Save draft &amp; send to ${hiPartnerName()}</button>`;
+    html += `<button class="hi-plan-btn solid" onclick="hiPlanSaveDraft()">Save draft &amp; send to ${escapeHtml(hiPartnerName())}</button>`;
   } else if(_hiPlanMode === 'review'){
     html += `<button class="hi-plan-btn" onclick="hiPlanSaveDraft()">Save changes</button>`;
     html += `<button class="hi-plan-btn solid" onclick="hiPlanApprove()">Approve &amp; seal</button>`;
