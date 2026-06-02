@@ -3956,6 +3956,24 @@ function migrateWorkoutHabits(){
   if(changed) saveState();
 }
 
+// One-time migration: sort kaizen into logical daily order.
+// Runs once, sets habitOrderMigrated flag so user reordering isn't overwritten later.
+// Unknown IDs (added via UI) slot into the morning cluster (between Morning prayer and Antonella).
+function migrateKaizenOrder(){
+  if(!state.kaizen || state.habitOrderMigrated) return;
+  // Preferred order: morning → study → workout → creative → history → salsa → evening
+  const PREFERRED = [300,302,305,306,304,401,402,403,404,405,406,303,407,314,311,313,309,312,310,301];
+  state.kaizen.sort((a,b)=>{
+    let ai=PREFERRED.indexOf(a.id);
+    let bi=PREFERRED.indexOf(b.id);
+    if(ai===-1) ai=0.5; // Unknown habits slot between Morning prayer and Antonella
+    if(bi===-1) bi=0.5;
+    return ai-bi;
+  });
+  state.habitOrderMigrated=true;
+  saveState();
+}
+
 // One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
 // Safe to call repeatedly — only fills empty fields, never overwrites user edits.
 function applyHabitDetailDefaults(){
@@ -7809,6 +7827,7 @@ async function loadFromCloud(compareTimestamp){
       Object.assign(state,cloud);
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
+      migrateKaizenOrder();       // sort into logical daily order (runs once)
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
       return true;
@@ -8575,6 +8594,7 @@ async function loadFirestoreState(user){
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
+      migrateKaizenOrder();       // sort into logical daily order (runs once)
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
