@@ -3921,9 +3921,12 @@ function saveState(){
 function migrateWorkoutHabits(){
   if(!state.kaizen) return;
   let changed = false;
-  // Remove deprecated habits
+  // Surface user-added habits so reviews never miss them
+  const userAdded = state.kaizen.filter(h => h.userAdded);
+  if(userAdded.length) console.log('[BUSHIDO] User-added habits (preserve in DEFAULT_STATE):', userAdded.map(h=>({id:h.id,text:h.text})));
+  // Remove deprecated habits — never removes userAdded habits
   const before = state.kaizen.length;
-  state.kaizen = state.kaizen.filter(h => ![307,308].includes(h.id));
+  state.kaizen = state.kaizen.filter(h => ![307,308].includes(h.id) || h.userAdded);
   if(state.kaizen.length !== before) changed = true;
   // Add new habits from DEFAULT_STATE if not already present
   const existingIds = new Set(state.kaizen.map(h => h.id));
@@ -5949,12 +5952,13 @@ function addGoal(){
   if(!text)return;
   const link=document.getElementById('link-select')?.value||'';
   if(currentTab==='kaizen'){
-    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:''});
+    // userAdded:true flags habits added through the UI so reviews & migrations never lose them
+    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true});
   } else if(currentTab==='shokunin'){
     const tf=document.getElementById('tf-select')?.value||'monthly';
-    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false});
+    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false,userAdded:true});
   } else {
-    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false});
+    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false,userAdded:true});
   }
   saveState();hideAdd();renderTab();
 }
