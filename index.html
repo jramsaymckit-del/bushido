@@ -3851,10 +3851,13 @@ if (FIREBASE_CONFIGURED) {
               <div id="srCalStatus" style="font-size:11px;color:var(--ink-faint);margin-top:12px;min-height:18px;font-style:italic;"></div>
             </div>
   
-            <!-- State C: calendar not connected — guide, don't bypass -->
+            <!-- State C: calendar not connected — offer bypass -->
             <div id="srNoCalendar" style="display:none;animation:fadeUp .3s ease;">
-              <div style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.6;margin-bottom:14px;">Scheduling with James is part of completing the Seasonal Review.<br>Connect Google Calendar in Settings, then return here to finish.</div>
-              <button class="btn btn-ghost" onclick="srClose()" style="font-size:11px;letter-spacing:1px;">Go to Settings</button>
+              <div style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.6;margin-bottom:18px;">Your review is sealed.<br>To schedule a check-in with James, connect Google Calendar first — or reach out to him directly.</div>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-ghost" onclick="srCancelPicker()" style="font-size:11px;letter-spacing:1px;">Connect Calendar</button>
+                <button class="btn" onclick="srClose()" style="font-size:11px;letter-spacing:2px;padding:10px 24px;">I'll reach out directly — done</button>
+              </div>
             </div>
           </div>
         </div>
