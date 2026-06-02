@@ -3916,6 +3916,40 @@ function saveState(){
   }
 }
 
+// One-time migration: replace old lift/run habits (307,308) with the 6-day training split
+// and add BUSHIDO daily habit. Safe to call repeatedly — checks ids before acting.
+function migrateWorkoutHabits(){
+  if(!state.kaizen) return;
+  let changed = false;
+  // Remove deprecated habits
+  const before = state.kaizen.length;
+  state.kaizen = state.kaizen.filter(h => ![307,308].includes(h.id));
+  if(state.kaizen.length !== before) changed = true;
+  // Add new habits from DEFAULT_STATE if not already present
+  const existingIds = new Set(state.kaizen.map(h => h.id));
+  [401,402,403,404,405,406,407].forEach(id => {
+    if(!existingIds.has(id)){
+      const def = (DEFAULT_STATE.kaizen||[]).find(d => d.id===id);
+      if(def){ state.kaizen.push(Object.assign({},def,{streak:0,bestStreak:0,done:false,lastDone:null})); changed=true; }
+    }
+  });
+  // Add Shokunin 207 if missing
+  if(!state.shokunin) state.shokunin=[];
+  if(!state.shokunin.find(sh => sh.id===207)){
+    const def=(DEFAULT_STATE.shokunin||[]).find(d=>d.id===207);
+    if(def){ state.shokunin.push(Object.assign({},def)); changed=true; }
+  }
+  // Update Shokunin 202 text if it still says the old description
+  const shok202=state.shokunin.find(sh=>sh.id===202);
+  if(shok202 && !shok202.text.includes('half marathon')){
+    const def=(DEFAULT_STATE.shokunin||[]).find(d=>d.id===202);
+    if(def){ shok202.text=def.text; changed=true; }
+  }
+  // Ensure nextId is at least 408
+  if((state.nextId||0)<408){ state.nextId=408; changed=true; }
+  if(changed) saveState();
+}
+
 // One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
 // Safe to call repeatedly — only fills empty fields, never overwrites user edits.
 function applyHabitDetailDefaults(){
@@ -7768,6 +7802,7 @@ async function loadFromCloud(compareTimestamp){
       saveLastKnownGood();
       Object.assign(state,cloud);
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
+      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
       return true;
@@ -8533,6 +8568,7 @@ async function loadFirestoreState(user){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
+      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
