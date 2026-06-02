@@ -3945,6 +3945,12 @@ function migrateWorkoutHabits(){
     const def=(DEFAULT_STATE.shokunin||[]).find(d=>d.id===202);
     if(def){ shok202.text=def.text; changed=true; }
   }
+  // Patch BUSHIDO habit text/bullets if still on old version
+  const bh=state.kaizen.find(h=>h.id===407);
+  if(bh && !bh.text.includes('30+')){
+    const def=(DEFAULT_STATE.kaizen||[]).find(d=>d.id===407);
+    if(def){ bh.text=def.text; bh.bullets=def.bullets; bh.why=def.why; changed=true; }
+  }
   // Ensure nextId is at least 408
   if((state.nextId||0)<408){ state.nextId=408; changed=true; }
   if(changed) saveState();
@@ -4065,9 +4071,9 @@ const DEFAULT_STATE = {
     {id:301, text:'Evening prayer', days:'daily', parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null,
       bullets:['Before sleep. Thank God for the day.','Reflect on your blessings, release what you didn\'t finish.','Ask for what tomorrow needs. Ask for Peace that transcends understanding.'],
       why:'The day that is bookended with prayer belongs to something greater than the hustle. This grounds you while you\'re building everything at once.'},
-    {id:407, text:'Work on BUSHIDO', days:'daily', parentShok:207, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Open the coreproject or canvas. Build something, fix something, improve something.','Even 20 minutes counts. The product grows one session at a time.'],
-      why:'BUSHIDO is becoming a real product. Daily attention is how it gets there.'}
+    {id:407, text:'Work on BUSHIDO (30+ min)', days:'daily', parentShok:207, streak:0, bestStreak:0, done:false, lastDone:null,
+      bullets:['Open the coreproject or canvas. Build something, fix something, improve something.','Minimum 30 minutes of real work — not browsing, not thinking about it. Hands on keys.'],
+      why:'BUSHIDO is becoming a real product. Thirty minutes a day compounds into something people want to use.'}
   ],
   completionLog: {},
   dailyNotes: {},
