@@ -3248,6 +3248,14 @@ body.dark .sr-phase-dot {
 .hg-cell.hg-done:not(.hg-today-col)::after {
   background: rgba(204,53,41,.75) !important;
 }
+/* Samurai theme: past done dots are opaque white, not red */
+.kk-outer.cal-samurai .hg-cell.hg-done:not(.hg-today-col)::after {
+  background: rgba(254,252,248,.55) !important;
+}
+/* Shinobi theme: past done dots slightly muted */
+.kk-outer.cal-shinobi .hg-cell.hg-done:not(.hg-today-col)::after {
+  background: rgba(204,53,41,.45) !important;
+}
 /* Past miss cells — keep faint, but slightly more visible so done/miss are still readable */
 .hg-cell.hg-miss:not(.hg-today-col)::after {
   border-color: rgba(245,240,232,.12);
