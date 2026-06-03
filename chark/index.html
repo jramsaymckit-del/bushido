@@ -441,8 +441,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-clan .hg-day-head.is-today{color:var(--red)}
 .kk-outer.cal-clan .hg-label{color:rgba(204,53,41,.6)}
 /* clan cell circles — red on white */
-.kk-outer.cal-clan .hg-cell.hg-off{background:rgba(204,53,41,.04);border-radius:3px}
-.kk-outer.cal-clan .hg-cell.hg-today-col:not(.hg-off){background:rgba(204,53,41,.05)}
+.kk-outer.cal-clan .hg-cell.hg-off{background:transparent;border-radius:3px}
+.kk-outer.cal-clan .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .kk-outer.cal-clan .hg-cell.hg-done::after{background:var(--red)}
 .kk-outer.cal-clan .hg-cell.hg-done:hover::after{background:var(--red-light)}
 .kk-outer.cal-clan .hg-cell.hg-miss::after{border-color:rgba(204,53,41,.25)}
@@ -481,7 +481,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-samurai .hg-cell.hg-done::after{background:rgba(254,252,248,.85)}
 .kk-outer.cal-samurai .hg-cell.hg-done:hover::after{background:#FEFCF8}
 .kk-outer.cal-samurai .hg-cell.hg-miss:hover::after{border-color:rgba(254,252,248,.35)}
-.kk-outer.cal-samurai .hg-cell.hg-off{background:rgba(0,0,0,.07);border-radius:3px}
+.kk-outer.cal-samurai .hg-cell.hg-off{background:transparent;border-radius:3px}
 .kk-outer.cal-samurai .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .kk-outer.cal-samurai .hg-cell.hg-miss::after{border-color:rgba(254,252,248,.2)}
 .kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(254,252,248,.08)}
@@ -521,8 +521,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-shinobi .hg-cell.hg-miss::after{border-color:rgba(204,53,41,.18)}
 .kk-outer.cal-shinobi .hg-cell.hg-miss:hover::after{border-color:rgba(204,53,41,.4)}
 .kk-outer.cal-shinobi .hg-cell.hg-future::after{border-color:rgba(204,53,41,.07)}
-.kk-outer.cal-shinobi .hg-cell.hg-off{background:rgba(0,0,0,.12);border-radius:3px}
-.kk-outer.cal-shinobi .hg-cell.hg-today-col:not(.hg-off){background:rgba(204,53,41,.03)}
+.kk-outer.cal-shinobi .hg-cell.hg-off{background:transparent;border-radius:3px}
+.kk-outer.cal-shinobi .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .kk-outer.cal-shinobi .ycal-cell.ycal-today{outline-color:rgba(204,53,41,.55)}
 /* ── Shinobi — exhibition header text (1869. THE SAMURAI CLASS IS ABOLISHED.) ── */
 /* Kaizen: date + day count */
@@ -3246,7 +3246,7 @@ body.dark .sr-phase-dot {
 
 /* Past done cells — muted dot so only today stands out */
 .hg-cell.hg-done:not(.hg-today-col)::after {
-  background: rgba(204,53,41,.22) !important;
+  background: rgba(204,53,41,.75) !important;
 }
 /* Past miss cells — keep faint, but slightly more visible so done/miss are still readable */
 .hg-cell.hg-miss:not(.hg-today-col)::after {
@@ -4153,6 +4153,10 @@ const PROVERBS = [
   {jp:'改善',rom:'kaizen',en:'"Change for the good." From 改 (kai — change) + 善 (zen — good). The principle that small, sustained improvements compound into transformation. The minimum viable action, done every day, outweighs the heroic ones done infrequently.',attr:'— Foundation Concept'},
   {jp:null,rom:null,en:'Too much of something is the same thing as not enough.',attr:'— Bruce Lee (attributed)'},
   {jp:null,rom:null,en:'We have it in our power to begin the world over again.',attr:'— Thomas Paine, Common Sense (1776)'},
+  {jp:null,rom:null,en:'The warrior should avoid harbouring a preference for any given weapon. Too much of one thing is just as bad as not enough. Do not imitate what others are using. Instead, take to hand weapons that are suited to you and feel right. For both generals and rank-and-file, it is harmful to entertain a strong preference for certain things. Having alternative plans is critical.',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:null,rom:null,en:'But as I continued to run, my body started to accept the fact that it was running, and I could gradually increase the distance. I was starting to acquire a runner\'s form, my breathing became more regular, and my pulse settled down. The main thing was not the speed or distance so much as running every day, without taking a break.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
+  {jp:null,rom:null,en:'There are three reasons I failed. Not enough training. Not enough training. And not enough training.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
+  {jp:null,rom:null,en:'I have only a few reasons to keep on running, and a truckload of them to quit. All I can do is keep the few reasons nicely polished.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
 ];
 function _buildProverbPlaylist(){
   const o=[];
