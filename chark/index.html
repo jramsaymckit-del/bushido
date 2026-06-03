@@ -376,8 +376,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .hg-date-num{font-size:10px;font-weight:700;display:block}
 .hg-label{padding:8px 10px;font-size:10px;color:rgba(255,255,255,.55);line-height:1.4;display:flex;align-items:center}
 .hg-cell{height:32px;display:flex;align-items:center;justify-content:center;position:relative}
-.hg-cell.hg-today-col:not(.hg-off){background:rgba(255,255,255,.03)}
-.hg-cell.hg-off{background:rgba(0,0,0,.05);border-radius:3px}
+.hg-cell.hg-today-col:not(.hg-off){background:transparent}
+.hg-cell.hg-off{background:none}
 .hg-cell.hg-miss{cursor:pointer}
 .hg-cell.hg-miss::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.18);display:block;transition:border-color .2s}
 .hg-cell.hg-miss:hover::after{border-color:rgba(245,240,232,.45)}
@@ -589,7 +589,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-shinobi .hg-label{color:rgba(254,252,248,.6)}
 /* all-done column glow — base (navy default) */
 .hg-day-head.hg-col-complete{color:rgba(255,255,255,.75);text-shadow:0 0 8px rgba(255,255,255,.45),0 0 18px rgba(255,255,255,.18)}
-.hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(255,255,255,.5),0 0 12px rgba(255,255,255,.22)}
+.hg-cell.hg-done.hg-col-complete::after{}
 /* samurai — white glow on red */
 .kk-outer.cal-samurai .hg-day-head.hg-col-complete{color:rgba(254,252,248,.9);text-shadow:0 0 8px rgba(254,252,248,.55),0 0 20px rgba(254,252,248,.22)}
 .kk-outer.cal-samurai .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(254,252,248,.6),0 0 14px rgba(254,252,248,.25)}
@@ -621,6 +621,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-samurai .wk-sealed-prev:hover{color:rgba(254,252,248,.9)}
 .kk-outer.cal-shinobi .wk-sealed-prev{color:rgba(204,53,41,.55);opacity:1}
 .kk-outer.cal-shinobi .wk-sealed-prev:hover{color:rgba(204,53,41,.95)}
+/* ── Weekly/Monthly reflection button states ──────────────── */
+.weekly-btn-active{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid var(--red)!important;padding:10px 20px!important;color:var(--red)!important;background:none!important;cursor:pointer}
+.weekly-btn-active:hover{background:var(--red)!important;color:var(--white)!important}
+.weekly-btn-review{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid rgba(0,0,0,.18)!important;padding:10px 20px!important;color:var(--ink-faint)!important;font-style:italic;opacity:.65;background:none!important;cursor:pointer;transition:opacity .2s}
+.weekly-btn-review:hover{opacity:1!important;background:rgba(0,0,0,.04)!important}
+.weekly-btn-outside{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid rgba(0,0,0,.1)!important;padding:10px 20px!important;color:var(--ink-faint)!important;opacity:.35!important;cursor:not-allowed!important;background:none!important;pointer-events:none}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
 .mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
@@ -3244,6 +3250,27 @@ body.dark .sr-phase-dot {
   color:rgba(254,252,248,.82);line-height:1.5}
 /* /CLAN YEAR CALENDAR */
 
+
+/* ── SEASONAL SEALS ────────────────────────────────────────────────────── */
+.sseal-row{padding:18px 20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;border-top:1px solid rgba(0,0,0,.05);margin-top:8px}
+.sseal-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);opacity:.55}
+.sseal-seals{display:flex;gap:20px;align-items:flex-start}
+.sseal-seal{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:default}
+.sseal-seal.sseal-past,.sseal-seal.sseal-current{cursor:pointer}
+.sseal-circle{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--sseal-color,rgba(204,53,41,.4));background:var(--sseal-fill,transparent);display:flex;align-items:center;justify-content:center;transition:all .22s}
+.sseal-seal.sseal-sealed .sseal-circle{background:var(--sseal-color,rgba(204,53,41,.7));border-color:var(--sseal-color,rgba(204,53,41,.7))}
+.sseal-seal.sseal-future .sseal-circle{opacity:.18;border-style:dashed}
+.sseal-seal.sseal-past .sseal-circle{opacity:.42}
+.sseal-seal.sseal-past:hover .sseal-circle,.sseal-seal.sseal-current:hover .sseal-circle{opacity:.85;background:var(--sseal-fill,transparent)}
+.sseal-seal.sseal-sealed .sseal-circle{opacity:.8}
+.sseal-seal.sseal-sealed:hover .sseal-circle{opacity:1}
+.sseal-kanji{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--sseal-color,var(--red));line-height:1;transition:color .22s}
+.sseal-seal.sseal-sealed .sseal-kanji{color:rgba(254,252,248,.92)}
+.sseal-seal.sseal-future .sseal-kanji{opacity:.25}
+.sseal-season-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);opacity:.55}
+.sseal-seal.sseal-future .sseal-season-label{opacity:.2}
+.sseal-seal.sseal-current .sseal-circle{border-width:2px}
+
 /* Past done cells — muted dot so only today stands out */
 .hg-cell.hg-done:not(.hg-today-col)::after {
   background: rgba(204,53,41,.75) !important;
@@ -3684,8 +3711,8 @@ if (FIREBASE_CONFIGURED) {
     <div class="divider-thin"></div>
     <div style="text-align:center;padding:8px 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5">reflection</div>
     <div style="display:flex;justify-content:center;gap:32px;padding:8px 0 20px">
-      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>
-      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>
+      <span id="weekly-btn-slot"></span>
+      <span id="monthly-btn-slot"></span>
       <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('annual')">年 &nbsp;Annual</button>
     </div>
     <!-- Export / Import / Sync -->
@@ -3859,10 +3886,13 @@ if (FIREBASE_CONFIGURED) {
               <div id="srCalStatus" style="font-size:11px;color:var(--ink-faint);margin-top:12px;min-height:18px;font-style:italic;"></div>
             </div>
   
-            <!-- State C: calendar not connected — guide, don't bypass -->
+            <!-- State C: calendar not connected — offer bypass -->
             <div id="srNoCalendar" style="display:none;animation:fadeUp .3s ease;">
-              <div style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.6;margin-bottom:14px;">Scheduling with James is part of completing the Seasonal Review.<br>Connect Google Calendar in Settings, then return here to finish.</div>
-              <button class="btn btn-ghost" onclick="srClose()" style="font-size:11px;letter-spacing:1px;">Go to Settings</button>
+              <div style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.6;margin-bottom:18px;">Your review is sealed.<br>To schedule a check-in with James, connect Google Calendar first — or reach out to him directly.</div>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-ghost" onclick="srCancelPicker()" style="font-size:11px;letter-spacing:1px;">Connect Calendar</button>
+                <button class="btn" onclick="srClose()" style="font-size:11px;letter-spacing:2px;padding:10px 24px;">I'll reach out directly — done</button>
+              </div>
             </div>
           </div>
         </div>
@@ -3909,6 +3939,9 @@ const PROD_KEY = 'bushido_chark_permanent'; // NEVER change this // NEVER change
 const DEV_KEY  = 'bushido_dev_v14';         // bump freely during dev
 const IS_DEV   = false;                     // set true when actively developing
 const STORAGE_KEY = PROD_KEY;
+// Derived local identity key — used as fallback when Firebase is offline.
+// Do NOT hardcode a name here; always derive from PROD_KEY so user files stay generic.
+const LOCAL_ME_KEY = PROD_KEY.replace('bushido_', '').replace('_permanent', '');
 const HARDCODED_BIN_ID = ''; // permanent bin — enables cross-device sync
 
 function saveState(){
@@ -3919,6 +3952,67 @@ function saveState(){
   } else {
     scheduleSyncToCloud(); // legacy JSONbin fallback
   }
+}
+
+// One-time migration: replace old lift/run habits (307,308) with the 6-day training split
+// and add BUSHIDO daily habit. Safe to call repeatedly — checks ids before acting.
+function migrateWorkoutHabits(){
+  if(!state.kaizen) return;
+  let changed = false;
+  // Surface user-added habits so reviews never miss them
+  const userAdded = state.kaizen.filter(h => h.userAdded);
+  if(userAdded.length) console.log('[BUSHIDO] User-added habits (preserve in DEFAULT_STATE):', userAdded.map(h=>({id:h.id,text:h.text})));
+  // Remove deprecated habits — never removes userAdded habits
+  const before = state.kaizen.length;
+  state.kaizen = state.kaizen.filter(h => ![307,308].includes(h.id) || h.userAdded);
+  if(state.kaizen.length !== before) changed = true;
+  // Add new habits from DEFAULT_STATE if not already present
+  const existingIds = new Set(state.kaizen.map(h => h.id));
+  [401,402,403,404,405,406,407].forEach(id => {
+    if(!existingIds.has(id)){
+      const def = (DEFAULT_STATE.kaizen||[]).find(d => d.id===id);
+      if(def){ state.kaizen.push(Object.assign({},def,{streak:0,bestStreak:0,done:false,lastDone:null})); changed=true; }
+    }
+  });
+  // Add Shokunin 207 if missing
+  if(!state.shokunin) state.shokunin=[];
+  if(!state.shokunin.find(sh => sh.id===207)){
+    const def=(DEFAULT_STATE.shokunin||[]).find(d=>d.id===207);
+    if(def){ state.shokunin.push(Object.assign({},def)); changed=true; }
+  }
+  // Update Shokunin 202 text if it still says the old description
+  const shok202=state.shokunin.find(sh=>sh.id===202);
+  if(shok202 && !shok202.text.includes('half marathon')){
+    const def=(DEFAULT_STATE.shokunin||[]).find(d=>d.id===202);
+    if(def){ shok202.text=def.text; changed=true; }
+  }
+  // Patch BUSHIDO habit text/bullets if still on old version
+  const bh=state.kaizen.find(h=>h.id===407);
+  if(bh && !bh.text.includes('30+')){
+    const def=(DEFAULT_STATE.kaizen||[]).find(d=>d.id===407);
+    if(def){ bh.text=def.text; bh.bullets=def.bullets; bh.why=def.why; changed=true; }
+  }
+  // Ensure nextId is at least 408
+  if((state.nextId||0)<408){ state.nextId=408; changed=true; }
+  if(changed) saveState();
+}
+
+// One-time migration: sort kaizen into logical daily order.
+// Runs once, sets habitOrderMigrated flag so user reordering isn't overwritten later.
+// Unknown IDs (added via UI) slot into the morning cluster (between Morning prayer and Antonella).
+function migrateKaizenOrder(){
+  if(!state.kaizen || state.habitOrderMigrated) return;
+  // Preferred order: morning → study → workout → creative → history → salsa → evening
+  const PREFERRED = [300,302,305,306,304,401,402,403,404,405,406,303,407,314,311,313,309,312,310,301];
+  state.kaizen.sort((a,b)=>{
+    let ai=PREFERRED.indexOf(a.id);
+    let bi=PREFERRED.indexOf(b.id);
+    if(ai===-1) ai=0.5; // Unknown habits slot between Morning prayer and Antonella
+    if(bi===-1) bi=0.5;
+    return ai-bi;
+  });
+  state.habitOrderMigrated=true;
+  saveState();
 }
 
 // One-time migration: apply DEFAULT_STATE bullets/why to any kaizen item that has none.
@@ -4728,6 +4822,98 @@ function sknDayExpandHtml(dateStr, calTheme){
   </div>`;
 }
 
+
+// ── SEASONAL SEALS ──────────────────────────────────────────────────────────
+const SEASONS = [
+  { key:'spring', kanji:'春', label:'SPRING', months:[2,3,4],  color:'rgba(201,160,160,0.75)', fill:'rgba(201,160,160,0.10)' },
+  { key:'summer', kanji:'夏', label:'SUMMER', months:[5,6,7],  color:'rgba(100,160,155,0.75)', fill:'rgba(100,160,155,0.10)' },
+  { key:'autumn', kanji:'秋', label:'AUTUMN', months:[8,9,10], color:'rgba(196,125,64,0.80)',  fill:'rgba(196,125,64,0.10)'  },
+  { key:'winter', kanji:'冬', label:'WINTER', months:[11,0,1], color:'rgba(104,120,160,0.75)', fill:'rgba(104,120,160,0.10)' },
+];
+
+function getSeasonStatus(year, seasonKey, todayStr) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return 'future';
+  const today = new Date(todayStr || getDateStr());
+  let startYear = year, endYear = year;
+  let startMonth = season.months[0], endMonth = season.months[2];
+  if(seasonKey === 'winter') { endYear = year + 1; endMonth = 1; }
+  const startDate = new Date(startYear, startMonth, 1);
+  const endDate   = new Date(endYear,  endMonth + 1, 0);
+  const stateKey  = year + '-' + seasonKey;
+  const sealed    = !!((state.seasonalReflections || {})[stateKey]);
+  if(today < startDate) return 'future';
+  if(today > endDate)   return sealed ? 'past-sealed' : 'past-unsealed';
+  return sealed ? 'past-sealed' : 'current';
+}
+
+function renderSeasonalSeals(viewYear) {
+  const todayStr = getDateStr();
+  let html = '<div class="sseal-row"><div class="sseal-label">SEASONS</div><div class="sseal-seals">';
+  SEASONS.forEach(function(season) {
+    const status   = getSeasonStatus(viewYear, season.key, todayStr);
+    const clickable = (status !== 'future');
+    let cls = 'sseal-seal';
+    if(status === 'past-sealed')   cls += ' sseal-sealed';
+    else if(status === 'current')  cls += ' sseal-current';
+    else if(status === 'past-unsealed') cls += ' sseal-past';
+    else                            cls += ' sseal-future';
+    const clickAttr = clickable ? ' onclick="openSeasonalReflection(' + viewYear + ',\'' + season.key + '\')"' : '';
+    html += '<div class="' + cls + '" style="--sseal-color:' + season.color + ';--sseal-fill:' + season.fill + '"' + clickAttr + '>'
+          + '<div class="sseal-circle"><span class="sseal-kanji">' + season.kanji + '</span></div>'
+          + '<div class="sseal-season-label">' + season.label + '</div>'
+          + '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function openSeasonalReflection(year, seasonKey) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return;
+  const stateKey = year + '-' + seasonKey;
+  const sr       = state.seasonalReflections || {};
+  const existing = sr[stateKey];
+  const m = document.getElementById('reflect-modal');
+  const c = document.getElementById('reflect-content');
+  m.classList.add('active');
+  const title = season.kanji + ' ' + season.label.charAt(0) + season.label.slice(1).toLowerCase() + ' ' + year;
+  if(existing) {
+    c.innerHTML = '<div class="reflect-header"><div class="reflect-title">' + title + '</div><div class="reflect-close" onclick="closeReflection()">×</div></div>'
+      + '<div class="reflect-body"><div style="font-family:\'Noto Serif JP\',serif;font-size:13px;color:var(--ink-light);line-height:1.9;white-space:pre-wrap">' + (existing.text || '') + '</div>'
+      + '<div style="margin-top:24px;display:flex;align-items:center;gap:8px;opacity:.5">'
+      + '<span style="font-family:\'Noto Serif JP\',serif;font-size:14px;color:var(--red)">印</span>'
+      + '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)">sealed · ' + (existing.sealedAt || '') + '</span>'
+      + '</div></div>';
+  } else {
+    c.innerHTML = '<div class="reflect-header"><div class="reflect-title">' + title + '</div><div class="reflect-close" onclick="closeReflection()">×</div></div>'
+      + '<div class="reflect-body"><textarea class="reflect-textarea" id="seasonal-reflect-text" placeholder="How did this season pass?" style="min-height:180px"></textarea></div>'
+      + '<div class="reflect-footer">'
+      + '<button class="reflect-btn-ghost" onclick="closeReflection()">later</button>'
+      + '<button class="reflect-btn-primary" onclick="saveSeasonalReflection(' + year + ',\'' + seasonKey + '\')">seal the season</button>'
+      + '</div>';
+  }
+}
+
+function saveSeasonalReflection(year, seasonKey) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return;
+  const text     = (document.getElementById('seasonal-reflect-text') || {}).value || '';
+  const stateKey = year + '-' + seasonKey;
+  if(!state.seasonalReflections) state.seasonalReflections = {};
+  state.seasonalReflections[stateKey] = { text: text.trim(), sealedAt: getDateStr() };
+  saveState();
+  const c = document.getElementById('reflect-content');
+  c.innerHTML = '<div style="text-align:center;padding:56px 0">'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>'
+    + '<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>'
+    + '</div>';
+  playEnsoMoment(season.kanji);
+  setTimeout(function() { closeReflection(); if(currentTab==='shokunin') renderGoals(); }, 2600);
+}
+// ── /SEASONAL SEALS ─────────────────────────────────────────────────────────
+
 function buildMonthCal(){
   const now=new Date();
   const ref=new Date(now.getFullYear(),now.getMonth()+calMonthOffset,1);
@@ -4911,7 +5097,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
     }
   }
 
-  html+=`</div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
+  html+=`</div></div>${renderSeasonalSeals(year)}</div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -5401,6 +5587,8 @@ function renderTab(){
   document.getElementById('med-text').innerHTML=renderProverb(getDailyProverb());
   renderGoals();
   updateStreak();
+  renderWeeklyBtn();
+  renderMonthlyBtn();
 }
 
 function getShrIdx(prog){return prog>=66?2:prog>=33?1:0}
@@ -5852,12 +6040,13 @@ function addGoal(){
   if(!text)return;
   const link=document.getElementById('link-select')?.value||'';
   if(currentTab==='kaizen'){
-    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:''});
+    // userAdded:true flags habits added through the UI so reviews & migrations never lose them
+    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true});
   } else if(currentTab==='shokunin'){
     const tf=document.getElementById('tf-select')?.value||'monthly';
-    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false});
+    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false,userAdded:true});
   } else {
-    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false});
+    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false,userAdded:true});
   }
   saveState();hideAdd();renderTab();
 }
@@ -5951,14 +6140,42 @@ let _activePromptType = 'weekly';
 
 function needsWeeklyReflection(){
   const dayIdx=todayIdx(); // Mon=0...Sun=6
-  if(dayIdx!==6&&dayIdx!==0) return false; // Only Sun + Mon grace (EOD Monday)
-  const wkOffset=(dayIdx===6)?0:-1; // Sunday = this week, Mon/Tue = last week
+  if(dayIdx!==5&&dayIdx!==6&&dayIdx!==0) return false; // Sat + Sun + Mon window
+  const wkOffset=(dayIdx===5||dayIdx===6)?0:-1; // Sat/Sun = this week, Mon = last week
   const wStart=getWeekStart(wkOffset);
   const wEnd=new Date(wStart); wEnd.setDate(wStart.getDate()+6);
   const wStartStr=getDateStr(wStart), wEndStr=getDateStr(wEnd);
   return !(state.reflections||[]).some(r=>
     r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
   );
+}
+
+function getWeeklyWindowStatus(){
+  // Returns 'sealed' | 'in-window' | 'outside'
+  const dayIdx=todayIdx();
+  const wkOffset=(dayIdx===5||dayIdx===6)?0:-1;
+  const wStart=getWeekStart(wkOffset);
+  const wEnd=new Date(wStart); wEnd.setDate(wStart.getDate()+6);
+  const wStartStr=getDateStr(wStart),wEndStr=getDateStr(wEnd);
+  const sealed=(state.reflections||[]).some(r=>
+    r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
+  );
+  if(sealed) return 'sealed';
+  if(dayIdx===5||dayIdx===6||dayIdx===0) return 'in-window';
+  return 'outside';
+}
+
+function renderWeeklyBtn(){
+  const slot=document.getElementById('weekly-btn-slot');
+  if(!slot) return;
+  const status=getWeeklyWindowStatus();
+  if(status==='sealed'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showReflectionReview(false)" title="review this week&#39;s sealed reflection">週 &nbsp;Review</button>`;
+  } else if(status==='in-window'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>`;
+  } else {
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens Saturday">週 &nbsp;Weekly</button>`;
+  }
 }
 
 function getReviewableWeeklyReflection(){
@@ -5984,6 +6201,70 @@ function getReviewableWeeklyReflection(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
   if(latest.date>=getDateStr(cutoff)) return {entry:latest,editable:false};
   return null;
+}
+
+function getMonthlyWindowStatus(){
+  // Returns 'sealed' | 'in-window' | 'outside'
+  const today=new Date();
+  const monthStr=getDateStr(today).substring(0,7);
+  const sealed=(state.reflections||[]).some(r=>
+    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+  );
+  if(sealed) return 'sealed';
+  const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  if(today.getDate()>=lastDay-2) return 'in-window';
+  return 'outside';
+}
+
+function renderMonthlyBtn(){
+  const slot=document.getElementById('monthly-btn-slot');
+  if(!slot) return;
+  const status=getMonthlyWindowStatus();
+  if(status==='sealed'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showMonthlyReflectionReview()" title="review this month&#39;s sealed reflection">月 &nbsp;Review</button>`;
+  } else if(status==='in-window'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>`;
+  } else {
+    const today=new Date();
+    const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+    const openDate=new Date(today.getFullYear(),today.getMonth(),lastDay-2);
+    const openLabel=openDate.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens ${openLabel}">月 &nbsp;Monthly</button>`;
+  }
+}
+
+function showMonthlyReflectionReview(){
+  const today=new Date();
+  const monthStr=getDateStr(today).substring(0,7);
+  const entry=(state.reflections||[]).find(r=>
+    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+  );
+  if(!entry) return;
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+  const monthLabel=today.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const safeVal=v=>(v||'').replace(/"/g,'&quot;');
+  c.innerHTML=`
+    <div class="modal-kanji">月</div>
+    <div class="modal-title">Monthly Reflection</div>
+    <div class="modal-sub">${monthLabel}</div>
+    <div class="reflect-review-badge">sealed · past month</div>
+    <div class="reflect-q">
+      <div class="reflect-label">What was working?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.working)}</textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">What was changing in you?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.changing)}</textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">What needed to shift?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.shifting)}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeReflection()">close</button>
+    </div>`;
 }
 
 function needsMonthlyReflection(){
@@ -6127,7 +6408,28 @@ function renderEOYPhase(n){
         }).join('')}
         ${strandCounts.some(c=>c<3)?`<div style="font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);margin-top:12px;opacity:.7">Some strands have few entries. Absence of reflection is data too.</div>`:''}
       </div>
-      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:32px 0"></div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.06),transparent);margin:28px 0"></div>
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);opacity:.55;margin-bottom:14px">SEASONS</div>
+        <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start">
+          ${SEASONS.map(function(season){
+            const status = getSeasonStatus(parseInt(yearStr), season.key, getDateStr());
+            const sealed = status === 'past-sealed';
+            const clickable = status !== 'future';
+            let cls = 'sseal-seal';
+            if(sealed) cls += ' sseal-sealed';
+            else if(status === 'current') cls += ' sseal-current';
+            else if(status === 'past-unsealed') cls += ' sseal-past';
+            else cls += ' sseal-future';
+            const clickAttr = clickable ? ' onclick="openSeasonalReflection(' + parseInt(yearStr) + ',\'' + season.key + '\')"' : '';
+            return '<div class="' + cls + '" style="--sseal-color:' + season.color + ';--sseal-fill:' + season.fill + '"' + clickAttr + '>'
+              + '<div class="sseal-circle"><span class="sseal-kanji">' + season.kanji + '</span></div>'
+              + '<div class="sseal-season-label">' + season.label + '</div>'
+              + '</div>';
+          }).join('')}
+        </div>
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:28px 0"></div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="closeEOYReview()">close</button>
         <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 28px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="renderEOYPhase(1)">read your year →</button>
@@ -6756,6 +7058,8 @@ function showReflection(type){
 
 function closeReflection(){
   document.getElementById('reflect-modal').classList.remove('active');
+  renderWeeklyBtn();
+  renderMonthlyBtn();
 }
 
 function showReflectionReview(editable){
@@ -7729,6 +8033,8 @@ async function loadFromCloud(compareTimestamp){
       saveLastKnownGood();
       Object.assign(state,cloud);
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
+      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
+      migrateKaizenOrder();       // sort into logical daily order (runs once)
       try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       setSyncStatus('synced');
       return true;
@@ -8389,8 +8695,8 @@ function initFirebaseAuth(){
 }
 
 // ── MIGRATION ──────────────────────────────────────────────────────────────
-// Check own PROD_KEY first, then well-known legacy keys — deduped
-const MIGRATE_KEYS = [PROD_KEY, DEV_KEY, 'bushido_james_permanent', 'bushido_coreproject']
+// Check only this user's own keys — never hardcode other users' keys here
+const MIGRATE_KEYS = [PROD_KEY, DEV_KEY]
   .filter((v, i, a) => v && a.indexOf(v) === i);
 let _migrationUid    = null;
 let _migrationData   = null;
@@ -8494,6 +8800,8 @@ async function loadFirestoreState(user){
       const saved = JSON.parse(docSnap.data().state);
       Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
+      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
+      migrateKaizenOrder();       // sort into logical daily order (runs once)
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
@@ -8799,7 +9107,7 @@ function hiFormatDate(dateStr){
   const [y,m,d]=dateStr.split('-').map(Number);
   return months[m-1]+' '+d;
 }
-function hiPartnerName(){ return HI_STATE.viewAs==='james' ? HI_STATE.partners.b.name : HI_STATE.partners.a.name; }
+function hiPartnerName(){ return HI_STATE.viewAs===HI_STATE.partners.a.key ? HI_STATE.partners.b.name : HI_STATE.partners.a.name; }
 function hiCurrentUserKey(){ return HI_STATE.viewAs; }
 function hiAssignmentLabel(a){
   if(a==='mine')   return HI_STATE.partners.a.name;
@@ -8956,8 +9264,8 @@ function hiRenderThisMonth(){
     });
     html += '</div>';
   } else if(pending){
-    const drafterName = pending.drafter==='james' ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
-    const awaitingName = pending.drafter==='james' ? HI_STATE.partners.b.name : HI_STATE.partners.a.name;
+    const drafterName = pending.drafter===HI_STATE.partners.a.key ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
+    const awaitingName = pending.drafter===HI_STATE.partners.a.key ? HI_STATE.partners.b.name : HI_STATE.partners.a.name;
     const isAwaitingMe = (pending.drafter !== me) && !pending.approvedBy.includes(me);
     html += '<div class="hi-this-month">';
     html += `<div class="hi-this-month-eyebrow"><span>This Month &nbsp;·&nbsp; ${pending.label}</span>`;
@@ -9036,7 +9344,7 @@ function hiOpenNote(id, title){
   const meta = document.getElementById('hi-note-card-meta');
   const existing = HI_STATE.notes[id];
   ta.value = existing ? existing.text : '';
-  meta.textContent = existing ? `edited by ${existing.editedBy==='james' ? HI_STATE.partners.a.name : HI_STATE.partners.b.name} · ${existing.editedAt}` : '';
+  meta.textContent = existing ? `edited by ${existing.editedBy===HI_STATE.partners.a.key ? HI_STATE.partners.a.name : HI_STATE.partners.b.name} · ${existing.editedAt}` : '';
   o.classList.add('show');
   setTimeout(() => ta.focus(), 100);
 }
@@ -9074,7 +9382,7 @@ function hiOpenPlan(label, mode){
   }
   _hiActivePlanId = key;
   document.getElementById('hi-plan-title').textContent = plan.label;
-  const drafterName = plan.drafter==='james' ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
+  const drafterName = plan.drafter===HI_STATE.partners.a.key ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
   document.getElementById('hi-plan-byline').textContent = plan.sealedAt ? 'sealed' : `drafted by ${drafterName}`;
   document.getElementById('hi-plan-eyebrow').textContent =
     _hiPlanMode==='draft'  ? 'Draft a plan' :
@@ -9204,7 +9512,7 @@ function hiPlanApprove(){
   const plan = HI_STATE.plans[_hiActivePlanId]; if(!plan) return;
   const me = hiCurrentUserKey();
   if(!plan.approvedBy.includes(me)) plan.approvedBy.push(me);
-  const need = ['james','antonella'];
+  const need = [HI_STATE.partners.a.key, HI_STATE.partners.b.key];
   if(need.every(k => plan.approvedBy.includes(k))){
     plan.sealedAt = new Date().toISOString();
   }
@@ -9218,7 +9526,7 @@ function hiCheckNotice(){
   const pending = hiPendingPlan('monthly');
   const me = hiCurrentUserKey();
   if(pending && pending.drafter !== me && !pending.approvedBy.includes(me)){
-    const drafter = pending.drafter==='james' ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
+    const drafter = pending.drafter===HI_STATE.partners.a.key ? HI_STATE.partners.a.name : HI_STATE.partners.b.name;
     hiShowNotice('計', `${drafter} has sent you a plan for ${pending.label}.`, 'review together', [
       {label:'Later', cls:'ghost', onclick:'hiDismissNotice()'},
       {label:'Review now', cls:'solid', onclick:`hiDismissNotice();hiOpenPlan('${pending.label}','review')`}
@@ -11654,6 +11962,14 @@ function srMarkComplete() {
   var s = srGetState();
   s.lastSeasonalReview = srGetSeasonKey();
   s.srSnoozeUntil      = null;
+  // Persist reflection content so it survives modal close and page reload
+  if (!s.seasonalReflections) s.seasonalReflections = {};
+  s.seasonalReflections[srGetSeasonKey()] = {
+    completedAt:  new Date().toISOString(),
+    ratings:      JSON.parse(JSON.stringify(srState.ratings  || {})),
+    notes:        JSON.parse(JSON.stringify(srState.notes    || {})),
+    seasonLesson: srState.seasonLesson || ''
+  };
   srSaveState();
   var banner = document.querySelector('.sr-banner');
   if (banner) {
@@ -12294,7 +12610,7 @@ function cnCalName(uid){
 }
 function cnCalMe(){
   if(cnCalFirestoreOn()) return _currentUser.uid;
-  return 'james';
+  return LOCAL_ME_KEY;
 }
 function cnCalClanMembers(){
   if(cnCalFirestoreOn()){
