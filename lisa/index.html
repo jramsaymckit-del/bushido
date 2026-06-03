@@ -4008,124 +4008,62 @@ function applyHabitDetailDefaults(){
 // ============ DEFAULT STATE — canvas blank slate ============
 // No personal data. Canvas is for design experimentation only.
 const DEFAULT_STATE = {
-  onboarded: true,
-  name: 'James',
-  visMode: 'samurai', // 'samurai' (full visibility) or 'shinobi' (obscured to clan)
+  onboarded: false,
+  name: 'Lisa',
+  visMode: 'samurai',
   strands: [
-    'Capital and Building',
-    'The Ancient World',
-    'The Warrior\u2019s Body',
-    'Creative Mastery',
-    'Faith and Love'
+    'The Free Giver',
+    'Freedom',
+    'The Brave Dreamer'
   ],
-  tenYearVision: 'Rome at dawn, coffee with Antonella in our London flat or a pied-\u00e0-terre in Paris. In great shape for my age. My work is multifaceted: business ventures, a history platform with an audience who cares, videos about the things that set me on fire. A beautiful piano in the living room I actually play. Traveling through Europe for lectures, for art, for friends. The fire within being used for the right things. The hunger fed the right nourishment. Risks taken but not recklessly. Mastery of self pursued but not selfishly. A heart full of the right kind of love.',
+  tenYearVision: 'I wake slowly in a simple, beautiful home in Costa Rica, surrounded by nature. The air is fresh and clean. There is an ocean and mountain view ahead of me. I am not rushing. Beside me is someone who earns their place — not needed, but chosen. The morning is mine. Animals fill the space around me. In the afternoon I give my time freely — to friends, to people who need lifting, even to hair if it brings me joy — but not because it is owed. I curate who gets my energy and my care. The ground beneath me is solid. The worry is gone. I chose this life, and I would choose it again.',
   milestones5yr: [
-    'CSC and CISI held, serious role in finance or business, first real steps taken on the venture with family',
-    'History platform launched, publishing consistently, audience engaging, woven into the fabric of life',
-    'Half marathon completed, full hybrid athlete, salsa a genuine weekly practice',
-    'Piano daily habit established, visibly and measurably better, a repertoire ready for recording',
-    'Antonella and I, consciously chosen, at least engaged if not married'
+    'The salon and spa runs without me at the centre — systems built, team empowered, I step back with trust',
+    'The hairstylist retreat is a programme running multiple cohorts a year, with a reputation in the community — Brooke leads the education, I hold the container',
+    'The property generates stable, predictable income — the investment and upkeep done, the foundation solid',
+    'My personal life is calm and protected, on my terms — peacefully on my own or with someone who makes life better, never harder'
   ],
   annualGoals: [
-    {id:100, text:'Finish CSC certification this year', parentMs:0, progress:0, done:false},
-    {id:101, text:'Establish disciplined investing practice: CC/CSP strategy, 2% weekly target on capital deployed', parentMs:0, progress:0, done:false},
-    {id:102, text:'Open family business conversation with brother and father, moving to an actual meeting with agenda', parentMs:0, progress:0, done:false},
-    {id:103, text:'Launch history platform: first video live, consistent bi-weekly cadence held through December', parentMs:1, progress:0, done:false},
-    {id:104, text:'Register for a race: bib number, date, finish line', parentMs:2, progress:0, done:false},
-    {id:105, text:'Daily piano non-negotiable by summer, two to three pieces in serious progress', parentMs:3, progress:0, done:false},
-    {id:106, text:'One intentional, significant move forward with Antonella', parentMs:4, progress:0, done:false}
+    {id:100, text:'Delegate the salon to my key girls — build the systems, write the list, hand over the weight', parentMs:0, progress:0, done:false},
+    {id:101, text:'Finalize and run the February 5–11 hairstylist retreat with Brooke', parentMs:1, progress:0, done:false},
+    {id:102, text:'Give the property an injection — invest in upkeep and improvements', parentMs:2, progress:0, done:false},
+    {id:103, text:'Take a real holiday Oct/Nov when Brooke arrives — phone-free, uncontactable, somewhere new', parentMs:3, progress:0, done:false}
   ],
   shokunin: [
-    {id:200, text:'CSC and Markets mastery: syllabus progress, one new concept applied monthly', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
-    {id:201, text:'History platform production: research and script one week, edit and publish the next', parentAnnual:103, progress:0, timeframe:'monthly', done:false},
-    {id:202, text:'Athletic conditioning: 6-day training split building toward half marathon, target -10 lbs from 190', parentAnnual:104, progress:0, timeframe:'monthly', done:false},
-    {id:203, text:'Salsa technique: one new move per week, lead it cleanly by month end', parentAnnual:104, progress:0, timeframe:'weekly', done:false},
-    {id:204, text:'Piano mastery: Through the Fire by Chaka Khan, deepening chord theory alongside', parentAnnual:105, progress:0, timeframe:'monthly', done:false},
-    {id:205, text:'Faith and Love daily practice: prayer and presence with Antonella', parentAnnual:106, progress:0, timeframe:'weekly', done:false},
-    {id:206, text:'Novel: 50 words a day (begins July 2026)', parentAnnual:105, progress:0, timeframe:'monthly', done:false},
-    {id:207, text:'BUSHIDO product development: build, refine, and grow the platform', parentAnnual:null, progress:0, timeframe:'monthly', done:false}
+    {id:200, text:'Leadership — map what is mine vs theirs, delegate with trust, build the team', parentAnnual:100, progress:0, timeframe:'monthly', done:false},
+    {id:201, text:'Retreat production — logistics, hospitality, the container for transformation', parentAnnual:101, progress:0, timeframe:'monthly', done:false},
+    {id:202, text:'The art of real rest — protect my own time and inner life by design', parentAnnual:103, progress:0, timeframe:'weekly', done:false}
   ],
   kaizen: [
-    {id:300, text:'Morning prayer', days:'daily', parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Before you jump into it, Pray.','Name what you\'re grateful for. Name what you\'re asking for.','Name Antonella, and name your intentions over the day.'],
-      why:'Clarity of intention and a clear mind are the way of the warrior. Start as you mean to go on.'},
-    {id:302, text:'Word of affirmation to Antonella', days:'daily', parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['One deliberate thing. Something specific you noticed.','A message, a look, a sentence that tells her she is seen.','Not a reflex but a choice.'],
-      why:'Love is a daily practice, not a feeling you wait for. This is how you build something that lasts.'},
-    {id:305, text:'Read markets commentary, one concept absorbed', days:'daily', parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Open the community. Read until one thing clicks. Write it down in one sentence. Close it.','Whether it\'s an emailer, an article, a video, a substack post — finance is the truest manifestation of the aphorism that knowledge is power.'],
-      why:'The CSC is the door. The markets mind is the key. One concept a day compounds faster than you think.'},
-    {id:306, text:'Cold message someone toward the right role', days:[0,3], parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['One message. A fund manager, a trader, a historian, a business owner — someone in the room you want to be in.','Short and genuine, no pitch. Just a door knocked on.'],
-      why:'The right role doesn\'t post on LinkedIn. It comes through a conversation you started six months ago. Start it now.'},
-    {id:304, text:'CSC study, 20 focused minutes', days:'daily', parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Syllabus open. Timer on. No tabs, no phone.','20 minutes of actual study, not skimming. Read, reflect, remember.','Bonus: write what you remember.'],
-      why:'The certification is the credential that opens the first door. Twenty minutes a day gets you there by summer. Half-measures get you nowhere.'},
-    {id:303, text:'Piano, 20 minutes minimum', days:'daily', parentShok:204, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Hands on the keys. Improvise, think about implementing what you\'ve been learning.','Work on a new song slowly, one section at a time.','Refine an old song.','Practice scales.','Practice a sheet music piece.'],
-      why:'The piano is proof to yourself that you can build mastery in the middle of everything else. Twenty minutes a day. By year end you\'ll have something worth recording.'},
-    {id:401, text:'Easy run', days:[0], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['60 minutes. Conversational pace — hold a sentence the whole way.','Can swap for stairmaster or swim.'],
-      why:'The half is built in easy miles. These train the engine without burning it.'},
-    {id:402, text:'Push day + core', days:[1], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Chest, shoulders, triceps. Compound first: bench or overhead press.','Core after: planks, hollow holds, leg raises — 2 rounds.','Beat last week by one rep or one increment.'],
-      why:'Upper body strength while running heavy mileage. Core is injury prevention — both matter for 13 miles.'},
-    {id:403, text:'Tempo run', days:[2], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['60 minutes. 10 easy → 40 at comfortably hard pace → 10 easy.','Can swap for stairmaster or swim.'],
-      why:'Tempo runs raise your lactate threshold — the pace you can hold for 13 miles.'},
-    {id:404, text:'Pull day + core', days:[3], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Back, biceps. Compound first: rows, pull-ups or lat pulldown.','Core after: same as Tuesday.','Beat last week by one rep or one increment.'],
-      why:'A strong back runs longer. Pulling strength balances the shoulders under mileage.'},
-    {id:405, text:'Easy run or swim', days:[4], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['60 minutes. Low intensity — active recovery, not a workout.','Swim if the legs are heavy. Water does the recovery work.'],
-      why:'Three running days need a third easy day at this volume. The swim option exists for a reason — use it.'},
-    {id:406, text:'Long run', days:[5], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Building toward 90–120 minutes for the half.','Slow and conversational the whole way. Heart rate stays low.','Add ~10% distance per week, no more.','Fuel if over 75 minutes.'],
-      why:'This is the cornerstone. Every other run exists to support Saturday. Do not negotiate with it.'},
-    {id:309, text:'Salsa class', days:[2], parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Be in the room. Pay attention. Learn the move that\'s being taught.','Don\'t overthink it — your body learns by doing, not by watching.'],
-      why:'Salsa is the one thing on this list that is purely for joy. Let it be that.'},
-    {id:312, text:'One new salsa move practiced', days:[2], parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['After class. Take the new move. Run it until it stops feeling foreign.','Own it before the week is out.'],
-      why:'One move a week, led cleanly by month end. That\'s the vocabulary. The floor is where you speak the language.'},
-    {id:310, text:'Social dance: one dance, on the floor, even when shy', days:[5], parentShok:203, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Ask someone to dance. Especially when you don\'t feel like it.'],
-      why:'Confidence on the floor is built by getting on the floor. Just one dance. Once a week. The wall gets broken down one chip at a time. Don\'t negotiate with yourself.'},
-    {id:314, text:'History: 15 minutes of reading, notes, or scripting', days:'daily', parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Read something. A book, your own script draft, your notes.','Fifteen minutes of forward momentum on the platform. It doesn\'t have to be brilliant, it just has to happen.','Write anything down.'],
-      why:'The platform is built in the margins. Daily fifteen-minute ideation sessions become fully-fledged ideas, which evolve into scripts and talking notes, which become videos, which become a platform which becomes an audience.'},
-    {id:311, text:'History platform work: deep session (record, edit, or publish)', days:[5,6], parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Record or edit a video. Publish something biweekly.','One real session of deep work on the platform. No half-hearted scrolling through footage or more writing.','Make something move forward.'],
-      why:'Bi-weekly publishing only works if the weekend sessions are real. This is where the platform actually gets built.'},
-    {id:313, text:'Novel, 50 words', days:'daily', startDate:'2026-07-01', parentShok:206, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Open the document. Write 50 words. They don\'t have to be good. They just have to exist.'],
-      why:'The novel starts by starting it. Fifty words a day is how it gets written. No one writes a novel in a session — they write it in increments that stitch together and compound daily, until it\'s done.'},
-    {id:301, text:'Evening prayer', days:'daily', parentShok:205, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Before sleep. Thank God for the day.','Reflect on your blessings, release what you didn\'t finish.','Ask for what tomorrow needs. Ask for Peace that transcends understanding.'],
-      why:'The day that is bookended with prayer belongs to something greater than the hustle. This grounds you while you\'re building everything at once.'},
-    {id:407, text:'Work on BUSHIDO (30+ min)', days:'daily', parentShok:207, streak:0, bestStreak:0, done:false, lastDone:null,
-      bullets:['Open the coreproject or canvas. Build something, fix something, improve something.','Minimum 30 minutes of real work — not browsing, not thinking about it. Hands on keys.'],
-      why:'BUSHIDO is becoming a real product. Thirty minutes a day compounds into something people want to use.'}
+    {id:300, text:'10 min before phone', days:'daily', parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:301, text:'20 min walk', days:'daily', parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:302, text:'Retreat admin, 30 min', days:'daily', parentShok:201, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:303, text:'15 min tidy', days:'daily', parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:304, text:'Dog to beach, no phone', days:[0,3,5], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:305, text:'Delegate one thing', days:[0], parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:306, text:'Wednesday admin day', days:[2], parentShok:200, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:307, text:'Protected evening', days:[4], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null},
+    {id:308, text:'Money check-in, 15 min', days:[2], parentShok:202, streak:0, bestStreak:0, done:false, lastDone:null}
   ],
   completionLog: {},
   dailyNotes: {},
   reflections: [],
-  milestoneStamps: {},  // {`${habitId}-${days}`: true} — permanently earned stamps
+  milestoneStamps: {},
   lastModified: 0,
   lastDailyComplete: null,
   lastWeeklyComplete: null,
   lastMonthlyComplete: null,
   lastSeasonalReview: null,
-  srSnoozeUntil: '2026-05-31',
-  nextId: 408,
-  yearEndMode: 'calendar',   // 'calendar' | 'anniversary'
-  yearEndMonth: 12,          // 1-12, the month the year-end review fires
-  calThemeShokunin: 'default',  // 'default' | 'clan' | 'samurai'
-  calThemeIkigai: 'default',     // 'default' | 'clan' | 'samurai'
-  calThemeKaizen: 'default',    // 'default' | 'clan' | 'samurai'
-  clanMilestones: [],          // clan events added to Ikigai as milestones
-  clanObligations: [],         // clan events added to Ikigai as obligations
-  yearStartDate: null,       // set on first onboarding completion, used for anniversary mode
+  srSnoozeUntil: null,
+  nextId: 309,
+  yearEndMode: 'calendar',
+  yearEndMonth: 12,
+  calThemeShokunin: 'default',
+  calThemeIkigai: 'default',
+  calThemeKaizen: 'default',
+  clanMilestones: [],
+  clanObligations: [],
+  yearStartDate: null,
 };
 
 // ============ STATE ============
