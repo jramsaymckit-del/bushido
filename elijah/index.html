@@ -767,15 +767,44 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.22);line-height:1.5}
 
 /* Daily note field */
-.daily-note-wrap{margin-top:32px;padding:0 2px}
+.daily-note-wrap{margin-top:28px;padding:20px 20px 16px;background:rgba(255,255,255,.38);border-radius:2px;border:1px solid rgba(0,0,0,.05);transition:box-shadow .6s ease,border-color .3s}
+body.dark .daily-note-wrap{background:var(--scroll);border-color:transparent}
 .daily-note{width:100%;font-family:'Noto Serif JP',serif;font-size:13px;font-weight:700;
-  color:var(--ink);background:none;border:none;border-bottom:1px solid rgba(0,0,0,.06);
-  padding:8px 0 10px;outline:none;resize:none;min-height:36px;line-height:1.8;
-  transition:border-color .2s;display:block}
-.daily-note:focus{border-bottom-color:rgba(0,0,0,.15)}
-.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s3);opacity:.85;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.daily-note-kanji{font-size:18px;opacity:.65}
-.daily-note::placeholder{color:var(--ink);opacity:.18;font-weight:400;font-style:normal}
+  color:var(--ink);background:none;border:none;border-bottom:1px solid rgba(0,0,0,.07);
+  padding:8px 0 10px;outline:none;resize:none;min-height:28px;line-height:1.9;
+  transition:border-color .2s;display:block;overflow:hidden}
+.daily-note:focus{border-bottom-color:rgba(0,0,0,.18)}
+.daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s3);margin-bottom:14px;display:flex;align-items:flex-start;gap:12px}
+.daily-note-kanji{font-size:30px;line-height:1;flex-shrink:0;margin-top:-2px}
+.daily-note-label-text{display:flex;flex-direction:column;gap:3px}
+.daily-note-label-title{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)}
+.daily-note-label-sub{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);letter-spacing:.5px}
+.daily-note::placeholder{color:var(--ink);opacity:.15;font-weight:400;font-style:italic}
+.daily-seal-row{display:flex;justify-content:flex-end;align-items:center;margin-top:12px;min-height:24px}
+.daily-seal-btn{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid rgba(0,0,0,.1);padding:5px 14px;cursor:pointer;opacity:.5;transition:opacity .2s,border-color .2s;border-radius:1px}
+.daily-seal-btn:hover{opacity:1;border-color:rgba(0,0,0,.22)}
+body.dark .daily-seal-btn{border-color:rgba(255,255,255,.12);color:var(--ink-faint)}
+body.dark .daily-seal-btn:hover{border-color:rgba(255,255,255,.3)}
+.daily-sealed-badge{font-family:'Noto Serif JP',serif;font-size:10px;font-style:italic;color:var(--red);opacity:.85;letter-spacing:1px}
+/* Evening nudge pulse */
+@keyframes dailyNudgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 32px 6px rgba(255,255,255,.08)}}
+@keyframes dailyKanjiPulse{
+  0%,100%{text-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,255,255,.25),0 0 50px rgba(255,255,255,.10)}
+  50%{text-shadow:0 0 14px rgba(255,255,255,.95),0 0 36px rgba(255,255,255,.6),0 0 80px rgba(255,255,255,.28)}}
+@keyframes dailyLabelPulse{
+  0%,100%{text-shadow:0 0 6px rgba(255,255,255,.38),0 0 18px rgba(255,255,255,.16)}
+  50%{text-shadow:0 0 12px rgba(255,255,255,.8),0 0 32px rgba(255,255,255,.42)}}
+@keyframes dailySealStamp{
+  0%{opacity:0;transform:translateY(-14px) scale(1.4) rotate(-4deg)}
+  55%{opacity:1;transform:translateY(2px) scale(.9) rotate(-4deg)}
+  75%{transform:translateY(-1px) scale(1.04) rotate(-4deg)}
+  100%{opacity:1;transform:translateY(0) scale(1) rotate(-4deg)}}
+@keyframes dailySealFadeOut{0%{opacity:1}100%{opacity:0;transform:scale(.8)}}
+.daily-note-wrap.evening-nudge{animation:dailyNudgePulse 3.8s ease-in-out infinite}
+body.dark .daily-note-wrap.evening-nudge .daily-note-kanji{animation:dailyKanjiPulse 3.8s ease-in-out infinite}
+body.dark .daily-note-wrap.evening-nudge .daily-note-label-title,
+body.dark .daily-note-wrap.evening-nudge .daily-note-label-sub{animation:dailyLabelPulse 3.8s ease-in-out infinite}
+.daily-seal-stamp-el{font-family:'Noto Serif JP',serif;font-size:26px;color:var(--red);display:inline-block;animation:dailySealStamp .5s cubic-bezier(.25,.46,.45,.94) forwards;transform-origin:center}
 
 /* Option C — momentum card in weekly reflection */
 .momentum-card{background:var(--grid-bg);border-radius:4px;padding:20px 22px 18px;margin-bottom:28px}
@@ -1213,7 +1242,13 @@ body.dark #proverb-overlay{background:rgba(28,24,20,.85)}
 body.dark .reflect-prompt-overlay{background:rgba(15,13,10,.75)}
 body.dark .stats-row{border-bottom-color:rgba(255,255,255,.04)}
 body.dark .stats-cols{border-bottom-color:rgba(255,255,255,.08)}
-body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06)}
+body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06);text-shadow:0 0 6px rgba(255,255,255,.38),0 0 18px rgba(255,255,255,.16),0 0 42px rgba(255,255,255,.07)}
+body.dark .daily-note-label{opacity:1;color:var(--ink)}
+body.dark .daily-note-kanji{opacity:1;text-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,255,255,.25),0 0 50px rgba(255,255,255,.10)}
+body.dark .daily-note-label-title{opacity:1;color:var(--ink);text-shadow:0 0 6px rgba(255,255,255,.38),0 0 18px rgba(255,255,255,.16)}
+body.dark .daily-note-label-sub{opacity:1;color:var(--ink);text-shadow:0 0 6px rgba(255,255,255,.38),0 0 18px rgba(255,255,255,.16)}
+body.dark .this-week-label{color:var(--red);text-shadow:0 0 8px rgba(204,53,41,.6),0 0 22px rgba(204,53,41,.25)}
+body.dark .kk-outer .hg-week-label{color:var(--red)!important;text-shadow:0 0 8px rgba(204,53,41,.6),0 0 22px rgba(204,53,41,.25)!important}
 body.dark .reflect-nudge{border-color:rgba(204,53,41,.25);border-left-color:var(--red)}
 body.dark .reflect-nudge.review-card{border-color:rgba(204,53,41,.12);border-left-color:rgba(204,53,41,.4)}
 body.dark .add-trigger:hover{opacity:.5}
@@ -5654,15 +5689,36 @@ function renderGoals(){
     const _wr=_ws.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'\u2013'+_we.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
     const gridSeparator=`<div style="display:flex;align-items:center;gap:16px;margin:52px 0 24px">
       <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08))"></div>
-      <span style="font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--ink);letter-spacing:2px">this week</span>
+      <span class="this-week-label" style="font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--ink);letter-spacing:2px">this week</span>
       <span style="font-size:9px;color:var(--ink-faint);letter-spacing:1px;opacity:.55">${_wr}</span>
       <div style="flex:1;height:1px;background:linear-gradient(270deg,transparent,rgba(0,0,0,.08))"></div>
     </div>`;
     const todayNoteStr=getDateStr();
     const todayNoteVal=(state.dailyNotes||{})[todayNoteStr]||'';
-    const noteHtml=`<div class="daily-note-wrap">
-      <div class="daily-note-label"><span class="daily-note-kanji">省</span>daily reflections</div>
-      <textarea class="daily-note" rows="2" placeholder="write freely..." onblur="saveDailyNote('${todayNoteStr}',this.value)">${todayNoteVal}</textarea>
+    const todayLabel=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    const sealedToday=(_dailyNoteSealed||{})[todayNoteStr];
+    const wasWrittenBefore=!sealedToday&&todayNoteVal.trim().length>0;
+    const sealRowHtml=todayNoteVal.trim()
+      ?(sealedToday
+        ?`<div class="daily-seal-row"><span class="daily-sealed-badge">省 &nbsp;sealed</span></div>`
+        :wasWrittenBefore
+          ?`<div class="daily-seal-row" id="daily-seal-row"><button class="daily-seal-btn" onclick="sealDailyNote('${todayNoteStr}')">省 &nbsp;reseal</button></div>`
+          :`<div class="daily-seal-row" id="daily-seal-row"><button class="daily-seal-btn" onclick="sealDailyNote('${todayNoteStr}')">省 &nbsp;seal the day</button></div>`)
+      :`<div class="daily-seal-row" id="daily-seal-row"></div>`;
+    const noteHtml=`<div class="daily-note-wrap" id="daily-note-wrap">
+      <div class="daily-note-label">
+        <span class="daily-note-kanji">省</span>
+        <div class="daily-note-label-text">
+          <span class="daily-note-label-title">daily reflection</span>
+          <span class="daily-note-label-sub">${todayLabel}</span>
+        </div>
+      </div>
+      <textarea class="daily-note" id="daily-note-ta" placeholder="write freely…"
+        onfocus="dismissDailyNudge()"
+        oninput="growDailyNote(this);updateDailySealRow('${todayNoteStr}')"
+        onblur="saveDailyNote('${todayNoteStr}',this.value)"
+      >${todayNoteVal}</textarea>
+      ${sealRowHtml}
     </div>`;
     let nudgeHtml='';
     if(needsAnnualReflection()) nudgeHtml+=buildReflectionNudgeCard('annual');
@@ -5672,6 +5728,9 @@ function renderGoals(){
     if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
     list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+noteHtml+buildKaizenGrid()+nudgeHtml;
     reApplyHabitDetails();
+    const _dnta=document.getElementById('daily-note-ta');
+    if(_dnta&&_dnta.value) growDailyNote(_dnta);
+    checkDailyNudge();
 
   } else if(currentTab==='shokunin'){
     const items=state.shokunin;
@@ -7969,6 +8028,64 @@ function _effectiveCalTheme(t){
   return (t||'default')==='clan'&&document.body.classList.contains('dark')?'shinobi':(t||'default');
 }
 
+// ── Daily reflection enhancements ────────────────────────────
+let _dailyNoteSealed={};
+let _dailyNudgeDismissed=false;
+let _dailyNudgeDate='';
+
+function growDailyNote(el){
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
+
+function updateDailySealRow(dateStr){
+  const row=document.getElementById('daily-seal-row');
+  const ta=document.getElementById('daily-note-ta');
+  if(!row||!ta) return;
+  const hasContent=ta.value.trim().length>0;
+  if(!hasContent){row.innerHTML='';return;}
+  const wasSealed=(_dailyNoteSealed||{})[dateStr];
+  const label=wasSealed?'省 &nbsp;reseal':'省 &nbsp;seal the day';
+  row.innerHTML=`<button class="daily-seal-btn" onclick="sealDailyNote('${dateStr}')">${label}</button>`;
+}
+
+function sealDailyNote(dateStr){
+  const ta=document.getElementById('daily-note-ta');
+  if(!ta||!ta.value.trim()) return;
+  saveDailyNote(dateStr,ta.value);
+  _dailyNoteSealed[dateStr]=true;
+  dismissDailyNudge();
+  const row=document.querySelector('#daily-note-wrap .daily-seal-row');
+  if(row){
+    row.innerHTML=`<span class="daily-seal-stamp-el">印</span>`;
+    setTimeout(()=>{
+      const el=row.querySelector('.daily-seal-stamp-el');
+      if(el){ el.style.animation='dailySealFadeOut .3s ease forwards'; }
+      setTimeout(()=>{
+        row.innerHTML=`<span class="daily-sealed-badge" style="animation:fadeUp .3s ease both">省 &nbsp;sealed</span>`;
+      },320);
+    },750);
+  }
+}
+
+function dismissDailyNudge(){
+  _dailyNudgeDismissed=true;
+  const wrap=document.getElementById('daily-note-wrap');
+  if(wrap) wrap.classList.remove('evening-nudge');
+}
+
+function checkDailyNudge(){
+  const today=getDateStr();
+  if(_dailyNudgeDate!==today){ _dailyNudgeDismissed=false; _dailyNudgeDate=today; }
+  const wrap=document.getElementById('daily-note-wrap');
+  if(!wrap) return;
+  const h=new Date().getHours();
+  const isDark=document.body.classList.contains('dark');
+  const noteEmpty=!((state.dailyNotes||{})[today]);
+  const shouldPulse=isDark&&h>=20&&noteEmpty&&!_dailyNudgeDismissed;
+  wrap.classList.toggle('evening-nudge',shouldPulse);
+}
+
 function updateDarkMode(){
   const h=new Date().getHours();
   const isDark=h>=21||h<6;
@@ -7978,6 +8095,7 @@ function updateDarkMode(){
     const clanActive=['calThemeShokunin','calThemeKaizen','calThemeIkigai'].some(k=>(state[k]||'default')==='clan');
     if(clanActive&&typeof renderGoals==='function') renderGoals();
   }
+  checkDailyNudge();
 }
 
 // ============ GRID SWIPE NAVIGATION ============
