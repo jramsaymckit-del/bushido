@@ -8335,7 +8335,7 @@ async function writeClanSummary(user){
   try{
     var data = buildOwnClanData();
     data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    await db.collection('clan').doc(user.uid).set(data);
+    await db.collection('clan').doc(user.uid).set(data, {merge:true});
   }catch(e){ console.warn('Clan write failed:',e); }
 }
 
@@ -8734,7 +8734,7 @@ async function performMigration(){
       created: new Date().toISOString(),
       migratedFrom: _migrationSource,
       migratedAt: new Date().toISOString()
-    });
+    }, {merge:true});
     document.getElementById('migrate-overlay').classList.remove('active');
     if(!state.milestoneStamps) state.milestoneStamps = {};
     if(!state.practiceStamps)  state.practiceStamps  = {};
@@ -8755,7 +8755,7 @@ async function declineMigration(){
   await db.collection('users').doc(_migrationUid).set({
     state: JSON.stringify(state),
     created: new Date().toISOString()
-  });
+  }, {merge:true});
   document.getElementById('migrate-overlay').classList.remove('active');
   document.getElementById('onboard').classList.add('active');
   renderObProgress();
@@ -8794,7 +8794,7 @@ async function loadFirestoreState(user){
       await db.collection('users').doc(user.uid).set({
         state: JSON.stringify(state),
         created: new Date().toISOString()
-      });
+      }, {merge:true});
     }
   } catch(e){
     console.warn('Firestore load failed:', e);
@@ -9616,14 +9616,14 @@ async function hiCreateCoupleDoc(myName){
     paired:       false,
     createdAt:    now,
     lastModified: now
-  }, _hiSnapshotForCloud()));
+  }, _hiSnapshotForCloud()), {merge:true});
 
   batch.set(db.collection('couple_invites').doc(shareCode), {
     coupleId:   coupleId,
     creatorUid: _currentUser.uid,
     createdAt:  now,
     expiresAt:  expiresAt
-  });
+  }, {merge:true});
 
   batch.set(db.collection('users').doc(_currentUser.uid),
     { coupleId: coupleId }, { merge: true });
@@ -12549,7 +12549,7 @@ function cnCalSaveToFirestore(){
     db.collection('clanCalendar').doc(CN_CAL_CLAN_ID).set({
       events: cnCalCurrentEvents(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(e){ console.warn('Clan calendar save failed:', e); });
+    }, {merge:true}).catch(function(e){ console.warn('Clan calendar save failed:', e); });
   }catch(e){ console.warn('Clan calendar save failed:', e); }
 }
 // Mutations call this: render optimistically, then persist.
