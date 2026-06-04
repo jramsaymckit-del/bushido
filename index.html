@@ -78,8 +78,7 @@
     Strand Filter ..................... line 5967
     Travel Mode ....................... line 5971
     Completion Celebrations ........... line 6047
-    Cloud Sync (JSONbin) .............. line 6392
-    Export / Import ................... line 6562
+    Export / Import ................... line 6392
     Dark Mode ......................... line 6596
     Grid Swipe Navigation ............. line 6602
     Firebase Auth ..................... line 6654
@@ -621,6 +620,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .kk-outer.cal-samurai .wk-sealed-prev:hover{color:rgba(254,252,248,.9)}
 .kk-outer.cal-shinobi .wk-sealed-prev{color:rgba(204,53,41,.55);opacity:1}
 .kk-outer.cal-shinobi .wk-sealed-prev:hover{color:rgba(204,53,41,.95)}
+/* ── Weekly/Monthly reflection button states ──────────────── */
+.weekly-btn-active{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid var(--red)!important;padding:10px 20px!important;color:var(--red)!important;background:none!important;cursor:pointer}
+.weekly-btn-active:hover{background:var(--red)!important;color:var(--white)!important}
+.weekly-btn-review{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid rgba(0,0,0,.18)!important;padding:10px 20px!important;color:var(--ink-faint)!important;font-style:italic;opacity:.65;background:none!important;cursor:pointer;transition:opacity .2s}
+.weekly-btn-review:hover{opacity:1!important;background:rgba(0,0,0,.04)!important}
+.weekly-btn-outside{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid rgba(0,0,0,.1)!important;padding:10px 20px!important;color:var(--ink-faint)!important;opacity:.35!important;cursor:not-allowed!important;background:none!important;pointer-events:none}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
 .mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
@@ -3244,6 +3249,27 @@ body.dark .sr-phase-dot {
   color:rgba(254,252,248,.82);line-height:1.5}
 /* /CLAN YEAR CALENDAR */
 
+
+/* ── SEASONAL SEALS ────────────────────────────────────────────────────── */
+.sseal-row{padding:18px 20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;border-top:1px solid rgba(0,0,0,.05);margin-top:8px}
+.sseal-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);opacity:.55}
+.sseal-seals{display:flex;gap:20px;align-items:flex-start}
+.sseal-seal{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:default}
+.sseal-seal.sseal-past,.sseal-seal.sseal-current{cursor:pointer}
+.sseal-circle{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--sseal-color,rgba(204,53,41,.4));background:var(--sseal-fill,transparent);display:flex;align-items:center;justify-content:center;transition:all .22s}
+.sseal-seal.sseal-sealed .sseal-circle{background:var(--sseal-color,rgba(204,53,41,.7));border-color:var(--sseal-color,rgba(204,53,41,.7))}
+.sseal-seal.sseal-future .sseal-circle{opacity:.18;border-style:dashed}
+.sseal-seal.sseal-past .sseal-circle{opacity:.42}
+.sseal-seal.sseal-past:hover .sseal-circle,.sseal-seal.sseal-current:hover .sseal-circle{opacity:.85;background:var(--sseal-fill,transparent)}
+.sseal-seal.sseal-sealed .sseal-circle{opacity:.8}
+.sseal-seal.sseal-sealed:hover .sseal-circle{opacity:1}
+.sseal-kanji{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--sseal-color,var(--red));line-height:1;transition:color .22s}
+.sseal-seal.sseal-sealed .sseal-kanji{color:rgba(254,252,248,.92)}
+.sseal-seal.sseal-future .sseal-kanji{opacity:.25}
+.sseal-season-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);opacity:.55}
+.sseal-seal.sseal-future .sseal-season-label{opacity:.2}
+.sseal-seal.sseal-current .sseal-circle{border-width:2px}
+
 /* Past done cells — muted dot so only today stands out */
 .hg-cell.hg-done:not(.hg-today-col)::after {
   background: rgba(204,53,41,.75) !important;
@@ -3684,16 +3710,14 @@ if (FIREBASE_CONFIGURED) {
     <div class="divider-thin"></div>
     <div style="text-align:center;padding:8px 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5">reflection</div>
     <div style="display:flex;justify-content:center;gap:32px;padding:8px 0 20px">
-      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>
-      <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>
+      <span id="weekly-btn-slot"></span>
+      <span id="monthly-btn-slot"></span>
       <button class="btn btn-ghost" style="font-size:10px;letter-spacing:2px;border:1.5px solid var(--red);padding:10px 20px;color:var(--red)" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'" onclick="showReflection('annual')">年 &nbsp;Annual</button>
     </div>
     <!-- Export / Import / Sync -->
     <div style="display:flex;justify-content:center;align-items:center;gap:20px;padding:16px 0 8px" id="data-tools">
       <button onclick="exportState()" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">↓ export</button>
       <label style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">↑ import<input type="file" accept=".json" onchange="importState(event)" style="display:none"></label>
-      <button onclick="showSyncSetup()" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);background:none;border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">☁ sync</button>
-      <span id="sync-status" style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;color:var(--ink-faint);opacity:.5"></span>
     </div>
 
     <!-- Stats panel (revealed by clicking the seal) -->
@@ -3915,15 +3939,12 @@ const STORAGE_KEY = PROD_KEY;
 // Derived local identity key — used as fallback when Firebase is offline.
 // Do NOT hardcode a name here; always derive from PROD_KEY so user files stay generic.
 const LOCAL_ME_KEY = PROD_KEY.replace('bushido_', '').replace('_permanent', '');
-const HARDCODED_BIN_ID = '69dea163aaba882197fc5550'; // permanent bin — enables cross-device sync
 
 function saveState(){
   state.lastModified=Date.now();
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
   if(FIREBASE_CONFIGURED){
     saveStateToFirestore(); // async fire-and-forget
-  } else {
-    scheduleSyncToCloud(); // legacy JSONbin fallback
   }
 }
 
@@ -4110,6 +4131,7 @@ const DEFAULT_STATE = {
   completionLog: {},
   dailyNotes: {},
   reflections: [],
+  seasonalReflections: {},
   milestoneStamps: {},  // {`${habitId}-${days}`: true} — permanently earned stamps
   lastModified: 0,
   lastDailyComplete: null,
@@ -4843,6 +4865,98 @@ function sknDayExpandHtml(dateStr, calTheme){
   </div>`;
 }
 
+
+// ── SEASONAL SEALS ──────────────────────────────────────────────────────────
+const SEASONS = [
+  { key:'spring', kanji:'春', label:'SPRING', months:[2,3,4],  color:'rgba(201,160,160,0.75)', fill:'rgba(201,160,160,0.10)' },
+  { key:'summer', kanji:'夏', label:'SUMMER', months:[5,6,7],  color:'rgba(100,160,155,0.75)', fill:'rgba(100,160,155,0.10)' },
+  { key:'autumn', kanji:'秋', label:'AUTUMN', months:[8,9,10], color:'rgba(196,125,64,0.80)',  fill:'rgba(196,125,64,0.10)'  },
+  { key:'winter', kanji:'冬', label:'WINTER', months:[11,0,1], color:'rgba(104,120,160,0.75)', fill:'rgba(104,120,160,0.10)' },
+];
+
+function getSeasonStatus(year, seasonKey, todayStr) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return 'future';
+  const today = new Date(todayStr || getDateStr());
+  let startYear = year, endYear = year;
+  let startMonth = season.months[0], endMonth = season.months[2];
+  if(seasonKey === 'winter') { endYear = year + 1; endMonth = 1; }
+  const startDate = new Date(startYear, startMonth, 1);
+  const endDate   = new Date(endYear,  endMonth + 1, 0);
+  const stateKey  = year + '-' + seasonKey;
+  const sealed    = !!((state.seasonalReflections || {})[stateKey]);
+  if(today < startDate) return 'future';
+  if(today > endDate)   return sealed ? 'past-sealed' : 'past-unsealed';
+  return sealed ? 'past-sealed' : 'current';
+}
+
+function renderSeasonalSeals(viewYear) {
+  const todayStr = getDateStr();
+  let html = '<div class="sseal-row"><div class="sseal-label">SEASONS</div><div class="sseal-seals">';
+  SEASONS.forEach(function(season) {
+    const status   = getSeasonStatus(viewYear, season.key, todayStr);
+    const clickable = (status !== 'future');
+    let cls = 'sseal-seal';
+    if(status === 'past-sealed')   cls += ' sseal-sealed';
+    else if(status === 'current')  cls += ' sseal-current';
+    else if(status === 'past-unsealed') cls += ' sseal-past';
+    else                            cls += ' sseal-future';
+    const clickAttr = clickable ? ' onclick="openSeasonalReflection(' + viewYear + ',\'' + season.key + '\')"' : '';
+    html += '<div class="' + cls + '" style="--sseal-color:' + season.color + ';--sseal-fill:' + season.fill + '"' + clickAttr + '>'
+          + '<div class="sseal-circle"><span class="sseal-kanji">' + season.kanji + '</span></div>'
+          + '<div class="sseal-season-label">' + season.label + '</div>'
+          + '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function openSeasonalReflection(year, seasonKey) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return;
+  const stateKey = year + '-' + seasonKey;
+  const sr       = state.seasonalReflections || {};
+  const existing = sr[stateKey];
+  const m = document.getElementById('reflect-modal');
+  const c = document.getElementById('reflect-content');
+  m.classList.add('active');
+  const title = season.kanji + ' ' + season.label.charAt(0) + season.label.slice(1).toLowerCase() + ' ' + year;
+  if(existing) {
+    c.innerHTML = '<div class="reflect-header"><div class="reflect-title">' + title + '</div><div class="reflect-close" onclick="closeReflection()">×</div></div>'
+      + '<div class="reflect-body"><div style="font-family:\'Noto Serif JP\',serif;font-size:13px;color:var(--ink-light);line-height:1.9;white-space:pre-wrap">' + (existing.text || '') + '</div>'
+      + '<div style="margin-top:24px;display:flex;align-items:center;gap:8px;opacity:.5">'
+      + '<span style="font-family:\'Noto Serif JP\',serif;font-size:14px;color:var(--red)">印</span>'
+      + '<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)">sealed · ' + (existing.sealedAt || '') + '</span>'
+      + '</div></div>';
+  } else {
+    c.innerHTML = '<div class="reflect-header"><div class="reflect-title">' + title + '</div><div class="reflect-close" onclick="closeReflection()">×</div></div>'
+      + '<div class="reflect-body"><textarea class="reflect-textarea" id="seasonal-reflect-text" placeholder="How did this season pass?" style="min-height:180px"></textarea></div>'
+      + '<div class="reflect-footer">'
+      + '<button class="reflect-btn-ghost" onclick="closeReflection()">later</button>'
+      + '<button class="reflect-btn-primary" onclick="saveSeasonalReflection(' + year + ',\'' + seasonKey + '\')">seal the season</button>'
+      + '</div>';
+  }
+}
+
+function saveSeasonalReflection(year, seasonKey) {
+  const season = SEASONS.find(s => s.key === seasonKey);
+  if(!season) return;
+  const text     = (document.getElementById('seasonal-reflect-text') || {}).value || '';
+  const stateKey = year + '-' + seasonKey;
+  if(!state.seasonalReflections) state.seasonalReflections = {};
+  state.seasonalReflections[stateKey] = { text: text.trim(), sealedAt: getDateStr() };
+  saveState();
+  const c = document.getElementById('reflect-content');
+  c.innerHTML = '<div style="text-align:center;padding:56px 0">'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>'
+    + '<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>'
+    + '</div>';
+  playEnsoMoment(season.kanji);
+  setTimeout(function() { closeReflection(); if(currentTab==='shokunin') renderGoals(); }, 2600);
+}
+// ── /SEASONAL SEALS ─────────────────────────────────────────────────────────
+
 function buildMonthCal(){
   const now=new Date();
   const ref=new Date(now.getFullYear(),now.getMonth()+calMonthOffset,1);
@@ -5026,7 +5140,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
     }
   }
 
-  html+=`</div></div></div><div class="kk-rod kk-rod-btm"></div></div>`;
+  html+=`</div></div>${renderSeasonalSeals(year)}</div><div class="kk-rod kk-rod-btm"></div></div>`;
   return html;
 }
 
@@ -5516,6 +5630,8 @@ function renderTab(){
   document.getElementById('med-text').innerHTML=renderProverb(getDailyProverb());
   renderGoals();
   updateStreak();
+  renderWeeklyBtn();
+  renderMonthlyBtn();
 }
 
 function getShrIdx(prog){return prog>=66?2:prog>=33?1:0}
@@ -6067,14 +6183,42 @@ let _activePromptType = 'weekly';
 
 function needsWeeklyReflection(){
   const dayIdx=todayIdx(); // Mon=0...Sun=6
-  if(dayIdx!==6&&dayIdx!==0) return false; // Only Sun + Mon grace (EOD Monday)
-  const wkOffset=(dayIdx===6)?0:-1; // Sunday = this week, Mon/Tue = last week
+  if(dayIdx!==5&&dayIdx!==6&&dayIdx!==0) return false; // Sat + Sun + Mon window
+  const wkOffset=(dayIdx===5||dayIdx===6)?0:-1; // Sat/Sun = this week, Mon = last week
   const wStart=getWeekStart(wkOffset);
   const wEnd=new Date(wStart); wEnd.setDate(wStart.getDate()+6);
   const wStartStr=getDateStr(wStart), wEndStr=getDateStr(wEnd);
   return !(state.reflections||[]).some(r=>
     r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
   );
+}
+
+function getWeeklyWindowStatus(){
+  // Returns 'sealed' | 'in-window' | 'outside'
+  const dayIdx=todayIdx();
+  const wkOffset=(dayIdx===5||dayIdx===6)?0:-1;
+  const wStart=getWeekStart(wkOffset);
+  const wEnd=new Date(wStart); wEnd.setDate(wStart.getDate()+6);
+  const wStartStr=getDateStr(wStart),wEndStr=getDateStr(wEnd);
+  const sealed=(state.reflections||[]).some(r=>
+    r.type==='weekly'&&r.date>=wStartStr&&r.date<=wEndStr
+  );
+  if(sealed) return 'sealed';
+  if(dayIdx===5||dayIdx===6||dayIdx===0) return 'in-window';
+  return 'outside';
+}
+
+function renderWeeklyBtn(){
+  const slot=document.getElementById('weekly-btn-slot');
+  if(!slot) return;
+  const status=getWeeklyWindowStatus();
+  if(status==='sealed'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showReflectionReview(false)" title="review this week&#39;s sealed reflection">週 &nbsp;Review</button>`;
+  } else if(status==='in-window'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>`;
+  } else {
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens Saturday">週 &nbsp;Weekly</button>`;
+  }
 }
 
 function getReviewableWeeklyReflection(){
@@ -6100,6 +6244,70 @@ function getReviewableWeeklyReflection(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
   if(latest.date>=getDateStr(cutoff)) return {entry:latest,editable:false};
   return null;
+}
+
+function getMonthlyWindowStatus(){
+  // Returns 'sealed' | 'in-window' | 'outside'
+  const today=new Date();
+  const monthStr=getDateStr(today).substring(0,7);
+  const sealed=(state.reflections||[]).some(r=>
+    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+  );
+  if(sealed) return 'sealed';
+  const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  if(today.getDate()>=lastDay-2) return 'in-window';
+  return 'outside';
+}
+
+function renderMonthlyBtn(){
+  const slot=document.getElementById('monthly-btn-slot');
+  if(!slot) return;
+  const status=getMonthlyWindowStatus();
+  if(status==='sealed'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showMonthlyReflectionReview()" title="review this month&#39;s sealed reflection">月 &nbsp;Review</button>`;
+  } else if(status==='in-window'){
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>`;
+  } else {
+    const today=new Date();
+    const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+    const openDate=new Date(today.getFullYear(),today.getMonth(),lastDay-2);
+    const openLabel=openDate.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens ${openLabel}">月 &nbsp;Monthly</button>`;
+  }
+}
+
+function showMonthlyReflectionReview(){
+  const today=new Date();
+  const monthStr=getDateStr(today).substring(0,7);
+  const entry=(state.reflections||[]).find(r=>
+    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+  );
+  if(!entry) return;
+  const m=document.getElementById('reflect-modal');
+  const c=document.getElementById('reflect-content');
+  m.classList.add('active');
+  const monthLabel=today.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const safeVal=v=>(v||'').replace(/"/g,'&quot;');
+  c.innerHTML=`
+    <div class="modal-kanji">月</div>
+    <div class="modal-title">Monthly Reflection</div>
+    <div class="modal-sub">${monthLabel}</div>
+    <div class="reflect-review-badge">sealed · past month</div>
+    <div class="reflect-q">
+      <div class="reflect-label">What was working?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.working)}</textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">What was changing in you?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.changing)}</textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">What needed to shift?</div>
+      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.shifting)}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeReflection()">close</button>
+    </div>`;
 }
 
 function needsMonthlyReflection(){
@@ -6243,7 +6451,28 @@ function renderEOYPhase(n){
         }).join('')}
         ${strandCounts.some(c=>c<3)?`<div style="font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);margin-top:12px;opacity:.7">Some strands have few entries. Absence of reflection is data too.</div>`:''}
       </div>
-      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:32px 0"></div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.06),transparent);margin:28px 0"></div>
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint);opacity:.55;margin-bottom:14px">SEASONS</div>
+        <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start">
+          ${SEASONS.map(function(season){
+            const status = getSeasonStatus(parseInt(yearStr), season.key, getDateStr());
+            const sealed = status === 'past-sealed';
+            const clickable = status !== 'future';
+            let cls = 'sseal-seal';
+            if(sealed) cls += ' sseal-sealed';
+            else if(status === 'current') cls += ' sseal-current';
+            else if(status === 'past-unsealed') cls += ' sseal-past';
+            else cls += ' sseal-future';
+            const clickAttr = clickable ? ' onclick="openSeasonalReflection(' + parseInt(yearStr) + ',\'' + season.key + '\')"' : '';
+            return '<div class="' + cls + '" style="--sseal-color:' + season.color + ';--sseal-fill:' + season.fill + '"' + clickAttr + '>'
+              + '<div class="sseal-circle"><span class="sseal-kanji">' + season.kanji + '</span></div>'
+              + '<div class="sseal-season-label">' + season.label + '</div>'
+              + '</div>';
+          }).join('')}
+        </div>
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:28px 0"></div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="closeEOYReview()">close</button>
         <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 28px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="renderEOYPhase(1)">read your year →</button>
@@ -6872,6 +7101,8 @@ function showReflection(type){
 
 function closeReflection(){
   document.getElementById('reflect-modal').classList.remove('active');
+  renderWeeklyBtn();
+  renderMonthlyBtn();
 }
 
 function showReflectionReview(editable){
@@ -7727,81 +7958,6 @@ function checkCelebrations(){
   if(toFire.length){saveState();fireCelebrations(toFire);}
 }
 
-// ============ CLOUD SYNC (JSONbin.io) ============
-// Credentials stored separately — never in the state or HTML source
-const SYNC_CFG_KEY = 'bushido_sync_config';
-
-function getSyncConfig(){
-  try{
-    const cfg=JSON.parse(localStorage.getItem(SYNC_CFG_KEY)||'{}');
-    if(!cfg.binId&&HARDCODED_BIN_ID) cfg.binId=HARDCODED_BIN_ID;
-    return cfg;
-  }catch(e){ return {binId:HARDCODED_BIN_ID}; }
-}
-function saveSyncConfig(cfg){
-  localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(cfg));
-}
-
-function setSyncStatus(status){
-  const el=document.getElementById('sync-status');
-  if(!el) return;
-  const map={syncing:'☁ syncing…',synced:'☁ synced',error:'☁ offline',off:''};
-  el.textContent=map[status]||'';
-  el.style.color=status==='error'?'var(--red)':'var(--ink-faint)';
-}
-
-let _syncTimer=null;
-function scheduleSyncToCloud(){
-  clearTimeout(_syncTimer);
-  _syncTimer=setTimeout(syncToCloud,5000);
-}
-
-// gzip-compress state to base64 string. Returns null if browser lacks
-// CompressionStream (older Safari pre-16.4) — falls back to raw JSON.
-async function compressState(stateObj){
-  if(typeof CompressionStream==='undefined') return null;
-  try{
-    const json=JSON.stringify(stateObj);
-    const stream=new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
-    const buf=await new Response(stream).arrayBuffer();
-    const bytes=new Uint8Array(buf);
-    let bin='';
-    const chunk=8192;
-    for(let i=0;i<bytes.length;i+=chunk){
-      bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk));
-    }
-    return btoa(bin);
-  }catch(e){ return null; }
-}
-
-async function decompressState(b64){
-  try{
-    const bin=atob(b64);
-    const bytes=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    const text=await new Response(stream).text();
-    return JSON.parse(text);
-  }catch(e){ return null; }
-}
-
-async function syncToCloud(){
-  const{binId,masterKey}=getSyncConfig();
-  if(!binId||!masterKey) return;
-  setSyncStatus('syncing');
-  try{
-    const compressed=await compressState(state);
-    // If compression succeeded, send wrapped {v:1,c:base64}; otherwise raw state
-    const payload=compressed?{v:1,c:compressed}:state;
-    const res=await fetch(`https://api.jsonbin.io/v3/b/${binId}`,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':masterKey},
-      body:JSON.stringify(payload)
-    });
-    if(res.ok) setSyncStatus('synced'); else setSyncStatus('error');
-  }catch(e){ setSyncStatus('error'); }
-}
-
 // Minimum shape a real BUSHIDO state must have. Guards the destructive
 // Object.assign paths (import / cloud-load) against {}, truncated files,
 // or another app's backup silently wiping the plan.
@@ -7815,106 +7971,6 @@ function isValidStateShape(obj){
 // out to be bad.
 function saveLastKnownGood(){
   try{ localStorage.setItem('bushido_last_known_good', JSON.stringify(state)); }catch(e){}
-}
-
-async function loadFromCloud(compareTimestamp){
-  const{binId,masterKey}=getSyncConfig();
-  if(!binId||!masterKey) return false;
-  setSyncStatus('syncing');
-  try{
-    const res=await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`,{
-      headers:{'X-Master-Key':masterKey}
-    });
-    if(!res.ok){ setSyncStatus('error'); return false; }
-    const data=await res.json();
-    const record=data.record||{};
-    // Detect format: compressed wrapper {v:1,c:string} vs legacy raw state
-    let cloud;
-    if(record.v===1&&typeof record.c==='string'){
-      cloud=await decompressState(record.c)||{};
-    } else {
-      cloud=record;
-    }
-    // Reject a corrupt or non-BUSHIDO cloud record before it can overwrite the plan.
-    if(!isValidStateShape(cloud)){ setSyncStatus('error'); return false; }
-    // Use the pre-render snapshot timestamp if provided — prevents startup saves
-    // (checkCelebrations etc.) from inflating lastModified and falsely making local
-    // look newer than a phone/other-device cloud state.
-    const localTs=compareTimestamp!==undefined?compareTimestamp:(state.lastModified||0);
-    if((cloud.lastModified||0)>localTs){
-      saveLastKnownGood();
-      Object.assign(state,cloud);
-      applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
-      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
-      migrateKaizenOrder();       // sort into logical daily order (runs once)
-      try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
-      setSyncStatus('synced');
-      return true;
-    }
-    // Local is newer — push up to cloud (will compress automatically)
-    syncToCloud();
-    return false;
-  }catch(e){ setSyncStatus('error'); return false; }
-}
-
-function showSyncSetup(){
-  const m=document.getElementById('reflect-modal');
-  const c=document.getElementById('reflect-content');
-  m.classList.add('active');
-  const{binId='',masterKey=''}=getSyncConfig();
-  c.innerHTML=`
-    <div class="modal-kanji" style="font-size:36px;opacity:.12">☁</div>
-    <div class="modal-title">Cloud Sync</div>
-    <div class="modal-sub" style="margin-bottom:28px">sync your data across all devices via JSONbin.io</div>
-    <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:2;margin-bottom:28px;border-left:2px solid rgba(204,53,41,.15);padding-left:16px">
-      1. Sign up free at <strong style="font-style:normal">jsonbin.io</strong><br>
-      2. Go to API Keys and copy your Master Key<br>
-      3. Paste it below — the app will create your bin automatically
-    </div>
-    <div class="reflect-q">
-      <div class="reflect-label">Master Key</div>
-      <input id="sync-master-key" class="reflect-textarea" style="min-height:auto;resize:none;font-style:normal;font-size:13px;font-family:'Noto Sans JP',sans-serif" value="${masterKey}" placeholder="\$2a\$10\$...">
-    </div>
-    ${binId?`<div class="reflect-q">
-      <div class="reflect-label">Bin ID (auto-saved)</div>
-      <input id="sync-bin-id" class="reflect-textarea" style="min-height:auto;resize:none;font-style:normal;font-size:12px;font-family:'Noto Sans JP',sans-serif;opacity:.6" value="${binId}" readonly>
-    </div>`:'<input type="hidden" id="sync-bin-id" value="">'}
-    <div class="form-actions" style="margin-top:28px">
-      <button class="btn-ghost btn" onclick="closeReflection()">cancel</button>
-      <button class="btn" onclick="saveSyncSetup()">Save &amp; sync</button>
-    </div>`;
-}
-
-async function saveSyncSetup(){
-  const masterKey=(document.getElementById('sync-master-key')?.value||'').trim();
-  if(!masterKey) return;
-  let binId=(document.getElementById('sync-bin-id')?.value||'').trim();
-  closeReflection();
-  setSyncStatus('syncing');
-  if(!binId){
-    // Create a new private bin
-    try{
-      const res=await fetch('https://api.jsonbin.io/v3/b',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'X-Master-Key':masterKey,
-          'X-Bin-Name':'bushido-state',
-          'X-Bin-Private':'true'
-        },
-        body:JSON.stringify(state)
-      });
-      const data=await res.json();
-      binId=data.metadata?.id||'';
-      if(!binId){ setSyncStatus('error'); return; }
-    }catch(e){ setSyncStatus('error'); return; }
-  }
-  saveSyncConfig({binId,masterKey});
-  // Pull from cloud first — never blindly push local over real cloud data.
-  // loadFromCloud() handles both directions: pulls if cloud is newer,
-  // pushes if local is newer (its built-in fallback).
-  const cloudWasNewer = await loadFromCloud();
-  if(cloudWasNewer && state.onboarded) renderDashboard();
 }
 
 // ============ EXPORT / IMPORT ============
@@ -8507,8 +8563,8 @@ function initFirebaseAuth(){
 }
 
 // ── MIGRATION ──────────────────────────────────────────────────────────────
-// Check own PROD_KEY first, then well-known legacy keys — deduped
-const MIGRATE_KEYS = [PROD_KEY, DEV_KEY, 'bushido_james_permanent', 'bushido_coreproject']
+// Check only this user's own keys — never hardcode other users' keys here
+const MIGRATE_KEYS = [PROD_KEY, DEV_KEY]
   .filter((v, i, a) => v && a.indexOf(v) === i);
 let _migrationUid    = null;
 let _migrationData   = null;
@@ -8526,23 +8582,6 @@ async function detectMigrationData(){
       }
     } catch(e){}
   }
-  // 2. Fallback: try JSONbin if API key + bin ID are in localStorage config
-  try{
-    const cfg = getSyncConfig();
-    if(cfg.binId && cfg.masterKey){
-      const resp = await fetch(
-        'https://api.jsonbin.io/v3/b/' + cfg.binId + '/latest',
-        { headers: { 'X-Master-Key': cfg.masterKey } }
-      );
-      if(resp.ok){
-        const json = await resp.json();
-        const data = json.record;
-        if(data && data.strands && data.strands.length && data.onboarded){
-          return { source: 'JSONbin', key: cfg.binId, data };
-        }
-      }
-    }
-  } catch(e){}
   return null;
 }
 
@@ -8555,7 +8594,7 @@ function showMigrationOverlay(uid, result){
   const logDays      = Object.keys(d.completionLog || {}).length;
   const firstDay     = logDays ? Object.keys(d.completionLog).sort()[0] : null;
   const strandsCount = (d.strands || []).length;
-  const sourceLabel  = result.source === 'JSONbin' ? 'cloud backup (JSONbin)' : result.key;
+  const sourceLabel  = result.key;
   document.getElementById('migrate-stats').innerHTML =
     strandsCount + ' strand' + (strandsCount !== 1 ? 's' : '') + ' &nbsp;&middot;&nbsp; ' +
     habitsCount  + ' habit'  + (habitsCount  !== 1 ? 's' : '') + '<br>' +
@@ -8626,7 +8665,7 @@ async function loadFirestoreState(user){
         }
       }
     } else {
-      // New user — check localStorage then JSONbin for existing data to migrate
+      // New user — check localStorage for existing data to migrate
       const result = await detectMigrationData();
       if(result){
         showMigrationOverlay(user.uid, result);
@@ -8687,17 +8726,9 @@ function showDashboard(){
     // Update the Samurai/Shinobi pill UI to match the restored mode.
     // persist:false because we're just painting the UI — state.visMode is already correct.
     setVis(_visMode, { persist: false });
-    if(!FIREBASE_CONFIGURED){
-      // JSONbin/legacy path: wait for cloud sync before checking prompts so we use
-      // the authoritative state (e.g. reflection sealed on phone won't re-prompt on desktop).
-      loadFromCloud(_preRenderTs)
-        .then(cloudWasNewer => { if(cloudWasNewer) renderDashboard(); })
-        .finally(() => { checkReflectionPrompts(); });
-    } else {
-      // Firebase path: Firestore data was already loaded by loadFirestoreState()
-      // before showDashboard() was called — safe to check prompts immediately.
-      checkReflectionPrompts();
-    }
+    // Firestore data was already loaded by loadFirestoreState()
+    // before showDashboard() was called — safe to check prompts immediately.
+    checkReflectionPrompts();
   });
 }
 
