@@ -1692,6 +1692,21 @@ body.dark .hanko{border-color:var(--red)}
 .hi-pair-modal-btn:hover{background:var(--hi-ours);color:var(--white)}
 .hi-pair-modal-btn.solid{background:var(--hi-ours);color:var(--white)}
 .hi-pair-modal-btn.solid:hover{background:var(--ink);border-color:var(--ink)}
+/* ── Unpair confirmation modal + notice banner ──────────────── */
+.hi-unpair-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,13,10,.55);align-items:center;justify-content:center;padding:24px}
+.hi-unpair-modal-overlay.show{display:flex}
+.hi-unpair-modal{background:var(--scroll);max-width:420px;width:100%;padding:40px 36px 32px;border-radius:2px;text-align:center;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.18)}
+.hi-unpair-modal-kanji{font-family:'Noto Serif JP',serif;font-size:42px;color:var(--red);opacity:.85;margin-bottom:14px;line-height:1}
+.hi-unpair-modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:10px}
+.hi-unpair-modal-body{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.7;margin-bottom:28px}
+.hi-unpair-modal-actions{display:flex;gap:14px;justify-content:center}
+.hi-unpair-btn{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 24px;border-radius:1px;cursor:pointer;transition:all .2s}
+.hi-unpair-btn-cancel{background:none;border:1px solid rgba(0,0,0,.18);color:var(--ink)}
+.hi-unpair-btn-cancel:hover{border-color:var(--ink);background:rgba(0,0,0,.04)}
+.hi-unpair-btn-go{background:none;border:1.5px solid var(--red);color:var(--red)}
+.hi-unpair-btn-go:hover{background:var(--red);color:var(--white)}
+.hi-unpair-notice{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--white);background:rgba(15,13,10,.92);padding:10px 22px;border-radius:1px;z-index:310;letter-spacing:.5px;opacity:0;transition:opacity .35s ease;pointer-events:none;max-width:340px;text-align:center;line-height:1.6}
+.hi-unpair-notice.show{opacity:1}
 .hi-pair-modal-divider{display:flex;align-items:center;justify-content:center;
   color:var(--ink-faint);font-size:9px;letter-spacing:3px;text-transform:uppercase;
   font-weight:700;opacity:.5;align-self:center;width:30px}
@@ -9638,6 +9653,24 @@ async function hiRedeemCoupleCode(rawCode, myName){
   return { coupleId };
 }
 
+// ── Reset local couple binding (used by onSnapshot for unpair + dissolved-doc paths) ─
+function hiClearLocalCouple(){
+  _hiCoupleId = null;
+  if(_hiHasAuth()){
+    db.collection('users').doc(_currentUser.uid).set(
+      { coupleId: firebase.firestore.FieldValue.delete() },
+      { merge: true }
+    ).catch(()=>{});
+  }
+  Object.assign(HI_STATE, {
+    paired: false,
+    partners: { a:{name:'You',key:'me'}, b:{name:'Partner',key:'partner'} },
+    vision: '', milestones: [], importantDates: [], goals: [],
+    practices: [], habits: [], notes: {}, plans: {}
+  });
+  hiRenderTab(); hiRenderThisMonth(); hiRenderPairLine();
+}
+
 // ── Subscribe to couple doc — onSnapshot drives HI_STATE ───────────────
 function hiSubscribeCoupleDoc(coupleId){
   if(!HI_FIREBASE_ON) return;
@@ -9645,24 +9678,17 @@ function hiSubscribeCoupleDoc(coupleId){
 
   _hiCoupleUnsub = db.collection('couples').doc(coupleId).onSnapshot(snap => {
     if(!snap.exists){
-      // Couple was dissolved by the partner — clear our coupleId and reset.
-      _hiCoupleId = null;
-      if(_hiHasAuth()){
-        db.collection('users').doc(_currentUser.uid).set(
-          { coupleId: firebase.firestore.FieldValue.delete() },
-          { merge: true }
-        ).catch(()=>{});
-      }
-      Object.assign(HI_STATE, {
-        paired: false,
-        partners: { a:{name:'You',key:'me'}, b:{name:'Partner',key:'partner'} },
-        vision: '', milestones: [], importantDates: [], goals: [],
-        practices: [], habits: [], notes: {}, plans: {}
-      });
-      hiRenderTab(); hiRenderThisMonth(); hiRenderPairLine();
+      // Legacy hard-delete (pre-soft-delete) — graceful fallback.
+      hiClearLocalCouple();
       return;
     }
     const data = snap.data();
+    if(data.status === 'unpaired'){
+      const initiatedByMe = data.unpairedBy === (_currentUser && _currentUser.uid);
+      hiClearLocalCouple();
+      hiShowUnpairNotice(initiatedByMe ? 'You unpaired.' : 'You\'ve been unlinked from your partner.');
+      return;
+    }
     HI_STATE.paired         = !!data.paired;
     HI_STATE.partners       = data.partners || HI_STATE.partners;
     HI_STATE.vision         = data.vision || '';
@@ -9709,7 +9735,7 @@ async function hiLoadCoupleFromAuth(){
   }
 }
 
-// ── Unpair: delete the couple doc; both clients self-clear via onSnapshot ─
+// ── Unpair: soft-delete the couple doc; both clients self-clear via onSnapshot ─
 async function hiUnpair(){
   if(!_hiHasAuth() || !_hiCoupleId){
     // Canvas / unauthenticated: just reset locally
@@ -9719,10 +9745,16 @@ async function hiUnpair(){
     return;
   }
   try{
-    await db.collection('couples').doc(_hiCoupleId).delete();
-    // onSnapshot fires next, clears our state & coupleId
+    // Soft delete — preserve doc for recovery; both sides detect status:'unpaired' via onSnapshot
+    await db.collection('couples').doc(_hiCoupleId).set({
+      status: 'unpaired',
+      unpairedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      unpairedBy: _currentUser.uid
+    }, { merge: true });
+    // onSnapshot fires next, gracefully disconnects
   }catch(e){
     console.warn('Hiyoku unpair failed:', e);
+    hiShowUnpairNotice('Could not unpair. Check your connection and try again.');
   }
 }
 
@@ -9801,9 +9833,41 @@ async function hiPairRedeem(){
 }
 
 function hiUnpairConfirm(){
-  if(!confirm('Unpair from your partner? Your shared Hiyoku doc will be dissolved. This cannot be undone.')) return;
-  hiUnpair();
+  // Open styled modal; Cancel autofocused so Enter doesn't trigger an accidental unpair.
+  const partnerName = (HI_STATE.partners && HI_STATE.partners.b && HI_STATE.partners.b.name) || 'your partner';
+  const titleEl = document.getElementById('hi-unpair-modal-title');
+  if(titleEl) titleEl.textContent = 'Unpair from ' + partnerName + '?';
+  document.getElementById('hi-unpair-modal-overlay').classList.add('show');
+  setTimeout(() => {
+    const btn = document.getElementById('hi-unpair-btn-cancel');
+    if(btn) btn.focus();
+  }, 60);
+}
+
+function hiUnpairConfirmCancel(){
+  document.getElementById('hi-unpair-modal-overlay').classList.remove('show');
+}
+
+function hiUnpairConfirmGo(){
+  document.getElementById('hi-unpair-modal-overlay').classList.remove('show');
   hiClosePairModal();
+  hiUnpair();
+}
+
+let _hiUnpairNoticeTimer = null;
+function hiShowUnpairNotice(msg){
+  let el = document.getElementById('hi-unpair-notice');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'hi-unpair-notice';
+    el.className = 'hi-unpair-notice';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  void el.offsetWidth; // reflow before adding .show for transition
+  el.classList.add('show');
+  if(_hiUnpairNoticeTimer) clearTimeout(_hiUnpairNoticeTimer);
+  _hiUnpairNoticeTimer = setTimeout(() => { el.classList.remove('show'); }, 4000);
 }
 
 // ─── PAIR LINE — dynamic state rendering ────────────────────────────────
@@ -9979,6 +10043,19 @@ hiInit = function(){
       <div class="hi-pair-modal-footer">
         <button class="hi-pair-modal-footer-link" onclick="hiClosePairModal()">Close</button>
         <button class="hi-pair-modal-footer-link" id="hi-pair-unpair-btn" onclick="hiUnpairConfirm()" style="display:none">Unpair</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Unpair confirmation modal ────────────────────────────────────── -->
+  <div class="hi-unpair-modal-overlay" id="hi-unpair-modal-overlay" onclick="if(event.target===this) hiUnpairConfirmCancel()">
+    <div class="hi-unpair-modal">
+      <div class="hi-unpair-modal-kanji">解</div>
+      <div class="hi-unpair-modal-title" id="hi-unpair-modal-title">Unpair?</div>
+      <div class="hi-unpair-modal-body">This will remove both of you from this connection.</div>
+      <div class="hi-unpair-modal-actions">
+        <button class="hi-unpair-btn hi-unpair-btn-cancel" id="hi-unpair-btn-cancel" onclick="hiUnpairConfirmCancel()">Cancel</button>
+        <button class="hi-unpair-btn hi-unpair-btn-go" onclick="hiUnpairConfirmGo()">Unpair</button>
       </div>
     </div>
   </div>
