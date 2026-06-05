@@ -6096,7 +6096,7 @@ function updateClanMomentum(){
 
 // Sort clan momentum rows by streak, highest first
 function sortClanRows(){
-  const wrap = document.getElementById('clan-exp-members');
+  const wrap = document.getElementById('clan-dynamic-members');
   if(!wrap) return;
   const rows = [...wrap.querySelectorAll(':scope > .clan-exp-row')];
   if(rows.length < 2) return;
