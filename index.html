@@ -6466,7 +6466,13 @@ let _eoyLesson='';    // overall "what did this year teach you"
 
 function openEOYReview(){
   if(!hasCompletedAnnualReflection()) return;
-  _eoyPhase=0; _eoyStrandFilter='all'; _eoyTypeFilter='all'; _eoyRatings={}; _eoyNotes={}; _eoyLesson='';
+  _eoyPhase=0; _eoyStrandFilter='all'; _eoyTypeFilter='all';
+  // Rehydrate phase-2 data from a previously-sealed seal (if any). Empty if never sealed.
+  const yearStr = String(getYearEndYear() - 1);
+  const sealed  = (state.eoySeals || {})[yearStr];
+  _eoyRatings = sealed && sealed.ratings ? Object.assign({}, sealed.ratings) : {};
+  _eoyNotes   = sealed && sealed.notes   ? Object.assign({}, sealed.notes)   : {};
+  _eoyLesson  = sealed && sealed.lesson  ? sealed.lesson : '';
   document.getElementById('eoy-overlay').style.display='block';
   document.body.style.overflow='hidden';
   renderEOYPhase(0);
@@ -6784,6 +6790,12 @@ function eoyStashNotes(){
 }
 
 function sealEOYReview(){
+  // Defensive: pull any latest textarea values into transients. The Phase 2 → 3
+  // transition button already calls this, but if the flow ever changes we
+  // shouldn't silently drop edits between the last stash and the seal click.
+  // eoyStashNotes() has internal if(noteEl) guards so it's a safe no-op when
+  // Phase 2 textareas aren't in the DOM (i.e. when Phase 3 is showing).
+  eoyStashNotes();
   const hanko=document.getElementById('eoy-seal-hanko');
   if(!hanko) return;
   hanko.style.background='rgba(204,53,41,.06)';
@@ -6800,6 +6812,15 @@ function sealEOYReview(){
       if(sub) sub.style.display='block';
     }, 700);
   }, 400);
+  // Persist phase-2 enrichment so it survives reload (the seal isn't just cosmetic).
+  if(!state.eoySeals) state.eoySeals = {};
+  const yearStr = String(getYearEndYear() - 1);
+  state.eoySeals[yearStr] = {
+    ratings:  Object.assign({}, _eoyRatings),
+    notes:    Object.assign({}, _eoyNotes),
+    lesson:   _eoyLesson,
+    sealedAt: Date.now()
+  };
   // Save state and close
   saveState();
   setTimeout(()=>{ closeEOYReview(); renderDashboard(); }, 3200);
