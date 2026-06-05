@@ -9684,6 +9684,17 @@ async function hiRedeemCoupleCode(rawCode, myName){
     throw new Error('That is your own code — share it with your partner.');
   }
 
+  // Hijack guard — read the couple doc to verify partners.b isn't already filled.
+  // A leaked or guessed 6-char invite code must not overwrite an existing partner B.
+  const coupleSnap = await db.collection('couples').doc(invite.coupleId).get();
+  if(!coupleSnap.exists){
+    throw new Error('That connection no longer exists.');
+  }
+  const coupleData = coupleSnap.data() || {};
+  if(coupleData.partners && coupleData.partners.b && coupleData.partners.b.uid){
+    throw new Error('This invitation has already been accepted.');
+  }
+
   const coupleId = invite.coupleId;
   const batch = db.batch();
 
