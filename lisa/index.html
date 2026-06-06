@@ -2967,6 +2967,9 @@ body.dark .sr-phase-dot {
 .hg-cell.hg-miss:not(.hg-today-col)::after {
   border-color: rgba(245,240,232,.12);
 }
+/* ── Cloud-sync error notice (Phase 6) ──────────────────────── */
+.cloud-sync-error-notice{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--white);background:rgba(15,13,10,.92);padding:10px 22px;border-radius:1px;z-index:311;letter-spacing:.5px;opacity:0;transition:opacity .35s ease;pointer-events:none;max-width:360px;text-align:center;line-height:1.6}
+.cloud-sync-error-notice.show{opacity:1}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -7455,6 +7458,25 @@ function saveLastKnownGood(){
   try{ localStorage.setItem('bushido_last_known_good', JSON.stringify(state)); }catch(e){}
 }
 
+// ── Cloud-sync error banner (Phase 6) ───────────────────────────────
+// Modeled on hiShowUnpairNotice. Distinct DOM id/class + z-index so a
+// cloud-sync error can stack above a Hiyoku unpair notice. 5s timer.
+let _cloudSyncErrorTimer = null;
+function showCloudSyncError(msg){
+  let el = document.getElementById('cloud-sync-error-notice');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'cloud-sync-error-notice';
+    el.className = 'cloud-sync-error-notice';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  void el.offsetWidth;  // reflow before .show class for transition
+  el.classList.add('show');
+  if(_cloudSyncErrorTimer) clearTimeout(_cloudSyncErrorTimer);
+  _cloudSyncErrorTimer = setTimeout(() => { el.classList.remove('show'); }, 5000);
+}
+
 async function loadFromCloud(compareTimestamp){
   const{binId,masterKey}=getSyncConfig();
   if(!binId||!masterKey) return false;
@@ -8208,6 +8230,10 @@ async function performMigration(){
   btn.textContent = 'Migrating\u2026';
   btn.disabled = true;
   try{
+    if(!isValidStateShape(_migrationData)){
+      throw new Error('Migration data has invalid shape \u2014 aborted to prevent corruption.');
+    }
+    saveLastKnownGood();  // snapshot current state before the destructive merge
     Object.assign(state, DEFAULT_STATE, _migrationData);
     state.lastModified = Date.now();
     await db.collection('users').doc(_migrationUid).set({
@@ -8228,6 +8254,7 @@ async function performMigration(){
     btn.textContent = 'Migration failed \u2014 try again';
     btn.disabled = false;
     console.error('Migration error:', e);
+    showCloudSyncError(e && e.message ? e.message : 'Migration failed.');
   }
 }
 
@@ -8245,10 +8272,41 @@ async function declineMigration(){
 
 async function loadFirestoreState(user){
   try{
+    // Boot hydration — gives state a populated lastModified so the cloud gate
+    // below can detect stale-cloud-overwrites-fresh-local. Without this, state
+    // starts at the literal initializer (lastModified=0) and the gate is moot.
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const local = JSON.parse(raw);
+        if(isValidStateShape(local)){
+          Object.assign(state, local);
+        }
+      }
+    }catch(e){ /* localStorage unreadable — fall through to cloud */ }
+
     const docSnap = await db.collection('users').doc(user.uid).get();
     if(docSnap.exists){
-      const saved = JSON.parse(docSnap.data().state);
-      Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+      let saved = null;
+      try{ saved = JSON.parse(docSnap.data().state); }catch(e){
+        console.warn('Cloud state JSON parse failed:', e);
+        showCloudSyncError('Cloud state was unreadable — kept your local data.');
+      }
+      if(saved){
+        if(!isValidStateShape(saved)){
+          console.warn('Cloud state failed shape validation — keeping local.');
+          showCloudSyncError('Cloud state was invalid — kept your local data.');
+        } else if((saved.lastModified||0) < (state.lastModified||0)){
+          // Stale cloud — local is fresher. Push local up to heal the cloud.
+          console.warn('Cloud lastModified', saved.lastModified,
+                       '< local', state.lastModified, '— keeping local, pushing up.');
+          saveStateToFirestore();  // heal cloud with fresh local
+        } else {
+          // Cloud is equal or newer — snapshot then take cloud.
+          saveLastKnownGood();
+          Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+        }
+      }
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
       migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
       migrateKaizenOrder();       // sort into logical daily order (runs once)
@@ -8264,7 +8322,7 @@ async function loadFirestoreState(user){
         }
       }
     } else {
-      // New user — check localStorage then JSONbin for existing data to migrate
+      // New user — check localStorage for existing data to migrate
       const result = await detectMigrationData();
       if(result){
         showMigrationOverlay(user.uid, result);
@@ -8279,7 +8337,10 @@ async function loadFirestoreState(user){
     }
   } catch(e){
     console.warn('Firestore load failed:', e);
-    Object.assign(state, DEFAULT_STATE);
+    showCloudSyncError('Cloud load failed — using your local data.');
+    // No assign — state already contains the boot-hydrated localStorage data
+    // (or the initial literal if localStorage was empty). Either way: better
+    // than wiping to DEFAULT_STATE.
   }
   if(!state.milestoneStamps) state.milestoneStamps = {};
   if(!state.practiceStamps)  state.practiceStamps  = {};
@@ -8347,7 +8408,10 @@ async function saveStateToFirestore(){
       { merge: true }
     );
     writeClanSummary(_currentUser); // fire-and-forget clan update
-  } catch(e){ console.warn('Firestore save failed:', e); }
+  } catch(e){
+    console.warn('Firestore save failed:', e);
+    showCloudSyncError('Cloud sync failed — your changes are saved locally.');
+  }
 }
 
 // Auth mode toggle (Sign In ↔ Create Account)
