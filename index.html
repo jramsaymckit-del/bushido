@@ -3478,7 +3478,7 @@ if (FIREBASE_CONFIGURED) {
       Bring it to the cloud →
     </button>
     <div class="migrate-actions">
-      <button class="auth-demo-link" onclick="declineMigration()">start fresh instead</button>
+      <button class="auth-demo-link" onclick="declineMigrationConfirm()">start fresh instead</button>
     </div>
   </div>
 </div>
@@ -8087,6 +8087,14 @@ function isValidStateShape(obj){
     && Array.isArray(obj.strands) && Array.isArray(obj.kaizen);
 }
 
+// hasRealState — pure decision predicate for the Phase 7 M5 guard.
+// True only when valid shape AND non-empty strands or kaizen (i.e., the user
+// has actual data, not a fresh literal). Extracted pure so tests.html can
+// verify it without DOM/Firebase coupling — see T44-T49.
+function hasRealState(obj){
+  return isValidStateShape(obj) && (obj.strands.length > 0 || obj.kaizen.length > 0);
+}
+
 // Snapshot of the live state taken immediately before each destructive
 // overwrite (cloud-load / file-import). Recoverable if the overwrite turns
 // out to be bad.
@@ -8390,6 +8398,9 @@ let _authMode    = 'signin';
 // _clanCache: { [uid]: { name, streak, todayRate, weekDays[7], updatedAt } }
 // Excludes the current user's own uid — their row is always live from state.
 var _clanCache = {};
+// Phase 7: throttle for loadClanData failure banners (5-min polling would
+// otherwise flash the banner every interval during an outage). 10-min window.
+let _clanLoadErrorLastShown = 0;
 
 // Compute this week's daily completion rates (Mon=0…Sun=6) from state.kaizen
 function computeWeekRates(){
@@ -8518,7 +8529,10 @@ async function writeClanSummary(user){
     var data = buildOwnClanData();
     data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('clan').doc(user.uid).set(data, {merge:true});
-  }catch(e){ console.warn('Clan write failed:',e); }
+  }catch(e){
+    console.warn('Clan write failed:',e);
+    showCloudSyncError('Clan sync failed — your local data is fine.');
+  }
 }
 
 // Fetch all /clan docs (excluding own uid), populate _clanCache, re-render
@@ -8546,7 +8560,14 @@ async function loadClanData(){
     updateClanPerfFromCache();
     if(typeof cnCalSubscribe === 'function') cnCalSubscribe();
     if(typeof cnYearCalBuild === 'function') cnYearCalBuild();
-  }catch(e){ console.warn('Clan load failed:',e); }
+  }catch(e){
+    console.warn('Clan load failed:',e);
+    const now = Date.now();
+    if(now - _clanLoadErrorLastShown > 10*60*1000){
+      showCloudSyncError('Couldn\'t load clan updates — your local data is unaffected.');
+      _clanLoadErrorLastShown = now;
+    }
+  }
 }
 
 // XSS-safe display of Firestore-sourced names (protects against injected HTML in m.name / partner names)
@@ -8938,6 +8959,7 @@ async function performMigration(){
 }
 
 async function declineMigration(){
+  saveLastKnownGood();  // Phase 7: snapshot existing state before the destructive wipe
   Object.assign(state, DEFAULT_STATE, { onboarded: false });
   await db.collection('users').doc(_migrationUid).set({
     state: JSON.stringify(state),
@@ -9155,6 +9177,26 @@ function enterDemoMode(){
   _currentUser = null;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display         = 'block';
+  // Phase 7: boot hydrate from localStorage (mirrors Phase 6 loadFirestoreState
+  // hydrate) so the guard below can see real local data even when enterDemoMode
+  // is the first reachable boot path (e.g., initFirebaseAuth catch).
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const local = JSON.parse(raw);
+      if(isValidStateShape(local)) Object.assign(state, local);
+    }
+  }catch(e){ /* localStorage unreadable — fall through */ }
+  // Phase 7 guard: real state present → render with it + show banner.
+  // hasRealState is a pure predicate (see tests.html T44-T49).
+  if(hasRealState(state)){
+    showCloudSyncError('Cloud unavailable — using your local data.');
+    if(!state.milestoneStamps) state.milestoneStamps = {};
+    if(!state.practiceStamps)  state.practiceStamps  = {};
+    showDashboard();
+    return;
+  }
+  saveLastKnownGood();  // belt-and-braces snapshot before destructive assign
   Object.assign(state, DEFAULT_STATE);
   if(!state.milestoneStamps) state.milestoneStamps = {};
   if(!state.practiceStamps)  state.practiceStamps  = {};
@@ -10113,6 +10155,23 @@ function hiUnpairConfirmGo(){
   hiUnpair();
 }
 
+// ── Decline-migration confirmation (Phase 7) ────────────────────────
+// Reuses the Phase 2 .hi-unpair-modal-* CSS for visual consistency.
+function declineMigrationConfirm(){
+  document.getElementById('decline-migration-modal-overlay').classList.add('show');
+  setTimeout(() => {
+    const btn = document.getElementById('decline-migration-btn-cancel');
+    if(btn) btn.focus();
+  }, 60);
+}
+function declineMigrationCancel(){
+  document.getElementById('decline-migration-modal-overlay').classList.remove('show');
+}
+function declineMigrationGo(){
+  document.getElementById('decline-migration-modal-overlay').classList.remove('show');
+  declineMigration();
+}
+
 let _hiUnpairNoticeTimer = null;
 function hiShowUnpairNotice(msg){
   let el = document.getElementById('hi-unpair-notice');
@@ -10315,6 +10374,19 @@ hiInit = function(){
       <div class="hi-unpair-modal-actions">
         <button class="hi-unpair-btn hi-unpair-btn-cancel" id="hi-unpair-btn-cancel" onclick="hiUnpairConfirmCancel()">Cancel</button>
         <button class="hi-unpair-btn hi-unpair-btn-go" onclick="hiUnpairConfirmGo()">Unpair</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Decline-migration confirmation modal (Phase 7) ─────────────── -->
+  <div class="hi-unpair-modal-overlay" id="decline-migration-modal-overlay" onclick="if(event.target===this) declineMigrationCancel()">
+    <div class="hi-unpair-modal">
+      <div class="hi-unpair-modal-kanji">棄</div>
+      <div class="hi-unpair-modal-title">Start fresh?</div>
+      <div class="hi-unpair-modal-body">This discards the saved data we found and begins onboarding. You can't undo this.</div>
+      <div class="hi-unpair-modal-actions">
+        <button class="hi-unpair-btn hi-unpair-btn-cancel" id="decline-migration-btn-cancel" onclick="declineMigrationCancel()">Cancel</button>
+        <button class="hi-unpair-btn hi-unpair-btn-go" onclick="declineMigrationGo()">Start fresh</button>
       </div>
     </div>
   </div>
@@ -12869,8 +12941,14 @@ function cnCalSaveToFirestore(){
     db.collection('clanCalendar').doc(CN_CAL_CLAN_ID).set({
       events: cnCalCurrentEvents(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true}).catch(function(e){ console.warn('Clan calendar save failed:', e); });
-  }catch(e){ console.warn('Clan calendar save failed:', e); }
+    }, {merge:true}).catch(function(e){
+      console.warn('Clan calendar save failed:', e);
+      showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
+    });
+  }catch(e){
+    console.warn('Clan calendar save failed:', e);
+    showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
+  }
 }
 // Mutations call this: render optimistically, then persist.
 function cnCalCommit(){

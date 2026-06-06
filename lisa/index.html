@@ -2970,6 +2970,19 @@ body.dark .sr-phase-dot {
 /* ── Cloud-sync error notice (Phase 6) ──────────────────────── */
 .cloud-sync-error-notice{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--white);background:rgba(15,13,10,.92);padding:10px 22px;border-radius:1px;z-index:311;letter-spacing:.5px;opacity:0;transition:opacity .35s ease;pointer-events:none;max-width:360px;text-align:center;line-height:1.6}
 .cloud-sync-error-notice.show{opacity:1}
+/* ── Decline-migration confirm modal (Phase 7) — reuses naming from Phase 2 ─ */
+.hi-unpair-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,13,10,.55);align-items:center;justify-content:center;padding:24px}
+.hi-unpair-modal-overlay.show{display:flex}
+.hi-unpair-modal{background:var(--scroll);max-width:420px;width:100%;padding:40px 36px 32px;border-radius:2px;text-align:center;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.18)}
+.hi-unpair-modal-kanji{font-family:'Noto Serif JP',serif;font-size:42px;color:var(--red);opacity:.85;margin-bottom:14px;line-height:1}
+.hi-unpair-modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:10px}
+.hi-unpair-modal-body{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.7;margin-bottom:28px}
+.hi-unpair-modal-actions{display:flex;gap:14px;justify-content:center}
+.hi-unpair-btn{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 24px;border-radius:1px;cursor:pointer;transition:all .2s}
+.hi-unpair-btn-cancel{background:none;border:1px solid rgba(0,0,0,.18);color:var(--ink)}
+.hi-unpair-btn-cancel:hover{border-color:var(--ink);background:rgba(0,0,0,.04)}
+.hi-unpair-btn-go{background:none;border:1.5px solid var(--red);color:var(--red)}
+.hi-unpair-btn-go:hover{background:var(--red);color:var(--white)}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -3086,7 +3099,20 @@ if (FIREBASE_CONFIGURED) {
       Bring it to the cloud →
     </button>
     <div class="migrate-actions">
-      <button class="auth-demo-link" onclick="declineMigration()">start fresh instead</button>
+      <button class="auth-demo-link" onclick="declineMigrationConfirm()">start fresh instead</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Decline-migration confirmation modal (Phase 7) ─────────────── -->
+<div class="hi-unpair-modal-overlay" id="decline-migration-modal-overlay" onclick="if(event.target===this) declineMigrationCancel()">
+  <div class="hi-unpair-modal">
+    <div class="hi-unpair-modal-kanji">棄</div>
+    <div class="hi-unpair-modal-title">Start fresh?</div>
+    <div class="hi-unpair-modal-body">This discards the saved data we found and begins onboarding. You can't undo this.</div>
+    <div class="hi-unpair-modal-actions">
+      <button class="hi-unpair-btn hi-unpair-btn-cancel" id="decline-migration-btn-cancel" onclick="declineMigrationCancel()">Cancel</button>
+      <button class="hi-unpair-btn hi-unpair-btn-go" onclick="declineMigrationGo()">Start fresh</button>
     </div>
   </div>
 </div>
@@ -7451,6 +7477,11 @@ function isValidStateShape(obj){
     && Array.isArray(obj.strands) && Array.isArray(obj.kaizen);
 }
 
+// hasRealState — pure decision predicate for the Phase 7 M5 guard.
+function hasRealState(obj){
+  return isValidStateShape(obj) && (obj.strands.length > 0 || obj.kaizen.length > 0);
+}
+
 // Snapshot of the live state taken immediately before each destructive
 // overwrite (cloud-load / file-import). Recoverable if the overwrite turns
 // out to be bad.
@@ -7694,6 +7725,7 @@ let _authMode    = 'signin';
 // _clanCache: { [uid]: { name, streak, todayRate, weekDays[7], updatedAt } }
 // Excludes the current user's own uid — their row is always live from state.
 var _clanCache = {};
+let _clanLoadErrorLastShown = 0;
 
 // Compute this week's daily completion rates (Mon=0…Sun=6) from state.kaizen
 function computeWeekRates(){
@@ -7822,7 +7854,10 @@ async function writeClanSummary(user){
     var data = buildOwnClanData();
     data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('clan').doc(user.uid).set(data);
-  }catch(e){ console.warn('Clan write failed:',e); }
+  }catch(e){
+    console.warn('Clan write failed:',e);
+    showCloudSyncError('Clan sync failed — your local data is fine.');
+  }
 }
 
 // Fetch all /clan docs (excluding own uid), populate _clanCache, re-render
@@ -7850,7 +7885,14 @@ async function loadClanData(){
     updateClanPerfFromCache();
     if(typeof cnCalSubscribe === 'function') cnCalSubscribe();
     if(typeof cnYearCalBuild === 'function') cnYearCalBuild();
-  }catch(e){ console.warn('Clan load failed:',e); }
+  }catch(e){
+    console.warn('Clan load failed:',e);
+    const now = Date.now();
+    if(now - _clanLoadErrorLastShown > 10*60*1000){
+      showCloudSyncError('Couldn\'t load clan updates — your local data is unaffected.');
+      _clanLoadErrorLastShown = now;
+    }
+  }
 }
 
 // XSS-safe display of Firestore-sourced names (protects against injected HTML in m.name / partner names)
@@ -8259,6 +8301,7 @@ async function performMigration(){
 }
 
 async function declineMigration(){
+  saveLastKnownGood();  // Phase 7: snapshot existing state before the destructive wipe
   Object.assign(state, DEFAULT_STATE, { onboarded: false });
   await db.collection('users').doc(_migrationUid).set({
     state: JSON.stringify(state),
@@ -8267,6 +8310,22 @@ async function declineMigration(){
   document.getElementById('migrate-overlay').classList.remove('active');
   document.getElementById('onboard').classList.add('active');
   renderObProgress();
+}
+
+// ── Decline-migration confirmation (Phase 7) ────────────────────────
+function declineMigrationConfirm(){
+  document.getElementById('decline-migration-modal-overlay').classList.add('show');
+  setTimeout(() => {
+    const btn = document.getElementById('decline-migration-btn-cancel');
+    if(btn) btn.focus();
+  }, 60);
+}
+function declineMigrationCancel(){
+  document.getElementById('decline-migration-modal-overlay').classList.remove('show');
+}
+function declineMigrationGo(){
+  document.getElementById('decline-migration-modal-overlay').classList.remove('show');
+  declineMigration();
 }
 // ── /MIGRATION ─────────────────────────────────────────────────────────────
 
@@ -8484,6 +8543,22 @@ function enterDemoMode(){
   _currentUser = null;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display         = 'block';
+  // Phase 7: boot hydrate + guard. See coreproject for rationale.
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const local = JSON.parse(raw);
+      if(isValidStateShape(local)) Object.assign(state, local);
+    }
+  }catch(e){ /* localStorage unreadable — fall through */ }
+  if(hasRealState(state)){
+    showCloudSyncError('Cloud unavailable — using your local data.');
+    if(!state.milestoneStamps) state.milestoneStamps = {};
+    if(!state.practiceStamps)  state.practiceStamps  = {};
+    showDashboard();
+    return;
+  }
+  saveLastKnownGood();  // belt-and-braces snapshot before destructive assign
   Object.assign(state, DEFAULT_STATE);
   if(!state.milestoneStamps) state.milestoneStamps = {};
   if(!state.practiceStamps)  state.practiceStamps  = {};
@@ -11086,8 +11161,14 @@ function cnCalSaveToFirestore(){
     db.collection('clanCalendar').doc(CN_CAL_CLAN_ID).set({
       events: cnCalCurrentEvents(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(e){ console.warn('Clan calendar save failed:', e); });
-  }catch(e){ console.warn('Clan calendar save failed:', e); }
+    }).catch(function(e){
+      console.warn('Clan calendar save failed:', e);
+      showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
+    });
+  }catch(e){
+    console.warn('Clan calendar save failed:', e);
+    showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
+  }
 }
 // Mutations call this: render optimistically, then persist.
 function cnCalCommit(){
