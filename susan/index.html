@@ -4016,6 +4016,25 @@ const STORAGE_KEY = PROD_KEY;
 // Do NOT hardcode a name here; always derive from PROD_KEY so user files stay generic.
 const LOCAL_ME_KEY = PROD_KEY.replace('bushido_', '').replace('_permanent', '');
 
+// ── Schema versioning (Tier 1.1) ───────────────────────────────────────
+// Framework is in place; no data-transforming migrations exist today.
+// CURRENT_VERSION = 1 means the v1 shape (as in fixtures/) is current.
+// A doc with NO schemaVersion field is treated as v1 (no migration needed).
+//
+// NOTES (1.1 honors-but-doesn't-fix):
+//   - Lazy persistence: when migrated===true the upgraded shape is NOT
+//     persisted until the next saveState(). A real migration therefore
+//     re-runs every load until the user triggers a save. Fine today (zero
+//     migrations); decide eager-persist before the first real v2 ships.
+//   - When a future migration touches habits or kaizen, coordinate with the
+//     legacy migrateWorkoutHabits() / migrateKaizenOrder() hooks called from
+//     loadFirestoreState after the assign — they pre-date this framework
+//     and operate directly on `state`.
+const CURRENT_VERSION = 1;
+const SCHEMA_MIGRATIONS = {
+  // 2: function migrate_v1_to_v2(s){ ... return s; }  // pure + idempotent
+};
+
 function saveState(){
   state.lastModified=Date.now();
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -4181,6 +4200,7 @@ const DEFAULT_STATE = {
 let state = {
   onboarded: false,
   name: '',
+  schemaVersion: 1,  // Tier 1.1 — stamped on every load through runSchemaMigrations
   strands: [],
   tenYearVision: '',
   milestones5yr: [],
@@ -8053,6 +8073,42 @@ function saveLastKnownGood(){
   try{ localStorage.setItem('bushido_last_known_good', JSON.stringify(state)); }catch(e){}
 }
 
+// runSchemaMigrations(obj) — Tier 1.1 — apply ordered migrations to bring obj
+// to CURRENT_VERSION. Returns:
+//   { ok:true,  state:obj, migrated:bool, future?:bool }  on success
+//   { ok:false, error:'reason', state:obj }               on failure
+// PURE: does not touch global `state`, no DOM, no Firebase. Never bumps
+// lastModified (preserves Phase 6 gate semantics). Caller integrates result.
+function runSchemaMigrations(obj){
+  if(!isValidStateShape(obj)){
+    return { ok:false, error:'invalid shape pre-migration', state:obj };
+  }
+  const rawV = obj.schemaVersion;
+  const from = (Number.isInteger(rawV) && rawV >= 1) ? rawV : 1;
+  // Forward-only: never downgrade. Future docs returned untouched.
+  // Object.assign caller-semantics preserve unknown keys → dual-running safety.
+  if(from > CURRENT_VERSION){
+    return { ok:true, state:obj, migrated:false, future:true };
+  }
+  if(from === CURRENT_VERSION){
+    if(obj.schemaVersion !== CURRENT_VERSION) obj.schemaVersion = CURRENT_VERSION;
+    return { ok:true, state:obj, migrated:false };
+  }
+  for(let v = from + 1; v <= CURRENT_VERSION; v++){
+    const fn = SCHEMA_MIGRATIONS[v];
+    if(typeof fn !== 'function'){
+      return { ok:false, error:'missing migration for v'+v, state:obj };
+    }
+    try{ obj = fn(obj); }
+    catch(e){ return { ok:false, error:'migration v'+v+' threw: '+(e && e.message), state:obj }; }
+    if(!isValidStateShape(obj)){
+      return { ok:false, error:'migration v'+v+' produced invalid shape', state:obj };
+    }
+  }
+  obj.schemaVersion = CURRENT_VERSION;
+  return { ok:true, state:obj, migrated:true };
+}
+
 // ── Cloud-sync error banner (Phase 6) ───────────────────────────────
 // Modeled on hiShowUnpairNotice. Distinct DOM id/class + z-index so a
 // cloud-sync error can stack above a Hiyoku unpair notice. 5s timer.
@@ -8141,8 +8197,16 @@ async function restoreLastKnownGoodGo(){
     _pendingRestoreState = null;
     return;
   }
-  // Apply restore — validate → snapshot → assign, same pattern as loadFromCloud/importState.
-  Object.assign(state, _pendingRestoreState);
+  // Tier 1.1 — restored snapshot can be any version; run it through the runner first.
+  const mr = runSchemaMigrations(_pendingRestoreState);
+  if(!mr.ok){
+    alert('Backup is from an unsupported version — restore aborted.');
+    document.getElementById('cs-restore-modal-overlay').classList.remove('show');
+    _pendingRestoreState = null;
+    return;
+  }
+  // Apply restore — validate → migrate → snapshot → assign.
+  Object.assign(state, mr.state);
   state.lastModified = Date.now();  // fresh timestamp so cloud sees this as "latest"
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
 
@@ -8196,8 +8260,13 @@ function importState(e){
         alert('That file isn\'t a valid BUSHIDO backup — your plan was not changed.');
         return;
       }
+      const mr = runSchemaMigrations(imported);
+      if(!mr.ok){
+        alert('Backup is from an unsupported version — your plan was not changed.');
+        return;
+      }
       saveLastKnownGood();
-      Object.assign(state,imported);
+      Object.assign(state, mr.state);
       localStorage.setItem(PROD_KEY,JSON.stringify(state));
       // Brief confirmation
       const tools=document.getElementById('data-tools');
@@ -8884,8 +8953,12 @@ async function performMigration(){
     if(!isValidStateShape(_migrationData)){
       throw new Error('Migration data has invalid shape \u2014 aborted to prevent corruption.');
     }
+    const mr = runSchemaMigrations(_migrationData);
+    if(!mr.ok){
+      throw new Error('Migration data version unsupported: ' + mr.error);
+    }
     saveLastKnownGood();  // snapshot current state before the destructive merge
-    Object.assign(state, DEFAULT_STATE, _migrationData);
+    Object.assign(state, DEFAULT_STATE, mr.state);
     state.lastModified = Date.now();
     await db.collection('users').doc(_migrationUid).set({
       state: JSON.stringify(state),
@@ -8932,7 +9005,11 @@ async function loadFirestoreState(user){
       if(raw){
         const local = JSON.parse(raw);
         if(isValidStateShape(local)){
-          Object.assign(state, local);
+          const mr = runSchemaMigrations(local);
+          if(mr.ok){
+            Object.assign(state, mr.state);
+          }
+          // If !mr.ok, skip — state remains at initial literal; cloud fetch will retry.
         }
       }
     }catch(e){ /* localStorage unreadable — fall through to cloud */ }
@@ -8954,9 +9031,16 @@ async function loadFirestoreState(user){
                        '< local', state.lastModified, '— keeping local, pushing up.');
           saveStateToFirestore();  // heal cloud with fresh local
         } else {
-          // Cloud is equal or newer — snapshot then take cloud.
-          saveLastKnownGood();
-          Object.assign(state, DEFAULT_STATE, saved); // saved data wins over defaults
+          // Cloud is equal or newer — migrate, snapshot, then take cloud.
+          const mr = runSchemaMigrations(saved);
+          if(!mr.ok){
+            console.warn('Schema migration failed:', mr.error);
+            showCloudSyncError('Cloud data version unsupported — kept your local data.');
+            // Skip assign — keep local state.
+          } else {
+            saveLastKnownGood();
+            Object.assign(state, DEFAULT_STATE, mr.state); // saved data wins over defaults
+          }
         }
       }
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
