@@ -2215,6 +2215,19 @@ li.goal.hd-open .habit-detail{display:block}
 /* Settings modal — single toggle */
 .cs-setting-row{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--edge)}
 .cs-setting-row:last-child{border-bottom:none}
+/* ── Restore-from-backup confirmation modal (Phase 5) ──────────────── */
+.cs-restore-modal-overlay{display:none;position:fixed;inset:0;z-index:320;background:rgba(15,13,10,.55);align-items:center;justify-content:center;padding:24px}
+.cs-restore-modal-overlay.show{display:flex}
+.cs-restore-modal{background:var(--scroll);max-width:440px;width:100%;padding:40px 36px 32px;border-radius:2px;text-align:center;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.18)}
+.cs-restore-modal-kanji{font-family:'Noto Serif JP',serif;font-size:42px;color:var(--red);opacity:.85;margin-bottom:14px;line-height:1}
+.cs-restore-modal-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:10px}
+.cs-restore-modal-body{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-light);line-height:1.7;margin-bottom:28px}
+.cs-restore-modal-actions{display:flex;gap:14px;justify-content:center}
+.cs-restore-btn{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 24px;border-radius:1px;cursor:pointer;transition:all .2s}
+.cs-restore-btn-cancel{background:none;border:1px solid rgba(0,0,0,.18);color:var(--ink)}
+.cs-restore-btn-cancel:hover{border-color:var(--ink);background:rgba(0,0,0,.04)}
+.cs-restore-btn-go{background:none;border:1.5px solid var(--red);color:var(--red)}
+.cs-restore-btn-go:hover{background:var(--red);color:var(--white)}
 .cs-setting-label{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink)}
 .cs-setting-help{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;color:var(--ink-faint);margin-top:5px;line-height:1.5}
 .cs-toggle{position:relative;width:42px;height:22px;background:var(--edge);cursor:pointer;transition:background .25s;border-radius:11px;border:none;outline:none;flex-shrink:0}
@@ -7543,6 +7556,110 @@ function showCloudSyncError(msg){
   _cloudSyncErrorTimer = setTimeout(() => { el.classList.remove('show'); }, 5000);
 }
 
+// ── User-facing restore from saveLastKnownGood (Phase 5) ─────────────
+let _pendingRestoreState = null;
+
+function _refreshBackupRow(){
+  const status = document.getElementById('cs-backup-status');
+  const btn    = document.getElementById('cs-backup-restore-btn');
+  if(!status || !btn) return;
+  let raw = null;
+  try{ raw = localStorage.getItem('bushido_last_known_good'); }catch(e){}
+  if(!raw){
+    status.textContent = 'none yet';
+    btn.style.display = 'none';
+    return;
+  }
+  let parsed = null;
+  try{ parsed = JSON.parse(raw); }catch(e){}
+  if(!isValidStateShape(parsed)){
+    status.textContent = 'snapshot present but unreadable';
+    btn.style.display = 'none';
+    return;
+  }
+  const ts = parsed.lastModified;
+  status.textContent = ts
+    ? new Date(ts).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'short'})
+    : 'unknown time';
+  btn.style.display = '';
+}
+
+function restoreLastKnownGoodConfirm(){
+  let raw = null;
+  try{ raw = localStorage.getItem('bushido_last_known_good'); }catch(e){}
+  if(!raw){ alert('No backup found.'); return; }
+  let parsed = null;
+  try{ parsed = JSON.parse(raw); }catch(e){}
+  if(!isValidStateShape(parsed)){
+    alert('Backup is unreadable. Cannot restore.');
+    return;
+  }
+  _pendingRestoreState = parsed;
+  const ts = parsed.lastModified;
+  const dateStr = ts
+    ? new Date(ts).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'short'})
+    : 'unknown time';
+  const dateEl = document.getElementById('cs-restore-modal-date');
+  if(dateEl) dateEl.textContent = dateStr;
+  document.getElementById('cs-restore-modal-overlay').classList.add('show');
+  setTimeout(() => {
+    const btn = document.getElementById('cs-restore-modal-cancel-btn');
+    if(btn) btn.focus();
+  }, 60);
+}
+
+// bushidoReload — thin wrapper around location.reload so the Tier 1.2
+// driver can stub it (location.reload itself is non-overridable in Chrome).
+// Production behavior is identical: a normal function-call indirection.
+function bushidoReload(){ location.reload(); }
+
+function restoreLastKnownGoodCancel(){
+  document.getElementById('cs-restore-modal-overlay').classList.remove('show');
+  _pendingRestoreState = null;
+}
+
+async function restoreLastKnownGoodGo(){
+  if(!_pendingRestoreState) return;
+  saveLastKnownGood();
+  if(!isValidStateShape(_pendingRestoreState)){
+    alert('Backup is unreadable. Cannot restore.');
+    document.getElementById('cs-restore-modal-overlay').classList.remove('show');
+    _pendingRestoreState = null;
+    return;
+  }
+  // Tier 1.1 — restored snapshot can be any version; run it through the runner first.
+  const mr = runSchemaMigrations(_pendingRestoreState);
+  if(!mr.ok){
+    alert('Backup is from an unsupported version — restore aborted.');
+    document.getElementById('cs-restore-modal-overlay').classList.remove('show');
+    _pendingRestoreState = null;
+    return;
+  }
+  Object.assign(state, mr.state);
+  state.lastModified = Date.now();
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+
+  closeSettings();
+  document.getElementById('cs-restore-modal-overlay').classList.remove('show');
+  _pendingRestoreState = null;
+
+  if(FIREBASE_CONFIGURED && typeof _currentUser !== 'undefined' && _currentUser){
+    try{
+      await Promise.race([
+        db.collection('users').doc(_currentUser.uid).set(
+          { state: JSON.stringify(state), updated: new Date().toISOString() },
+          { merge: true }
+        ),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 3000))
+      ]);
+    }catch(e){
+      console.warn('Restore: Firestore push failed or timed out, reloading anyway:', e);
+    }
+  }
+
+  bushidoReload();
+}
+
 async function loadFromCloud(compareTimestamp){
   const{binId,masterKey}=getSyncConfig();
   if(!binId||!masterKey) return false;
@@ -8981,12 +9098,34 @@ function setupNavSquish(){
       </div>
     </div>
 
+    <div class="cs-setting-row" id="cs-backup-row">
+      <div style="flex:1;padding-right:24px">
+        <div class="cs-setting-label">Last backup</div>
+        <div class="cs-setting-help" id="cs-backup-status">none yet</div>
+      </div>
+      <button class="cs-btn ghost" id="cs-backup-restore-btn" onclick="restoreLastKnownGoodConfirm()" style="display:none">Restore</button>
+    </div>
+
     <div class="cs-actions" style="border-top:none;padding-top:8px;justify-content:flex-end">
       <button class="cs-btn ghost" onclick="closeSettings()">close</button>
     </div>
   </div>
 </div>
 <!-- ══════════ /EXPERIMENT: SETTINGS MODAL ══════════ -->
+
+<!-- ── Restore-from-backup confirmation modal (Phase 5) ───────────────── -->
+<div class="cs-restore-modal-overlay" id="cs-restore-modal-overlay"
+     onclick="if(event.target===this) restoreLastKnownGoodCancel()">
+  <div class="cs-restore-modal">
+    <div class="cs-restore-modal-kanji">復</div>
+    <div class="cs-restore-modal-title">Restore from <span id="cs-restore-modal-date"></span>?</div>
+    <div class="cs-restore-modal-body">This will replace your current plan with the backup. Your current plan will be saved as the new backup first, so the restore can be undone.</div>
+    <div class="cs-restore-modal-actions">
+      <button class="cs-restore-btn cs-restore-btn-cancel" id="cs-restore-modal-cancel-btn" onclick="restoreLastKnownGoodCancel()">Cancel</button>
+      <button class="cs-restore-btn cs-restore-btn-go" onclick="restoreLastKnownGoodGo()">Restore</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════ EXPERIMENT: CALENDAR SYNC WIZARD ══════════ -->
 <div class="cs-backdrop" id="csWizardBackdrop" onclick="if(event.target===this)closeCalSync()">
@@ -9305,6 +9444,7 @@ function openSettings(){
   const t = document.getElementById('csKaizenToggle');
   if(t) t.classList.toggle('on', csKaizenTimesEnabled);
   _syncCalThemePills();
+  _refreshBackupRow();  // Phase 5 — populate backup row before showing modal
   document.getElementById('csSettingsBackdrop').classList.add('show');
 }
 function closeSettings(){
