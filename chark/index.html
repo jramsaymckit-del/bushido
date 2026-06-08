@@ -8181,6 +8181,11 @@ function restoreLastKnownGoodConfirm(){
   }, 60);
 }
 
+// bushidoReload — thin wrapper around location.reload so the Tier 1.2
+// driver can stub it (location.reload itself is non-overridable in Chrome).
+// Production behavior is identical: a normal function-call indirection.
+function bushidoReload(){ location.reload(); }
+
 function restoreLastKnownGoodCancel(){
   document.getElementById('cs-restore-modal-overlay').classList.remove('show');
   _pendingRestoreState = null;
@@ -8234,7 +8239,7 @@ async function restoreLastKnownGoodGo(){
     }
   }
 
-  location.reload();
+  bushidoReload();
 }
 
 // ============ EXPORT / IMPORT ============
