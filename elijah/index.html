@@ -9048,7 +9048,9 @@ async function loadFirestoreState(user){
         }
       }
       applyHabitDetailDefaults(); // backfill bullets/why from DEFAULT_STATE if missing
-      migrateWorkoutHabits();     // add 6-day split, remove deprecated habits
+      // migrateWorkoutHabits() intentionally NOT called (neutralized 2026-06-12) —
+      // it is a James-specific migration whose id-based filter deletes THIS user's
+      // real habits 307/308. Deliberate per-file divergence; do NOT re-sync this line.
       migrateKaizenOrder();       // sort into logical daily order (runs once)
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
