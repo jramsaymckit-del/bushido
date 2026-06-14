@@ -9051,7 +9051,10 @@ async function loadFirestoreState(user){
       // migrateWorkoutHabits() intentionally NOT called (neutralized 2026-06-12) —
       // it is a James-specific migration whose id-based filter deletes THIS user's
       // real habits 307/308. Deliberate per-file divergence; do NOT re-sync this line.
-      migrateKaizenOrder();       // sort into logical daily order (runs once)
+      // migrateKaizenOrder() intentionally NOT called (neutralized 2026-06-14) —
+      // it sorts kaizen into James's PREFERRED id order. Elijah's habit order is
+      // his own and must be PRESERVED (James's decision). Deliberate per-file
+      // divergence; keep the fn def, do NOT re-sync this line.
       // If saved state has no name, fall back to DEFAULT_STATE.name (set per-user file)
       if(!state.name && DEFAULT_STATE.name) state.name = DEFAULT_STATE.name;
       // If doc exists but onboarded:false, still check for migration data —
