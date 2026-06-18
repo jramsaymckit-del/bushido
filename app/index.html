@@ -5093,10 +5093,18 @@ function renderTab(){
   const p=PILLARS[currentTab];
   document.getElementById('pillar-head').innerHTML=`<div class="pillar-head"><span class="pillar-tf">${p.tf}</span></div>`;
   document.getElementById('med-text').innerHTML=renderProverb(getDailyProverb());
-  renderGoals();
-  updateStreak();
-  renderWeeklyBtn();
-  renderMonthlyBtn();
+  // The gated reflection launchers (#weekly-btn-slot/#monthly-btn-slot) must paint on every
+  // render — including FIRST PAINT — regardless of whether the data-heavy goals/streak render
+  // throws on a given account's state. Without this, a throw anywhere in renderGoals()/updateStreak()
+  // silently leaves the launchers empty until the user switches tabs. try/finally keeps the error
+  // loud (re-thrown) but guarantees the launcher renders. (CONSOLIDATION_PARITY_AUDIT — launcher hotfix)
+  try {
+    renderGoals();
+    updateStreak();
+  } finally {
+    renderWeeklyBtn();
+    renderMonthlyBtn();
+  }
 }
 
 function getShrIdx(prog){return prog>=66?2:prog>=33?1:0}
@@ -5689,7 +5697,12 @@ function getReviewableWeeklyReflection(){
   wEnd.setDate(wStart.getDate()+6);
   const wStartStr=getDateStr(wStart),wEndStr=getDateStr(wEnd);
   const sorted=(state.reflections||[])
-    .filter(r=>r.type==='weekly')
+    // Require a STRING date. Legacy/date-less entries can't be reviewed anyway, AND any non-string date
+    // (undefined on a pre-date-field entry, or a number/Date) would make the localeCompare sort below
+    // throw — aborting renderGoals before the launcher renders. typeof-guard (stricter than the bare
+    // r.date guard in weeklyNotesCascade/monthlyNotesCascade) so NO legacy reflection shape can crash
+    // renderGoals, incl. family data at A6. (CONSOLIDATION_PARITY_AUDIT — launcher hotfix root cause)
+    .filter(r=>r.type==='weekly'&&typeof r.date==='string'&&r.date)
     .sort((a,b)=>b.date.localeCompare(a.date));
   if(!sorted.length) return null;
   const latest=sorted[0];
