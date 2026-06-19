@@ -5747,7 +5747,14 @@ function renderWeeklyBtn(){
   } else if(status==='in-window'){
     slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>`;
   } else {
-    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens Saturday">週 &nbsp;Weekly</button>`;
+    // In the gap (last week sealed, this week's window not yet open) keep the just-sealed weekly
+    // reviewable read-only via showReflectionReview (which reads getReviewableWeeklyReflection);
+    // else the disabled "Opens Saturday" button. The weekly nudge-card path is untouched.
+    if(getReviewableWeeklyReflection()){
+      slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showReflectionReview(false)" title="review last week&#39;s sealed reflection — opens Saturday">週 &nbsp;Review</button>`;
+    } else {
+      slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens Saturday">週 &nbsp;Weekly</button>`;
+    }
   }
 }
 
@@ -5764,6 +5771,23 @@ function getMonthlyWindowStatus(){
   return 'outside';
 }
 
+function getReviewableMonthlyReflection(){
+  // Most-recent SEALED monthly reflection (read-only review of the prior month while outside
+  // the current window), or null. typeof-string date guard like getReviewableWeeklyReflection
+  // so no legacy/date-less shape can crash the localeCompare sort → renderGoals. Bounded to the
+  // current or immediately-preceding month so a stale months-old entry doesn't linger.
+  const sorted=(state.reflections||[])
+    .filter(r=>r.type==='monthly'&&typeof r.date==='string'&&r.date)
+    .sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length) return null;
+  const latest=sorted[0];
+  const today=new Date();
+  const thisMonth=getDateStr(today).substring(0,7);
+  const prevMonth=getDateStr(new Date(today.getFullYear(),today.getMonth()-1,1)).substring(0,7);
+  const m=latest.date.substring(0,7);
+  return (m===thisMonth||m===prevMonth)?latest:null;
+}
+
 function renderMonthlyBtn(){
   const slot=document.getElementById('monthly-btn-slot');
   if(!slot) return;
@@ -5777,27 +5801,36 @@ function renderMonthlyBtn(){
     const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
     const openDate=new Date(today.getFullYear(),today.getMonth(),lastDay-2);
     const openLabel=openDate.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens ${openLabel}">月 &nbsp;Monthly</button>`;
+    // In the gap (last month sealed, this month's window not yet open) keep the just-sealed
+    // prior-month reflection reviewable read-only; else the disabled "Opens [date]" button.
+    if(getReviewableMonthlyReflection()){
+      slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showMonthlyReflectionReview()" title="review last month&#39;s sealed reflection — next monthly opens ${openLabel}">月 &nbsp;Review</button>`;
+    } else {
+      slot.innerHTML=`<button class="btn btn-ghost weekly-btn-outside" disabled title="Opens ${openLabel}">月 &nbsp;Monthly</button>`;
+    }
   }
 }
 
 function showMonthlyReflectionReview(){
   const today=new Date();
   const monthStr=getDateStr(today).substring(0,7);
+  // Prefer THIS month's sealed entry (the 'sealed'-branch case — behavior unchanged); otherwise
+  // fall back to the reviewable prior-month entry (the 'outside'-branch Review). Labels/badge are
+  // derived from the entry actually shown, not hardcoded to the current month.
   const entry=(state.reflections||[]).find(r=>
     r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
-  );
+  )||getReviewableMonthlyReflection();
   if(!entry) return;
   const m=document.getElementById('reflect-modal');
   const c=document.getElementById('reflect-content');
   m.classList.add('active');
-  const monthLabel=today.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const monthLabel=new Date(entry.date+'T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const safeVal=v=>(v||'').replace(/"/g,'&quot;');
   c.innerHTML=`
     <div class="modal-kanji">月</div>
     <div class="modal-title">Monthly Reflection</div>
     <div class="modal-sub">${monthLabel}</div>
-    <div class="reflect-review-badge">sealed · past month</div>
+    <div class="reflect-review-badge">sealed · ${monthLabel}</div>
     <div class="reflect-q">
       <div class="reflect-label">What was working?</div>
       <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.working)}</textarea>
