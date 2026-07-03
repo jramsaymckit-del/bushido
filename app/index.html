@@ -1952,6 +1952,12 @@ li.goal.hd-open .habit-detail{display:block}
   font-family:'Noto Serif JP',serif;font-size:6px;color:var(--scroll);opacity:.7;
   line-height:1;margin-top:1px;display:block;
 }
+/* 省 reflection seal is invisible on the LIGHT calendar themes (default + clan) — the base
+   rule above colors it var(--scroll), which matches the white/parchment background. Force a
+   visible red there (higher specificity than the base + themed rules so it always wins).
+   Dark themes (samurai/shinobi) keep their own light-on-dark mark, untouched. */
+.kk-outer:not([class*="cal-"]) .mcal-cell.has-note .mcal-note-mark,
+.kk-outer.cal-clan .mcal-cell.has-note .mcal-note-mark{ color:rgba(204,53,41,.85); opacity:1; }
 /* ── Milestone / obligation day ───────────────────────────────────── */
 .mcal-cell.skn-ms-day{cursor:pointer;position:relative}
 .mcal-cell.skn-ms-day:hover{background:rgba(255,255,255,.07)}
@@ -4132,7 +4138,7 @@ function recomputeStreak(habitId){
   const today=new Date(); today.setHours(0,0,0,0);
   const todayStr=getDateStr(today);
   const todayDayIdx=(today.getDay()+6)%7;
-  const todayScheduled=habitOnDay(k,todayDayIdx);
+  const todayScheduled=habitOnDay(k,todayDayIdx,today);
   const todayDone=(log[todayStr]||[]).includes(habitId);
   let cursor=new Date(today);
   // Grace: if today scheduled but not done yet, count from yesterday
@@ -4147,7 +4153,7 @@ function recomputeStreak(habitId){
     }
     const dayIdx=(cursor.getDay()+6)%7;
     const dStr=getDateStr(cursor);
-    if(habitOnDay(k,dayIdx)){
+    if(habitOnDay(k,dayIdx,cursor)){
       if((log[dStr]||[]).includes(habitId)) streak++;
       else break;
     }
@@ -4216,7 +4222,7 @@ function openDayNote(dateStr){
   var dayIdx=(d.getDay()+6)%7;
   var sched=state.kaizen.filter(function(k){
     if(k.startDate){var s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-    return habitOnDay(k,dayIdx);
+    return habitOnDay(k,dayIdx,d);
   });
   var metaStr=sched.length
     ?log.length+' of '+sched.length+' practice'+(sched.length!==1?'s':'')+' completed'
@@ -4300,7 +4306,7 @@ function buildKaizenGrid(){
       const today=new Date();today.setHours(0,0,0,0);
       if(today<s)return false;
     }
-    for(let i=0;i<7;i++){if(habitOnDay(k,i))return true;}
+    for(let i=0;i<7;i++){if(habitOnDay(k,i,days[i]))return true;}
     return false;
   });
 
@@ -4316,7 +4322,7 @@ function buildKaizenGrid(){
   const completeDays=days.map((d,i)=>{
     const dStr=getDateStr(d);
     if(dStr>todayStr)return false;
-    const scheduled=habits.filter(k=>habitOnDay(k,i));
+    const scheduled=habits.filter(k=>habitOnDay(k,i,d));
     if(!scheduled.length)return false;
     return scheduled.every(k=>isHabitDoneOnDate(k.id,dStr));
   });
@@ -4346,7 +4352,7 @@ function buildKaizenGrid(){
           <div class="hg-label"${needsTip?` data-full="${k.text.replace(/"/g,'&quot;')}"`:''}>${label}</div>
           ${days.map((d,i)=>{
             const dStr=getDateStr(d);
-            const scheduled=habitOnDay(k,i);
+            const scheduled=habitOnDay(k,i,d);
             const done=isHabitDoneOnDate(k.id,dStr);
             const isT=isCurrentWeek&&i===todayDayIdx;
             const isFuture=dStr>todayStr;
@@ -4534,7 +4540,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
       const dayIdx=(cell.d.getDay()+6)%7;
       const scheduled=state.kaizen.filter(k=>{
         if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(cell.d<s)return false;}
-        return habitOnDay(k,dayIdx);
+        return habitOnDay(k,dayIdx,cell.d);
       });
       const done=scheduled.filter(k=>isHabitDoneOnDate(k.id,cell.dateStr));
       const pct=scheduled.length?done.length/scheduled.length:0;
@@ -4670,7 +4676,7 @@ function buildYearView(){
 
       const scheduled=state.kaizen.filter(k=>{
         if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-        return habitOnDay(k,dayIdx);
+        return habitOnDay(k,dayIdx,d);
       });
       const doneHabits=scheduled.filter(k=>isHabitDoneOnDate(k.id,dStr));
       const pct=scheduled.length?doneHabits.length/scheduled.length:0;
@@ -5005,7 +5011,7 @@ document.addEventListener('keydown',function(e){
 // ══════════ /IKIGAI PLANNING CALENDAR JS ════════════════════════════════════
 
 // ============ WEEK STRIP ============
-function habitOnDay(k, d){
+function habitOnDay(k, d, dateObj){
   // Respect startDate — hide habit until that date arrives
   if(k.startDate){
     const today = new Date(); today.setHours(0,0,0,0);
@@ -5013,7 +5019,20 @@ function habitOnDay(k, d){
     if(today < start) return false;
   }
   if(k.days === 'daily' || !k.days) return true;
-  return Array.isArray(k.days) && k.days.includes(d);
+  if(!(Array.isArray(k.days) && k.days.includes(d))) return false;
+  // Frequency gate — weekly (default/absent) fires on every matching week; fortnightly/monthly
+  // fire only on their ON-weeks, measured in Monday-anchored weeks from freqAnchor (every-4-weeks
+  // for monthly). dateObj is the date being asked about; without it we behave weekly (never over-hide).
+  const interval = k.freq === 'fortnightly' ? 2 : k.freq === 'monthly' ? 4 : 1;
+  if(interval === 1) return true;
+  const anchorRaw = k.freqAnchor || k.startDate;
+  if(!anchorRaw || !dateObj) return true;
+  const mondayOf = dt => { const m = new Date(dt); m.setHours(0,0,0,0); m.setDate(m.getDate()-((m.getDay()+6)%7)); return m; };
+  const aStr = (typeof anchorRaw === 'string' && anchorRaw.indexOf('T') < 0) ? anchorRaw + 'T12:00:00' : anchorRaw;
+  const a = new Date(aStr);
+  if(isNaN(a.getTime())) return true;
+  const wk = Math.round((mondayOf(dateObj) - mondayOf(a)) / 604800000);
+  return (((wk % interval) + interval) % interval) === 0;
 }
 
 // ============ DASHBOARD ============
@@ -5132,7 +5151,7 @@ function renderGoals(){
       <a onclick="openTravelSetup(true)">Edit core practices</a>
     </div>`:'';
     const todayItems=state.kaizen.filter(k=>{
-      if(!habitOnDay(k,todayIdx2))return false;
+      if(!habitOnDay(k,todayIdx2,new Date()))return false;
       if(state.travelMode&&k.core!==true)return false;
       return true;
     });
@@ -5155,7 +5174,7 @@ function renderGoals(){
       checklistHtml+=`<div class="daily-reset">show up today</div>`+
         todayItems.map((g,i)=>{
           const parent=state.shokunin.find(s=>s.id==g.parentShok);
-          const freq=g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
+          const freq=g.freq==='fortnightly'?'fortnightly':g.freq==='monthly'?'monthly':g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
           const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
           const strandCls=strandLinkedIds!==null?(strandLinkedIds.has(g.id)?' strand-glow':' strand-faint'):'';
           const hdBullets=buildHabitDetailHtml(g);
@@ -5490,7 +5509,7 @@ function updateClanMomentum(){
   const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
   ms.textContent=maxSt||'\u2014';
   const todayStr=getDateStr();
-  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx()));
+  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx(),new Date()));
   const doneToday=todayItems.filter(g=>g.done).length;
   mt.textContent=todayItems.length?(doneToday+'/'+todayItems.length):'\u2014';
   const today=new Date(); today.setHours(0,0,0,0);
@@ -5504,7 +5523,7 @@ function updateClanMomentum(){
     const isTod=dStr===todayStr;
     if(isFut){bHtml+='<div class="clan-exp-bar" style="height:3px"></div>';continue;}
     const dayIdx=(d2.getDay()+6)%7;
-    const sc=state.kaizen.filter(k=>habitOnDay(k,dayIdx));
+    const sc=state.kaizen.filter(k=>habitOnDay(k,dayIdx,d2));
     const dn=sc.filter(k=>isHabitDoneOnDate(k.id,dStr)).length;
     const pct=sc.length?dn/sc.length:0;
     const h=Math.max(3,Math.round(pct*20));
@@ -5610,7 +5629,7 @@ function get30DayRate(habitId){
     const d=new Date(); d.setDate(d.getDate()-i);
     if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)continue;}
     const dayIdx=(d.getDay()+6)%7;
-    if(habitOnDay(k,dayIdx)){
+    if(habitOnDay(k,dayIdx,d)){
       scheduled++;
       if(isHabitDoneOnDate(habitId,getDateStr(d))) completed++;
     }
@@ -6478,7 +6497,7 @@ function getWeakestCraft(){
       const dStr=getDateStr(d);
       habits.forEach(k=>{
         if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return;}
-        if(habitOnDay(k,dayIdx)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
+        if(habitOnDay(k,dayIdx,d)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
       });
     }
     if(!scheduled) return null;
@@ -6499,7 +6518,7 @@ function switchFocusCraft(craftId){
     const dStr=getDateStr(d);
     habits.forEach(k=>{
       if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return;}
-      if(habitOnDay(k,dayIdx)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
+      if(habitOnDay(k,dayIdx,d)){scheduled++;if(isHabitDoneOnDate(k.id,dStr))completed++;}
     });
   }
   const rate=scheduled>0?Math.round(completed/scheduled*100):0;
@@ -6857,7 +6876,7 @@ document.addEventListener('click',function(){
 function getGreeting(){
   const h=new Date().getHours();
   const n=state.name?', '+state.name:'';
-  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx()));
+  const todayItems=state.kaizen.filter(k=>habitOnDay(k,todayIdx(),new Date()));
   const done=todayItems.filter(k=>k.done).length;
   if(todayItems.length>0&&done===todayItems.length){
     if(h<12)return 'the morning is yours.';
@@ -7228,7 +7247,7 @@ function isDayComplete(dateStr){
   const dayIdx=(d.getDay()+6)%7;
   const scheduled=state.kaizen.filter(k=>{
     if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-    return habitOnDay(k,dayIdx);
+    return habitOnDay(k,dayIdx,d);
   });
   if(!scheduled.length) return true; // rest day — can't fail it
   const log=state.completionLog[dateStr]||[];
@@ -7258,7 +7277,7 @@ function getMonthCompletionRate(){
     const dayIdx=(d.getDay()+6)%7;
     const scheduled=state.kaizen.filter(k=>{
       if(k.startDate){const s=new Date(k.startDate);s.setHours(0,0,0,0);if(d<s)return false;}
-      return habitOnDay(k,dayIdx);
+      return habitOnDay(k,dayIdx,d);
     });
     const log=state.completionLog[dStr]||[];
     totalPossible+=scheduled.length;
@@ -7937,7 +7956,7 @@ function computeWeekRates(){
     var dt=new Date(wStart); dt.setDate(wStart.getDate()+d);
     var dStr=getDateStr(dt);
     var dayOfW=(dt.getDay()+6)%7;
-    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW);});
+    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW,dt);});
     var dn=sc.filter(function(k){return isHabitDoneOnDate(k.id,dStr);}).length;
     rates[d]=sc.length?dn/sc.length:0;
   }
@@ -7965,7 +7984,7 @@ function computeStrandRates(){
       var dStr=getDateStr(day);
       var dIdx=(day.getDay()+6)%7;
       sk.forEach(function(k){
-        if(habitOnDay(k,dIdx)){total++;if(isHabitDoneOnDate(k.id,dStr))done++;}
+        if(habitOnDay(k,dIdx,day)){total++;if(isHabitDoneOnDate(k.id,dStr))done++;}
       });
     }
     rates.push(total>0?Math.round(done/total*100):0);
@@ -7992,7 +8011,7 @@ function buildOwnClanData(){
   var mStr = nowDate.getFullYear()+'-'+((nowDate.getMonth()+1)<10?'0':'')+(nowDate.getMonth()+1);
   var weekReflect  = (state.reflections||[]).some(function(r){return r.type==='weekly' && r.date>=wStartStr && r.date<=wEndStr;});
   var monthReflect = (state.reflections||[]).some(function(r){return r.type==='monthly' && r.date && r.date.startsWith(mStr);});
-  var todayHabits = (state.kaizen||[]).filter(function(k){return habitOnDay(k, tidx);});
+  var todayHabits = (state.kaizen||[]).filter(function(k){return habitOnDay(k, tidx, new Date());});
   var todayDone = todayHabits.filter(function(k){return k.done;}).length;
   // clanName comes ONLY from the clan roster (design §2.2/§2.4) — never self-asserted from the DOM input,
   // never state.clanName, never a hardcoded literal (closes DS-2). On-branch _clanRosterName is '' (C3 fills it).
@@ -8189,7 +8208,7 @@ function updateClanPerfFromCache(){
     var dt=new Date(wStart); dt.setDate(wStart.getDate()+d);
     var dStr=getDateStr(dt);
     var dayOfW=(dt.getDay()+6)%7;
-    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW);});
+    var sc=(state.kaizen||[]).filter(function(k){return habitOnDay(k,dayOfW,dt);});
     var dn=sc.filter(function(k){return isHabitDoneOnDate(k.id,dStr);}).length;
     jDays[d]=sc.length?dn/sc.length:0;
   }
@@ -8238,7 +8257,7 @@ function updateClanPerfFromCache(){
   if(actEl) actEl.textContent=activeToday+' of '+memberCount+' warriors active today';
   // Today's score — sum real todayDone/todayTotal across all members
   var totalDone=0,totalPossible=0;
-  var jTodayHabits=(state.kaizen||[]).filter(function(k){return habitOnDay(k,tidx);});
+  var jTodayHabits=(state.kaizen||[]).filter(function(k){return habitOnDay(k,tidx,new Date());});
   totalDone+=jTodayHabits.filter(function(k){return k.done;}).length;
   totalPossible+=jTodayHabits.length;
   Object.keys(_clanCache).forEach(function(uid){
