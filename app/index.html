@@ -2999,6 +2999,10 @@ body.dark .sr-phase-dot {
 /* ── Cloud-sync error notice (Phase 6) ──────────────────────── */
 .cloud-sync-error-notice{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--white);background:rgba(15,13,10,.92);padding:10px 22px;border-radius:1px;z-index:311;letter-spacing:.5px;opacity:0;transition:opacity .35s ease;pointer-events:none;max-width:360px;text-align:center;line-height:1.6}
 .cloud-sync-error-notice.show{opacity:1}
+/* ── Persistent "not saved to cloud" indicator (INCIDENT 2026-07-02) — unlike the
+   transient error-notice above, this STAYS until a save succeeds. Silent loss was the bug. */
+.cloud-sync-indicator{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:.5px;color:var(--white);background:var(--red,#cc3529);padding:9px 20px;border-radius:1px;z-index:312;max-width:360px;text-align:center;line-height:1.5;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.25);display:none}
+.cloud-sync-indicator.show{display:block}
 /* ── Decline-migration confirm modal (Phase 7) — reuses naming from Phase 2 ─ */
 .hi-unpair-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,13,10,.55);align-items:center;justify-content:center;padding:24px}
 .hi-unpair-modal-overlay.show{display:flex}
@@ -8617,18 +8621,134 @@ function acknowledgeClansWelcome(){
   if(el && el.parentNode) el.parentNode.removeChild(el);
 }
 
+// ── Cloud sync status + completion-preserving write (INCIDENT 2026-07-02) ───────────
+// The silent completion-save loss had three defects here: (1) a silent no-op when
+// _currentUser was null (auth-lapsed long-lived tab) — a tick vanished with no signal;
+// (2) a whole-blob `set(merge:true)` write — merge merges DOCUMENT fields, but `state`
+// is one field, so a stale/multi-device client's blob CLOBBERED newer completions;
+// (3) failure surfaced only as a 5s banner. James lost a week of ticks unknowingly.
+// Fix: make failure VISIBLE (persistent), and UNION completionLog inside a transaction
+// so a stale write can only ADD ticks, never drop another client's newer completion.
+let _cloudSyncState = 'ok';   // 'ok' | 'saving' | 'error'
+let _cloudSyncReason = '';
+
+function setCloudSync(s, reason){
+  _cloudSyncState = s;
+  _cloudSyncReason = reason || '';
+  renderCloudSyncIndicator();
+}
+function renderCloudSyncIndicator(){
+  let el = document.getElementById('cloud-sync-indicator');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'cloud-sync-indicator';
+    el.className = 'cloud-sync-indicator';
+    el.addEventListener('click', retryCloudSync);
+    document.body.appendChild(el);
+  }
+  if(_cloudSyncState === 'error'){
+    el.textContent = '⚠ not saved to cloud — tap to retry';
+    el.title = _cloudSyncReason || '';
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
+}
+function retryCloudSync(){
+  if(_currentUser) saveStateToFirestore();
+  else setCloudSync('error', 'Signed out — reload to sign back in.');
+}
+
+// Union two completionLog maps: per date, the deduped union of habit ids. Guarantees a
+// stale/multi-device client can only ADD ticks, never remove another client's completion.
+function unionCompletionLogs(a, b){
+  const out = {};
+  const dates = new Set([...Object.keys(a || {}), ...Object.keys(b || {})]);
+  for(const d of dates){
+    out[d] = [...new Set([...((a && a[d]) || []), ...((b && b[d]) || [])])];
+  }
+  return out;
+}
+
 async function saveStateToFirestore(){
-  if(!FIREBASE_CONFIGURED || !_currentUser) return;
+  if(!FIREBASE_CONFIGURED) return;
+  if(!_currentUser){
+    // Do NOT silently drop the save. localStorage already holds the change (saveState
+    // wrote it before calling us); surface a PERSISTENT unsaved state so the user knows.
+    setCloudSync('error', 'Not signed in — your change is saved on this device only.');
+    return;
+  }
+  setCloudSync('saving');
+  const ref = db.collection('users').doc(_currentUser.uid);
   try{
-    await db.collection('users').doc(_currentUser.uid).set(
-      { state: JSON.stringify(state), updated: new Date().toISOString() },
-      { merge: true }
-    );
+    // Completion-preserving transactional write: read cloud INSIDE the txn and union
+    // completionLog, so a stale client's write can't wipe a newer completion. Plan
+    // fields take the local (just-edited) value; lastModified stays monotonic.
+    let mergedCompletion = state.completionLog;
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      let cloud = null;
+      if(snap.exists){ try{ cloud = JSON.parse(snap.data().state); }catch(e){ cloud = null; } }
+      const toWrite = Object.assign({}, state);
+      if(cloud && cloud.completionLog){
+        mergedCompletion = unionCompletionLogs(state.completionLog, cloud.completionLog);
+        toWrite.completionLog = mergedCompletion;
+        toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
+      }
+      tx.set(ref, { state: JSON.stringify(toWrite), updated: new Date().toISOString() }, { merge: true });
+    });
+    // Reflect the union back into local so this tab shows every client's completions.
+    if(mergedCompletion !== state.completionLog){
+      state.completionLog = mergedCompletion;
+      try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    }
+    setCloudSync('ok');
     writeClanSummary(_currentUser); // fire-and-forget clan update
   } catch(e){
     console.warn('Firestore save failed:', e);
+    setCloudSync('error', 'Cloud sync failed — your changes are saved on this device.');
     showCloudSyncError('Cloud sync failed — your changes are saved locally.');
   }
+}
+
+// Reload cloud on tab focus / visibility / reconnect so a long-lived tab can't sit on a
+// stale blob (the incident's James+Chark symptom) and so it shows other devices' ticks.
+// Unions completions (never drops local unsynced ticks); takes cloud plan fields when
+// cloud is newer. This is the "bust the stale session" mechanism.
+let _reconcileInFlight = false;
+async function reconcileFromCloud(){
+  if(!FIREBASE_CONFIGURED || !_currentUser || !state.onboarded) return;
+  if(_reconcileInFlight || _cloudSyncState === 'saving') return;
+  _reconcileInFlight = true;
+  try{
+    const snap = await db.collection('users').doc(_currentUser.uid).get();
+    if(!snap.exists) return;
+    let cloud; try{ cloud = JSON.parse(snap.data().state); }catch(e){ return; }
+    if(!isValidStateShape(cloud)) return;
+    const mergedCL = unionCompletionLogs(state.completionLog, cloud.completionLog);
+    const cloudNewer = (cloud.lastModified || 0) > (state.lastModified || 0);
+    const clChanged = JSON.stringify(mergedCL) !== JSON.stringify(state.completionLog);
+    if(cloudNewer){
+      Object.assign(state, DEFAULT_STATE, cloud);
+      state.completionLog = mergedCL;
+      state.lastModified = Math.max(cloud.lastModified || 0, state.lastModified || 0);
+    } else if(clChanged){
+      state.completionLog = mergedCL;
+    }
+    if(cloudNewer || clChanged){
+      try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+      // push our unioned view up if we hold local-only ticks the cloud lacked
+      if(JSON.stringify(mergedCL) !== JSON.stringify(cloud.completionLog)) saveStateToFirestore();
+      if(typeof renderTab === 'function' && document.getElementById('dashboard') &&
+         document.getElementById('dashboard').classList.contains('active')) renderTab();
+    }
+  } catch(e){ /* transient — leave local intact */ }
+  finally{ _reconcileInFlight = false; }
+}
+if(typeof document !== 'undefined'){
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') reconcileFromCloud(); });
+  window.addEventListener('focus', reconcileFromCloud);
+  window.addEventListener('online', reconcileFromCloud);
 }
 
 // Auth mode toggle (Sign In ↔ Create Account)
