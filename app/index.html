@@ -4276,6 +4276,7 @@ function toggleHabitOnDate(habitId,dateStr){
   const nowDone=idx<0;
   if(nowDone)arr.push(habitId);else arr.splice(idx,1);
   state.completionLog[dateStr]=arr;
+  recordCompletionToggle(dateStr, habitId, nowDone);  // P6-1 — so an un-tick isn't unioned back on save
   // Recompute streak from completionLog — handles retroactive fills correctly
   recomputeStreak(habitId);
   // If today, sync k.done + animation + cascade
@@ -5428,6 +5429,7 @@ function toggleKaizen(id){
     const i=arr.indexOf(id);if(i>=0)arr.splice(i,1);
   }
   state.completionLog[todayStr]=arr;
+  recordCompletionToggle(todayStr, id, g.done);  // P6-1 — so an un-tick isn't unioned back on save
   // Recompute streak from log; updates bestStreak too
   recomputeStreak(id);
   if(g.done) autoCompound(g);
@@ -8689,6 +8691,37 @@ function unionCompletionLogs(a, b){
   return out;
 }
 
+// ── UN-TICK FIX (P6-1, 2026-07-05) ───────────────────────────────────────────
+// The union above only ADDS (incident 2026-07-02 protection: a stale/multi-device client can never
+// DROP another client's completion). But a pure union also blocked the user's OWN legitimate un-tick —
+// every save read the cloud (still holding the id), unioned it back in, and re-wrote it, so a filled
+// circle could not be cleared. Fix: record the ids the user EXPLICITLY un-ticked this session
+// (_pendingUntick) and subtract them AFTER the union. A deliberate removal therefore sticks, while a
+// stale client — which recorded no such removal — still can't drop anyone's tick (union protection
+// intact; see sync-persistence gate P2). Session-local, not persisted: after a successful save the
+// cloud already reflects the removal, so on reload the map resets empty and the cloud is authoritative.
+let _pendingUntick = {};   // { 'YYYY-MM-DD': Set(habitId) } — user-intended removals awaiting persistence
+function recordCompletionToggle(dateStr, habitId, nowDone){
+  if(nowDone){
+    // re-ticked → the earlier removal is void; drop the tombstone so a genuine re-add is never subtracted
+    if(_pendingUntick[dateStr]){ _pendingUntick[dateStr].delete(habitId); if(!_pendingUntick[dateStr].size) delete _pendingUntick[dateStr]; }
+  } else {
+    (_pendingUntick[dateStr] || (_pendingUntick[dateStr] = new Set())).add(habitId);
+  }
+}
+function applyPendingUntick(logMap){
+  if(!_pendingUntick || !Object.keys(_pendingUntick).length) return logMap;
+  const out = {};
+  for(const d of Object.keys(logMap || {})){
+    const rem = _pendingUntick[d];
+    out[d] = rem ? (logMap[d] || []).filter(id => !rem.has(id)) : (logMap[d] || []);
+  }
+  return out;
+}
+// Merge for the completion-preserving write/reconcile: union (never drop another client's tick), then
+// subtract this client's deliberate un-ticks (so the user's own removal is honored).
+function mergeCompletionLogs(local, cloud){ return applyPendingUntick(unionCompletionLogs(local, cloud)); }
+
 async function saveStateToFirestore(){
   if(!FIREBASE_CONFIGURED) return;
   if(!_currentUser){
@@ -8700,9 +8733,10 @@ async function saveStateToFirestore(){
   setCloudSync('saving');
   const ref = db.collection('users').doc(_currentUser.uid);
   try{
-    // Completion-preserving transactional write: read cloud INSIDE the txn and union
-    // completionLog, so a stale client's write can't wipe a newer completion. Plan
-    // fields take the local (just-edited) value; lastModified stays monotonic.
+    // Completion-preserving transactional write: read cloud INSIDE the txn and MERGE completionLog —
+    // union (a stale client can't wipe a newer completion) then subtract this client's deliberate
+    // un-ticks (so a filled circle the user cleared actually clears). Plan fields take the local
+    // (just-edited) value; lastModified stays monotonic.
     let mergedCompletion = state.completionLog;
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
@@ -8710,17 +8744,22 @@ async function saveStateToFirestore(){
       if(snap.exists){ try{ cloud = JSON.parse(snap.data().state); }catch(e){ cloud = null; } }
       const toWrite = Object.assign({}, state);
       if(cloud && cloud.completionLog){
-        mergedCompletion = unionCompletionLogs(state.completionLog, cloud.completionLog);
+        mergedCompletion = mergeCompletionLogs(state.completionLog, cloud.completionLog);
         toWrite.completionLog = mergedCompletion;
         toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
       }
+      // else: no cloud completionLog to union against — toWrite already carries local state.completionLog,
+      // which reflects the un-tick, so nothing is re-introduced and no subtraction is needed.
       tx.set(ref, { state: JSON.stringify(toWrite), updated: new Date().toISOString() }, { merge: true });
     });
-    // Reflect the union back into local so this tab shows every client's completions.
+    // Reflect the merged view back into local so this tab shows every client's completions (minus our un-ticks).
     if(mergedCompletion !== state.completionLog){
       state.completionLog = mergedCompletion;
       try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
     }
+    // The un-ticks we just persisted are now reflected in the cloud — drop their tombstones so a later
+    // legitimate re-add from another device is not perpetually subtracted on this long-lived tab.
+    _pendingUntick = {};
     setCloudSync('ok');
     writeClanSummary(_currentUser); // fire-and-forget clan update
   } catch(e){
@@ -8744,7 +8783,7 @@ async function reconcileFromCloud(){
     if(!snap.exists) return;
     let cloud; try{ cloud = JSON.parse(snap.data().state); }catch(e){ return; }
     if(!isValidStateShape(cloud)) return;
-    const mergedCL = unionCompletionLogs(state.completionLog, cloud.completionLog);
+    const mergedCL = mergeCompletionLogs(state.completionLog, cloud.completionLog);
     const cloudNewer = (cloud.lastModified || 0) > (state.lastModified || 0);
     const clChanged = JSON.stringify(mergedCL) !== JSON.stringify(state.completionLog);
     if(cloudNewer){
