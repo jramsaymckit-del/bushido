@@ -3641,6 +3641,12 @@ if (FIREBASE_CONFIGURED) {
 </div>
 
 <script>
+// ── BUILD STAMP — logged on EVERY load so a STALE CACHED build is obvious at a glance. (2026-07-09: the
+// localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
+// cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
+// If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
+const BUILD_ID = 'p2-1-3a · 2026-07-09 · daily-note keystroke-persist + boot/reconcile merge';
+try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
 // Per-uid persistence keys (consolidated app · Chunk C1 · 2026-06-15). NULL until auth
@@ -3699,6 +3705,7 @@ const DEFAULT_STATE = {
   kaizen: [],
   completionLog: {},
   dailyNotes: {},
+  dailyNotesMeta: {},           // P2-1 3a: {'YYYY-MM-DD': lastEdited ms} — per-note edit time; a CLEARED day is '' with a fresh ts, so the newest-ts note merge handles clear/re-add/cross-tab (no tombstone map)
   reflections: [],
   milestoneStamps: {},          // {`${habitId}-${days}`: true} — permanently earned stamps
   lastModified: 0,
@@ -3730,7 +3737,8 @@ let state = {
   shokunin: [],       // {id, text, parentAnnual, progress, timeframe, done}
   kaizen: [],         // {id, text, parentShok, streak, done, lastDone}
   completionLog: {},  // {'YYYY-MM-DD': [id, ...]}
-  dailyNotes: {},     // {'YYYY-MM-DD': 'note text'}
+  dailyNotes: {},     // {'YYYY-MM-DD': 'note text'}  ('' = cleared, treated as no-note on read)
+  dailyNotesMeta: {},      // P2-1 3a: {'YYYY-MM-DD': lastEdited ms}
   reflections: [],    // {date, type, data}
   lastModified: 0,
   milestoneStamps: {},
@@ -5229,7 +5237,7 @@ function renderGoals(){
       </div>
       <textarea class="daily-note" id="daily-note-ta" rows="2" placeholder="write freely..."
         onfocus="dismissDailyNudge()"
-        oninput="growDailyNote(this);updateDailySealRow('${todayNoteStr}')"
+        oninput="growDailyNote(this);updateDailySealRow('${todayNoteStr}');persistDailyNoteLocal('${todayNoteStr}',this.value)"
         onblur="saveDailyNote('${todayNoteStr}',this.value)"
       >${todayNoteVal}</textarea>
       ${sealRowHtml}
@@ -6428,10 +6436,29 @@ function checkDailyNudge(){
 
 function saveDailyNote(dateStr, val){
   if(!state.dailyNotes) state.dailyNotes={};
-  const trimmed=val.trim();
-  if(trimmed) state.dailyNotes[dateStr]=trimmed;
-  else delete state.dailyNotes[dateStr];
+  if(!state.dailyNotesMeta) state.dailyNotesMeta={};
+  // P2-1 3a: store the value (a CLEAR is '' — every read site treats '' as "no note", audited) with a
+  // fresh edit time. The newest-lastEdited note merge then makes a clear stick across reload AND a second
+  // stale tab, and a later re-add (newer ts) wins — no separate delete-tombstone map needed.
+  state.dailyNotes[dateStr]=val.trim();
+  state.dailyNotesMeta[dateStr]=Date.now();
   saveState();
+}
+
+// BLOCKER fix (2026-07-08): the daily note used to persist ONLY on blur (onblur), so typing a note and
+// refreshing while the field was still focused lost it — blur never fired, nothing was saved. Persist to
+// state + localStorage on EVERY keystroke so an immediate refresh can't lose it; debounce only the cloud
+// write (no Firestore write per character). onblur/seal still do the full immediate save.
+let _dailyNoteCloudTimer=null;
+function persistDailyNoteLocal(dateStr, val){
+  if(!state.dailyNotes) state.dailyNotes={};
+  if(!state.dailyNotesMeta) state.dailyNotesMeta={};
+  state.dailyNotes[dateStr]=val.trim();
+  state.dailyNotesMeta[dateStr]=Date.now();
+  state.lastModified=Date.now();
+  try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  clearTimeout(_dailyNoteCloudTimer);
+  _dailyNoteCloudTimer=setTimeout(()=>{ if(FIREBASE_CONFIGURED && _currentUser) saveStateToFirestore(); }, 800);
 }
 
 // ============ REFLECTION CASCADE HELPERS ============
@@ -6804,6 +6831,7 @@ function resealReflection(date,ts){
   if(c.querySelector('#rev-q2'))  entry.showingUp=c.querySelector('#rev-q2').value.trim();
   if(c.querySelector('#rev-notes')) entry.notes=c.querySelector('#rev-notes').value;
   if(c.querySelector('#rev-intention')) entry.intention=c.querySelector('#rev-intention').value.trim();
+  entry.ts=Date.now(); // P2-1 3a: an in-place reseal must bump ts so the sync merge picks this edit as newest
   saveState();
   c.innerHTML=`<div style="text-align:center;padding:56px 0">
     <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
@@ -7826,7 +7854,15 @@ function importState(e){
       }
       saveLastKnownGood();
       Object.assign(state, mr.state);
+      state.lastModified = Date.now(); // P4-A: an import is the newest truth — bump so a later reconcile can't revert it
       if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+      // P4-A: push the import to cloud. Previously import wrote ONLY localStorage, so the next reconcile/
+      // focus could silently overwrite it with the older cloud. Mirrors restoreLastKnownGoodGo's persist.
+      if(FIREBASE_CONFIGURED && typeof _currentUser !== 'undefined' && _currentUser){
+        db.collection('users').doc(_currentUser.uid).set(
+          { state: JSON.stringify(state), updated: new Date().toISOString() }, { merge: true }
+        ).catch(err=>console.warn('Import: Firestore push failed:', err));
+      }
       // Brief confirmation
       const tools=document.getElementById('data-tools');
       if(tools){
@@ -8506,14 +8542,24 @@ async function loadFirestoreState(user){
                        '< local', state.lastModified, '— keeping local, pushing up.');
           saveStateToFirestore();  // heal cloud with fresh local
         } else {
-          // Cloud is equal or newer — migrate, snapshot, then take cloud.
+          // Cloud is equal or newer — take cloud for PLAN fields, but MERGE the mergeable fields with the
+          // boot-hydrated localStorage so an unsynced local write (a note/reflection/stamp made just
+          // before an immediate reload) is NEVER dropped. Third merge site (P2-1 3a follow-up — the design
+          // covered save txn + reconcileFromCloud but not boot; a stale-equal cloud used to wipe it here).
           const mr = runSchemaMigrations(saved);
           if(!mr.ok){
             console.warn('Schema migration failed:', mr.error);
             showCloudSyncError('Cloud data version unsupported — kept your local data.');
           } else {
             saveLastKnownGood();
-            Object.assign(state, DEFAULT_STATE, mr.state);
+            const localSnap = Object.assign({}, state);           // boot-hydrated localStorage (may hold unsynced writes)
+            Object.assign(state, DEFAULT_STATE, mr.state);         // cloud wins PLAN fields
+            const merged = mergeMergeableFields(localSnap, mr.state);
+            Object.assign(state, merged);                          // mergeable fields: never drop a local-only entry
+            // heal the cloud ONLY if merged holds REAL data the cloud lacked (normalise a missing cloud
+            // field to its empty default so a legacy doc without the newer maps doesn't trigger a spurious
+            // heal write on every boot — that extra async write races concurrent saves).
+            if(MERGEABLE_KEYS.some(k => { const c=(mr.state||{})[k]; return JSON.stringify(merged[k]) !== JSON.stringify(c==null ? (Array.isArray(merged[k])?[]:{}) : c); })) saveStateToFirestore();
           }
         }
       }
@@ -8722,6 +8768,84 @@ function applyPendingUntick(logMap){
 // subtract this client's deliberate un-ticks (so the user's own removal is honored).
 function mergeCompletionLogs(local, cloud){ return applyPendingUntick(unionCompletionLogs(local, cloud)); }
 
+// ── P2-1 increment 3a — merge the OTHER data fields, not just completionLog ────────────────────────
+// The 2026-07-02 fix merged completionLog only; every other field stayed last-write-wins, so a stale
+// writer clobbered reflections/notes/stamps (that erased two weeks of reflections). These merges extend
+// the same "a stale client can't clobber" guarantee to the rest, while honoring the user's own EDITS
+// (newest lastEdited wins — never "keep longer", which would lose a shortening) and DELETES (a note CLEAR
+// is stored as '' + a fresh ts, so the newest-ts merge makes it stick across reload AND a second tab, and
+// a later re-add wins — no separate tombstone map). Monotonic stamps/seals are a key-union. Cloud wins
+// exact ties (strict >) so all clients converge. Missing timestamps (legacy) = 0 = oldest → any real edit
+// wins, no migration. PLAN fields are NOT merged here (3b adds CAS). Reflection DELETE has no UI today;
+// if one is added, mirror the note pattern (a '' sentinel or a per-reflKey tombstone) — documented, not built.
+const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections'];
+
+function _mondayOf(dateStr){ // Monday of dateStr's ISO week — the Mon–Sun bucket saveReflection dedups on
+  const d = new Date((dateStr || '') + 'T12:00:00');
+  if(isNaN(d)) return dateStr || '';
+  const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+  return getDateStr(mon);
+}
+function _reflKey(r){ // key a reflection by the SAME period the app dedups on (so the merge can't create two per period)
+  if(!r) return '?';
+  if(r.type==='weekly')  return 'w:'+_mondayOf(r.date);
+  if(r.type==='monthly') return 'm:'+String(r.date||'').slice(0,7);
+  if(r.type==='annual')  return 'a:'+String(r.date||'').slice(0,4);
+  return (r.type||'?')+':'+(r.date||'');
+}
+// reflections: per-key (period) newest `ts` wins, cloud on exact tie. No delete UI → no tombstone today.
+function mergeReflections(local, cloud){
+  const byKey = new Map();
+  for(const r of [...(Array.isArray(cloud)?cloud:[]), ...(Array.isArray(local)?local:[])]){
+    const k = _reflKey(r), cur = byKey.get(k);
+    if(!cur || (r.ts||0) > (cur.ts||0)) byKey.set(k, r); // strictly-newer replaces → cloud kept on exact tie
+  }
+  return [...byKey.values()]; // reflections have no delete UI today; a future one mirrors the note pattern
+}
+// dailyNotes: per-day newest note wins by dailyNotesMeta ts. A cleared day is '' with a fresh ts, so a
+// clear (and a later re-add) merges the same way an edit does — no tombstone map.
+function mergeDailyNotes(lNotes, cNotes, lMeta, cMeta){
+  const notes = {}, meta = {};
+  const days = new Set([ ...Object.keys(lNotes||{}), ...Object.keys(cNotes||{}) ]);
+  for(const d of days){
+    const inL = !!(lNotes && d in lNotes), inC = !!(cNotes && d in cNotes);
+    let val, ts;
+    if(inL && inC){                                       // in BOTH sides → newest lastEdited wins (cloud on exact tie)
+      const lt = (lMeta&&lMeta[d])||0, ct = (cMeta&&cMeta[d])||0;
+      if(lt > ct){ val = lNotes[d]; ts = lt; } else { val = cNotes[d]; ts = ct; }
+    } else if(inL){ val = lNotes[d]; ts = (lMeta&&lMeta[d])||0; }  // local-only → KEEP unconditionally (never dropped by a tie vs an absent cloud entry)
+    else { val = cNotes[d]; ts = (cMeta&&cMeta[d])||0; }          // cloud-only → KEEP unconditionally
+    if(val != null){ notes[d] = val; meta[d] = ts>0 ? ts : 0; }   // val may be '' (a cleared day) — read sites treat '' as no-note
+  }
+  return { notes, meta };
+}
+// sealed records (eoySeals via sealedAt, seasonalReflections via completedAt): union keys, newest on
+// collision (cloud wins exact tie). Monotonic — no delete.
+function mergeSealed(local, cloud, tsField){
+  const out = Object.assign({}, cloud||{});
+  for(const k in (local||{})){
+    const l = local[k], c = out[k];
+    if(!c || ((l&&l[tsField])||0) > ((c&&c[tsField])||0)) out[k] = l; // strictly-newer replaces → cloud wins tie
+  }
+  return out;
+}
+const unionKeys = (local, cloud) => Object.assign({}, cloud||{}, local||{}); // monotonic {k:true} stamps
+// The single place that produces every merged field, used by BOTH the save txn and the reconcile.
+function mergeMergeableFields(local, cloud){
+  local = local || {}; cloud = cloud || {};
+  const notes = mergeDailyNotes(local.dailyNotes, cloud.dailyNotes, local.dailyNotesMeta, cloud.dailyNotesMeta);
+  return {
+    completionLog:       mergeCompletionLogs(local.completionLog, cloud.completionLog), // unchanged: union + _pendingUntick
+    reflections:         mergeReflections(local.reflections, cloud.reflections),
+    dailyNotes:          notes.notes,
+    dailyNotesMeta:      notes.meta,
+    milestoneStamps:     unionKeys(local.milestoneStamps, cloud.milestoneStamps),
+    practiceStamps:      unionKeys(local.practiceStamps, cloud.practiceStamps),
+    eoySeals:            mergeSealed(local.eoySeals, cloud.eoySeals, 'sealedAt'),
+    seasonalReflections: mergeSealed(local.seasonalReflections, cloud.seasonalReflections, 'completedAt'),
+  };
+}
+
 async function saveStateToFirestore(){
   if(!FIREBASE_CONFIGURED) return;
   if(!_currentUser){
@@ -8737,24 +8861,26 @@ async function saveStateToFirestore(){
     // union (a stale client can't wipe a newer completion) then subtract this client's deliberate
     // un-ticks (so a filled circle the user cleared actually clears). Plan fields take the local
     // (just-edited) value; lastModified stays monotonic.
-    let mergedCompletion = state.completionLog;
+    let merged = null;
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       let cloud = null;
       if(snap.exists){ try{ cloud = JSON.parse(snap.data().state); }catch(e){ cloud = null; } }
       const toWrite = Object.assign({}, state);
-      if(cloud && cloud.completionLog){
-        mergedCompletion = mergeCompletionLogs(state.completionLog, cloud.completionLog);
-        toWrite.completionLog = mergedCompletion;
+      if(cloud){
+        // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks), reflections
+        // & notes (newest-ts per key + persisted delete tombstones), stamps/seals (key-union). PLAN fields
+        // keep the local value (3b adds compare-and-set). Strict improvement over the old completion-only merge.
+        merged = mergeMergeableFields(state, cloud);
+        Object.assign(toWrite, merged);
         toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
       }
-      // else: no cloud completionLog to union against — toWrite already carries local state.completionLog,
-      // which reflects the un-tick, so nothing is re-introduced and no subtraction is needed.
+      // else: no cloud doc yet — toWrite already carries local state (incl. un-ticks/deletes), nothing to merge.
       tx.set(ref, { state: JSON.stringify(toWrite), updated: new Date().toISOString() }, { merge: true });
     });
-    // Reflect the merged view back into local so this tab shows every client's completions (minus our un-ticks).
-    if(mergedCompletion !== state.completionLog){
-      state.completionLog = mergedCompletion;
+    // Reflect the merged view back into local so this tab shows every client's data (minus our un-ticks/deletes).
+    if(merged){
+      Object.assign(state, merged);
       try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
     }
     // The un-ticks we just persisted are now reflected in the cloud — drop their tombstones so a later
@@ -8783,20 +8909,20 @@ async function reconcileFromCloud(){
     if(!snap.exists) return;
     let cloud; try{ cloud = JSON.parse(snap.data().state); }catch(e){ return; }
     if(!isValidStateShape(cloud)) return;
-    const mergedCL = mergeCompletionLogs(state.completionLog, cloud.completionLog);
+    const localSnap = Object.assign({}, state);            // capture local mergeable fields before any overwrite
+    const merged = mergeMergeableFields(localSnap, cloud);
     const cloudNewer = (cloud.lastModified || 0) > (state.lastModified || 0);
-    const clChanged = JSON.stringify(mergedCL) !== JSON.stringify(state.completionLog);
-    if(cloudNewer){
-      Object.assign(state, DEFAULT_STATE, cloud);
-      state.completionLog = mergedCL;
-      state.lastModified = Math.max(cloud.lastModified || 0, state.lastModified || 0);
-    } else if(clChanged){
-      state.completionLog = mergedCL;
-    }
-    if(cloudNewer || clChanged){
+    const changed = MERGEABLE_KEYS.some(k => JSON.stringify(merged[k]) !== JSON.stringify(localSnap[k]));
+    if(cloudNewer || changed){
+      if(cloudNewer){
+        Object.assign(state, DEFAULT_STATE, cloud);        // cloud wins PLAN fields (3b replaces with compare-and-set)
+        state.lastModified = Math.max(cloud.lastModified || 0, localSnap.lastModified || 0);
+      }
+      Object.assign(state, merged);                        // mergeable fields ALWAYS take the merged view (never drop local-only data)
       try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-      // push our unioned view up if we hold local-only ticks the cloud lacked
-      if(JSON.stringify(mergedCL) !== JSON.stringify(cloud.completionLog)) saveStateToFirestore();
+      // push our merged view up ONLY if it holds REAL data the cloud lacked (normalise a missing cloud
+      // field to its empty default so a legacy doc doesn't trigger a spurious push every reconcile)
+      if(MERGEABLE_KEYS.some(k => { const c=(cloud||{})[k]; return JSON.stringify(merged[k]) !== JSON.stringify(c==null ? (Array.isArray(merged[k])?[]:{}) : c); })) saveStateToFirestore();
       if(typeof renderTab === 'function' && document.getElementById('dashboard') &&
          document.getElementById('dashboard').classList.contains('active')) renderTab();
     }
