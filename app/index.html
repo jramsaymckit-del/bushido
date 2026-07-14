@@ -3645,7 +3645,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'p2-1-3a · 2026-07-09 · daily-note keystroke-persist + boot/reconcile merge';
+const BUILD_ID = 'p2-1-3b RELEASE · 2026-07-14 · plan-field CAS (visible conflict, no silent clobber) + nextId guard';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -8553,9 +8553,17 @@ async function loadFirestoreState(user){
           } else {
             saveLastKnownGood();
             const localSnap = Object.assign({}, state);           // boot-hydrated localStorage (may hold unsynced writes)
-            Object.assign(state, DEFAULT_STATE, mr.state);         // cloud wins PLAN fields
+            // PLAN compare-and-set on BOOT (3b): a reload = "get the latest", so we ADOPT the cloud plan. If the
+            // boot-hydrated local held a genuinely CONFLICTING plan edit (we changed it AND cloud advanced past our
+            // last-synced base), stash that edit first so it's recoverable + flag a re-apply. (A local plan edit
+            // with NO concurrent cloud change is lastModified-ahead → it takes the stale-cloud push-up branch
+            // above and never reaches here, so it is not dropped.)
+            const bootLocalDirty    = _planBaseSig !== null && planSig(localSnap) !== _planBaseSig;
+            const bootCloudAdvanced = _planBaseSig !== null && planSig(mr.state) !== _planBaseSig;
+            Object.assign(state, DEFAULT_STATE, mr.state);         // adopt cloud plan
             const merged = mergeMergeableFields(localSnap, mr.state);
             Object.assign(state, merged);                          // mergeable fields: never drop a local-only entry
+            if(bootLocalDirty && bootCloudAdvanced){ stashPlanConflict(pickPlanDeep(localSnap)); setCloudSync('error', PLAN_CONFLICT_MSG); } // conflicting local plan edit → stash for re-apply
             // heal the cloud ONLY if merged holds REAL data the cloud lacked (normalise a missing cloud
             // field to its empty default so a legacy doc without the newer maps doesn't trigger a spurious
             // heal write on every boot — that extra async write races concurrent saves).
@@ -8576,6 +8584,12 @@ async function loadFirestoreState(user){
         created: new Date().toISOString()
       });
     }
+    // 3b — establish the plan-CAS base from FULLY-SETTLED state (after migrations + the name fallback above),
+    // for BOTH the existing-user and new-user paths. A no-op save/reconcile right after load compares equal to
+    // this base → never a spurious conflict. Runtime-only (not persisted): first load of a session has base=null
+    // so its conflict detection is off (== pre-3b behavior, no regression); the LIVE two-device race — where
+    // conflicts actually arise — always has a base by the time a second save/reconcile runs.
+    _planBaseSig = planSig(state);
   } catch(e){
     console.warn('Firestore load failed:', e);
     showCloudSyncError('Cloud load failed — using your local data.');
@@ -8846,6 +8860,56 @@ function mergeMergeableFields(local, cloud){
   };
 }
 
+// ── P2-1 increment 3b — PLAN-field COMPARE-AND-SET (CAS) ──────────────────────────────────────────────
+// 3a merged the append-only fields; the STRUCTURED plan (strands/goals/crafts/habits + settings) and the
+// nextId ALLOCATOR were still last-write-wins, so a stale second writer silently CLOBBERED a newer plan edit
+// (rename a strand on device A; device B saves stale → A's edit gone — the last open piece of the 2026-07-02
+// incident). Plan fields can't be key-unioned (interlinked parent refs, id collisions), so instead of merging
+// we DETECT a concurrent plan edit and surface a VISIBLE, recoverable conflict — never silent loss:
+//   • the "version" is a CONTENT SIGNATURE of the plan surface — no per-edit-site counter to forget to bump
+//     (that missing-a-bump bug class is exactly what we fought all session; a signature can't miss a site),
+//   • _planBaseSig = the plan this client last converged with the cloud (set from FULLY-SETTLED state each load),
+//   • WRITE:  cloud plan == base → write ours;  cloud advanced & we're clean → ADOPT cloud;  BOTH changed → CONFLICT
+//             (write cloud's plan back so it's never clobbered; keep our edit local + stash it; flag the indicator),
+//   • ADOPT (reconcile/boot): a background reconcile must NOT yank a live edit (keep local, flag); a RELOAD is an
+//     explicit "get the latest" → adopt cloud + stash the losing edit for re-apply,
+//   • nextId: monotonic max so the allocator can't regress into an id another device already handed out.
+// stableStringify SORTS object keys (immune to key-order — James's spurious-conflict risk) but PRESERVES array
+// order (order is meaningful in a plan), so an UNCHANGED plan can never raise a spurious conflict. CAS touches
+// ONLY PLAN_KEYS; the append-only merge (3a), completion union (incident) and un-tick tombstone (P6-1) are
+// untouched and still run on every write.
+const PLAN_KEYS = ['strands','tenYearVision','milestones5yr','annualGoals','shokunin','kaizen',
+                   'yearEndMode','yearEndMonth','calThemeShokunin','calThemeIkigai','calThemeKaizen',
+                   'yearStartDate','name'];
+// clanMilestones/clanObligations are deliberately NOT CAS-guarded — clan-event code writes them, so including
+// them would false-conflict on a clan write. The gate-completion scalars stay last-write-wins by design.
+const PLAN_CONFLICT_MSG = "Your plan edit wasn't saved — a newer version exists on another device. Reload to get the latest, then re-apply.";
+let _planBaseSig = null;   // runtime-only; re-established from settled state on every load — NOT persisted, so a stale base can't drift into a spurious conflict
+function stableStringify(v){
+  if(v===undefined) return 'null';
+  if(v===null || typeof v!=='object') return JSON.stringify(v);
+  if(Array.isArray(v)) return '['+v.map(stableStringify).join(',')+']';                                    // array order preserved (meaningful)
+  return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stableStringify(v[k])).join(',')+'}';      // object keys sorted (order-immune)
+}
+// The plan arrays carry DERIVED / VOLATILE per-item fields — streak/lastDone/bestStreak/done are recomputed
+// from completionLog on every render (see recalcStreaks), and progress/done are nudged by completions. Those
+// change on a TICK, not a plan edit; signing them raw would make every completion look like a plan change and
+// fire false conflicts. Sign only the AUTHORED structure (id/text/parent/frequency/detail). The derived fields
+// stay last-write-wins and are rebuilt from the (separately MERGED) completionLog on load, so excluding them
+// loses nothing — a stale value is re-derived, never a silent authored loss.
+const _PLAN_ITEM_VOLATILE = ['streak','lastDone','bestStreak','done','progress'];
+function _projectPlanItem(it){ if(!it || typeof it!=='object' || Array.isArray(it)) return it; const o={}; for(const k in it){ if(!_PLAN_ITEM_VOLATILE.includes(k)) o[k]=it[k]; } return o; }
+function _planValue(k, v){ return ((k==='kaizen'||k==='shokunin'||k==='annualGoals') && Array.isArray(v)) ? v.map(_projectPlanItem) : v; }
+// A MISSING plan key must also sign identically to its DEFAULT value — otherwise a cloud doc created before a
+// newer key existed (e.g. a pre-yearEndMode/calTheme doc) would sign differently from a default-filled local
+// state and raise a SPURIOUS conflict on its very first save (the exact non-determinism risk to guard — R15).
+function planSig(s){ s=s||{}; return stableStringify(PLAN_KEYS.map(k => { const v = (s[k]===undefined ? DEFAULT_STATE[k] : s[k]); return v===undefined ? null : _planValue(k, v); })); }
+function pickPlanDeep(s){ s=s||{}; const o={}; for(const k of PLAN_KEYS){ if(k in s) o[k]=s[k]; } return JSON.parse(JSON.stringify(o)); }
+function copyPlan(dst, src){ if(!src) return; for(const k of PLAN_KEYS){ if(k in src) dst[k]=src[k]; } } // adopt a plan into a target (toWrite or local state)
+function planConflictKey(){ return _currentUser ? 'bushido_plan_conflict_'+_currentUser.uid : null; }
+function stashPlanConflict(planObj){ try{ const k=planConflictKey(); if(k) localStorage.setItem(k, JSON.stringify({plan:planObj, at:new Date().toISOString()})); }catch(e){} } // keyed by uid → recoverable
+function clearPlanConflict(){ try{ const k=planConflictKey(); if(k) localStorage.removeItem(k); }catch(e){} }  // a clean (non-conflict) save resolves the conflict → drop the stash so it can't linger/resurrect
+
 async function saveStateToFirestore(){
   if(!FIREBASE_CONFIGURED) return;
   if(!_currentUser){
@@ -8859,9 +8923,9 @@ async function saveStateToFirestore(){
   try{
     // Completion-preserving transactional write: read cloud INSIDE the txn and MERGE completionLog —
     // union (a stale client can't wipe a newer completion) then subtract this client's deliberate
-    // un-ticks (so a filled circle the user cleared actually clears). Plan fields take the local
-    // (just-edited) value; lastModified stays monotonic.
-    let merged = null;
+    // un-ticks (so a filled circle the user cleared actually clears). PLAN fields go through the 3b
+    // compare-and-set below (write / adopt / conflict); nextId takes a monotonic max; lastModified stays monotonic.
+    let merged = null, planMode = 'write', cloudPlanSnap = null, newBaseSig = null, newNextId = Number(state.nextId)||100;
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       let cloud = null;
@@ -8869,24 +8933,52 @@ async function saveStateToFirestore(){
       const toWrite = Object.assign({}, state);
       if(cloud){
         // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks), reflections
-        // & notes (newest-ts per key + persisted delete tombstones), stamps/seals (key-union). PLAN fields
-        // keep the local value (3b adds compare-and-set). Strict improvement over the old completion-only merge.
+        // & notes (newest-ts per key + persisted delete tombstones), stamps/seals (key-union).
         merged = mergeMergeableFields(state, cloud);
         Object.assign(toWrite, merged);
         toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
+        // nextId: monotonic max so a stale writer can't regress the allocator into a live id (3b · R14).
+        newNextId = Math.max(Number(state.nextId)||100, Number(cloud.nextId)||100);
+        toWrite.nextId = newNextId;
+        // PLAN compare-and-set (3b · R13): decide our plan fields against the cloud read IN-txn.
+        const localDirty    = _planBaseSig !== null && planSig(state) !== _planBaseSig;   // WE changed the plan since base
+        const cloudAdvanced = _planBaseSig !== null && planSig(cloud) !== _planBaseSig;   // another device changed it
+        if(cloudAdvanced && localDirty){
+          planMode = 'conflict';            // both edited → do NOT clobber cloud's newer plan: write IT back, keep ours local + stash (post-commit)
+          copyPlan(toWrite, cloud);
+          cloudPlanSnap = pickPlanDeep(cloud);
+        } else if(cloudAdvanced && !localDirty){
+          planMode = 'adopt';               // cloud advanced, we didn't touch the plan → take cloud's plan (never clobber it)
+          copyPlan(toWrite, cloud);
+          cloudPlanSnap = pickPlanDeep(cloud);
+          newBaseSig = planSig(cloud);
+        } else {
+          planMode = 'write';               // cloud plan == our base → our plan is a clean advance (or a no-op): write it
+          newBaseSig = planSig(toWrite);
+        }
+      } else {
+        // no cloud doc yet — first writer; toWrite already carries local state (incl. un-ticks/deletes).
+        toWrite.nextId = newNextId;
+        newBaseSig = planSig(state);
       }
-      // else: no cloud doc yet — toWrite already carries local state (incl. un-ticks/deletes), nothing to merge.
       tx.set(ref, { state: JSON.stringify(toWrite), updated: new Date().toISOString() }, { merge: true });
     });
     // Reflect the merged view back into local so this tab shows every client's data (minus our un-ticks/deletes).
-    if(merged){
-      Object.assign(state, merged);
-      try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-    }
+    if(merged) Object.assign(state, merged);
+    if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
+    state.nextId = newNextId;
+    try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
     // The un-ticks we just persisted are now reflected in the cloud — drop their tombstones so a later
     // legitimate re-add from another device is not perpetually subtracted on this long-lived tab.
     _pendingUntick = {};
-    setCloudSync('ok');
+    if(planMode === 'conflict'){
+      stashPlanConflict(pickPlanDeep(state));   // our unsaved plan edit → recoverable (keyed by uid), for re-apply
+      setCloudSync('error', PLAN_CONFLICT_MSG);
+    } else {
+      if(newBaseSig !== null) _planBaseSig = newBaseSig;
+      clearPlanConflict();                        // a clean save resolves any prior conflict → drop the stash
+      setCloudSync('ok');
+    }
     writeClanSummary(_currentUser); // fire-and-forget clan update
   } catch(e){
     console.warn('Firestore save failed:', e);
@@ -8915,8 +9007,16 @@ async function reconcileFromCloud(){
     const changed = MERGEABLE_KEYS.some(k => JSON.stringify(merged[k]) !== JSON.stringify(localSnap[k]));
     if(cloudNewer || changed){
       if(cloudNewer){
-        Object.assign(state, DEFAULT_STATE, cloud);        // cloud wins PLAN fields (3b replaces with compare-and-set)
+        // PLAN compare-and-set on ADOPT (3b): a background reconcile (focus/visibility/online) must NOT yank a
+        // live local plan edit. Keep our plan whenever we're dirty; adopt cloud's plan only when we're clean.
+        const localDirty    = _planBaseSig !== null && planSig(localSnap) !== _planBaseSig;
+        const cloudAdvanced = _planBaseSig !== null && planSig(cloud) !== _planBaseSig;
+        const myPlan = localDirty ? pickPlanDeep(localSnap) : null;   // preserve our unsynced/conflicting plan edit
+        Object.assign(state, DEFAULT_STATE, cloud);        // cloud wins scalars + plan…
+        if(localDirty) copyPlan(state, myPlan);            // …but keep our plan edit (don't overwrite it on a background reconcile)
         state.lastModified = Math.max(cloud.lastModified || 0, localSnap.lastModified || 0);
+        if(localDirty && cloudAdvanced){ stashPlanConflict(myPlan); setCloudSync('error', PLAN_CONFLICT_MSG); } // both edited → visible conflict
+        else if(!localDirty) _planBaseSig = planSig(state); // adopted cloud plan → new base
       }
       Object.assign(state, merged);                        // mergeable fields ALWAYS take the merged view (never drop local-only data)
       try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
