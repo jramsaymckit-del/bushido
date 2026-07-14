@@ -3645,7 +3645,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'p2-1-3b RELEASE · 2026-07-14 · plan-field CAS (visible conflict, no silent clobber) + nextId guard';
+const BUILD_ID = 'proverbs-162 · 2026-07-14 · bank propagation (+35 appends, Nonet restructure, Diptych repair) + rotation re-parity';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3758,7 +3758,7 @@ const PILLARS = {
 };
 
 // ============ ROTATING PROVERB ENGINE ============
-// 85 banked entries. Sequences: DIPTYCH (Blake→有構無構), TRIPTYCH (心持→身→観).
+// 162 banked entries; 93 in the daily rotation (indices 0–92). Sequences (array order): NONET (Nine Principles 1–9) → TRIPTYCH (心持→身→観) → DIPTYCH (Blake→有構無構).
 const PROVERBS = [
   {jp:'別無工夫',rom:'betsu ni kufū nashi',en:'No special method. No other way.',attr:'— Musō Soseki, Zen master, 1275–1351'},
   {jp:'雨垂れ石を穿つ',rom:'amadare ishi o ugatsu',en:'Dripping water pierces stone.',attr:'— Japanese proverb'},
@@ -3826,15 +3826,23 @@ const PROVERBS = [
   {jp:'義を見てせざるは勇なきなり',rom:'gi wo mite sezaru wa yū naki nari',en:'To see what is right and fail to do it is cowardice.',attr:'— Confucius, Analects 2:24'},
   {jp:'忠臣は二君に仕えず',rom:'chūshin wa nikun ni tsukaezu',en:'A loyal retainer does not serve two lords.',attr:'— Classical Confucian, absorbed into Japanese tradition'},
   {jp:'怒りは敵と思え',rom:'ikari wa teki to omoe',en:'Consider anger your enemy.',attr:'— Tokugawa Ieyasu'},
-  {jp:null,rom:null,en:'Expect poison from standing water.',attr:'— William Blake, Proverbs of Hell, The Marriage of Heaven and Hell (1790–93)'},
   {jp:'道に脇道あり',rom:'michi ni wakimichi ari',en:'If you study a Way daily, and your spirit diverges, you may think you are obeying a good way — but objectively it is not the true Way. If you are following the true Way and diverge a little, this will later become a large divergence. You must realise this.',attr:'— Miyamoto Musashi, Go Rin No Sho (Wind Book)'},
   {jp:'各々その道を磨くべし',rom:'onoono sono michi wo migaku beshi',en:'If you know the Way broadly, you will see it in everything. Men must polish their particular Way.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
   {jp:'万事に拍子あり',rom:'banji ni hyōshi ari',en:'There is timing in everything. Timing in strategy cannot be mastered without a great deal of practice.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
   {jp:'興廃にも拍子あり',rom:'kōhai ni mo hyōshi ari',en:'There is timing in the whole life of the warrior, in his thriving and declining, in his harmony and discord. Similarly, there is timing in the Way of the merchant, in the rise and fall of capital. All things entail rising and falling timing. You must be able to discern this.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book)'},
-  {jp:'兵法を学ぶ道',rom:'heihō wo manabu michi',en:'1. Do not think dishonestly.<br>2. The Way is in training.<br>3. Become acquainted with every art.<br>4. Know the Ways of all professions.<br>5. Distinguish between gain and loss in worldly matters.<br>6. Develop intuitive judgment and understanding for everything.<br>7. Perceive those things which cannot be seen.<br>8. Pay attention even to trifles.<br>9. Do nothing which is of no use.',attr:'— Miyamoto Musashi, Go Rin No Sho, the Nine Principles'},
+  {jp:null,rom:null,en:'Think never to veer from the Way.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (1 of 9)'},
+  {jp:null,rom:null,en:'Train unremittingly in the Way.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (2 of 9)'},
+  {jp:null,rom:null,en:'Acquaint yourself with all arts.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (3 of 9)'},
+  {jp:null,rom:null,en:'Know the Ways of all vocations.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (4 of 9)'},
+  {jp:null,rom:null,en:'Discern the truth in all things.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (5 of 9)'},
+  {jp:null,rom:null,en:'See the intrinsic worth in all things.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (6 of 9)'},
+  {jp:null,rom:null,en:'Perceive and know what cannot be seen with the eyes.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (7 of 9)'},
+  {jp:null,rom:null,en:'Pay attention even to trifles.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (8 of 9)'},
+  {jp:null,rom:null,en:'Do not engage in superfluous activities.',attr:'— Miyamoto Musashi, Go Rin No Sho (Earth Book), the Nine Principles (9 of 9)'},
   {jp:'兵法の心持',rom:'heihō no kokoromochi',en:'In strategy your spiritual bearing must not be any different from normal. Both in fighting and in everyday life you should be determined though calm. Meet the situation without tenseness yet not recklessly, your spirit settled yet unbiased. Even when your spirit is calm do not let your body relax, and when your body is relaxed do not let your spirit slacken.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
   {jp:'兵法の身、平常の身',rom:'heihō no mi, heijō no mi',en:'In all forms of strategy, it is necessary to maintain the combat stance in everyday life and to make your everyday stance your combat stance. You must research this well.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
   {jp:'観の目強く、見の目弱く',rom:'kan no me tsuyoku, ken no me yowaku',en:'The gaze should be large and broad. Perception is strong and sight weak. In strategy it is important to see distant things as if they were close and to take a distanced view of close things. The gaze is the same for single combat and for large-scale combat.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
+  {jp:null,rom:null,en:'Expect poison from standing water.',attr:'— William Blake, Proverbs of Hell, The Marriage of Heaven and Hell (1790–93)'},
   {jp:'有構無構',rom:'ukō mukō',en:'Fixed formation is bad. Study this well.',attr:'— Miyamoto Musashi, Go Rin No Sho (Water Book)'},
   {jp:'三つの先',rom:'mittsu no sen',en:'The Three Methods to Forestall the Enemy: to forestall by attacking, to forestall as he attacks, and to forestall when you and the enemy attack together. There are no methods of taking the lead other than these three. Because you can win quickly by taking the lead, it is one of the most important things in strategy.',attr:'— Miyamoto Musashi, Go Rin No Sho (Fire Book)'},
   {jp:null,rom:null,en:'Difficulties strengthen the mind, as labour does the body.',attr:'— Seneca, Moral Letters to Lucilius'},
@@ -3879,12 +3887,49 @@ const PROVERBS = [
   {jp:null,rom:null,en:'But as I continued to run, my body started to accept the fact that it was running, and I could gradually increase the distance. I was starting to acquire a runner\'s form, my breathing became more regular, and my pulse settled down. The main thing was not the speed or distance so much as running every day, without taking a break.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
   {jp:null,rom:null,en:'There are three reasons I failed. Not enough training. Not enough training. And not enough training.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
   {jp:null,rom:null,en:'I have only a few reasons to keep on running, and a truckload of them to quit. All I can do is keep the few reasons nicely polished.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
+  {jp:null,rom:null,en:'Per ardua surgo. Through difficulties, I arise.',attr:'— Latin motto'},
+  {jp:null,rom:null,en:'Per aspera ad astra. Through hardship to the stars.',attr:'— Latin maxim'},
+  {jp:null,rom:null,en:'Ars vivendi. The art of living.',attr:'— Latin'},
+  {jp:null,rom:null,en:'Aut inveniam viam aut faciam. Either I will find the way, or I will make one.',attr:'— Attributed to Hannibal'},
+  {jp:null,rom:null,en:'Non nobis solum nati sumus. We are not born for ourselves alone.',attr:'— Cicero, De Officiis 1.7.22'},
+  {jp:'ἦθος ἀνθρώπῳ δαίμων',rom:'ēthos anthrōpōi daimōn',en:'A human\'s character is their fate.',attr:'— Heraclitus, Fragment 119'},
+  {jp:null,rom:null,en:'Labor omnia vicit improbus. Persistent labour conquered all things.',attr:'— Virgil, Georgics 1.145'},
+  {jp:null,rom:null,en:'Ēheu nōs miserōs, quam tōtus homuncio nīl est. Sīc erimus cūnctī, postquam nōs auferet Orcus. Ergō vīvāmus, dum licet esse bene. Alas, we wretches — how a man is wholly nothing. So shall we all be after Orcus carries us off. Therefore let us live well while we may.',attr:'— Petronius, Satyricon 34 (Trimalchio\'s feast)'},
+  {jp:null,rom:null,en:'In mundo pressuram habetis sed confidite: ego vici mundum. In the world ye shall have tribulation, but be of good cheer; I have overcome the world.',attr:'— Jesus, John 16:33 (Vulgate)'},
+  {jp:null,rom:null,en:'It would be better for me that multitudes of men should disagree with me rather than that I, being one, should be out of harmony with myself.',attr:'— Socrates (Plato, Gorgias 482b–c)'},
+  {jp:null,rom:null,en:'In every one of us there are two ruling and directing principles: the one being an innate desire of pleasure; the other, an acquired judgment which aspires after excellence.',attr:'— Socrates (Plato, Phaedrus 237d–238a)'},
+  {jp:null,rom:null,en:'There is more wisdom in your body than in your deepest philosophy.',attr:'— Friedrich Nietzsche, Thus Spoke Zarathustra'},
+  {jp:null,rom:null,en:'O my soul, do not aspire to immortal life, but exhaust the possible.',attr:'— Pindar, Third Pythian (used by Camus as the epigraph to The Myth of Sisyphus)'},
+  {jp:null,rom:null,en:'All philosophy begins in wonder.',attr:'— Plato, Theaetetus 155d'},
+  {jp:null,rom:null,en:'All cruelty springs from weakness.',attr:'— Seneca, De Ira (paraphrase)'},
+  {jp:null,rom:null,en:'I improve through adversity.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'A knife cannot cut itself open.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'The risk of insult is the price of clarity.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'Hesitation is death.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'Therefore, take action. Before action takes you.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'Nemo vir est qui mundum non reddat meliorem. What man is a man who does not make the world better?',attr:'— BUSHIDO (original Latin coinage)'},
+  {jp:null,rom:null,en:'Act on the thing that brings you the most excitement to the very best of your ability with no expectation of an outcome.',attr:'— BUSHIDO'},
+  {jp:null,rom:null,en:'The only difference between the master and the beginner is the master has failed more times than the beginner has ever tried.',attr:'— Attributed to Stephen McCranie'},
+  {jp:null,rom:null,en:'A river cuts through rock not because of its power but because of its persistence.',attr:'— Jim Watkins'},
+  {jp:null,rom:null,en:'Be without fear in the face of your enemies. Be brave and upright that God may love thee. Speak the truth always, even if it leads to your death. Safeguard the helpless, and do no wrong.',attr:'— From Kingdom of Heaven (Ridley Scott, 2005) — written as a knight\'s oath'},
+  {jp:null,rom:null,en:'The trials you encounter will introduce you to your strengths.',attr:'— Modern aphorism'},
+  {jp:null,rom:null,en:'Anger is just fear unconfronted.',attr:'— Modern aphorism'},
+  {jp:null,rom:null,en:'If more of us valued food and cheer and song above hoarded gold, it would be a merrier world.',attr:'— J.R.R. Tolkien, The Hobbit (Thorin)'},
+  {jp:null,rom:null,en:'Eat, drink and be merry, friend, since all other human things are not worth this.',attr:'— Inscription attributed to King Sardanapalus (transmitted via Strabo, Geography 14.5.9)'},
+  {jp:null,rom:null,en:'Enjoy yourself here, please! For soon again will other men exist, but I, after dying, will become black earth.',attr:'— Theognis of Megara, Elegies (6th century BCE)'},
+  {jp:null,rom:null,en:'Venit hora eius, veniet et tua. His hour has come; so too will yours.',attr:'— Inscription on a Knight\'s tombstone, Co-Cathedral of St. John, Valletta, Malta (16th–18th c.)'},
+  {jp:null,rom:null,en:'It does not matter how young or strong you may be, the hour of death comes sooner than you expect. It is an extraordinary miracle that you should have escaped to this day; do you suppose you have even the briefest respite in which to relax? In the Japanese Buddhist tradition, awareness of the fundamental condition of existence is no cause for nihilistic despair, but rather a call to vital activity in the present moment and to gratitude for another moment\'s being granted to us.',attr:'— Translated by Donald Keene; cited in the Stanford Encyclopedia of Philosophy, entry on Japanese Philosophy'},
+  {jp:null,rom:null,en:'It is not about the answer, but the process of searching for the answer.',attr:'— Carl Johnson, PhD'},
+  {jp:null,rom:null,en:'Furthermore, with your spirit attuned to the Way you will triumph over the enemy with your mind. Having come so far, how can you be beaten by anyone?',attr:'— Miyamoto Musashi, Go Rin No Sho'},
+  {jp:null,rom:null,en:'The secret to your future is hidden in your daily routine.',attr:'— Mike Murdock (attributed)'},
 ];
 function _buildProverbPlaylist(){
+  // Rotation = array indices 0–92, natural order. (The old hand-tuned reorder
+  // ended at 84 and was tuned to the pre-Nonet layout; after the restructure it
+  // scrambled the Nine Principles and evicted 8 entries, so it is retired.)
+  // Nonet plays 1→9; Triptych (心持→身→観) and Diptych (Blake→有構無構) stay contiguous.
   const o=[];
-  for(let i=0;i<=65;i++) o.push(i);
-  o.push(66,75,67,68,69,70,71,72,73,74);
-  for(let i=76;i<=84;i++) o.push(i);
+  for(let i=0;i<=92;i++) o.push(i);
   return o.map(i=>PROVERBS[i]);
 }
 const PROVERB_PLAYLIST=_buildProverbPlaylist();
