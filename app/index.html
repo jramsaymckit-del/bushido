@@ -257,6 +257,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .pbar{margin-top:8px;height:6px;background:rgba(0,0,0,.05);border-radius:3px;overflow:hidden}
 .pfill{height:100%;background:var(--ink-light);border-radius:3px;transition:width .5s}
 .pfill.red{background:var(--red)}
+.pfill.done{background:var(--red)}
 .plabel{font-size:9px;color:var(--ink-faint);margin-top:4px;text-align:right;letter-spacing:1px}
 .pctrl{display:flex;align-items:center;gap:8px;margin-top:6px}
 .pbtn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink);background:none;
@@ -3645,7 +3646,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'proverbs-162 · 2026-07-14 · bank propagation (+35 appends, Nonet restructure, Diptych repair) + rotation re-parity';
+const BUILD_ID = 'p2-2 RELEASE · 2026-07-21 · progress ratchet retired → derived 30d adherence + user completion override';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3661,12 +3662,39 @@ let   STORAGE_KEY = null;   // === PROD_KEY post-auth (per-uid localStorage cach
 let   LKG_KEY     = null;   // 'bushido_lkg_<uid>' post-auth (last-known-good snapshot key)
 
 // ── Schema versioning (Tier 1.1) ───────────────────────────────────────
-// Framework is in place; no data-transforming migrations exist today.
-// CURRENT_VERSION = 1 means the v1 shape is current.
-// A doc with NO schemaVersion field is treated as v1 (no migration needed).
-const CURRENT_VERSION = 1;
+// A doc with NO schemaVersion field is treated as v1.
+// CURRENT_VERSION = 2 (P2-2): craft/goal progress is now DERIVED, never stored.
+const CURRENT_VERSION = 2;
 const SCHEMA_MIGRATIONS = {
-  // 2: function migrate_v1_to_v2(s){ ... return s; }  // pure + idempotent
+  // P2-2 — retire the one-way autoCompound ratchet. progress is now a pure derived
+  // function (craftProgress/goalProgress) recomputed on render, so the stored values
+  // are dead weight AND actively wrong (crafts crept to 100 and phantom-locked).
+  // Pure + idempotent. planSig-neutral: 'progress' and 'done' are both in
+  // _PLAN_ITEM_VOLATILE, so the 3b CAS does not read this as a plan edit.
+  2: function migrate_v1_to_v2(s){
+    // craft/kaizen `done` is LEFT UNTOUCHED throughout.
+    (s.annualGoals||[]).forEach(function(g){
+      // Clear ONLY ratchet-fabricated Ikigai dones: habit-backed AND not truly complete.
+      // Craftless hand-marked binaries (e.g. "open the family business conversation") survive.
+      var crafts = (s.shokunin||[]).filter(function(c){ return String(c.parentAnnual)===String(g.id); });
+      var habitBacked = crafts.some(function(c){
+        return (s.kaizen||[]).some(function(k){ return String(k.parentShok)===String(c.id); });
+      });
+      if(g.done===true && habitBacked && (goalProgress(g, s)||0) < 100) g.done = false;
+    });
+    // ── TRANSITIONAL · WRITE-ONLY backward-compat mirror (expand/contract) ──────────────
+    // CURRENT CODE NEVER READS THESE FIELDS. craftProgress()/goalProgress() recompute from
+    // completionLog on every render; the read path does not trust a stored number — that is
+    // exactly what let the ratchet drive the display. These are written ONLY so a PRE-p2-2
+    // build (which does `reduce((a,c)=>a+c.progress,0)`) reads a sane number instead of NaN,
+    // keeping a deploy rollback safe for every migrated user.
+    // CONTRACT STEP: delete these two writes — and the field — in a later cleanup once no
+    // pre-p2-2 build can load a doc. Enforced by scripts/ci/gate_progress_ratchet.mjs, which
+    // poisons the stored values and asserts no render/rollup path consumes them.
+    (s.shokunin||[]).forEach(function(c){ c.progress = craftProgress(c, s); });
+    (s.annualGoals||[]).forEach(function(g){ g.progress = goalDisplayPct(g, s) || 0; });   // 100 for a preserved user-done goal
+    return s;
+  }
 };
 // Derived local identity — set to the Firebase uid in loadFirestoreState(user); used as a
 // fallback when Firebase is offline. Was PROD_KEY-derived (per-user name); now the uid so
@@ -4338,7 +4366,7 @@ function toggleHabitOnDate(habitId,dateStr){
     const k=state.kaizen.find(k=>k.id===habitId);
     if(k){
       k.done=nowDone;
-      if(nowDone){ autoCompound(k); _animatingIds.add(habitId); }
+      if(nowDone){ _animatingIds.add(habitId); }
     }
   }
   saveState();renderGoals();updateStreak();
@@ -5306,6 +5334,7 @@ function renderGoals(){
       const parent=state.annualGoals.find(a=>a.id==g.parentAnnual);
       const childKaizens=state.kaizen.filter(k=>k.parentShok==g.id);
       const activeStreaks=childKaizens.filter(k=>k.streak>0).length;
+      const cp=craftHasBar(g)?craftProgress(g):null;   // P2-2 — 30-day adherence; null hides the bar
       return `<li class="goal" style="animation-delay:${i*.05}s" data-shok-id="${g.id}">
         <div class="goal-content">
           <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
@@ -5314,6 +5343,8 @@ function renderGoals(){
             ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
             ${activeStreaks?`<span class="goal-streak">${activeStreaks} active habit${activeStreaks>1?'s':''}</span>`:''}
           </div>
+          ${cp!=null?`<div class="pbar"><div class="pfill" style="width:${cp}%"></div></div>
+          <div class="plabel">${cp}% (last 30 days)</div>`:''}
         </div>
         </li>`;
     }).join('');
@@ -5324,7 +5355,7 @@ function renderGoals(){
     if(!items.length){list.innerHTML=emptyState()+addTriggerHtml()+buildYearView();return;}
     list.innerHTML=items.map((g,i)=>{
       const childShok=state.shokunin.filter(s=>s.parentAnnual==g.id);
-      const avgProg=childShok.length?Math.round(childShok.reduce((a,c)=>a+c.progress,0)/childShok.length):0;
+      const gp=goalDisplayPct(g);   // P2-2b — user-ticked → 100%; else live derived avg (null when 0 crafts & not done)
       const msLabel=g.parentMs!==''&&state.milestones5yr[g.parentMs]?state.milestones5yr[g.parentMs]:'';
       return `<li class="goal ${g.done?'done':''}" style="animation-delay:${i*.05}s" data-annual-id="${g.id}">
         <div class="check ${g.done?'done':''}" onclick="toggleIkigai(${g.id})"></div>
@@ -5335,8 +5366,8 @@ function renderGoals(){
             ${msLabel?`<span class="goal-parent">\u2192 ${msLabel.substring(0,30)}</span>`:''}
             ${childShok.length?`<span>${childShok.length} craft${childShok.length>1?'s':''} linked</span>`:''}
           </div>
-          <div class="pbar"><div class="pfill" style="width:${avgProg}%"></div></div>
-          <div class="plabel">${avgProg}% (avg. of linked Shokunin goals)</div>
+          ${gp!=null?`<div class="pbar"><div class="pfill${g.done?' done':''}" style="width:${gp}%"></div></div>
+          <div class="plabel">${g.done?'100% · complete':gp+'% (avg. of linked Shokunin goals)'}</div>`:''}
           ${typeof ipcGoalStripHtml==='function'?ipcGoalStripHtml(g):''}
         </div>
         <div class="goal-actions">
@@ -5485,7 +5516,6 @@ function toggleKaizen(id){
   recordCompletionToggle(todayStr, id, g.done);  // P6-1 — so an un-tick isn't unioned back on save
   // Recompute streak from log; updates bestStreak too
   recomputeStreak(id);
-  if(g.done) autoCompound(g);
   saveState();
   renderTab();
   // Check for newly earned milestone stamps (stamps enqueue before seal)
@@ -5493,42 +5523,49 @@ function toggleKaizen(id){
   checkCelebrations();
 }
 
-function autoCompound(kaizenGoal){
-  if(!kaizenGoal.parentShok)return;
-  const parent=state.shokunin.find(s=>s.id==kaizenGoal.parentShok);
-  if(!parent||parent.done)return;
-  const siblings=state.kaizen.filter(k=>k.parentShok==parent.id);
-  const completedToday=siblings.filter(k=>k.done).length;
-  if(completedToday>0){
-    const nudge=Math.round(2/siblings.length*completedToday);
-    parent.progress=Math.min(100,parent.progress+nudge);
-    if(parent.progress>=100)parent.done=true;
-    // Cascade up to Ikigai
-    if(parent.parentAnnual){
-      const ikigai=state.annualGoals.find(a=>a.id==parent.parentAnnual);
-      if(ikigai){
-        const childShok=state.shokunin.filter(s=>s.parentAnnual==ikigai.id);
-        const avg=Math.round(childShok.reduce((a,c)=>a+c.progress,0)/childShok.length);
-        ikigai.progress=avg;
-        if(avg>=100)ikigai.done=true;
-      }
+// ============ P2-2 — DERIVED PROGRESS (replaces the retired autoCompound ratchet) ============
+// The bar means "am I doing the work": 30-day, cadence-aware adherence across a craft's
+// child habits, recomputed on EVERY render and NEVER stored. Reaching 100% never sets
+// `done` — done is user-only (toggleIkigai) — so the phantom-lock cannot recur.
+// Pure + state-parameterized (st) so the schema migration can call these on a loaded
+// doc before it is assigned to the global `state`.
+function _craftAdherence(craft, st){
+  st = st || state;
+  const kids = (st.kaizen||[]).filter(k=>String(k.parentShok)===String(craft.id));
+  if(!kids.length) return null;                 // no habits → no denominator (hide the bar)
+  const today = new Date(); today.setHours(0,0,0,0);
+  const log = st.completionLog || {};
+  let scheduled=0, done=0;
+  for(let d=0; d<30; d++){
+    const day = new Date(today); day.setDate(today.getDate()-d);
+    const dStr = getDateStr(day);
+    const dIdx = (day.getDay()+6)%7;
+    for(const k of kids){
+      if(habitOnDay(k, dIdx, day)){ scheduled++; if((log[dStr]||[]).includes(k.id)) done++; }
     }
   }
+  if(!scheduled) return null;                   // habits exist but none scheduled yet (future startDate)
+  return Math.round(done/scheduled*100);
 }
+function craftProgress(craft, st){ const v=_craftAdherence(craft, st); return v==null ? 0 : v; }
+function craftHasBar(craft, st){ return _craftAdherence(craft, st) != null; }
+function goalProgress(goal, st){                // avg over linked crafts; null when 0 crafts (hide bar)
+  st = st || state;
+  const crafts = (st.shokunin||[]).filter(s=>String(s.parentAnnual)===String(goal.id));
+  if(!crafts.length) return null;
+  return Math.round(crafts.reduce((a,c)=>a+craftProgress(c, st),0)/crafts.length);
+}
+// P2-2b — user completion override: a goal the user has TICKED reads 100%; un-ticking reverts to the
+// live derived %. `done` is user-only (toggleIkigai) and never auto-set, so this cannot re-introduce the
+// phantom-lock — reaching a derived 100% still leaves done=false. Reversible any number of times.
+function goalDisplayPct(goal, st){ return (goal && goal.done) ? 100 : goalProgress(goal, st); }
 
-function toggleShok(id){
-  const g=state.shokunin.find(s=>s.id===id);
-  if(g){g.done=!g.done;if(g.done)g.progress=100;saveState();renderTab();}
-}
 function toggleIkigai(id){
   const g=state.annualGoals.find(a=>a.id===id);
   if(g){g.done=!g.done;saveState();renderTab();}
 }
-
-function adjProg(id,delta){
-  const g=state.shokunin.find(s=>s.id===id);
-  if(g){g.progress=Math.max(0,Math.min(100,g.progress+delta));g.done=g.progress>=100;saveState();renderTab();}
-}
+// toggleShok / adjProg REMOVED (P2-2) — both were unwired (no UI call site) and wrote a
+// stored progress/done that nothing reads now that progress is derived.
 
 function updateStreak(){
   // D — update James's live row in clan momentum (includes practice badge)
@@ -8137,7 +8174,7 @@ function buildOwnClanData(){
     strands:    (state.strands||[]).slice(0,5),
     strandRates: isShinobi ? [] : computeStrandRates(),
     crafts:     (state.shokunin||[]).map(function(s){var t=s.text||'';return t.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();}).slice(0,6),
-    goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:g.progress||0};}).slice(0,6),
+    goals:      (state.annualGoals||[]).map(function(g){return {text:(g.text||'').substring(0,45),progress:(goalDisplayPct(g)||0)};}).slice(0,6),   // P2-2 — derived (or 100 when user-marked done), not the stale stored value
     weekReflect:  weekReflect,
     monthReflect: monthReflect,
     practiceMilestoneDays: highestMilestoneDays,
