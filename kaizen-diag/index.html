@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="fixed">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Kaizen touch diagnostic</title>
+<style>
+  :root{ --red:#CC3529; --red-light:#D94A3E; --ink-faint:#8A8578; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,'Noto Sans JP',sans-serif;background:#17130f;color:#F5F0E8;
+       min-height:100vh;padding:14px 12px 44vh}
+  h1{font-size:15px;letter-spacing:1px;margin:6px 2px 2px}
+  .sub{font-size:11px;color:#9a9284;line-height:1.5;margin:0 2px 12px}
+  .modebar{display:flex;gap:8px;align-items:center;margin:0 2px 14px;flex-wrap:wrap}
+  .modebar button{font:600 12px/1 -apple-system,sans-serif;padding:9px 12px;border-radius:7px;border:1px solid #3a332b;
+       background:#241f18;color:#F5F0E8;touch-action:manipulation}
+  .modebar button.on{background:var(--red);border-color:var(--red);color:#fff}
+  .tally{font-size:12px;color:#c9c1b2;margin-left:auto}
+  .tally b{color:#F5F0E8}
+
+  /* dark card behind the grid — matches the app's Kaizen panel */
+  .card{background:linear-gradient(160deg,#2a2019,#1d1712);border:1px solid #38302650;border-radius:10px;
+        padding:10px 8px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+
+  /* ===== HABIT GRID — CSS copied verbatim from bushido_app.html ===== */
+  .hg-grid{overflow:hidden}
+  .hg-row{display:grid;grid-template-columns:minmax(88px,120px) repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,.04)}
+  .hg-row:last-child{border-bottom:none}
+  .hg-header{background:rgba(0,0,0,.25)}
+  .hg-label-cell{padding:8px 10px}
+  .hg-day-head{text-align:center;padding:8px 2px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);line-height:1.7}
+  .hg-day-head.is-today{color:var(--red)}
+  .hg-date-num{font-size:10px;font-weight:700;display:block}
+  .hg-label{padding:8px 10px;font-size:10px;color:rgba(255,255,255,.55);line-height:1.4;display:flex;align-items:center}
+  .hg-cell{height:34px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:manipulation}
+  .hg-cell.hg-today-col:not(.hg-off){background:transparent}
+  .hg-cell.hg-miss{cursor:pointer}
+  .hg-cell.hg-miss::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.18);display:block;transition:border-color .2s}
+  .hg-cell.hg-done{cursor:pointer}
+  .hg-cell.hg-done::after{content:'';width:13px;height:13px;border-radius:50%;background:var(--red);display:block;transition:background .2s}
+  .hg-cell.hg-future::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.07);display:block}
+
+  /* ---- HOVER RULES ---- *
+     BROKEN mode: hover applies on ALL devices (what shipped in kaizen-fix → iOS makes it sticky on the
+     reused cell → absorbs the untick re-tap).
+     FIXED mode: the SAME hover rules, but gated behind @media (hover:hover) so touch devices never get them. */
+  html[data-mode="broken"] .hg-cell.hg-miss:hover::after{border-color:rgba(245,240,232,.45)}
+  html[data-mode="broken"] .hg-cell.hg-done:hover::after{background:var(--red-light)}
+  @media (hover:hover){
+    html[data-mode="fixed"] .hg-cell.hg-miss:hover::after{border-color:rgba(245,240,232,.45)}
+    html[data-mode="fixed"] .hg-cell.hg-done:hover::after{background:var(--red-light)}
+  }
+
+  /* instrumentation panel */
+  #panel{position:fixed;left:0;right:0;bottom:0;height:40vh;overflow:auto;background:rgba(8,8,8,.94);
+         color:#7CFC7C;font:10px/1.45 ui-monospace,Menlo,monospace;padding:8px 10px;white-space:pre-wrap;
+         border-top:1px solid #333;z-index:99}
+  #panel .t{color:#F5F0E8;font-weight:700}
+  #panel .fire{color:#7CFC7C;font-weight:700}
+  #panel .warn{color:#ffcf5a;font-weight:700}
+  #panel .bad{color:#ff6b5e;font-weight:700}
+</style>
+</head>
+<body>
+  <h1>Kaizen touch diagnostic <span style="color:#9a9284;font-weight:400">· no login</span></h1>
+  <p class="sub">TICK fast down the <b>today</b> column (red header), then UNTICK fast down the same column.
+     Pass = every tap flips its own dot, 1:1, both directions. Tap the black panel to clear the log.</p>
+  <div class="modebar">
+    <button id="btn-fixed" class="on">FIXED (hover-gated + pointerup)</button>
+    <button id="btn-broken">BROKEN (reproduces the bug)</button>
+    <span class="tally">taps <b id="t-taps">0</b> · toggles <b id="t-tog">0</b></span>
+  </div>
+  <div class="card"><div class="hg-grid" id="grid"></div></div>
+  <div id="panel">kaizen-diag ready — tap a dot.</div>
+
+<script>
+(function(){
+  var grid = document.getElementById('grid');
+  var panel = document.getElementById('panel');
+  var HABITS = [
+    {id:1,text:'Morning prayer'},{id:2,text:'Listen to Bushido'},{id:3,text:'Identify one thing'},
+    {id:4,text:'Word of affirmation'},{id:5,text:'Read 10 pages'},{id:6,text:'Cold shower'},
+    {id:7,text:'Gratitude note'}
+  ];
+  var DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var now = new Date(); now.setHours(0,0,0,0);
+  var dow = (now.getDay()+6)%7;                 // 0=Mon .. today's column index
+  var weekStart = new Date(now); weekStart.setDate(now.getDate()-dow);
+  var COLS = [];
+  for(var i=0;i<7;i++){ var d=new Date(weekStart); d.setDate(weekStart.getDate()+i);
+    COLS.push({i:i, num:d.getDate(), isToday:i===dow, isFuture:i>dow}); }
+
+  var done = {};                                // key h+'_'+col -> bool
+  function key(h,c){ return h+'_'+c; }
+  function isDone(h,c){ return !!done[key(h,c)]; }
+
+  // ── render ONCE; toggles mutate cells in place (surgical node-reuse — the Bug A behaviour we keep) ──
+  function render(){
+    var html = '<div class="hg-row hg-header"><div class="hg-label-cell"></div>';
+    COLS.forEach(function(c){ html += '<div class="hg-day-head'+(c.isToday?' is-today':'')+'" data-col="'+c.i+'">'+DAYS[c.i]+'<span class="hg-date-num">'+c.num+'</span></div>'; });
+    html += '</div>';
+    HABITS.forEach(function(k){
+      html += '<div class="hg-row"><div class="hg-label">'+k.text+'</div>';
+      COLS.forEach(function(c){
+        var cls='hg-cell';
+        if(c.isFuture) cls+=' hg-future';
+        else if(isDone(k.id,c.i)) cls+=' hg-done';
+        else cls+=' hg-miss';
+        if(c.isToday) cls+=' hg-today-col';
+        var clickable = !c.isFuture;
+        if(clickable) cls+=' hg-clickable';
+        html += '<div class="'+cls+'" data-habit="'+k.id+'" data-col="'+c.i+'"></div>';
+      });
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+  render();
+
+  // ── surgical single-cell update (mirrors _surgicalToggleUpdate: reuse node, no rebuild) ──
+  function surgical(h,c,nowDone){
+    var cell = grid.querySelector('.hg-cell[data-habit="'+h+'"][data-col="'+c+'"]');
+    if(!cell) return;
+    if(nowDone){ cell.classList.remove('hg-miss'); cell.classList.add('hg-done'); }
+    else { cell.classList.remove('hg-done'); cell.classList.add('hg-miss'); }
+  }
+
+  // ── instrumentation ──
+  var t0=0, taps=0, togs=0, log=[];
+  function ms(){ return Math.round(performance.now()-t0); }
+  function paint(){ panel.innerHTML = 'kaizen-diag — mode='+document.documentElement.getAttribute('data-mode')+' (tap to clear)\n'+log.join('\n'); }
+  function push(cls,txt){ if(!t0) t0=performance.now(); log.unshift('<span class="'+cls+'">'+txt+'</span>'); if(log.length>80) log.pop(); paint(); }
+  function clsOf(cell){ return cell? (cell.classList.contains('hg-done')?'DONE':cell.classList.contains('hg-miss')?'MISS':'?') : '-'; }
+  function tally(){ document.getElementById('t-taps').textContent=taps; document.getElementById('t-tog').textContent=togs; }
+
+  // raw touch/pointer/click logging (capture — logging only, never toggles)
+  ['pointerdown','touchstart','touchend','pointerup','click'].forEach(function(type){
+    grid.addEventListener(type,function(e){
+      var cell = e.target.closest ? e.target.closest('.hg-cell') : null;
+      var h = cell? cell.getAttribute('data-habit') : '-';
+      var sym = {pointerdown:'⇣ pd ',touchstart:'↓ ts ',touchend:'↑ te ',pointerup:'⇡ pu ',click:'● clk'}[type];
+      var cls = (type==='click' && document.documentElement.getAttribute('data-mode')==='fixed') ? 'warn' : 't';
+      push(cls, '+'+ms()+'ms  '+sym+'  h'+h+'  '+clsOf(cell));
+      if(type==='pointerdown') taps++, tally();   // one per physical press (fires for touch + mouse)
+    }, true);
+  });
+
+  function doToggle(h,c){
+    if(COLS[c].isFuture) return;
+    var nowDone = !isDone(h,c);
+    done[key(h,c)] = nowDone;
+    togs++; tally();
+    push('fire','        ✔ TOGGLE h'+h+' → '+(nowDone?'DONE':'MISS'));
+    surgical(h,c,nowDone);
+  }
+
+  // FIXED mode: toggle on pointerup (+preventDefault); no click handler → exactly one fire per tap.
+  grid.addEventListener('pointerup',function(e){
+    if(document.documentElement.getAttribute('data-mode')!=='fixed') return;
+    var cell = e.target.closest('.hg-cell.hg-clickable'); if(!cell) return;
+    e.preventDefault();
+    doToggle(+cell.getAttribute('data-habit'), +cell.getAttribute('data-col'));
+  });
+  // BROKEN mode: toggle on click (mirrors the shipped inline onclick), hover ungated.
+  grid.addEventListener('click',function(e){
+    if(document.documentElement.getAttribute('data-mode')!=='broken') return;
+    var cell = e.target.closest('.hg-cell.hg-clickable'); if(!cell) return;
+    doToggle(+cell.getAttribute('data-habit'), +cell.getAttribute('data-col'));
+  });
+
+  // panel clear
+  panel.addEventListener('click',function(){ log=[]; t0=0; paint(); });
+
+  // mode switch
+  function setMode(m){
+    document.documentElement.setAttribute('data-mode',m);
+    document.getElementById('btn-fixed').classList.toggle('on',m==='fixed');
+    document.getElementById('btn-broken').classList.toggle('on',m==='broken');
+    // reset the grid so each mode starts clean
+    done={}; render(); taps=0; togs=0; tally(); log=[]; t0=0;
+    push('t','— mode → '+m.toUpperCase()+' — grid reset —');
+  }
+  document.getElementById('btn-fixed').addEventListener('click',function(){ setMode('fixed'); });
+  document.getElementById('btn-broken').addEventListener('click',function(){ setMode('broken'); });
+})();
+</script>
+</body>
+</html>
