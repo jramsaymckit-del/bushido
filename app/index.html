@@ -233,7 +233,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 
 /* Checkbox */
 .check{width:28px;height:28px;border:2px solid var(--ink);border-radius:50%;flex-shrink:0;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .3s;margin-top:2px;opacity:.4}
+  display:flex;align-items:center;justify-content:center;transition:all .3s;margin-top:2px;opacity:.4;touch-action:manipulation}
 .check:hover{opacity:.7;border-color:var(--red)}
 .check.done{background:var(--red);border-color:var(--red);opacity:1}
 .check.done::after{content:'';width:8px;height:8px;background:var(--scroll);border-radius:50%}
@@ -367,7 +367,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .hg-day-head.is-today{color:var(--red)}
 .hg-date-num{font-size:10px;font-weight:700;display:block}
 .hg-label{padding:8px 10px;font-size:10px;color:rgba(255,255,255,.55);line-height:1.4;display:flex;align-items:center}
-.hg-cell{height:32px;display:flex;align-items:center;justify-content:center;position:relative}
+.hg-cell{height:32px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:manipulation}
 .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .hg-cell.hg-off{background:none}
 .hg-cell.hg-miss{cursor:pointer}
@@ -3646,7 +3646,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'p2-2 RELEASE · 2026-07-21 · progress ratchet retired → derived 30d adherence + user completion override';
+const BUILD_ID = 'kaizen-fix · 2026-07-23 · Bug A surgical single-cell + touch-action · Bug B save-mutex + snapshot + scoped-clear';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4350,6 +4350,47 @@ function isHabitDoneOnDate(habitId,dateStr){
   return (log[dateStr]||[]).includes(habitId);
 }
 
+// ── Bug A (2026-07-23) — surgical single-cell update (replaces the full renderGoals() rebuild) ──
+// Fast consecutive grid taps each triggered a full `#goals-list` innerHTML rebuild; a follow-up tap
+// (≤~1s later, within iOS's ~300ms double-tap click delay) then resolved against a half-rebuilt grid,
+// so it landed on the wrong cell / two toggled at once / the column scrambled. This patches ONLY the
+// affected DOM in place — NEVER tearing down the grid the finger is on — and refreshes the full
+// dependent set: the tapped cell, the column-complete glow (day-head + the column's done cells), the
+// "show up today" checklist item (today only), the streak whisper, and the strand arms. If the expected
+// DOM isn't present (grid not mounted, or the habit isn't in the visible week) it falls back to a full
+// render so the UI is never left stale. Paired with `touch-action:manipulation` on the cells (CSS).
+function _surgicalToggleUpdate(habitId,dateStr,nowDone){
+  const grid=document.querySelector('.hg-grid');
+  const cell=grid&&grid.querySelector('.hg-cell[data-habit="'+habitId+'"][data-date="'+dateStr+'"]');
+  if(!grid||!cell){ renderGoals(); return; }                 // safety — never leave the UI stale
+  // 1) the tapped cell
+  if(nowDone){ cell.classList.remove('hg-miss'); cell.classList.add('hg-done'); }
+  else { cell.classList.remove('hg-done','hg-col-complete'); cell.classList.add('hg-miss'); }
+  // 2) column-complete glow — recompute this column from the live cells (scheduled, non-future = done|miss)
+  const col=cell.getAttribute('data-col');
+  const colCells=[].slice.call(grid.querySelectorAll('.hg-cell[data-col="'+col+'"]'));
+  const active=colCells.filter(c=>c.classList.contains('hg-done')||c.classList.contains('hg-miss'));
+  const complete=active.length>0&&active.every(c=>c.classList.contains('hg-done'));
+  const head=grid.querySelector('.hg-day-head[data-col="'+col+'"]');
+  if(head) head.classList.toggle('hg-col-complete',complete);
+  colCells.forEach(c=>c.classList.toggle('hg-col-complete',complete&&c.classList.contains('hg-done')));
+  // 3) the "show up today" checklist item + its check (today only)
+  if(dateStr===getDateStr()){
+    const li=document.querySelector('#goals-list li[data-kaizen-id="'+habitId+'"]');
+    if(li){
+      li.classList.toggle('done',nowDone);
+      const chk=li.querySelector('.check');
+      if(chk){ chk.classList.toggle('done',nowDone); if(nowDone) chk.classList.add('origami-fill'); else chk.classList.remove('origami-fill'); }
+    }
+  }
+  // 4) streak whisper (· day N) — update the number if the span is present
+  const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
+  const whisper=document.querySelector('.kk-streak-whisper');
+  if(whisper) whisper.textContent=maxSt>1?'· day '+maxSt:'';
+  // 5) strand arms (above the grid — safe to rebuild; reflects the streak change)
+  if(typeof renderStrandArms==='function') renderStrandArms();
+}
+
 function toggleHabitOnDate(habitId,dateStr){
   if(!state.completionLog)state.completionLog={};
   const arr=[...(state.completionLog[dateStr]||[])];
@@ -4369,7 +4410,7 @@ function toggleHabitOnDate(habitId,dateStr){
       if(nowDone){ _animatingIds.add(habitId); }
     }
   }
-  saveState();renderGoals();updateStreak();
+  saveState();_surgicalToggleUpdate(habitId,dateStr,nowDone);updateStreak();
   checkCelebrations();
 }
 
@@ -4424,7 +4465,7 @@ function buildKaizenGrid(){
         <div class="hg-label-cell"></div>
         ${days.map((d,i)=>{
           const isT=isCurrentWeek&&i===todayDayIdx;
-          return `<div class="hg-day-head${isT?' is-today':''}${completeDays[i]?' hg-col-complete':''}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
+          return `<div class="hg-day-head${isT?' is-today':''}${completeDays[i]?' hg-col-complete':''}" data-col="${i}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
         }).join('')}
       </div>
       ${habits.map(k=>{
@@ -4445,7 +4486,7 @@ function buildKaizenGrid(){
             else{cls+=' hg-miss';}
             if(isT&&scheduled)cls+=' hg-today-col';
             const clickable=scheduled&&!isFuture;
-            return `<div class="${cls}"${clickable?` onclick="toggleHabitOnDate(${k.id},'${dStr}')"`:''} ></div>`;
+            return `<div class="${cls}" data-habit="${k.id}" data-date="${dStr}" data-col="${i}"${clickable?` onclick="toggleHabitOnDate(${k.id},'${dStr}')"`:''} ></div>`;
           }).join('')}
         </div>`;
       }).join('')}
@@ -5517,7 +5558,7 @@ function toggleKaizen(id){
   // Recompute streak from log; updates bestStreak too
   recomputeStreak(id);
   saveState();
-  renderTab();
+  _surgicalToggleUpdate(id,todayStr,g.done);updateStreak();  // Bug A — surgical, no full rebuild (keeps fast checklist taps clean too)
   // Check for newly earned milestone stamps (stamps enqueue before seal)
   if(g.done) checkMilestoneStamps(g);
   checkCelebrations();
@@ -8851,18 +8892,35 @@ function recordCompletionToggle(dateStr, habitId, nowDone){
     (_pendingUntick[dateStr] || (_pendingUntick[dateStr] = new Set())).add(habitId);
   }
 }
-function applyPendingUntick(logMap){
-  if(!_pendingUntick || !Object.keys(_pendingUntick).length) return logMap;
+// ── Bug B (fast-toggle overwrite, 2026-07-22) ─────────────────────────────────────────────────────
+// The un-tick tombstone is consumed inside saveStateToFirestore's Firestore txn, which RETRIES with
+// backoff. The tombstone used to be cleared by a blanket `_pendingUntick = {}` on ANY save's success,
+// so a concurrent save (or a coalesced re-run) could wipe it while another save was still retrying —
+// a retry then unioned the just-un-ticked id back from cloud (data loss, reproduced deterministically).
+// Fix = (1) a save MUTEX so two saves never overlap, (2) a per-save SNAPSHOT of the tombstone so every
+// retry of one save is consistent, (3) a SCOPED clear that removes only what this save persisted.
+function _snapshotPendingUntick(){ const o = {}; for(const d of Object.keys(_pendingUntick)) o[d] = new Set(_pendingUntick[d]); return o; }
+function _clearPersistedUntick(snap){   // drop only the (date,id) pairs THIS save just persisted; a
+  for(const d of Object.keys(snap)){    // removal recorded AFTER the snapshot stays pending for the next save
+    const cur = _pendingUntick[d]; if(!cur) continue;
+    for(const id of snap[d]) cur.delete(id);
+    if(!cur.size) delete _pendingUntick[d];
+  }
+}
+function applyPendingUntick(logMap, untickMap){
+  const u = untickMap || _pendingUntick;                     // default = live global (reconcile/boot); a save passes its snapshot
+  if(!u || !Object.keys(u).length) return logMap;
   const out = {};
   for(const d of Object.keys(logMap || {})){
-    const rem = _pendingUntick[d];
+    const rem = u[d];
     out[d] = rem ? (logMap[d] || []).filter(id => !rem.has(id)) : (logMap[d] || []);
   }
   return out;
 }
 // Merge for the completion-preserving write/reconcile: union (never drop another client's tick), then
-// subtract this client's deliberate un-ticks (so the user's own removal is honored).
-function mergeCompletionLogs(local, cloud){ return applyPendingUntick(unionCompletionLogs(local, cloud)); }
+// subtract this client's deliberate un-ticks (so the user's own removal is honored). untickMap lets a
+// retrying save subtract against a stable snapshot instead of the mutable global (Bug B).
+function mergeCompletionLogs(local, cloud, untickMap){ return applyPendingUntick(unionCompletionLogs(local, cloud), untickMap); }
 
 // ── P2-1 increment 3a — merge the OTHER data fields, not just completionLog ────────────────────────
 // The 2026-07-02 fix merged completionLog only; every other field stayed last-write-wins, so a stale
@@ -8927,11 +8985,11 @@ function mergeSealed(local, cloud, tsField){
 }
 const unionKeys = (local, cloud) => Object.assign({}, cloud||{}, local||{}); // monotonic {k:true} stamps
 // The single place that produces every merged field, used by BOTH the save txn and the reconcile.
-function mergeMergeableFields(local, cloud){
+function mergeMergeableFields(local, cloud, untickMap){
   local = local || {}; cloud = cloud || {};
   const notes = mergeDailyNotes(local.dailyNotes, cloud.dailyNotes, local.dailyNotesMeta, cloud.dailyNotesMeta);
   return {
-    completionLog:       mergeCompletionLogs(local.completionLog, cloud.completionLog), // unchanged: union + _pendingUntick
+    completionLog:       mergeCompletionLogs(local.completionLog, cloud.completionLog, untickMap), // union + un-ticks (snapshot when a save passes one; else live global)
     reflections:         mergeReflections(local.reflections, cloud.reflections),
     dailyNotes:          notes.notes,
     dailyNotesMeta:      notes.meta,
@@ -8992,6 +9050,11 @@ function planConflictKey(){ return _currentUser ? 'bushido_plan_conflict_'+_curr
 function stashPlanConflict(planObj){ try{ const k=planConflictKey(); if(k) localStorage.setItem(k, JSON.stringify({plan:planObj, at:new Date().toISOString()})); }catch(e){} } // keyed by uid → recoverable
 function clearPlanConflict(){ try{ const k=planConflictKey(); if(k) localStorage.removeItem(k); }catch(e){} }  // a clean (non-conflict) save resolves the conflict → drop the stash so it can't linger/resurrect
 
+// Save MUTEX + coalescing (Bug B). Two completion saves must never run concurrently: a re-entrant
+// caller marks the run dirty and returns; the in-flight save re-runs once more after it commits so the
+// latest state still lands. This serialises reconcile's un-awaited re-push (P4-C) and the boot heals
+// through one lane, so no concurrent save can clear another save's un-tick tombstone mid-retry.
+let _saveInFlight = false, _saveDirty = false;
 async function saveStateToFirestore(){
   if(!FIREBASE_CONFIGURED) return;
   if(!_currentUser){
@@ -9000,8 +9063,19 @@ async function saveStateToFirestore(){
     setCloudSync('error', 'Not signed in — your change is saved on this device only.');
     return;
   }
+  if(_saveInFlight){ _saveDirty = true; return; }   // coalesce into the running save
+  _saveInFlight = true;
+  try{
+    do { _saveDirty = false; await _saveStateOnce(); } while(_saveDirty && _currentUser);
+  } finally { _saveInFlight = false; }
+}
+async function _saveStateOnce(){
   setCloudSync('saving');
   const ref = db.collection('users').doc(_currentUser.uid);
+  // Snapshot THIS save's un-tick tombstones — the txn RETRIES with backoff and the global map may be
+  // mutated between attempts (a re-tick, a coalesced re-run); a per-save snapshot keeps every retry of
+  // this save consistent so a mid-flight clear can't make the union re-add a just-removed completion (Bug B).
+  const _untickSnap = _snapshotPendingUntick();
   try{
     // Completion-preserving transactional write: read cloud INSIDE the txn and MERGE completionLog —
     // union (a stale client can't wipe a newer completion) then subtract this client's deliberate
@@ -9014,9 +9088,9 @@ async function saveStateToFirestore(){
       if(snap.exists){ try{ cloud = JSON.parse(snap.data().state); }catch(e){ cloud = null; } }
       const toWrite = Object.assign({}, state);
       if(cloud){
-        // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks), reflections
-        // & notes (newest-ts per key + persisted delete tombstones), stamps/seals (key-union).
-        merged = mergeMergeableFields(state, cloud);
+        // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks, against
+        // THIS save's snapshot), reflections & notes (newest-ts per key + delete tombstones), stamps/seals (key-union).
+        merged = mergeMergeableFields(state, cloud, _untickSnap);
         Object.assign(toWrite, merged);
         toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
         // nextId: monotonic max so a stale writer can't regress the allocator into a live id (3b · R14).
@@ -9050,9 +9124,10 @@ async function saveStateToFirestore(){
     if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
     state.nextId = newNextId;
     try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-    // The un-ticks we just persisted are now reflected in the cloud — drop their tombstones so a later
-    // legitimate re-add from another device is not perpetually subtracted on this long-lived tab.
-    _pendingUntick = {};
+    // The un-ticks we just persisted are now reflected in the cloud — drop ONLY those tombstones (scoped
+    // to this save's snapshot). A removal recorded AFTER the snapshot stays pending so the next coalesced
+    // save still honors it; never blanket-clear, which is what let a concurrent save lose an un-tick (Bug B).
+    _clearPersistedUntick(_untickSnap);
     if(planMode === 'conflict'){
       stashPlanConflict(pickPlanDeep(state));   // our unsaved plan edit → recoverable (keyed by uid), for re-apply
       setCloudSync('error', PLAN_CONFLICT_MSG);
@@ -9076,7 +9151,7 @@ async function saveStateToFirestore(){
 let _reconcileInFlight = false;
 async function reconcileFromCloud(){
   if(!FIREBASE_CONFIGURED || !_currentUser || !state.onboarded) return;
-  if(_reconcileInFlight || _cloudSyncState === 'saving') return;
+  if(_reconcileInFlight || _cloudSyncState === 'saving' || _saveInFlight) return;  // stay out of the save lane through coalescing gaps too (Bug B / P4-C)
   _reconcileInFlight = true;
   try{
     const snap = await db.collection('users').doc(_currentUser.uid).get();
@@ -12686,5 +12761,40 @@ function cnCalRemoveIkigaiEntries(clanEventId){
 </div>
 <!-- ══════════ /IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
 
+
+<script>
+/* kaizen-fix release diagnostics — active only with ?debug=1 in the URL */
+(function(){
+  if(!/[?&]debug=1/.test(location.search)) return;
+  var log=[], panel;
+  function paint(){ if(panel) panel.textContent='kaizen-fix debug (tap to clear)\n'+log.join('\n'); }
+  function push(s){ try{ log.unshift(s); if(log.length>50)log.pop(); paint(); }catch(e){} }
+  function mount(){
+    panel=document.createElement('div');
+    panel.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:40vh;overflow:auto;background:rgba(10,10,10,.9);color:#7CFC7C;font:10px/1.4 ui-monospace,Menlo,monospace;z-index:99999;padding:6px;white-space:pre-wrap;border-top:1px solid #333';
+    panel.addEventListener('click',function(){ log=[]; paint(); });
+    document.body.appendChild(panel); paint();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount); else mount();
+  var t0=(performance&&performance.now)?performance.now():Date.now();
+  function now(){ return Math.round(((performance&&performance.now)?performance.now():Date.now())-t0); }
+  try{
+    if(typeof toggleHabitOnDate==='function'){ var _tg=toggleHabitOnDate;
+      toggleHabitOnDate=function(h,d){ var arr=(state.completionLog&&state.completionLog[d])||[]; var nd=arr.indexOf(h)<0;
+        push('+'+now()+'ms  TAP h='+h+' d='+d+'  -> '+(nd?'TICK':'UNTICK')); return _tg.apply(this,arguments); }; }
+    if(typeof toggleKaizen==='function'){ var _tk=toggleKaizen;
+      toggleKaizen=function(id){ push('+'+now()+'ms  CHECK id='+id); return _tk.apply(this,arguments); }; }
+    if(typeof saveStateToFirestore==='function'){ var _sv=saveStateToFirestore, sn=0;
+      saveStateToFirestore=function(){ var n=++sn, td=getDateStr();
+        push('   save#'+n+' begin  cl='+JSON.stringify((state.completionLog&&state.completionLog[td])||[]));
+        var p=_sv.apply(this,arguments);
+        if(p&&p.then){ p.then(function(){ push('   save#'+n+' end    sync='+(typeof _cloudSyncState!=='undefined'?_cloudSyncState:'?')); },
+                               function(e){ push('   save#'+n+' ERR    '+(e&&e.message||e)); }); }
+        return p; }; }
+    if(typeof setCloudSync==='function'){ var _sc=setCloudSync;
+      setCloudSync=function(s,r){ if(s==='error') push('   ⚠ CLOUD SYNC ERROR: '+(r||'')); return _sc.apply(this,arguments); }; }
+  }catch(e){ push('debug hook error: '+(e&&e.message||e)); }
+})();
+</script>
 </body>
 </html>
