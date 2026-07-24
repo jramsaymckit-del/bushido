@@ -3646,7 +3646,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'kaizen-fix3 · 2026-07-24 · slow-save untick race: subtract live pending in save-merge · +hover/pointerup +save-mutex';
+const BUILD_ID = 'kaizen-fix4 RELEASE · 2026-07-24 · live-tombstone: keep until cloud-read-confirms gone (R3) + confirm-clear · +slow-save +hover/pointerup';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -8900,10 +8900,19 @@ function recordCompletionToggle(dateStr, habitId, nowDone){
 // Fix = (1) a save MUTEX so two saves never overlap, (2) a per-save SNAPSHOT of the tombstone so every
 // retry of one save is consistent, (3) a SCOPED clear that removes only what this save persisted.
 function _snapshotPendingUntick(){ const o = {}; for(const d of Object.keys(_pendingUntick)) o[d] = new Set(_pendingUntick[d]); return o; }
-function _clearPersistedUntick(snap){   // drop only the (date,id) pairs THIS save just persisted; a
-  for(const d of Object.keys(snap)){    // removal recorded AFTER the snapshot stays pending for the next save
+// Clear a tombstone ONLY when a fresh cloud READ confirms the id is truly GONE — not merely that we wrote a
+// removal (a stale client can resurrect it between our write and the next read). `candidates` (a live snapshot)
+// bounds WHAT we clear so a removal recorded after the read stays pending; an id still present in cloud keeps
+// its tombstone so the next merge/reconcile subtracts the resurrection again. This closes the multi-client
+// stale-writer resurrection (R3). Termination (bounded, never accumulates): the set only holds distinct
+// un-ticked (date,id) not-yet-confirmed — a re-tick drops its own (recordCompletionToggle), a confirming read
+// drops it here, a reload resets to {}.
+function _clearConfirmedUntick(candidates, cloudLog){
+  cloudLog = cloudLog || {};
+  for(const d of Object.keys(candidates)){
     const cur = _pendingUntick[d]; if(!cur) continue;
-    for(const id of snap[d]) cur.delete(id);
+    const inCloud = new Set(cloudLog[d] || []);
+    for(const id of candidates[d]) if(!inCloud.has(id)) cur.delete(id);   // confirmed absent from cloud → safe to drop
     if(!cur.size) delete _pendingUntick[d];
   }
 }
@@ -9068,6 +9077,10 @@ async function saveStateToFirestore(){
   try{
     do { _saveDirty = false; await _saveStateOnce(); } while(_saveDirty && _currentUser);
   } finally { _saveInFlight = false; }
+  // Once the burst settles, confirm-and-clear tombstones against a fresh cloud read (bounded termination):
+  // a removal we persisted stays pending until a READ proves it gone; the reconcile subtracts any resurrection
+  // and drops confirmed ones. Runs only when tombstones remain — a no-op push/render in the clean single-device case.
+  if(_currentUser && Object.keys(_pendingUntick).length) reconcileFromCloud();
 }
 async function _saveStateOnce(){
   setCloudSync('saving');
@@ -9134,10 +9147,9 @@ async function _saveStateOnce(){
     if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
     state.nextId = newNextId;
     try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-    // The un-ticks we just persisted are now reflected in the cloud — drop ONLY those tombstones (scoped
-    // to this save's snapshot). A removal recorded AFTER the snapshot stays pending so the next coalesced
-    // save still honors it; never blanket-clear, which is what let a concurrent save lose an un-tick (Bug B).
-    _clearPersistedUntick(_untickSnap);
+    // Do NOT clear tombstones on write. Writing a removal doesn't mean it STAYS gone — a stale client can
+    // resurrect it right after (R3). Keep every tombstone until a fresh cloud READ confirms the id is gone
+    // (in reconcileFromCloud / the post-burst confirm below). _untickSnap still governs the txn merge above.
     if(planMode === 'conflict'){
       stashPlanConflict(pickPlanDeep(state));   // our unsaved plan edit → recoverable (keyed by uid), for re-apply
       setCloudSync('error', PLAN_CONFLICT_MSG);
@@ -9170,6 +9182,10 @@ async function reconcileFromCloud(){
     if(!isValidStateShape(cloud)) return;
     const localSnap = Object.assign({}, state);            // capture local mergeable fields before any overwrite
     const merged = mergeMergeableFields(localSnap, cloud);
+    // Confirm-and-clear: any pending un-tick this fresh cloud read shows is truly GONE can be dropped; an id
+    // still present in cloud (a stale writer resurrected it) keeps its tombstone so the merge above — and the
+    // re-push below — remove it again. This is what makes a deliberate un-tick survive a stale re-add (R3).
+    _clearConfirmedUntick(_snapshotPendingUntick(), cloud.completionLog || {});
     const cloudNewer = (cloud.lastModified || 0) > (state.lastModified || 0);
     const changed = MERGEABLE_KEYS.some(k => JSON.stringify(merged[k]) !== JSON.stringify(localSnap[k]));
     if(cloudNewer || changed){
