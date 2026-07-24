@@ -3646,7 +3646,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'kaizen-fix2 · 2026-07-23 · Bug A surgical + @media(hover) gate + pointerup (iOS untick fix) · Bug B save-mutex';
+const BUILD_ID = 'kaizen-fix3 · 2026-07-24 · slow-save untick race: subtract live pending in save-merge · +hover/pointerup +save-mutex';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -9091,6 +9091,13 @@ async function _saveStateOnce(){
         // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks, against
         // THIS save's snapshot), reflections & notes (newest-ts per key + delete tombstones), stamps/seals (key-union).
         merged = mergeMergeableFields(state, cloud, _untickSnap);
+        // Slow-save untick race (2026-07-24): _untickSnap only tombstones un-ticks known when THIS save began.
+        // A habit un-ticked DURING a slow (mobile) save isn't in it, so union() re-adds it — to the cloud write
+        // AND the local reflect (Object.assign(state, merged) below) — for the whole save window. Re-subtract the
+        // LIVE pending set so no in-flight un-tick is ever resurrected (purely subtractive; never re-adds a tick).
+        // The snapshot still governs which tombstones we CLEAR post-commit (any un-tick added after it stays
+        // pending and is honored by the next coalesced save).
+        merged.completionLog = applyPendingUntick(merged.completionLog, _pendingUntick);
         Object.assign(toWrite, merged);
         toWrite.lastModified = Math.max(state.lastModified || 0, cloud.lastModified || 0);
         // nextId: monotonic max so a stale writer can't regress the allocator into a live id (3b · R14).
@@ -9120,7 +9127,10 @@ async function _saveStateOnce(){
       tx.set(ref, { state: JSON.stringify(toWrite), updated: new Date().toISOString() }, { merge: true });
     });
     // Reflect the merged view back into local so this tab shows every client's data (minus our un-ticks/deletes).
-    if(merged) Object.assign(state, merged);
+    // Slow-save race (2026-07-24): the merge ran INSIDE the (slow, on mobile) txn, against the pending set as it
+    // was THEN. Any habit un-ticked DURING the txn isn't in `merged`, so union() would bounce it back red here.
+    // Re-subtract the LIVE pending set at reflect time — the authoritative "what the user has un-ticked" as of now.
+    if(merged){ merged.completionLog = applyPendingUntick(merged.completionLog, _pendingUntick); Object.assign(state, merged); }
     if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
     state.nextId = newNextId;
     try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
