@@ -198,6 +198,49 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .sh-shelf-native{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
 .clan-momentum-block{margin-bottom:0}
 
+/* ══════════ THE DAY'S WORD (今日の言葉) — 24h clan headboard ══════════ */
+/* Ported from the approved CANVAS design (EXPERIMENT: CLAN — THE DAY'S WORD). Colour vars are
+   --dw-* scoped to .dw-root so they never clash with the app's own --red/--ink/--scroll. */
+.dw-root{--dw-scroll:#F5F0E8;--dw-edge:#E8DFD0;--dw-ink:#1A1A1A;--dw-ink-light:#3A3A3A;--dw-ink-faint:#8A8578;--dw-red:#B5372C;--dw-white:#FEFCF8;font-family:'Noto Sans JP',sans-serif;background:var(--dw-scroll);border-radius:4px;padding:22px 20px 18px;margin:0 0 18px}
+.dw-panel{position:relative;background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:2px;padding:20px 24px 15px;box-shadow:inset 0 0 0 1px var(--dw-white),inset 0 0 0 2px rgba(181,55,44,.07)}
+.dw-head{display:flex;align-items:baseline;gap:12px}
+.dw-head-jp{font-family:'Noto Serif JP',serif;font-size:14px;letter-spacing:5px;color:var(--dw-red);opacity:.85}
+.dw-head-en{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-faint)}
+.dw-rule{height:1px;background:linear-gradient(90deg,var(--dw-edge),var(--dw-edge) 70%,transparent);margin:9px 0 2px}
+.dw-stage{padding:14px 0 6px}
+.dw-word{font-family:'Noto Serif JP',serif;font-style:italic;font-size:21px;font-weight:500;line-height:1.55;color:var(--dw-ink);word-break:break-word;border-left:2px solid rgba(181,55,44,.35);padding-left:14px}
+.dw-empty{padding-top:4px}
+.dw-emptyrow{display:flex;gap:12px;align-items:center}
+.dw-input{flex:1;font-family:'Noto Serif JP',serif;font-style:italic;font-size:16px;color:var(--dw-ink);background:none;border:none;border-bottom:1px solid var(--dw-edge);padding:7px 2px;outline:none}
+.dw-input:focus{border-bottom-color:var(--dw-red)}
+.dw-input::placeholder{color:var(--dw-ink-faint);opacity:.5}
+.dw-input-edit{width:100%;flex:none}
+.dw-btn{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-light);background:none;border:1.5px solid var(--dw-ink-light);padding:8px 18px;border-radius:1px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.dw-btn:hover:not(:disabled){background:var(--dw-ink);color:var(--dw-scroll);border-color:var(--dw-ink)}
+.dw-btn:disabled{opacity:.28;cursor:default}
+.dw-btn-ack{border-color:var(--dw-red);color:var(--dw-red)}
+.dw-btn-ack:hover{background:var(--dw-red);color:var(--dw-white);border-color:var(--dw-red)}
+.dw-linkbtn{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dw-ink-faint);background:none;border:none;cursor:pointer;padding:6px 4px}
+.dw-linkbtn:hover{color:var(--dw-red)}
+.dw-hint{font-size:10px;color:var(--dw-ink-faint);letter-spacing:1px;font-style:italic;opacity:.8;margin-top:12px}
+.dw-timewrap{margin:12px 0 2px}
+.dw-timebar{height:1px;background:var(--dw-edge);position:relative;overflow:hidden}
+.dw-timefill{position:absolute;left:0;top:0;height:100%;background:var(--dw-red);opacity:.55;transition:width 1s linear}
+.dw-timemeta{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dw-ink-faint);text-align:right;margin-top:6px}
+.dw-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:26px;margin-top:6px}
+.dw-rakkan{display:flex;align-items:center;gap:8px}
+.dw-rakkan-seal{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--dw-red);border:1px solid rgba(181,55,44,.4);border-radius:2px;padding:1px 4px;line-height:1.2}
+.dw-meta{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dw-ink-faint)}
+.dw-editrow{display:flex;gap:6px;align-items:center;margin-top:10px}
+.dw-sealbar{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--dw-edge);margin-top:12px;padding-top:11px}
+.dw-sealbar-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dw-ink-faint);opacity:.65;white-space:nowrap}
+.dw-seals{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center;min-height:20px}
+.dw-seals-empty{font-size:9px;letter-spacing:1px;color:var(--dw-ink-faint);opacity:.5;font-style:italic}
+.dw-seal{font-family:'Noto Serif JP',serif;font-size:19px;line-height:1;cursor:default}
+.dw-seal.stamp{animation:dwStamp .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes dwStamp{0%{opacity:0;transform:scale(1.9) rotate(-12deg)}55%{opacity:1;transform:scale(.9) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+.dw-seal-presence{color:var(--dw-ink-faint);font-size:15px;opacity:.75}
+
 /* Pillar tabs */
 .tabs{display:flex;margin-bottom:36px;border-bottom:1px solid rgba(0,0,0,.06)}
 .tab{flex:1;text-align:center;padding:16px 8px 14px;cursor:pointer;transition:all .3s;position:relative;background:none;border:none;font-family:'Noto Sans JP',sans-serif}
@@ -3646,7 +3689,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'kaizen-fix4 RELEASE · 2026-07-24 · live-tombstone: keep until cloud-read-confirms gone (R3) + confirm-clear · +slow-save +hover/pointerup';
+const BUILD_ID = 'dayword RELEASE · 2026-07-24 · clan Day\'s Word 今日の言葉 (FCFS claim + author-edit + acknowledge) · on kaizen-fix4';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -8261,6 +8304,7 @@ async function loadClanData(){
     _clanCache={};
     renderClanRows(); renderClanCards(); updateClanPerfFromCache();
     if(typeof cnYearCalBuild === 'function') cnYearCalBuild();   // renders an empty grid
+    if(typeof dwUnsubscribe === 'function'){ dwUnsubscribe(); renderDayWord(); }   // no day-word when clanless
     return;                                                       // do NOT cnCalSubscribe(clanCalendar/null)
   }
   try{
@@ -8278,6 +8322,7 @@ async function loadClanData(){
     updateClanPerfFromCache();
     if(typeof cnCalSubscribe === 'function') cnCalSubscribe();
     if(typeof cnYearCalBuild === 'function') cnYearCalBuild();
+    if(typeof dwSubscribe === 'function') dwSubscribe();   // subscribe to the clan's Day's Word
   }catch(e){
     if(e && e.code === 'permission-denied'){
       // roster↔activeClanId desync (§8) — distinguishable + self-healing: clear the stale active clan,
@@ -9318,6 +9363,7 @@ function switchPrimary(name){
   });
   document.getElementById('primary-bushido').style.display = name==='bushido' ? 'block' : 'none';
   document.getElementById('primary-clan').style.display    = name==='clan'    ? 'block' : 'none';
+  if(name==='clan' && typeof renderDayWord==='function') renderDayWord();   // paint the headboard from cache
   window.scrollTo({top:0, behavior:'instant'});
 }
 
@@ -9385,6 +9431,14 @@ function setupNavSquish(){
   <!-- ══════════ MY CLAN PANEL ══════════ -->
   <div id="primary-clan" style="display:none">
     <div class="clan-wrap">
+
+      <!-- ══════════ THE DAY'S WORD (今日の言葉) — 24h clan headboard ══════════ -->
+      <!-- 24h ephemeral clan message, first-come-first-serve. Rendered by renderDayWord()
+           from Firestore dayWord/{clanId}; hidden entirely when clanless. -->
+      <div id="clan-dayword" class="dw-root" style="display:none">
+        <div class="dw-panel" id="dw-panel"></div>
+      </div>
+      <!-- ══════════ /THE DAY'S WORD ══════════ -->
 
       <!-- Clan Momentum — header absorbed, toggle inline on James's row -->
       <div class="clan-momentum-block">
@@ -11891,6 +11945,223 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
 </script>
 
 <script>
+// ══════════ CLAN — THE DAY'S WORD (今日の言葉) ══════════
+// A 24h ephemeral clan headboard message. FIRST-COME-FIRST-SERVE: one word per clan
+// per day, claimed via a Firestore transaction (write only if no unexpired word).
+// The author may EDIT (never retract); the word runs a rolling 24h from postedAt.
+// Members ACKNOWLEDGE once — each ack stamps that member's highest PRACTICE_MILESTONE
+// seal (sub-7-day member → ○ presence mark). Poster auto-acknowledges on claim.
+//   dayWord/{clanId} = { text, authorUid, authorName, postedAt,
+//                        acks: { <uid>: { sealDays, name, ackedAt } } }
+// Expiry (postedAt + 24h) is computed client-side. Mirrors cnCal* (onSnapshot-driven,
+// null-id BLOCKER-7 guard, isClanMember scoping). Seal derivation reuses PRACTICE_MILESTONES
+// (the same ladder renderMilestoneSeal renders from) — each member publishes only their
+// derived sealDays so every member can render the seal without reading private state.
+const DW_DAY_MS = 86400000;   // 24h
+const DW_MAX    = 140;        // single line
+let _dayWord   = null;        // latest snapshot data (raw; may be expired)
+let _dwUnsub   = null;        // onSnapshot handle
+let _dwEditing = false;       // author is editing (local UI state)
+let _dwLastAck = '';          // uid whose seal just stamped (animation gate)
+let _dwTicker  = null;        // 1s receding-time-line ticker
+
+function dwClanId(){ return (typeof _activeClanId !== 'undefined') ? _activeClanId : null; }
+function dwFirestoreOn(){
+  return (typeof FIREBASE_CONFIGURED !== 'undefined' && FIREBASE_CONFIGURED)
+      && (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.uid)
+      && (typeof db !== 'undefined' && db)
+      && !!dwClanId();
+}
+function dwExpired(w){ return !w || !w.postedAt || (Date.now() > w.postedAt + DW_DAY_MS); }
+function dwMyName(){ return (typeof state !== 'undefined' && state && state.name) ? state.name : 'Warrior'; }
+
+// Highest earned practice-milestone day-value for THIS user (0 = sub-7-day → ○).
+// Same derivation as buildOwnClanData().practiceMilestoneDays, so the seal a member
+// stamps here matches the seal beside their name on the clan card.
+function dwMySealDays(){
+  var hi = 0;
+  if(typeof PRACTICE_MILESTONES !== 'undefined' && typeof state !== 'undefined' && state && state.practiceStamps){
+    PRACTICE_MILESTONES.forEach(function(m){
+      if(state.practiceStamps['ps-' + m.days] && m.days > hi) hi = m.days;
+    });
+  }
+  return hi;
+}
+
+// Subscribe to the clan's day-word doc — onSnapshot drives every render.
+function dwSubscribe(){
+  if(_dwUnsub){ try{ _dwUnsub(); }catch(e){} _dwUnsub = null; }
+  if(!dwFirestoreOn()) return;
+  var cid = dwClanId();
+  if(!cid) return;   // BLOCKER-7 — never .doc(null)
+  dwStartTicker();
+  _dwUnsub = db.collection('dayWord').doc(cid).onSnapshot(
+    function(snap){ _dayWord = (snap && snap.exists) ? (snap.data() || null) : null; renderDayWord(); },
+    function(err){ console.warn('Day\'s Word listener failed:', err); }
+  );
+}
+function dwUnsubscribe(){ if(_dwUnsub){ try{ _dwUnsub(); }catch(e){} _dwUnsub = null; } _dayWord = null; _dwEditing = false; }
+
+function dwStartTicker(){
+  if(_dwTicker) return;
+  _dwTicker = setInterval(function(){
+    if(!_dayWord || dwExpired(_dayWord) || _dwEditing) return;
+    var meta = document.querySelector('#dw-panel .dw-timemeta');
+    var fill = document.querySelector('#dw-panel .dw-timefill');
+    var remainMs = Math.max(0, _dayWord.postedAt + DW_DAY_MS - Date.now());
+    if(meta){ var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000); meta.textContent = 'fades in ' + h + 'h ' + m + 'm'; }
+    if(fill){ fill.style.width = Math.max(0, Math.min(100, remainMs/DW_DAY_MS*100)) + '%'; }
+    if(Date.now() > _dayWord.postedAt + DW_DAY_MS) renderDayWord();   // crossed expiry → reveal composer
+  }, 1000);
+}
+
+// Look up a milestone kanji/colour from the published sealDays (an exact ladder value).
+function dwMilestoneFor(sealDays){
+  if(!sealDays || typeof PRACTICE_MILESTONES === 'undefined') return null;
+  var pm = PRACTICE_MILESTONES.find(function(m){ return m.days === sealDays; });
+  if(!pm) PRACTICE_MILESTONES.forEach(function(m){ if(sealDays >= m.days) pm = m; });   // belt-and-braces
+  return pm || null;
+}
+function dwRakkanKanji(sealDays){ var pm = dwMilestoneFor(sealDays); return pm ? pm.kanji : '○'; }
+function dwSealMarkup(sealDays, name, stamp){
+  var pm = dwMilestoneFor(sealDays);
+  var st = stamp ? ' stamp' : '';
+  if(!pm){
+    return '<span class="dw-seal dw-seal-presence' + st + '" title="' + escapeHtml((name||'') + ' · present (no seal yet)') + '">○</span>';
+  }
+  var title = escapeHtml((name||'') + ' · ' + pm.name + ' · ' + pm.days + ' day' + (pm.days===1?'':'s'));
+  return '<span class="dw-seal' + st + '" style="color:' + pm.col + '" title="' + title + '">' + pm.kanji + '</span>';
+}
+function dwSealsHtml(acks){
+  var keys = Object.keys(acks || {});
+  if(!keys.length) return '<span class="dw-seals-empty">be the first to answer</span>';
+  keys.sort(function(a,b){ return (acks[a].ackedAt||0) - (acks[b].ackedAt||0); });   // stable, by ack time
+  return keys.map(function(uid){
+    var a = acks[uid] || {};
+    return dwSealMarkup(a.sealDays, a.name, uid === _dwLastAck);
+  }).join('');
+}
+
+function dwHead(){
+  return '<div class="dw-head"><span class="dw-head-jp">今日の言葉</span><span class="dw-head-en">the day’s word</span></div><div class="dw-rule"></div>';
+}
+
+function renderDayWord(){
+  var panel = document.getElementById('dw-panel');
+  if(!panel) return;
+  var host = document.getElementById('clan-dayword');
+  if(host) host.style.display = dwClanId() ? 'block' : 'none';   // headboard only with an active clan
+  if(!dwClanId()){ panel.innerHTML = ''; return; }
+
+  var w = _dayWord;
+  var active = w && !dwExpired(w);
+
+  if(!active){
+    panel.innerHTML = dwHead() +
+      '<div class="dw-empty"><div class="dw-emptyrow">' +
+        '<input id="dw-input" class="dw-input" maxlength="' + DW_MAX + '" placeholder="Speak to the clan. One line. One day." oninput="dwToggle()"/>' +
+        '<button id="dw-post" class="dw-btn" disabled onclick="dwPost()">post the word</button>' +
+      '</div><div class="dw-hint">First to speak claims the day. It fades in 24 hours.</div></div>';
+    return;
+  }
+
+  var myUid    = (typeof _currentUser !== 'undefined' && _currentUser) ? _currentUser.uid : null;
+  var isAuthor = w.authorUid === myUid;
+  var acks     = w.acks || {};
+  var acted    = !!(myUid && acks[myUid]);
+
+  var body = _dwEditing
+    ? '<div class="dw-stage"><input id="dw-edit" class="dw-input dw-input-edit" maxlength="' + DW_MAX + '" value="' + escapeHtml(w.text) + '"/>' +
+        '<div class="dw-editrow"><button class="dw-btn" onclick="dwSave()">save</button>' +
+        '<button class="dw-linkbtn" onclick="dwCancelEdit()">cancel</button></div></div>'
+    : '<div class="dw-stage"><div class="dw-word">' + escapeHtml(w.text) + '</div></div>';
+
+  var action = (isAuthor && !_dwEditing)
+    ? '<button class="dw-linkbtn" onclick="dwEdit()">edit</button>'
+    : ((!isAuthor && !acted) ? '<button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button>' : '');
+
+  var remainMs = Math.max(0, w.postedAt + DW_DAY_MS - Date.now());
+  var pct = Math.max(0, Math.min(100, remainMs/DW_DAY_MS*100));
+  var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000);
+  var authorAck = acks[w.authorUid] || {};
+
+  panel.innerHTML = dwHead() + body +
+    '<div class="dw-timewrap"><div class="dw-timebar"><div class="dw-timefill" style="width:' + pct + '%"></div></div>' +
+      '<div class="dw-timemeta">fades in ' + h + 'h ' + m + 'm</div></div>' +
+    '<div class="dw-foot"><div class="dw-rakkan"><span class="dw-rakkan-seal">' + dwRakkanKanji(authorAck.sealDays) + '</span>' +
+      '<span class="dw-meta">spoken by ' + escapeHtml((w.authorName||'').toLowerCase()) + '</span></div><div>' + action + '</div></div>' +
+    '<div class="dw-sealbar"><span class="dw-sealbar-label">those who answered</span><div class="dw-seals">' + dwSealsHtml(acks) + '</div></div>';
+}
+
+window.dwToggle = function(){
+  var i = document.getElementById('dw-input'), b = document.getElementById('dw-post');
+  if(i && b) b.disabled = !i.value.trim();
+};
+
+// Claim the day — FIRST-COME-FIRST-SERVE via a transaction: write only if there is
+// no unexpired word. If someone already claimed, the onSnapshot delivers theirs.
+window.dwPost = function(){
+  var i = document.getElementById('dw-input'); if(!i) return;
+  var text = i.value.trim().replace(/\s+/g, ' ').slice(0, DW_MAX);   // collapse to a single line
+  if(!text) return;
+  if(!dwFirestoreOn()){ if(typeof showCloudSyncError==='function') showCloudSyncError('Sign in to speak to the clan.'); return; }
+  var cid = dwClanId(); if(!cid) return;
+  var uid = _currentUser.uid, now = Date.now();
+  var mine = { text: text, authorUid: uid, authorName: dwMyName(), postedAt: now, acks: {} };
+  mine.acks[uid] = { sealDays: dwMySealDays(), name: dwMyName(), ackedAt: now };   // poster auto-acknowledges
+  var ref = db.collection('dayWord').doc(cid);
+  var btn = document.getElementById('dw-post'); if(btn) btn.disabled = true;
+  db.runTransaction(function(tx){
+    return tx.get(ref).then(function(snap){
+      var cur = snap.exists ? snap.data() : null;
+      if(cur && !dwExpired(cur)) throw { dwClaimed: true };   // lost the race — do NOT overwrite
+      tx.set(ref, mine);                                      // claim fresh, or overwrite an expired word
+    });
+  }).then(function(){
+    _dayWord = mine; _dwLastAck = uid; _dwEditing = false; renderDayWord();
+  }).catch(function(e){
+    if(e && e.dwClaimed){ /* onSnapshot will render the winner's word */ }
+    else { console.warn('Day\'s Word post failed:', e); if(typeof showCloudSyncError==='function') showCloudSyncError('Couldn\'t post the word — try again.'); if(btn) btn.disabled = false; }
+  });
+};
+
+window.dwEdit = function(){
+  var w = _dayWord; if(!w || !_currentUser || w.authorUid !== _currentUser.uid) return;   // author only
+  _dwEditing = true; renderDayWord();
+  setTimeout(function(){ var e = document.getElementById('dw-edit'); if(e){ e.focus(); } }, 0);
+};
+window.dwCancelEdit = function(){ _dwEditing = false; renderDayWord(); };
+window.dwSave = function(){
+  var e = document.getElementById('dw-edit'); if(!e) return;
+  var w = _dayWord; if(!w) return;
+  var text = e.value.trim().replace(/\s+/g, ' ').slice(0, DW_MAX);
+  _dwEditing = false;
+  if(!text){ renderDayWord(); return; }
+  if(!dwFirestoreOn() || !_currentUser || _currentUser.uid !== w.authorUid){ renderDayWord(); return; }
+  var cid = dwClanId(); if(!cid) return;
+  w.text = text; renderDayWord();                            // optimistic; edit keeps acks + postedAt
+  db.collection('dayWord').doc(cid).update({ text: text }).catch(function(err){
+    console.warn('Day\'s Word edit failed:', err); if(typeof showCloudSyncError==='function') showCloudSyncError('Edit didn\'t save — try again.');
+  });
+};
+
+// Acknowledge once. Field-path update (acks.<uid>) so concurrent acks never collide.
+window.dwAck = function(){
+  var w = _dayWord; if(!w || dwExpired(w)) return;
+  if(!dwFirestoreOn() || !_currentUser) return;
+  var uid = _currentUser.uid;
+  if(w.authorUid === uid) return;               // author auto-acked on claim
+  if(w.acks && w.acks[uid]) return;             // once per member
+  var cid = dwClanId(); if(!cid) return;
+  var ackObj = { sealDays: dwMySealDays(), name: dwMyName(), ackedAt: Date.now() };
+  w.acks = w.acks || {}; w.acks[uid] = ackObj; _dwLastAck = uid; renderDayWord();   // optimistic
+  var upd = {}; upd['acks.' + uid] = ackObj;
+  db.collection('dayWord').doc(cid).update(upd).catch(function(err){
+    console.warn('Day\'s Word ack failed:', err); if(typeof showCloudSyncError==='function') showCloudSyncError('Couldn\'t acknowledge — try again.');
+  });
+};
+// ══════════ /CLAN — THE DAY'S WORD ══════════
+
 // ══════════ CLAN CALENDAR JS ══════════════════════════════════════════════════
 // A shared dated panel inside each clan tab. Two event kinds:
 //   • recurring — annual MM-DD dates, no RSVP (birthdays, anniversaries).
