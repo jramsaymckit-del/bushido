@@ -10,7 +10,7 @@
      pure redirect to the single consolidated app at /bushido/app/. It contains NO cloud
      code of any kind, so it can never write the doc again. Opening the app signs the same
      account into the SAME users/{uid} data — no data and no access is lost. -->
-<meta http-equiv="refresh" content="0; url=/bushido/app/">
+<meta http-equiv="refresh" content="0; url=app/">
 <title>BUSHIDO — moved to /app/</title>
 <style>
   html,body{height:100%}
@@ -23,11 +23,11 @@
 <script>
   // Pure redirect: carry any query/hash across to the consolidated app, then leave.
   // No auth, no storage, no cloud — this page cannot touch your data.
-  location.replace('/bushido/app/' + location.search + location.hash);
+  location.replace('app/' + location.search + location.hash);
 </script>
 </head>
 <body>
   <div class="mark">武士道</div>
-  <div class="msg">BUSHIDO now lives in one place.<br>Taking you to <a href="/bushido/app/">your dashboard</a>…</div>
+  <div class="msg">BUSHIDO now lives in one place.<br>Taking you to <a href="app/">your dashboard</a>…</div>
 </body>
 </html>
