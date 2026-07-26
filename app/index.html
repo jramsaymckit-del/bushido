@@ -202,7 +202,42 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 /* Ported from the approved CANVAS design (EXPERIMENT: CLAN — THE DAY'S WORD). Colour vars are
    --dw-* scoped to .dw-root so they never clash with the app's own --red/--ink/--scroll. */
 .dw-root{--dw-scroll:#F5F0E8;--dw-edge:#E8DFD0;--dw-ink:#1A1A1A;--dw-ink-light:#3A3A3A;--dw-ink-faint:#8A8578;--dw-red:#B5372C;--dw-white:#FEFCF8;font-family:'Noto Sans JP',sans-serif;background:var(--dw-scroll);border-radius:4px;padding:22px 20px 18px;margin:0 0 18px}
-.dw-panel{position:relative;background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:2px;padding:20px 24px 15px;box-shadow:inset 0 0 0 1px var(--dw-white),inset 0 0 0 2px rgba(181,55,44,.07)}
+.dw-panel{position:relative}
+/* v2 (mobile de-cramp) — the card chrome lives on .dw-card so the collapsed .dw-pillcard can be chrome-less */
+.dw-card{background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:5px;padding:26px 22px 20px;box-shadow:inset 0 0 0 2px rgba(181,55,44,.05)}
+.dw-fade{animation:dwFadeIn .42s ease}
+@keyframes dwFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.dw-kicker{text-align:center;margin-bottom:20px}
+.dw-kicker-jp{display:block;font-family:'Noto Serif JP',serif;font-size:13px;letter-spacing:6px;color:var(--dw-red);opacity:.9}
+.dw-kicker-en{display:block;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-faint);margin-top:6px;font-style:italic}
+.dw-hero{text-align:center;padding:8px 0 2px}
+.dw-hero-seal{font-family:'Noto Serif JP',serif;font-size:72px;line-height:1;color:var(--dw-red)}
+.dw-hero-presence{color:var(--dw-ink-faint);font-size:56px;opacity:.8}
+.dw-spokenby{text-align:center;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dw-red);opacity:.85;margin-top:13px}
+.dw-message{text-align:center;font-family:'Noto Serif JP',serif;font-style:italic;font-size:19px;line-height:1.65;color:var(--dw-ink);max-width:30ch;margin:19px auto 4px;word-break:break-word}
+.dw-timepill{display:flex;justify-content:center;margin:21px 0 4px}
+.dw-timepill-inner{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--dw-edge);border-radius:999px;padding:6px 15px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dw-ink-faint)}
+.dw-timepill .dw-clock{opacity:.7}
+.dw-divider2{height:1px;background:linear-gradient(90deg,transparent,var(--dw-edge) 22%,var(--dw-edge) 78%,transparent);margin:21px 0 16px}
+.dw-answered-lbl{text-align:center;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-faint);opacity:.7;margin-bottom:15px}
+.dw-seals2{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;min-height:26px;margin-bottom:22px}
+.dw-add{font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--dw-ink-faint);border:1px dashed #CFC6B4;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.dw-add:hover{color:var(--dw-red);border-color:var(--dw-red)}
+.dw-action{display:flex;justify-content:center}
+.dw-btn-edit{color:var(--dw-ink-light);border-color:var(--dw-ink-light);border-radius:999px}
+.dw-btn-edit:hover{background:var(--dw-ink);color:var(--dw-white);border-color:var(--dw-ink)}
+.dw-btn-ack{border-radius:999px;padding:11px 32px}
+.dw-editwrap{margin:16px auto 2px;max-width:30ch}
+.dw-edit-input{width:100%;font-family:'Noto Serif JP',serif;font-style:italic;font-size:17px;text-align:center;color:var(--dw-ink);background:none;border:none;border-bottom:1px solid var(--dw-edge);padding:7px 2px;outline:none}
+.dw-edit-input:focus{border-bottom-color:var(--dw-red)}
+/* collapsed pill (Item 4) */
+.dw-pillrow{display:flex;justify-content:flex-end}
+.dw-pillcard{display:inline-flex;align-items:center;gap:9px;background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:999px;padding:8px 15px 8px 13px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.dw-pill-kicker{font-family:'Noto Serif JP',serif;font-size:11px;letter-spacing:3px;color:var(--dw-red);opacity:.75}
+.dw-pill-seal{font-family:'Noto Serif JP',serif;font-size:17px;color:var(--dw-red);line-height:1}
+.dw-pill-check{font-size:12px;color:#3D6B5F}
+/* Item 3 — My Clan nav unread dot */
+.dw-navdot{position:absolute;top:7px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(204,53,41,.16)}
 .dw-head{display:flex;align-items:baseline;gap:12px}
 .dw-head-jp{font-family:'Noto Serif JP',serif;font-size:14px;letter-spacing:5px;color:var(--dw-red);opacity:.85}
 .dw-head-en{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-faint)}
@@ -3689,7 +3724,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'dayword RELEASE · 2026-07-24 · clan Day\'s Word 今日の言葉 (FCFS claim + author-edit + acknowledge) · on kaizen-fix4';
+const BUILD_ID = 'dayword-mobile RELEASE · 2026-07-26 · de-cramp card (seal hero + message) + countdown-expiry-flip fix + My-Clan unread dot + acknowledge-collapse-to-pill · on dayword';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -11963,7 +11998,8 @@ let _dayWord   = null;        // latest snapshot data (raw; may be expired)
 let _dwUnsub   = null;        // onSnapshot handle
 let _dwEditing = false;       // author is editing (local UI state)
 let _dwLastAck = '';          // uid whose seal just stamped (animation gate)
-let _dwTicker  = null;        // 1s receding-time-line ticker
+let _dwTicker  = null;        // countdown ticker (60s)
+let _dwExpanded = false;      // Item 4: pill tapped open this session (LOCAL view toggle, never synced)
 
 function dwClanId(){ return (typeof _activeClanId !== 'undefined') ? _activeClanId : null; }
 function dwFirestoreOn(){
@@ -11996,23 +12032,32 @@ function dwSubscribe(){
   if(!cid) return;   // BLOCKER-7 — never .doc(null)
   dwStartTicker();
   _dwUnsub = db.collection('dayWord').doc(cid).onSnapshot(
-    function(snap){ _dayWord = (snap && snap.exists) ? (snap.data() || null) : null; renderDayWord(); },
+    function(snap){
+      var data = (snap && snap.exists) ? (snap.data() || null) : null;
+      // Item 4: a NEW/changed word resets the local view toggle so an unanswered word opens full.
+      if(!data || !_dayWord || data.postedAt !== _dayWord.postedAt) _dwExpanded = false;
+      _dayWord = data; renderDayWord(); dwUpdateNavDot();   // Item 3: refresh the My Clan unread dot
+    },
     function(err){ console.warn('Day\'s Word listener failed:', err); }
   );
 }
-function dwUnsubscribe(){ if(_dwUnsub){ try{ _dwUnsub(); }catch(e){} _dwUnsub = null; } _dayWord = null; _dwEditing = false; }
+function dwUnsubscribe(){ if(_dwUnsub){ try{ _dwUnsub(); }catch(e){} _dwUnsub = null; } _dayWord = null; _dwEditing = false; _dwExpanded = false; dwUpdateNavDot(); }
 
 function dwStartTicker(){
   if(_dwTicker) return;
   _dwTicker = setInterval(function(){
-    if(!_dayWord || dwExpired(_dayWord) || _dwEditing) return;
-    var meta = document.querySelector('#dw-panel .dw-timemeta');
-    var fill = document.querySelector('#dw-panel .dw-timefill');
-    var remainMs = Math.max(0, _dayWord.postedAt + DW_DAY_MS - Date.now());
-    if(meta){ var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000); meta.textContent = 'fades in ' + h + 'h ' + m + 'm'; }
-    if(fill){ fill.style.width = Math.max(0, Math.min(100, remainMs/DW_DAY_MS*100)) + '%'; }
-    if(Date.now() > _dayWord.postedAt + DW_DAY_MS) renderDayWord();   // crossed expiry → reveal composer
-  }, 1000);
+    if(!_dayWord || _dwEditing) return;
+    // Item 1 FIX: flip on expiry BEFORE any early return. The old order put this expiry
+    // re-render AFTER a `dwExpired(...) return` guard, so it was dead code — an expiring
+    // word froze at "fades in 0h 0m" on an open tab instead of fading to the composer.
+    if(dwExpired(_dayWord)){ renderDayWord(); dwUpdateNavDot(); return; }
+    var pill = document.querySelector('#dw-panel .dw-timepill-text');
+    if(pill){
+      var remainMs = Math.max(0, _dayWord.postedAt + DW_DAY_MS - Date.now());
+      var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000);
+      pill.textContent = 'fades in ' + h + 'h ' + m + 'm';
+    }
+  }, 60000);
 }
 
 // Look up a milestone kanji/colour from the published sealDays (an exact ladder value).
@@ -12043,25 +12088,58 @@ function dwSealsHtml(acks){
 }
 
 function dwHead(){
-  return '<div class="dw-head"><span class="dw-head-jp">今日の言葉</span><span class="dw-head-en">the day’s word</span></div><div class="dw-rule"></div>';
+  return '<div class="dw-kicker"><span class="dw-kicker-jp">今日の言葉</span><span class="dw-kicker-en">the day’s word</span></div>';
 }
+function dwClockSvg(){
+  return '<svg class="dw-clock" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+}
+// Item 2: the large HERO seal — the AUTHOR's highest practice-milestone kanji (sub-7-day → ○).
+function dwHeroSeal(sealDays){
+  var pm = dwMilestoneFor(sealDays);
+  if(!pm) return '<span class="dw-hero-seal dw-hero-presence">○</span>';
+  return '<span class="dw-hero-seal" style="color:' + pm.col + '">' + pm.kanji + '</span>';
+}
+// The answered seal row (+ optional joinable ＋ for a member who hasn't answered yet).
+function dwSealsHtml2(acks, acted){
+  var keys = Object.keys(acks || {});
+  keys.sort(function(a,b){ return (acks[a].ackedAt||0) - (acks[b].ackedAt||0); });
+  var html = keys.map(function(uid){ var a = acks[uid] || {}; return dwSealMarkup(a.sealDays, a.name, uid === _dwLastAck); }).join('');
+  if(!acted) html += '<span class="dw-add" title="add yours" onclick="dwAck()">＋</span>';
+  return html || '<span class="dw-seals-empty">be the first to answer</span>';
+}
+// Item 3: the My Clan nav unread dot — shown when an active word exists AND I haven't answered.
+// Derived purely from acks (no stored state); created lazily on the clan nav button.
+function dwUpdateNavDot(){
+  var btn = document.querySelector('.primary-tab[data-primary="clan"]');
+  if(!btn) return;
+  var dot = btn.querySelector('.dw-navdot');
+  var myUid = (typeof _currentUser !== 'undefined' && _currentUser) ? _currentUser.uid : null;
+  var unread = !!(myUid && _dayWord && !dwExpired(_dayWord) && !((_dayWord.acks||{})[myUid]));
+  if(unread){
+    if(!dot){ dot = document.createElement('span'); dot.className = 'dw-navdot'; btn.appendChild(dot); }
+    dot.style.display = '';
+  } else if(dot){ dot.style.display = 'none'; }
+}
+// Item 4: tapping the pill re-expands the full card (LOCAL, this session only — never synced).
+window.dwToggleExpand = function(){ _dwExpanded = !_dwExpanded; renderDayWord(); };
 
 function renderDayWord(){
   var panel = document.getElementById('dw-panel');
-  if(!panel) return;
+  if(!panel){ dwUpdateNavDot(); return; }
   var host = document.getElementById('clan-dayword');
   if(host) host.style.display = dwClanId() ? 'block' : 'none';   // headboard only with an active clan
-  if(!dwClanId()){ panel.innerHTML = ''; return; }
+  if(!dwClanId()){ panel.innerHTML = ''; dwUpdateNavDot(); return; }
 
   var w = _dayWord;
   var active = w && !dwExpired(w);
 
   if(!active){
-    panel.innerHTML = dwHead() +
+    panel.innerHTML = '<div class="dw-card dw-fade">' + dwHead() +
       '<div class="dw-empty"><div class="dw-emptyrow">' +
         '<input id="dw-input" class="dw-input" maxlength="' + DW_MAX + '" placeholder="Speak to the clan. One line. One day." oninput="dwToggle()"/>' +
         '<button id="dw-post" class="dw-btn" disabled onclick="dwPost()">post the word</button>' +
-      '</div><div class="dw-hint">First to speak claims the day. It fades in 24 hours.</div></div>';
+      '</div><div class="dw-hint">First to speak claims the day. It fades in 24 hours.</div></div></div>';
+    dwUpdateNavDot();
     return;
   }
 
@@ -12069,28 +12147,47 @@ function renderDayWord(){
   var isAuthor = w.authorUid === myUid;
   var acks     = w.acks || {};
   var acted    = !!(myUid && acks[myUid]);
-
-  var body = _dwEditing
-    ? '<div class="dw-stage"><input id="dw-edit" class="dw-input dw-input-edit" maxlength="' + DW_MAX + '" value="' + escapeHtml(w.text) + '"/>' +
-        '<div class="dw-editrow"><button class="dw-btn" onclick="dwSave()">save</button>' +
-        '<button class="dw-linkbtn" onclick="dwCancelEdit()">cancel</button></div></div>'
-    : '<div class="dw-stage"><div class="dw-word">' + escapeHtml(w.text) + '</div></div>';
-
-  var action = (isAuthor && !_dwEditing)
-    ? '<button class="dw-linkbtn" onclick="dwEdit()">edit</button>'
-    : ((!isAuthor && !acted) ? '<button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button>' : '');
-
-  var remainMs = Math.max(0, w.postedAt + DW_DAY_MS - Date.now());
-  var pct = Math.max(0, Math.min(100, remainMs/DW_DAY_MS*100));
-  var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000);
   var authorAck = acks[w.authorUid] || {};
 
-  panel.innerHTML = dwHead() + body +
-    '<div class="dw-timewrap"><div class="dw-timebar"><div class="dw-timefill" style="width:' + pct + '%"></div></div>' +
-      '<div class="dw-timemeta">fades in ' + h + 'h ' + m + 'm</div></div>' +
-    '<div class="dw-foot"><div class="dw-rakkan"><span class="dw-rakkan-seal">' + dwRakkanKanji(authorAck.sealDays) + '</span>' +
-      '<span class="dw-meta">spoken by ' + escapeHtml((w.authorName||'').toLowerCase()) + '</span></div><div>' + action + '</div></div>' +
-    '<div class="dw-sealbar"><span class="dw-sealbar-label">those who answered</span><div class="dw-seals">' + dwSealsHtml(acks) + '</div></div>';
+  // Item 4: once I've answered (members ack; author auto-acks), default to the compact pill —
+  // the full card is only ever spent on a word I haven't answered. Tapping the pill re-expands.
+  if(acted && !_dwExpanded && !_dwEditing){
+    panel.innerHTML =
+      '<div class="dw-pillrow dw-fade"><div class="dw-pillcard" onclick="dwToggleExpand()" title="tap to open">' +
+        '<span class="dw-pill-kicker">今日の言葉</span>' +
+        '<span class="dw-pill-seal">' + dwRakkanKanji(authorAck.sealDays) + '</span>' +
+        '<span class="dw-pill-check">✓</span>' +
+      '</div></div>';
+    dwUpdateNavDot();
+    return;
+  }
+
+  var remainMs = Math.max(0, w.postedAt + DW_DAY_MS - Date.now());
+  var h = Math.floor(remainMs/3600000), m = Math.floor((remainMs%3600000)/60000);
+
+  var message = _dwEditing
+    ? '<div class="dw-editwrap"><input id="dw-edit" class="dw-edit-input" maxlength="' + DW_MAX + '" value="' + escapeHtml(w.text) + '"/>' +
+        '<div class="dw-editrow"><button class="dw-btn" onclick="dwSave()">save</button>' +
+        '<button class="dw-linkbtn" onclick="dwCancelEdit()">cancel</button></div></div>'
+    : '<div class="dw-message">' + escapeHtml(w.text) + '</div>';
+
+  var action = (isAuthor && !_dwEditing)
+    ? '<div class="dw-action"><button class="dw-btn dw-btn-edit" onclick="dwEdit()">edit</button></div>'
+    : ((!isAuthor && !acted) ? '<div class="dw-action"><button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button></div>' : '');
+
+  panel.innerHTML =
+    '<div class="dw-card dw-fade">' +
+      dwHead() +
+      (_dwEditing ? '' : '<div class="dw-hero">' + dwHeroSeal(authorAck.sealDays) + '</div>') +
+      '<div class="dw-spokenby">spoken by ' + escapeHtml((w.authorName||'').toLowerCase()) + '</div>' +
+      message +
+      '<div class="dw-timepill"><span class="dw-timepill-inner">' + dwClockSvg() + '<span class="dw-timepill-text">fades in ' + h + 'h ' + m + 'm</span></span></div>' +
+      '<div class="dw-divider2"></div>' +
+      '<div class="dw-answered-lbl">those who answered</div>' +
+      '<div class="dw-seals2">' + dwSealsHtml2(acks, acted) + '</div>' +
+      action +
+    '</div>';
+  dwUpdateNavDot();
 }
 
 window.dwToggle = function(){
@@ -12118,7 +12215,7 @@ window.dwPost = function(){
       tx.set(ref, mine);                                      // claim fresh, or overwrite an expired word
     });
   }).then(function(){
-    _dayWord = mine; _dwLastAck = uid; _dwEditing = false; renderDayWord();
+    _dayWord = mine; _dwLastAck = uid; _dwEditing = false; _dwExpanded = true; renderDayWord(); dwUpdateNavDot();   // author sees the full card right after posting
   }).catch(function(e){
     if(e && e.dwClaimed){ /* onSnapshot will render the winner's word */ }
     else { console.warn('Day\'s Word post failed:', e); if(typeof showCloudSyncError==='function') showCloudSyncError('Couldn\'t post the word — try again.'); if(btn) btn.disabled = false; }
@@ -12154,7 +12251,7 @@ window.dwAck = function(){
   if(w.acks && w.acks[uid]) return;             // once per member
   var cid = dwClanId(); if(!cid) return;
   var ackObj = { sealDays: dwMySealDays(), name: dwMyName(), ackedAt: Date.now() };
-  w.acks = w.acks || {}; w.acks[uid] = ackObj; _dwLastAck = uid; renderDayWord();   // optimistic
+  w.acks = w.acks || {}; w.acks[uid] = ackObj; _dwLastAck = uid; _dwExpanded = false; renderDayWord(); dwUpdateNavDot();   // Item 4: collapse to pill · Item 3: clear the dot
   var upd = {}; upd['acks.' + uid] = ackObj;
   db.collection('dayWord').doc(cid).update(upd).catch(function(err){
     console.warn('Day\'s Word ack failed:', err); if(typeof showCloudSyncError==='function') showCloudSyncError('Couldn\'t acknowledge — try again.');
