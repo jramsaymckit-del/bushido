@@ -204,7 +204,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .dw-root{--dw-scroll:#F5F0E8;--dw-edge:#E8DFD0;--dw-ink:#1A1A1A;--dw-ink-light:#3A3A3A;--dw-ink-faint:#8A8578;--dw-red:#B5372C;--dw-white:#FEFCF8;font-family:'Noto Sans JP',sans-serif;background:var(--dw-scroll);border-radius:4px;padding:22px 20px 18px;margin:0 0 18px}
 .dw-panel{position:relative}
 /* v2 (mobile de-cramp) — the card chrome lives on .dw-card so the collapsed .dw-pillcard can be chrome-less */
-.dw-card{background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:5px;padding:26px 22px 20px;box-shadow:inset 0 0 0 2px rgba(181,55,44,.05)}
+.dw-card{position:relative;background:var(--dw-white);border:1px solid var(--dw-edge);border-radius:5px;padding:26px 22px 20px;box-shadow:inset 0 0 0 2px rgba(181,55,44,.05)}
+/* re-collapse control (2026-07-26): once answered, the expanded card can tuck back to the pill — reversible */
+.dw-collapse{position:absolute;top:9px;right:11px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;color:var(--dw-ink-faint);opacity:.5;cursor:pointer;padding:0;line-height:1;border-radius:50%;transition:opacity .15s,color .15s,background .15s}
+.dw-collapse:hover{opacity:1;color:var(--dw-red);background:rgba(181,55,44,.06)}
+.dw-collapse svg{display:block}
 .dw-fade{animation:dwFadeIn .42s ease}
 @keyframes dwFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .dw-kicker{text-align:center;margin-bottom:20px}
@@ -3724,7 +3728,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'dayword-mobile RELEASE · 2026-07-26 · de-cramp card (seal hero + message) + countdown-expiry-flip fix + My-Clan unread dot + acknowledge-collapse-to-pill · on dayword';
+const BUILD_ID = 'kaizen-churn-fix RELEASE · 2026-07-26 · Option B live-reflect (in-window ticks survive the slow-save merge) + Day\'s-Word re-collapse control · on dayword-mobile';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -9174,7 +9178,7 @@ async function _saveStateOnce(){
     // union (a stale client can't wipe a newer completion) then subtract this client's deliberate
     // un-ticks (so a filled circle the user cleared actually clears). PLAN fields go through the 3b
     // compare-and-set below (write / adopt / conflict); nextId takes a monotonic max; lastModified stays monotonic.
-    let merged = null, planMode = 'write', cloudPlanSnap = null, newBaseSig = null, newNextId = Number(state.nextId)||100;
+    let merged = null, planMode = 'write', cloudPlanSnap = null, newBaseSig = null, newNextId = Number(state.nextId)||100, cloudCLSnap = null;
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       let cloud = null;
@@ -9184,6 +9188,7 @@ async function _saveStateOnce(){
         // Merge every mergeable field with cloud INSIDE the txn: completions (union − un-ticks, against
         // THIS save's snapshot), reflections & notes (newest-ts per key + delete tombstones), stamps/seals (key-union).
         merged = mergeMergeableFields(state, cloud, _untickSnap);
+        cloudCLSnap = cloud.completionLog || {};   // Option B: the committed cloud read's completionLog, for the LIVE reflect below
         // Slow-save untick race (2026-07-24): _untickSnap only tombstones un-ticks known when THIS save began.
         // A habit un-ticked DURING a slow (mobile) save isn't in it, so union() re-adds it — to the cloud write
         // AND the local reflect (Object.assign(state, merged) below) — for the whole save window. Re-subtract the
@@ -9223,7 +9228,19 @@ async function _saveStateOnce(){
     // Slow-save race (2026-07-24): the merge ran INSIDE the (slow, on mobile) txn, against the pending set as it
     // was THEN. Any habit un-ticked DURING the txn isn't in `merged`, so union() would bounce it back red here.
     // Re-subtract the LIVE pending set at reflect time — the authoritative "what the user has un-ticked" as of now.
-    if(merged){ merged.completionLog = applyPendingUntick(merged.completionLog, _pendingUntick); Object.assign(state, merged); }
+    if(merged){
+      // Option B (kaizen churn fix, 2026-07-26): merged.completionLog was unioned INSIDE the (slow, mobile) txn
+      // against state.completionLog AS IT WAS at tx-get. A habit TICKED during the save window is in the LIVE
+      // state.completionLog but NOT in merged — so the old `Object.assign(state, merged)` blanked that just-tapped
+      // cell (in-window churn: red→empty→red flicker, occasional double-tap; the fix4 re-subtract only protected
+      // un-ticks, never re-added an in-window tick). Recompute the reflect against LIVE state.completionLog (which
+      // already carries every in-window TICK and reflects every in-window UN-tick) unioned with the committed cloud
+      // read, then subtract the LIVE pending un-ticks. In-window ticks survive, in-window un-ticks stay gone, and
+      // another device's cloud additions still merge in. The cloud WRITE above still used the tx-get view; the next
+      // coalesced save / reconcile pushes the newer live ticks up — this only stops the LOCAL reflect from churning.
+      merged.completionLog = applyPendingUntick(unionCompletionLogs(state.completionLog, cloudCLSnap || {}), _pendingUntick);
+      Object.assign(state, merged);
+    }
     if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
     state.nextId = newNextId;
     try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -12175,8 +12192,18 @@ function renderDayWord(){
     ? '<div class="dw-action"><button class="dw-btn dw-btn-edit" onclick="dwEdit()">edit</button></div>'
     : ((!isAuthor && !acted) ? '<div class="dw-action"><button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button></div>' : '');
 
+  // Re-collapse (2026-07-26): once I've answered (member ack / author auto-ack), the expanded card gets a
+  // subtle chevron-up top-right that tucks it back to the pill — so expand ↔ collapse is freely reversible
+  // (before, the card only ever collapsed once, on the acknowledge itself). Hidden while editing.
+  var collapse = (acted && !_dwEditing)
+    ? '<button class="dw-collapse" aria-label="collapse" title="collapse" onclick="dwToggleExpand()">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>' +
+      '</button>'
+    : '';
+
   panel.innerHTML =
     '<div class="dw-card dw-fade">' +
+      collapse +
       dwHead() +
       (_dwEditing ? '' : '<div class="dw-hero">' + dwHeroSeal(authorAck.sealDays) + '</div>') +
       '<div class="dw-spokenby">spoken by ' + escapeHtml((w.authorName||'').toLowerCase()) + '</div>' +
