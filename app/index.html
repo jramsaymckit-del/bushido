@@ -93,6 +93,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BUSHIDO</title>
+<script>
+  // Domain consolidation (2026-07-27): jramsaymckit-del.github.io/bushido/... still resolves — GitHub
+  // doesn't auto-redirect a project Pages URL once a custom domain is set — so every old bookmark
+  // (root, /chark/ /elijah/ /lisa/ /susan/ stubs all funnel here, plus direct /app/ links) needs to
+  // land on the branded bushidolife.net instead. bushidolife.net/www.bushidolife.net pass through
+  // untouched (www already 301s to apex at the GitHub Pages edge before this ever runs).
+  if (location.hostname === 'jramsaymckit-del.github.io') {
+    location.replace('https://bushidolife.net' + location.pathname.replace(/^\/bushido/, '') + location.search + location.hash);
+  }
+</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap');
