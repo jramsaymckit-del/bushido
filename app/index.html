@@ -358,6 +358,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   border-bottom:1px solid rgba(0,0,0,.1);padding:8px 0;color:var(--ink);outline:none;width:100%}
 .add-form select{font-size:13px;cursor:pointer}
 .add-form input::placeholder{color:var(--ink-faint);opacity:.4}
+.add-form-error{color:var(--red);font-family:'Noto Sans JP',sans-serif;font-size:12px;letter-spacing:.3px;margin-top:-4px}
 .add-form input:focus,.add-form select:focus{border-bottom-color:var(--ink)}
 .form-row{display:flex;gap:16px}.form-row>*{flex:1}
 .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:8px}
@@ -3728,7 +3729,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'kaizen-churn-fix RELEASE · 2026-07-26 · Option B live-reflect (in-window ticks survive the slow-save merge) + Day\'s-Word re-collapse control · on dayword-mobile';
+const BUILD_ID = 'c1-root RELEASE · 2026-07-28 · add-flow parent guard (cascade items can never be orphaned) + Option B live-reflect churn fix + Day\'s Word re-collapse · main==prod reconcile';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4116,25 +4117,25 @@ function saveObStep(){
     state.annualGoals=[];
     document.querySelectorAll('.annual-row').forEach(r=>{
       const t=r.querySelector('input').value.trim();
-      const p=r.querySelector('select')?.value||'';
-      if(t) state.annualGoals.push({id:state.nextId++,text:t,parentMs:p,progress:0,done:false});
+      const res=resolveParentLink('annual', r.querySelector('select')?.value||'', state);
+      if(t && res.ok) state.annualGoals.push({id:state.nextId++,text:t,parentMs:res.value,progress:0,done:false});
     });
   }
   if(obStep===6){
     state.shokunin=[];
     document.querySelectorAll('.shok-row').forEach(r=>{
       const t=r.querySelector('input').value.trim();
-      const p=r.querySelector('select')?.value||'';
+      const res=resolveParentLink('shokunin', r.querySelector('select')?.value||'', state);
       const tf=r.querySelector('.tf-select')?.value||'monthly';
-      if(t) state.shokunin.push({id:state.nextId++,text:t,parentAnnual:p,progress:0,timeframe:tf,done:false});
+      if(t && res.ok) state.shokunin.push({id:state.nextId++,text:t,parentAnnual:res.value,progress:0,timeframe:tf,done:false});
     });
   }
   if(obStep===7){
     state.kaizen=[];
     document.querySelectorAll('.kaizen-row').forEach(r=>{
       const t=r.querySelector('input').value.trim();
-      const p=r.querySelector('select')?.value||'';
-      if(t) state.kaizen.push({id:state.nextId++,text:t,parentShok:p,streak:0,done:false,lastDone:null,bullets:[],why:''});
+      const res=resolveParentLink('kaizen', r.querySelector('select')?.value||'', state);
+      if(t && res.ok) state.kaizen.push({id:state.nextId++,text:t,parentShok:res.value,streak:0,done:false,lastDone:null,bullets:[],why:''});
     });
   }
 }
@@ -5509,6 +5510,7 @@ function addTriggerHtml(){
   <div class="add-form" id="add-form">
     <input type="text" id="new-input" placeholder="Write your intention..." onkeydown="if(event.key==='Enter')addGoal()"/>
     <div class="form-row" id="form-extras"></div>
+    <div class="add-form-error" id="add-form-error" style="display:none"></div>
     <div class="form-actions">
       <button class="btn-ghost btn" onclick="hideAdd()">Cancel</button>
       <button class="btn" onclick="addGoal()">Commit</button>
@@ -5797,6 +5799,7 @@ function showAdd(){
   document.getElementById('add-trigger').style.display='none';
   document.getElementById('add-form').classList.add('visible');
   document.getElementById('new-input').focus();
+  const err=document.getElementById('add-form-error'); if(err){ err.style.display='none'; err.textContent=''; }
   const ex=document.getElementById('form-extras');
   if(currentTab==='kaizen'){
     const opts=state.shokunin.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('');
@@ -5814,19 +5817,51 @@ function hideAdd(){
   document.getElementById('add-trigger').style.display='flex';
   document.getElementById('add-form').classList.remove('visible');
   document.getElementById('new-input').value='';
+  const err=document.getElementById('add-form-error'); if(err){ err.style.display='none'; err.textContent=''; }
+}
+// C1-root — the single gate that stops orphaned cascade items. Both the in-app add-flow
+// (addGoal) and onboarding save (saveObStep) route every parent link through this, so no
+// goal/craft/habit is ever created without a parent that rolls it up to a strand. Always
+// returns a Number on success (also fixes the string-parentMs latent bug).
+function resolveParentLink(kind, rawLink, st){
+  const s = (rawLink==null) ? '' : String(rawLink).trim();
+  if(s==='') return {ok:false, reason:'none'};
+  const n = Number(s);
+  if(!Number.isInteger(n)) return {ok:false, reason:'nan'};
+  if(kind==='kaizen')   return ((st.shokunin||[]).some(c=>c.id===n))      ? {ok:true,value:n} : {ok:false,reason:'missing'};
+  if(kind==='shokunin') return ((st.annualGoals||[]).some(g=>g.id===n))   ? {ok:true,value:n} : {ok:false,reason:'missing'};
+  if(kind==='annual')   return (n>=0 && n<(st.milestones5yr||[]).length)  ? {ok:true,value:n} : {ok:false,reason:'range'};
+  return {ok:false, reason:'kind'};
+}
+function showAddError(kind){
+  const noParents = kind==='kaizen' ? !((state.shokunin||[]).length)
+                  : kind==='shokunin' ? !((state.annualGoals||[]).length) : false;
+  const msg = noParents
+    ? (kind==='kaizen' ? 'Create a craft first — every habit must serve one.'
+                       : 'Create an annual goal first — every craft must serve one.')
+    : (kind==='kaizen' ? 'Choose which craft this habit feeds.'
+       : kind==='shokunin' ? 'Choose which annual goal this craft serves.'
+       : 'Choose which 5-year milestone this goal serves.');
+  const el=document.getElementById('add-form-error');
+  if(el){ el.textContent=msg; el.style.display='block'; }
+  const sel=document.getElementById('link-select');
+  if(sel){ sel.classList.add('shake'); setTimeout(()=>sel.classList.remove('shake'),350); }
 }
 function addGoal(){
   const text=document.getElementById('new-input').value.trim();
   if(!text)return;
-  const link=document.getElementById('link-select')?.value||'';
-  if(currentTab==='kaizen'){
+  const kind = currentTab==='kaizen' ? 'kaizen' : currentTab==='shokunin' ? 'shokunin' : 'annual';
+  const rawLink=document.getElementById('link-select')?.value||'';
+  const res=resolveParentLink(kind, rawLink, state);
+  if(!res.ok){ showAddError(kind); return; }   // block — never create an orphan
+  if(kind==='kaizen'){
     // userAdded:true flags habits added through the UI so reviews & migrations never lose them
-    state.kaizen.push({id:state.nextId++,text,parentShok:link?Number(link):'',streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true});
-  } else if(currentTab==='shokunin'){
+    state.kaizen.push({id:state.nextId++,text,parentShok:res.value,streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true});
+  } else if(kind==='shokunin'){
     const tf=document.getElementById('tf-select')?.value||'monthly';
-    state.shokunin.push({id:state.nextId++,text,parentAnnual:link?Number(link):'',progress:0,timeframe:tf,done:false,userAdded:true});
+    state.shokunin.push({id:state.nextId++,text,parentAnnual:res.value,progress:0,timeframe:tf,done:false,userAdded:true});
   } else {
-    state.annualGoals.push({id:state.nextId++,text,parentMs:link,progress:0,done:false,userAdded:true});
+    state.annualGoals.push({id:state.nextId++,text,parentMs:res.value,progress:0,done:false,userAdded:true});
   }
   saveState();hideAdd();renderTab();
 }
