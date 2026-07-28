@@ -13217,40 +13217,5 @@ function cnCalRemoveIkigaiEntries(clanEventId){
 </div>
 <!-- ══════════ /IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
 
-
-<script>
-/* kaizen-fix release diagnostics — active only with ?debug=1 in the URL */
-(function(){
-  if(!/[?&]debug=1/.test(location.search)) return;
-  var log=[], panel;
-  function paint(){ if(panel) panel.textContent='kaizen-fix debug (tap to clear)\n'+log.join('\n'); }
-  function push(s){ try{ log.unshift(s); if(log.length>50)log.pop(); paint(); }catch(e){} }
-  function mount(){
-    panel=document.createElement('div');
-    panel.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:40vh;overflow:auto;background:rgba(10,10,10,.9);color:#7CFC7C;font:10px/1.4 ui-monospace,Menlo,monospace;z-index:99999;padding:6px;white-space:pre-wrap;border-top:1px solid #333';
-    panel.addEventListener('click',function(){ log=[]; paint(); });
-    document.body.appendChild(panel); paint();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount); else mount();
-  var t0=(performance&&performance.now)?performance.now():Date.now();
-  function now(){ return Math.round(((performance&&performance.now)?performance.now():Date.now())-t0); }
-  try{
-    if(typeof toggleHabitOnDate==='function'){ var _tg=toggleHabitOnDate;
-      toggleHabitOnDate=function(h,d){ var arr=(state.completionLog&&state.completionLog[d])||[]; var nd=arr.indexOf(h)<0;
-        push('+'+now()+'ms  TAP h='+h+' d='+d+'  -> '+(nd?'TICK':'UNTICK')); return _tg.apply(this,arguments); }; }
-    if(typeof toggleKaizen==='function'){ var _tk=toggleKaizen;
-      toggleKaizen=function(id){ push('+'+now()+'ms  CHECK id='+id); return _tk.apply(this,arguments); }; }
-    if(typeof saveStateToFirestore==='function'){ var _sv=saveStateToFirestore, sn=0;
-      saveStateToFirestore=function(){ var n=++sn, td=getDateStr();
-        push('   save#'+n+' begin  cl='+JSON.stringify((state.completionLog&&state.completionLog[td])||[]));
-        var p=_sv.apply(this,arguments);
-        if(p&&p.then){ p.then(function(){ push('   save#'+n+' end    sync='+(typeof _cloudSyncState!=='undefined'?_cloudSyncState:'?')); },
-                               function(e){ push('   save#'+n+' ERR    '+(e&&e.message||e)); }); }
-        return p; }; }
-    if(typeof setCloudSync==='function'){ var _sc=setCloudSync;
-      setCloudSync=function(s,r){ if(s==='error') push('   ⚠ CLOUD SYNC ERROR: '+(r||'')); return _sc.apply(this,arguments); }; }
-  }catch(e){ push('debug hook error: '+(e&&e.message||e)); }
-})();
-</script>
 </body>
 </html>
