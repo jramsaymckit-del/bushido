@@ -3515,6 +3515,14 @@ if (FIREBASE_CONFIGURED) {
       <label style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);border:1px solid rgba(0,0,0,.1);padding:7px 14px;cursor:pointer;opacity:.35;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='.35'">↑ import<input type="file" accept=".json" onchange="importState(event)" style="display:none"></label>
     </div>
 
+    <!-- Known limitations — honest, understated note on the two accepted sync trade-offs (P2-1 residual docs, 2026-07-28). Copy only, no engine change. -->
+    <div class="divider-thin"></div>
+    <div style="text-align:center;padding:8px 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5">known limitations</div>
+    <div style="max-width:380px;margin:0 auto;padding:0 0 8px">
+      <p style="font-family:'Noto Serif JP',serif;font-style:italic;font-size:11.5px;line-height:1.75;color:var(--ink-light);opacity:.6;text-align:center;margin:0 0 12px">Your record holds. Across devices this app will always keep a completion rather than risk dropping one&nbsp;— so on rare occasions a habit you cleared on one screen can return until the other screen catches up. Nothing you've done is ever lost.</p>
+      <p style="font-family:'Noto Serif JP',serif;font-style:italic;font-size:11.5px;line-height:1.75;color:var(--ink-light);opacity:.6;text-align:center;margin:0">Edit your plan on two devices at the same moment and only one edit lands. You'll be told, and asked to reload and re-apply&nbsp;— never overwritten in silence.</p>
+    </div>
+
     <!-- Stats panel (revealed by clicking the seal) -->
     <div class="stats-panel" id="stats-panel"></div>
 
@@ -3729,7 +3737,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'P4-B RELEASE · 2026-07-28 · storage-full guard: persistLocalState() surfaces a quota-exceeded write at every local-write site + import no longer mislabels a full disk "could not read backup" · on c1-root (add-flow orphan guard + Option B churn fix + Day\'s Word re-collapse)';
+const BUILD_ID = 'P2-1 residual docs RELEASE · 2026-07-28 · in-app "known limitations" note by Export/Import (R3 cross-device un-tick resurrection + two-device plan-edit conflict — both accepted trade-offs, honestly surfaced; COPY ONLY, no engine change) · on P4-B storage-full guard';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
