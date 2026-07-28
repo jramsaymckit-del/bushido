@@ -3729,7 +3729,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'c1-root RELEASE · 2026-07-28 · add-flow parent guard (cascade items can never be orphaned) + Option B live-reflect churn fix + Day\'s Word re-collapse · main==prod reconcile';
+const BUILD_ID = 'P4-B RELEASE · 2026-07-28 · storage-full guard: persistLocalState() surfaces a quota-exceeded write at every local-write site + import no longer mislabels a full disk "could not read backup" · on c1-root (add-flow orphan guard + Option B churn fix + Day\'s Word re-collapse)';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3784,9 +3784,24 @@ const SCHEMA_MIGRATIONS = {
 // no personal name is baked into the consolidated app.
 let LOCAL_ME_KEY = null;   // Firebase uid post-auth
 
+// P4-B: single guarded writer for the local state blob. A quota-exceeded setItem used to be
+// swallowed silently at every call site (and mislabeled "Could not read backup file." on the
+// import path); now it surfaces the persistent storage-full indicator so the user knows the
+// change lives only in the cloud (or nowhere, if offline) and should export a backup. Returns
+// true on success, false if storage was full. setCloudSync is hoisted, but guard it defensively.
+function persistLocalState(){
+  try{
+    if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  }catch(e){
+    try{ setCloudSync('error', "This device's storage is full — export a backup to be safe."); }catch(_){}
+    return false;
+  }
+}
+
 function saveState(){
   state.lastModified=Date.now();
-  try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  persistLocalState();
   if(FIREBASE_CONFIGURED){
     saveStateToFirestore(); // async fire-and-forget
   }
@@ -6696,7 +6711,7 @@ function persistDailyNoteLocal(dateStr, val){
   state.dailyNotes[dateStr]=val.trim();
   state.dailyNotesMeta[dateStr]=Date.now();
   state.lastModified=Date.now();
-  try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  persistLocalState();
   clearTimeout(_dailyNoteCloudTimer);
   _dailyNoteCloudTimer=setTimeout(()=>{ if(FIREBASE_CONFIGURED && _currentUser) saveStateToFirestore(); }, 800);
 }
@@ -8036,7 +8051,7 @@ async function restoreLastKnownGoodGo(){
   }
   Object.assign(state, mr.state);
   state.lastModified = Date.now();
-  try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  persistLocalState();
 
   closeSettings();
   document.getElementById('cs-restore-modal-overlay').classList.remove('show');
@@ -8095,7 +8110,7 @@ function importState(e){
       saveLastKnownGood();
       Object.assign(state, mr.state);
       state.lastModified = Date.now(); // P4-A: an import is the newest truth — bump so a later reconcile can't revert it
-      if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+      persistLocalState(); // P4-B: was a bare setItem — a quota throw here fell to the outer catch and mislabeled it "Could not read backup file."
       // P4-A: push the import to cloud. Previously import wrote ONLY localStorage, so the next reconcile/
       // focus could silently overwrite it with the older cloud. Mirrors restoreLastKnownGoodGo's persist.
       if(FIREBASE_CONFIGURED && typeof _currentUser !== 'undefined' && _currentUser){
@@ -9278,7 +9293,7 @@ async function _saveStateOnce(){
     }
     if(planMode === 'adopt' && cloudPlanSnap) copyPlan(state, cloudPlanSnap); // caution: local state must reflect the ADOPTED cloud plan, not a stale one
     state.nextId = newNextId;
-    try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    persistLocalState();
     // Do NOT clear tombstones on write. Writing a removal doesn't mean it STAYS gone — a stale client can
     // resurrect it right after (R3). Keep every tombstone until a fresh cloud READ confirms the id is gone
     // (in reconcileFromCloud / the post-burst confirm below). _untickSnap still governs the txn merge above.
@@ -9334,7 +9349,7 @@ async function reconcileFromCloud(){
         else if(!localDirty) _planBaseSig = planSig(state); // adopted cloud plan → new base
       }
       Object.assign(state, merged);                        // mergeable fields ALWAYS take the merged view (never drop local-only data)
-      try{ if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+      persistLocalState();
       // push our merged view up ONLY if it holds REAL data the cloud lacked (normalise a missing cloud
       // field to its empty default so a legacy doc doesn't trigger a spurious push every reconcile)
       if(MERGEABLE_KEYS.some(k => { const c=(cloud||{})[k]; return JSON.stringify(merged[k]) !== JSON.stringify(c==null ? (Array.isArray(merged[k])?[]:{}) : c); })) saveStateToFirestore();
@@ -13197,25 +13212,4 @@ function cnCalRemoveIkigaiEntries(clanEventId){
 
     <div class="cn-field">
       <label class="cn-field-label">Milestone</label>
-      <input type="text" class="cn-field-input" id="ipcMsText" maxlength="80" spellcheck="false"
-             placeholder="lease secured" />
-    </div>
-
-    <div class="cn-field">
-      <label class="cn-field-label">Date</label>
-      <input type="date" class="cn-field-input" id="ipcMsDate" />
-    </div>
-
-    <div class="cn-error" id="ipcMsError" style="display:none"></div>
-
-    <div class="cn-actions">
-      <button class="cn-btn ghost" id="ipcMsRemove" onclick="ipcRemoveMilestone()" style="display:none">remove</button>
-      <button class="cn-btn ghost" onclick="ipcCloseMilestone()">cancel</button>
-      <button class="cn-btn primary" onclick="ipcSubmitMilestone()">save</button>
-    </div>
-  </div>
-</div>
-<!-- ══════════ /IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
-
-</body>
-</html>
+      <input type="text" class="cn-field-input"
