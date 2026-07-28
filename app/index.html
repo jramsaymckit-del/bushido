@@ -13212,4 +13212,25 @@ function cnCalRemoveIkigaiEntries(clanEventId){
 
     <div class="cn-field">
       <label class="cn-field-label">Milestone</label>
-      <input type="text" class="cn-field-input"
+      <input type="text" class="cn-field-input" id="ipcMsText" maxlength="80" spellcheck="false"
+             placeholder="lease secured" />
+    </div>
+
+    <div class="cn-field">
+      <label class="cn-field-label">Date</label>
+      <input type="date" class="cn-field-input" id="ipcMsDate" />
+    </div>
+
+    <div class="cn-error" id="ipcMsError" style="display:none"></div>
+
+    <div class="cn-actions">
+      <button class="cn-btn ghost" id="ipcMsRemove" onclick="ipcRemoveMilestone()" style="display:none">remove</button>
+      <button class="cn-btn ghost" onclick="ipcCloseMilestone()">cancel</button>
+      <button class="cn-btn primary" onclick="ipcSubmitMilestone()">save</button>
+    </div>
+  </div>
+</div>
+<!-- ══════════ /IKIGAI PLANNING CALENDAR — MILESTONE MODAL ══════════ -->
+
+</body>
+</html>
