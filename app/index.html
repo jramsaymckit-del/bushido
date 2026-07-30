@@ -3737,7 +3737,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'P2-1 residual docs RELEASE · 2026-07-28 · in-app "known limitations" note by Export/Import (R3 cross-device un-tick resurrection + two-device plan-edit conflict — both accepted trade-offs, honestly surfaced; COPY ONLY, no engine change) · on P4-B storage-full guard';
+const BUILD_ID = 'Finding #1 clan-merge RELEASE · 2026-07-30 · clanMilestones/clanObligations brought into the sync merge net (id-keyed union + persisted clanRemovals tombstone — a stale client can no longer clobber an added clan entry, and a removed one is never resurrected, incl. cross-device R3-class) · on P2-1 residual docs';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3856,6 +3856,7 @@ const DEFAULT_STATE = {
   calThemeKaizen: 'default',    // 'default' | 'clan' | 'samurai'
   clanMilestones: [],           // clan events added to Ikigai as milestones
   clanObligations: [],          // clan events added to Ikigai as obligations
+  clanRemovals: {},             // {entryId: true} tombstones — persisted so a removed clan entry is never resurrected by the union (Finding #1)
   yearStartDate: null,          // set on first onboarding completion, used for anniversary mode
 };
 
@@ -9083,7 +9084,7 @@ function mergeCompletionLogs(local, cloud, untickMap){ return applyPendingUntick
 // exact ties (strict >) so all clients converge. Missing timestamps (legacy) = 0 = oldest → any real edit
 // wins, no migration. PLAN fields are NOT merged here (3b adds CAS). Reflection DELETE has no UI today;
 // if one is added, mirror the note pattern (a '' sentinel or a per-reflKey tombstone) — documented, not built.
-const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections'];
+const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals'];
 
 function _mondayOf(dateStr){ // Monday of dateStr's ISO week — the Mon–Sun bucket saveReflection dedups on
   const d = new Date((dateStr || '') + 'T12:00:00');
@@ -9135,10 +9136,30 @@ function mergeSealed(local, cloud, tsField){
   return out;
 }
 const unionKeys = (local, cloud) => Object.assign({}, cloud||{}, local||{}); // monotonic {k:true} stamps
+// ── Finding #1 (audit 2026-07-29) — clanMilestones/clanObligations merge ─────────────────────────────
+// These two USER-AUTHORED arrays were in NEITHER net (not MERGEABLE, not PLAN — see PLAN_KEYS note), so a
+// stale second writer clobbered them: an ADD on device A was lost when device B saved (the incident's own
+// class, on the arrays 3a left out). Clan entries are IMMUTABLE after add — no edit/toggle UI (ipcRevealRow
+// renders clan rows without a "mark done" button) — so an id-keyed UNION is add-safe with no per-item
+// timestamps. DELETE is the R3-class trap: a naive union would resurrect a removed entry a stale client still
+// holds. We subtract a PERSISTED removal-tombstone map (clanRemovals, merged monotonically like stamps), which
+// — because it lives in the doc, not the session — also defeats the CROSS-CLIENT resurrection that
+// completionLog's session-local un-tick tombstone cannot. Entry ids never repeat (cm_/ob_ + Date.now() + rand),
+// so a re-add after a delete gets a fresh id the tombstone can't touch, and clanRemovals may grow monotonically
+// (bounded by the clan events a user engages — a handful) without ever blocking a legitimate re-add.
+function mergeClanEntries(local, cloud, removals){
+  removals = removals || {};
+  const byId = new Map();
+  for(const e of [...(Array.isArray(cloud)?cloud:[]), ...(Array.isArray(local)?local:[])]){
+    if(e && e.id && !removals[e.id]) byId.set(e.id, e);  // union by id; drop tombstoned; local (2nd) wins an identical-id tie (immutable → same content)
+  }
+  return [...byId.values()];
+}
 // The single place that produces every merged field, used by BOTH the save txn and the reconcile.
 function mergeMergeableFields(local, cloud, untickMap){
   local = local || {}; cloud = cloud || {};
   const notes = mergeDailyNotes(local.dailyNotes, cloud.dailyNotes, local.dailyNotesMeta, cloud.dailyNotesMeta);
+  const clanRemovals = unionKeys(local.clanRemovals, cloud.clanRemovals); // monotonic removal tombstones (both clients')
   return {
     completionLog:       mergeCompletionLogs(local.completionLog, cloud.completionLog, untickMap), // union + un-ticks (snapshot when a save passes one; else live global)
     reflections:         mergeReflections(local.reflections, cloud.reflections),
@@ -9148,6 +9169,9 @@ function mergeMergeableFields(local, cloud, untickMap){
     practiceStamps:      unionKeys(local.practiceStamps, cloud.practiceStamps),
     eoySeals:            mergeSealed(local.eoySeals, cloud.eoySeals, 'sealedAt'),
     seasonalReflections: mergeSealed(local.seasonalReflections, cloud.seasonalReflections, 'completedAt'),
+    clanMilestones:      mergeClanEntries(local.clanMilestones, cloud.clanMilestones, clanRemovals),   // id-union − removals (Finding #1)
+    clanObligations:     mergeClanEntries(local.clanObligations, cloud.clanObligations, clanRemovals), // id-union − removals (Finding #1)
+    clanRemovals:        clanRemovals,
   };
 }
 
@@ -9173,7 +9197,9 @@ const PLAN_KEYS = ['strands','tenYearVision','milestones5yr','annualGoals','shok
                    'yearEndMode','yearEndMonth','calThemeShokunin','calThemeIkigai','calThemeKaizen',
                    'yearStartDate','name'];
 // clanMilestones/clanObligations are deliberately NOT CAS-guarded — clan-event code writes them, so including
-// them would false-conflict on a clan write. The gate-completion scalars stay last-write-wins by design.
+// them would false-conflict on a clan write. They are instead in the MERGEABLE net (id-keyed union + a
+// persisted clanRemovals tombstone; see mergeClanEntries — Finding #1). The gate-completion scalars stay
+// last-write-wins by design.
 const PLAN_CONFLICT_MSG = "Your plan edit wasn't saved — a newer version exists on another device. Reload to get the latest, then re-apply.";
 let _planBaseSig = null;   // runtime-only; re-established from settled state on every load — NOT persisted, so a stale base can't drift into a spurious conflict
 function stableStringify(v){
@@ -13145,6 +13171,12 @@ function cnCalIkigaiChange(evId){
 
 function cnCalRemoveIkigaiEntries(clanEventId){
   if(!state) return;
+  // Record a PERSISTED tombstone for each removed entry BEFORE filtering, so the merge never resurrects it —
+  // not on reload, and not from a stale device that still holds it (Finding #1). ids never repeat, so a later
+  // re-add of the same clan event gets a fresh id the tombstone can't touch.
+  if(!state.clanRemovals) state.clanRemovals = {};
+  (state.clanMilestones||[]).forEach(function(cm){ if(cm.clanEventId===clanEventId && cm.id) state.clanRemovals[cm.id]=true; });
+  (state.clanObligations||[]).forEach(function(ob){ if(ob.clanEventId===clanEventId && ob.id) state.clanRemovals[ob.id]=true; });
   state.clanMilestones = (state.clanMilestones||[]).filter(function(cm){
     return cm.clanEventId !== clanEventId;
   });
