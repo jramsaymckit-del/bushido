@@ -308,7 +308,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 
 /* Goal cards */
 .goals{list-style:none}
-.goal{padding:20px 0;border-bottom:1px solid rgba(0,0,0,.04);display:flex;align-items:flex-start;gap:16px;
+.goal{padding:20px 0;border-bottom:1px solid rgba(0,0,0,.04);display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px;
   transition:all .3s;animation:fadeUp .4s ease}
 .goal:hover{background:rgba(0,0,0,.01);margin:0 -16px;padding:20px 16px;border-radius:4px}
 .goal.done .goal-title{opacity:.3;text-decoration:line-through;text-decoration-thickness:1.5px}
@@ -2015,7 +2015,10 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 li.goal.hd-open .hd-hint{opacity:.7;transform:rotate(180deg)}
 .goal-content{cursor:pointer}
 body.edit-mode .goal-content{cursor:default}
-.habit-detail{display:none;border-top:1px solid var(--edge);padding:12px 14px 14px 48px;animation:hdIn .18s ease}
+/* .habit-detail is a child of the flex .goal row — force it to wrap to its own full-width line
+   BELOW the row (its border-top + 48px left pad are designed for a full-width panel, not a
+   cramped flex sibling to the right). `.goal` carries flex-wrap:wrap so this basis:100% wraps. */
+.habit-detail{display:none;flex-basis:100%;width:100%;box-sizing:border-box;border-top:1px solid var(--edge);padding:12px 14px 14px 48px;animation:hdIn .18s ease}
 li.goal.hd-open .habit-detail{display:block}
 @keyframes hdIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
 .hd-bullets{list-style:none;margin-bottom:12px;display:flex;flex-direction:column;gap:4px}
@@ -2029,6 +2032,41 @@ li.goal.hd-open .habit-detail{display:block}
 .hd-edit-btn:hover{border-color:var(--ink-light);color:var(--ink-light)}
 .hd-save-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;background:var(--ink);color:var(--scroll);border:none;padding:5px 14px;cursor:pointer;border-radius:1px;font-family:'Noto Sans JP',sans-serif}
 .hd-ta{width:100%;font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.65;border:1px solid var(--edge);border-radius:2px;background:transparent;padding:7px 9px;outline:none;resize:none;min-height:50px;margin-bottom:8px}
+.hd-save-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--white);background:var(--red);border:1px solid var(--red);padding:3px 12px;cursor:pointer;border-radius:1px;margin-top:10px;transition:opacity .15s;font-family:'Noto Sans JP',sans-serif}
+.hd-save-btn:hover{opacity:.85}
+/* ── User Autonomy (Phase 1): cascade lineage + schedule picker ── */
+.ua-lineage{font-family:'Noto Serif JP',serif;font-style:italic;font-size:11px;margin-bottom:10px;line-height:1.6;display:flex;flex-wrap:wrap;align-items:center;gap:3px;color:var(--ink-faint)}
+.ua-lin-kanji{font-style:normal;color:var(--ink-light);opacity:.85;margin-right:5px}
+.ua-lin-arrow{color:var(--ink-faint);margin:0 1px}
+.ua-lin-node{color:var(--ink-light);opacity:.75}
+.ua-lin-self{color:var(--ink);opacity:.9}
+.ua-lin-strand{font-style:normal;font-weight:600;display:inline-flex;align-items:center}
+.ua-lin-skanji{font-style:normal;margin-right:3px;font-size:12px}
+.ua-add-chain:not(:empty){margin-top:8px}
+.ua-add-chain .ua-lineage{margin-bottom:0}
+.ua-freq-btn{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;border:1px solid var(--edge);border-radius:2px;background:rgba(0,0,0,.02);padding:8px 10px;transition:border-color .15s;font-family:'Noto Sans JP',sans-serif}
+.ua-freq-btn:hover{border-color:var(--ink-faint)}
+.ua-freq-btn.open{border-color:var(--red);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.ua-freq-btn-l{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65}
+.ua-freq-btn-v{flex:1;text-align:left;font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light)}
+.ua-freq-btn-chev{color:var(--ink-faint);font-size:10px}
+.ua-picker{border:1px solid var(--red);border-top:none;border-radius:0 0 2px 2px;padding:11px;background:var(--white)}
+.ua-q{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65;margin:10px 0 6px}
+.ua-q:first-child{margin-top:0}
+.ua-modes{display:flex;flex-wrap:wrap;gap:5px}
+.ua-mode{font-size:11px;padding:5px 9px;border:1px solid var(--edge);border-radius:2px;background:var(--scroll);cursor:pointer;transition:all .12s}
+.ua-mode:hover{border-color:var(--ink-faint)}
+.ua-mode.on{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.ua-daystrip{display:flex;gap:4px}
+.ua-day{flex:1;text-align:center;padding:7px 0;border:1px solid var(--edge);border-radius:2px;background:var(--scroll);cursor:pointer;font-size:11px;font-weight:700;color:var(--ink-light);transition:all .12s;user-select:none}
+.ua-day:hover{border-color:var(--ink-faint)}
+.ua-day.on{background:var(--red);color:var(--white);border-color:var(--red)}
+.ua-counts{display:flex;gap:5px}
+.ua-cnt{width:27px;height:27px;line-height:25px;text-align:center;border:1px solid var(--edge);border-radius:50%;background:var(--scroll);cursor:pointer;font-size:11px;transition:all .12s}
+.ua-cnt:hover{border-color:var(--ink-faint)}
+.ua-cnt.on{background:var(--ink-light);color:var(--white);border-color:var(--ink-light)}
+.ua-readback{font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;color:var(--ink);margin-top:11px}
+.ua-next{font-size:10px;color:var(--ink-light);font-style:italic;margin-top:5px}
 
 /* ── Day journal tap ──────────────────────────────────────────────── */
 .mcal-cell.has-note{ cursor:pointer }
@@ -3737,7 +3775,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Finding #1 clan-merge RELEASE · 2026-07-30 · clanMilestones/clanObligations brought into the sync merge net (id-keyed union + persisted clanRemovals tombstone — a stale client can no longer clobber an added clan entry, and a removed one is never resurrected, incl. cross-device R3-class) · on P2-1 residual docs';
+const BUILD_ID = 'User Autonomy Phase 1 (fix round) · 2026-08-01 · ✎ pencil now opens the detail editor (Frequency ▸ reachable) + cascade lineage extended to the FULL named chain habit→craft→goal→strand (named, coloured) in the editor AND the Kaizen add form + reachability gate · Path B days/freq/freqAnchor, Monday-anchored · on Finding #1 clan-merge';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5404,7 +5442,7 @@ function renderGoals(){
       checklistHtml+=`<div class="daily-reset">show up today</div>`+
         todayItems.map((g,i)=>{
           const parent=state.shokunin.find(s=>s.id==g.parentShok);
-          const freq=g.freq==='fortnightly'?'fortnightly':g.freq==='monthly'?'monthly':g.days==='daily'?'daily':g.days&&g.days.length?`${g.days.length}x/wk`:'weekly';
+          const freq=cadenceLabel(g);
           const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
           const strandCls=strandLinkedIds!==null?(strandLinkedIds.has(g.id)?' strand-glow':' strand-faint'):'';
           const hdBullets=buildHabitDetailHtml(g);
@@ -5419,7 +5457,7 @@ function renderGoals(){
               </div>
             </div>
             <div class="goal-actions">
-              <button class="goal-act" onclick="startEdit('kaizen',${g.id})">✎</button>
+              <button class="goal-act" onclick="event.stopPropagation();editHabit(${g.id})">✎</button>
               <button class="goal-act goal-del" onclick="confirmDelete('kaizen',${g.id})">×</button>
             </div>
             <div class="habit-detail" id="hd-${g.id}">${hdBullets}</div>
@@ -5488,7 +5526,7 @@ function renderGoals(){
           <div class="goal-title" data-edit-id="${g.id}">${g.text}</div>
           <div class="goal-meta">
             <span class="goal-tf">${g.timeframe||'monthly'}</span>
-            ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
+            ${parent?`<span class="goal-parent">${_uaKanjiForGoal(parent)?_uaKanjiForGoal(parent)+' ':''}\u2192 ${escapeHtml(parent.text.substring(0,30))}</span>`:''}
             ${activeStreaks?`<span class="goal-streak">${activeStreaks} active habit${activeStreaks>1?'s':''}</span>`:''}
           </div>
           ${cp!=null?`<div class="pbar"><div class="pfill" style="width:${cp}%"></div></div>
@@ -5569,6 +5607,158 @@ document.addEventListener('click', function(e){
   _openHabitDetails.clear();
 });
 
+// ============ USER AUTONOMY (Phase 1) — cadence label · lineage · schedule picker ============
+// Path (B): reads/writes the canonical flat fields days/freq/freqAnchor (Monday-anchored, 0=Mon…6=Sun).
+// No new stored field; Shokunin scheduling is cut (cadence is Kaizen-only).
+const _UA_DAYFULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const _UA_DAYINIT = ['M','T','W','T','F','S','S'];
+const _UA_KANJI   = ['志','史','鍛','匠','愛'];   // 志 史 鍛 匠 愛
+
+// Human cadence label off the canonical fields — reads day NAMES, never "2x/wk" (James, Jul 31).
+// daily / absent / all-7 → 'Daily'.
+function cadenceLabel(k){
+  if(!k || k.days==='daily' || !k.days) return 'Daily';
+  if(!Array.isArray(k.days) || !k.days.length || k.days.length===7) return 'Daily';
+  const ds = k.days.slice().sort((a,b)=>a-b);
+  const abbr = ds.map(d=>DAYS[d]);
+  if(k.freq==='fortnightly') return 'Every other ' + (ds.length===1?_UA_DAYFULL[ds[0]]:abbr.join(' & '));
+  if(k.freq==='monthly')     return 'Every 4 weeks · ' + (ds.length===1?_UA_DAYFULL[ds[0]]:abbr.join(' & '));
+  if(ds.length===1) return _UA_DAYFULL[ds[0]] + 's';   // "Tuesdays"
+  return abbr.join(', ');                                // "Mon, Thu"
+}
+
+// Read-only cascade lineage. James's ask (Aug 1): render the FULL named chain so it reaches
+// the strand — habit → craft → Ikigai goal → Ryughi strand — not just a bare kanji. The
+// strand is a NAMED node with its own colour, reusing Cascade Pulse's four-level vocabulary
+// (per-strand colour + kanji). `--s0..--s4` CSS vars don't exist in this file, so the colours
+// are a hardcoded map of the Cascade Pulse hexes.
+const _UA_STRAND_COLOR = ['#2C5282','#7A5C1E','#276749','#553C9A','#922B21']; // 志 史 鍛 匠 愛
+function _uaKanjiForGoal(goal){                          // still used by the Shokunin craft card
+  if(!goal || goal.parentMs==null || goal.parentMs==='') return '';
+  const si = Number(goal.parentMs);
+  return (si>=0 && si<5) ? _UA_KANJI[si] : '';
+}
+// Build the upward chain craft → goal → strand (+ optional leading habit). Renders nothing
+// when there is no upward chain at all (never a lone habit name, never 'undefined').
+function _uaChainHtml(habitText, craft){
+  const up = [];
+  let goal=null, si=null;
+  if(craft){
+    up.push(`<span class="ua-lin-node">${escapeHtml(craft.text||'')}</span>`);
+    goal = (state.annualGoals||[]).find(a=>String(a.id)===String(craft.parentAnnual));
+  }
+  if(goal){
+    up.push(`<span class="ua-lin-node">${escapeHtml(goal.text||'')}</span>`);
+    if(goal.parentMs!=null && goal.parentMs!==''){ const n=Number(goal.parentMs); if(Number.isInteger(n)&&n>=0&&n<5) si=n; }
+  }
+  if(si!=null){
+    const nm = escapeHtml((state.strands&&state.strands[si])||'');
+    up.push(`<span class="ua-lin-strand" style="color:${_UA_STRAND_COLOR[si]}"><span class="ua-lin-skanji">${_UA_KANJI[si]}</span>${nm}</span>`);
+  }
+  if(!up.length) return '';                               // fully orphaned → render nothing
+  const nodes = (habitText && habitText.trim())
+    ? [`<span class="ua-lin-node ua-lin-self">${escapeHtml(habitText.trim())}</span>`, ...up]
+    : up;
+  return `<div class="ua-lineage">${nodes.join('<span class="ua-lin-arrow">→</span>')}</div>`;
+}
+function _uaLineageHtml(kind, item){
+  if(!item) return '';
+  if(kind==='kaizen'){
+    const craft = (state.shokunin||[]).find(s=>String(s.id)===String(item.parentShok));
+    return _uaChainHtml(item.text||null, craft);          // habit → craft → goal → strand
+  }
+  if(kind==='shokunin'){
+    return _uaChainHtml(null, item);                      // item IS the craft → goal → strand
+  }
+  return '';
+}
+
+// ── schedule picker (drives the Frequency button inside the Kaizen detail editor) ──
+let _uaDraft = null;       // {days:[], freq, freqAnchor, mode}
+let _uaEditId = null;      // habit id currently editing
+let _uaFreqOpen = false;   // is the picker expanded
+
+function _uaModeOf(k){
+  if(k.days==='daily' || !k.days || (Array.isArray(k.days)&&k.days.length===7)) return 'daily';
+  if(k.freq==='fortnightly') return 'fortnightly';
+  if(k.freq==='monthly') return 'monthly';
+  if(Array.isArray(k.days) && k.days.length===1) return 'weekly';
+  return 'few';
+}
+function _uaNewDraft(k){
+  return { days:(k.days==='daily'||!k.days||!Array.isArray(k.days))?[0,1,2,3,4,5,6]:k.days.slice(),
+           freq:k.freq, freqAnchor:k.freqAnchor, mode:_uaModeOf(k) };
+}
+function _uaDraftToSched(){
+  const d=_uaDraft;
+  if(d.mode==='daily') return {days:'daily'};
+  return {days:d.days, freq:(d.mode==='fortnightly'?'fortnightly':d.mode==='monthly'?'monthly':undefined), freqAnchor:d.freqAnchor||getDateStr()};
+}
+function _uaNextOccurrence(sched){
+  const s=new Date(); s.setHours(0,0,0,0);
+  for(let i=0;i<400;i++){ const dt=new Date(s); dt.setDate(s.getDate()+i); if(habitOnDay(sched,(dt.getDay()+6)%7,dt)) return dt; }
+  return null;
+}
+function _uaFmtNext(dt){
+  const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
+  return wd+' '+dt.getDate()+' '+mo;
+}
+function _uaReadback(){
+  const d=_uaDraft, ds=d.days.slice().sort((a,b)=>a-b);
+  if(d.mode==='daily') return 'Every day.';
+  const names=ds.map(x=>_UA_DAYFULL[x]);
+  const list=names.length===1?names[0]:names.slice(0,-1).join(', ')+' and '+names.slice(-1);
+  if(d.mode==='fortnightly') return 'Every other '+list+'.';
+  if(d.mode==='monthly') return 'Every 4 weeks, on '+list+'.';
+  return names.length>1?list+' each week.':list+' — every week.';
+}
+function _uaSetMode(m){
+  const d=_uaDraft; d.mode=m;
+  if(m==='daily'){ d.days=[0,1,2,3,4,5,6]; d.freq=undefined; }
+  else{
+    if(m==='weekly'||m==='fortnightly'||m==='monthly'){ d.days=[d.days.length?d.days[0]:0]; d.freqAnchor=d.freqAnchor||getDateStr(); }
+    if(m==='few' && d.days.length===7) d.days=[0,3];
+  }
+  _uaRenderFreqSection();
+}
+function _uaToggleDay(dd){
+  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
+  if(single) d.days=[dd];
+  else{ const i=d.days.indexOf(dd); if(i>=0){ if(d.days.length>1) d.days.splice(i,1); } else d.days.push(dd); }
+  _uaRenderFreqSection();
+}
+function _uaPickCount(n){ _uaDraft.days=({2:[0,3],3:[0,2,4],4:[0,1,3,5],5:[0,1,2,3,4],6:[0,1,2,3,4,5]})[n].slice(); _uaRenderFreqSection(); }
+function _uaToggleFreqOpen(){ _uaFreqOpen=!_uaFreqOpen; _uaRenderFreqSection(); }
+function _uaRenderFreqSection(){
+  const host=document.getElementById('ua-freq-section-'+_uaEditId);
+  if(host) host.innerHTML=_uaFreqSectionHtml();
+}
+function _uaFreqSectionHtml(){
+  const label=cadenceLabel(_uaDraftToSched());
+  const btn=`<button type="button" class="ua-freq-btn${_uaFreqOpen?' open':''}" onclick="event.stopPropagation();_uaToggleFreqOpen()">
+      <span class="ua-freq-btn-l">frequency</span>
+      <span class="ua-freq-btn-v">${_uaFreqOpen?'':escapeHtml(label)}</span>
+      <span class="ua-freq-btn-chev">${_uaFreqOpen?'▲':'▸'}</span>
+    </button>`;
+  return btn + (_uaFreqOpen ? _uaPickerHtml() : '');
+}
+function _uaPickerHtml(){
+  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
+  const modeBtn=(m,l)=>`<div class="ua-mode${d.mode===m?' on':''}" onclick="event.stopPropagation();_uaSetMode('${m}')">${l}</div>`;
+  const strip=_UA_DAYINIT.map((ini,i)=>`<div class="ua-day${d.days.includes(i)?' on':''}" title="${_UA_DAYFULL[i]}" onclick="event.stopPropagation();_uaToggleDay(${i})">${ini}</div>`).join('');
+  const counts=[2,3,4,5,6].map(n=>`<div class="ua-cnt${d.days.length===n&&!single?' on':''}" onclick="event.stopPropagation();_uaPickCount(${n})">${n}</div>`).join('');
+  let nextNote='';
+  if(d.mode==='fortnightly'||d.mode==='monthly'){ const nd=_uaNextOccurrence(_uaDraftToSched()); if(nd) nextNote=`<div class="ua-next">Next: <b>${_uaFmtNext(nd)}</b></div>`; }
+  return `<div class="ua-picker" onclick="event.stopPropagation()">
+    <div class="ua-q">How often?</div>
+    <div class="ua-modes">${modeBtn('daily','Every day')}${modeBtn('few','A few days a week')}${modeBtn('weekly','Weekly')}${modeBtn('fortnightly','Fortnightly')}${modeBtn('monthly','Every 4 weeks')}</div>
+    ${d.mode==='few'?`<div class="ua-q">How many?</div><div class="ua-counts">${counts}</div>`:''}
+    ${d.mode!=='daily'?`<div class="ua-q">${single?'Which day?':'Which days?'}</div><div class="ua-daystrip">${strip}</div>`:''}
+    <div class="ua-readback">${escapeHtml(_uaReadback())}</div>${nextNote}
+  </div>`;
+}
+
 function buildHabitDetailHtml(g){
   const bullets = g.bullets && g.bullets.length ? g.bullets : null;
   const why = g.why && g.why.trim() ? g.why : null;
@@ -5578,7 +5768,7 @@ function buildHabitDetailHtml(g){
   const whyHtml = why
     ? `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text">${why}</div>`
     : `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text hd-placeholder">Why does this habit exist in your life?</div>`;
-  return bulletsHtml + whyHtml +
+  return _uaLineageHtml('kaizen', g) + bulletsHtml + whyHtml +
     `<button class="hd-edit-btn" onclick="event.stopPropagation();openHabitEdit(${g.id})">edit</button>`;
 }
 
@@ -5601,22 +5791,41 @@ function reApplyHabitDetails(){
   });
 }
 
+// The ✎ pencil (edit-mode) is the obvious "edit" affordance. Route it straight to the detail
+// editor — text · what · why · Frequency ▸ · lineage — the same editor the panel's small "edit"
+// button opens (two paths to ONE editor). Ensures the detail panel is open first so #hd-<id>
+// exists to populate; the tick (.check → toggleKaizen) on the same row is untouched.
+function editHabit(id){
+  const li = document.querySelector(`[data-kaizen-id="${id}"]`);
+  if(!li) return;
+  if(!_openHabitDetails.has(id)){ _openHabitDetails.add(id); li.classList.add('hd-open'); }
+  openHabitEdit(id);
+}
+
 function openHabitEdit(id){
   const g = state.kaizen.find(k=>k.id===id);
   if(!g) return;
   const panel = document.getElementById('hd-'+id);
   if(!panel) return;
+  _uaEditId = id; _uaDraft = _uaNewDraft(g); _uaFreqOpen = false;
   const bulletsVal = (g.bullets||[]).join('\n');
   const whyVal = g.why||'';
   panel.innerHTML = `
+    ${_uaLineageHtml('kaizen', g)}
     <div style="margin-bottom:8px">
-      <div class="hd-why-label" style="margin-bottom:5px">practice — one item per line</div>
-      <textarea class="hd-ta" id="hd-bullets-${id}">${bulletsVal}</textarea>
+      <div class="hd-why-label" style="margin-bottom:5px">practice</div>
+      <input class="hd-ta" id="hd-text-${id}" value="${escapeHtml(g.text||'')}" style="min-height:0;font-style:normal">
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="hd-why-label" style="margin-bottom:5px">what — one item per line</div>
+      <textarea class="hd-ta" id="hd-bullets-${id}">${escapeHtml(bulletsVal)}</textarea>
     </div>
     <div class="hd-divider"></div>
     <div class="hd-why-label" style="margin-bottom:5px">why</div>
-    <textarea class="hd-ta" id="hd-why-${id}">${whyVal}</textarea>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
+    <textarea class="hd-ta" id="hd-why-${id}">${escapeHtml(whyVal)}</textarea>
+    <div class="hd-divider"></div>
+    <div class="ua-freq-section" id="ua-freq-section-${id}">${_uaFreqSectionHtml()}</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
       <button class="hd-edit-btn" onclick="event.stopPropagation();cancelHabitEdit(${id})">cancel</button>
       <button class="hd-save-btn" onclick="event.stopPropagation();saveHabitDetail(${id})">save</button>
     </div>`;
@@ -5629,6 +5838,7 @@ function openHabitEdit(id){
 }
 
 function cancelHabitEdit(id){
+  _uaDraft=null; _uaEditId=null; _uaFreqOpen=false;
   const g = state.kaizen.find(k=>k.id===id);
   if(!g) return;
   const panel = document.getElementById('hd-'+id);
@@ -5638,13 +5848,34 @@ function cancelHabitEdit(id){
 function saveHabitDetail(id){
   const g = state.kaizen.find(k=>k.id===id);
   if(!g) return;
+  // Schedule from the picker draft (Path B: canonical days/freq/freqAnchor; interval-days guard).
+  let sched = null;
+  if(_uaDraft && _uaEditId===id){
+    if(_uaDraft.mode==='daily'){
+      sched = {days:'daily', freq:undefined, freqAnchor:undefined};
+    } else {
+      const days = _uaDraft.days.slice().sort((a,b)=>a-b);
+      const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
+      // GUARD — an interval cadence must never save with days absent/'daily' (it would fire all 7 days of the on-week).
+      if(freq && !(Array.isArray(days) && days.length)) return;
+      sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
+    }
+  }
+  const textEl = document.getElementById('hd-text-'+id);
   const bulletsRaw = (document.getElementById('hd-bullets-'+id)||{}).value||'';
   const why = ((document.getElementById('hd-why-'+id)||{}).value||'').trim();
+  if(textEl){ const t=(textEl.value||'').trim(); if(t) g.text=t; }
   g.bullets = bulletsRaw.split('\n').map(l=>l.trim()).filter(Boolean);
   g.why = why;
+  if(sched){
+    g.days = sched.days;
+    if(sched.freq===undefined) delete g.freq; else g.freq = sched.freq;
+    if(sched.freqAnchor===undefined) delete g.freqAnchor; else g.freqAnchor = sched.freqAnchor;
+    recomputeStreak(id);   // a cadence change alters the streak maths
+  }
   saveState();
-  const panel = document.getElementById('hd-'+id);
-  if(panel) panel.innerHTML = buildHabitDetailHtml(g);
+  _uaDraft=null; _uaEditId=null; _uaFreqOpen=false;
+  renderGoals();   // full re-render so the row cadence chip + today-filter + grid reflect the change
 }
 
 // ============ ACTIONS ============
@@ -5827,7 +6058,9 @@ function showAdd(){
   const ex=document.getElementById('form-extras');
   if(currentTab==='kaizen'){
     const opts=state.shokunin.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('');
-    ex.innerHTML=`<select id="link-select"><option value="">feeds which craft?</option>${opts}</select>`;
+    // Read-only cascade context: picking a craft previews where this new habit will sit —
+    // craft → goal → strand — so placement reads "this feeds Capital and Building," not a bare dropdown.
+    ex.innerHTML=`<select id="link-select" onchange="_uaAddChainPreview()"><option value="">feeds which craft?</option>${opts}</select><div id="ua-add-chain" class="ua-add-chain"></div>`;
   } else if(currentTab==='shokunin'){
     const opts=state.annualGoals.map(a=>`<option value="${a.id}">${a.text.substring(0,40)}</option>`).join('');
     ex.innerHTML=`<select id="link-select"><option value="">serves which annual goal?</option>${opts}</select>
@@ -5836,6 +6069,14 @@ function showAdd(){
     const opts=state.milestones5yr.map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');
     ex.innerHTML=`<select id="link-select"><option value="">serves which 5-year milestone?</option>${opts}</select>`;
   }
+}
+// Add-form cascade preview — renders craft → goal → strand once a craft is chosen (Kaizen add).
+function _uaAddChainPreview(){
+  const host=document.getElementById('ua-add-chain');
+  if(!host) return;
+  const sel=document.getElementById('link-select');
+  const craft=(state.shokunin||[]).find(s=>String(s.id)===String(sel&&sel.value));
+  host.innerHTML = craft ? _uaChainHtml(null, craft) : '';
 }
 function hideAdd(){
   document.getElementById('add-trigger').style.display='flex';
@@ -7477,7 +7718,7 @@ function renderTravelModalHabits(){
   c.innerHTML=state.kaizen.map(h=>{
     const sel=_travelPending[h.id]?'sel':'';
     const tick=_travelPending[h.id]?'✓':'';
-    const dl=h.days==='daily'?'Daily':Array.isArray(h.days)?h.days.length+'x/wk':'Weekly';
+    const dl=cadenceLabel(h);
     return `<div class="tmh-row ${sel}" id="tmh${h.id}" onclick="toggleTravelHabit(${h.id})">
       <div class="tmh-tick">${tick}</div>
       <span class="tmh-text">${h.text}</span>
