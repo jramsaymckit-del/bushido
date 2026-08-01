@@ -249,8 +249,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .dw-stage{padding:14px 0 6px}
 .dw-word{font-family:'Noto Serif JP',serif;font-style:italic;font-size:21px;font-weight:500;line-height:1.55;color:var(--dw-ink);word-break:break-word;border-left:2px solid rgba(181,55,44,.35);padding-left:14px}
 .dw-empty{padding-top:4px}
-.dw-emptyrow{display:flex;gap:12px;align-items:center}
-.dw-input{flex:1;font-family:'Noto Serif JP',serif;font-style:italic;font-size:16px;color:var(--dw-ink);background:none;border:none;border-bottom:1px solid var(--dw-edge);padding:7px 2px;outline:none}
+/* Composer row REFLOWS on narrow screens (portrait phone): the input takes the full width and the
+   Speak button wraps to its own line beneath, right-aligned — so it can never be pushed past
+   #app's overflow-x:clip and clipped off (the portrait-unreachable bug). flex-basis:100% forces the
+   wrap; min-width:0 lets the input ignore its intrinsic ~154px floor. Scoped to .dw-emptyrow so the
+   shared .dw-btn (edit/ack rows) is untouched. */
+.dw-emptyrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.dw-emptyrow .dw-btn{margin-left:auto;margin-top:2px}
+.dw-input{flex:1 1 100%;min-width:0;font-family:'Noto Serif JP',serif;font-style:italic;font-size:16px;color:var(--dw-ink);background:none;border:none;border-bottom:1px solid var(--dw-edge);padding:7px 2px;outline:none}
 .dw-input:focus{border-bottom-color:var(--dw-red)}
 .dw-input::placeholder{color:var(--dw-ink-faint);opacity:.5}
 .dw-input-edit{width:100%;flex:none}
@@ -3775,7 +3781,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'User Autonomy Phase 1 (fix round) · 2026-08-01 · ✎ pencil now opens the detail editor (Frequency ▸ reachable) + cascade lineage extended to the FULL named chain habit→craft→goal→strand (named, coloured) in the editor AND the Kaizen add form + reachability gate · Path B days/freq/freqAnchor, Monday-anchored · on Finding #1 clan-merge';
+const BUILD_ID = 'Day\'s Word composer fix · 2026-08-01 · portrait POST button no longer clipped off-screen (compose row reflows — input full-width, "Speak to the Clan" wraps below, right-aligned) + hint line cut · 375px reachability gate · on User Autonomy Phase 1 (fix round)';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -12479,8 +12485,8 @@ function renderDayWord(){
     panel.innerHTML = '<div class="dw-card dw-fade">' + dwHead() +
       '<div class="dw-empty"><div class="dw-emptyrow">' +
         '<input id="dw-input" class="dw-input" maxlength="' + DW_MAX + '" placeholder="Speak to the clan. One line. One day." oninput="dwToggle()"/>' +
-        '<button id="dw-post" class="dw-btn" disabled onclick="dwPost()">post the word</button>' +
-      '</div><div class="dw-hint">First to speak claims the day. It fades in 24 hours.</div></div></div>';
+        '<button id="dw-post" class="dw-btn" disabled onclick="dwPost()">Speak to the Clan</button>' +
+      '</div></div></div>';
     dwUpdateNavDot();
     return;
   }
