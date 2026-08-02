@@ -3816,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Add-flow cadence fix · 2026-08-02 · a Kaizen habit could carry an empty day-mask (days:[]) → invisible in "show up today" forever (habitOnDay never matches) though it saved. FIX: checkDailyReset repairs days:[] → daily on load (heals live-broken habits); saveHabitDetail coerces an empty mask to daily (parity with addGoal, which already blocked it). Add default already writes daily — verified. Gate verify_addflow_visible asserts the USER-VISIBLE outcome (habit appears in the rendered #goals-list + survives reload) · on Travel Mode (a) + 2a';
+const BUILD_ID = 'Travel Mode (b) · 2026-08-02 · travel-framed reflection prompts — a ≥50%-travel reflection period (reads travelDays HISTORY, not the live boolean, so a past travel week still swaps after you are home) reframes the deficit prompts: weekly "what got in the way?"→"what did you enjoy?", monthly "what is changing in you?"→"what did you learn about yourself?" (one-for-one, affirming prompts kept); entry.travel stamped at seal, timeline reads distinctly (✈); reflections stay in the merge net · on Add-flow cadence fix + Travel Mode (a) + 2a';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4533,7 +4533,7 @@ function openMonthReflect(year,month){
   if(_monthReflectOpen===key){closeDayNote();return;}
   _monthReflectOpen=key; _dayNoteOpen=null;
   var monthName=new Date(year,month,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-  var pairs=[['what is working',ref.working],['what needs to change',ref.changing],['what is shifting',ref.shifting],['notes',ref.notes]];
+  var pairs=[['what is working',ref.working],[ref.travel?'what you learned about yourself':'what needs to change',ref.changing],['what is shifting',ref.shifting],['notes',ref.notes]];
   var bodyHtml=pairs.filter(function(p){return p[1];}).map(function(p){
     return '<div style="margin-bottom:14px"><div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.35;margin-bottom:4px">'+p[0]+'</div>'
       +'<div style="font-family:&quot;Noto Serif JP&quot;,serif;font-size:13px;font-weight:700;line-height:1.65;color:var(--ink)">'+p[1]+'</div></div>';
@@ -4909,13 +4909,13 @@ let html=`<div class="kk-outer ${_calThemeCls}">
     if(reflection){
       const fields=[];
       if(reflection.notes) fields.push(`<div class="exp-field"><div class="exp-label">reflection</div><div class="exp-text">${reflection.notes}</div></div>`);
-      if(reflection.whatGotInWay) fields.push(`<div class="exp-field"><div class="exp-label">what got in the way</div><div class="exp-text">${reflection.whatGotInWay}</div></div>`);
+      if(reflection.whatGotInWay) fields.push(`<div class="exp-field"><div class="exp-label">${reflection.travel?'what you enjoyed':'what got in the way'}</div><div class="exp-text">${reflection.whatGotInWay}</div></div>`);
       if(reflection.showingUp) fields.push(`<div class="exp-field"><div class="exp-label">where I showed up</div><div class="exp-text">${reflection.showingUp}</div></div>`);
       const intentionHtml=reflection.intention?`<div class="exp-field exp-intention"><div class="exp-label">intention set →</div><div class="exp-text">${reflection.intention}</div></div>`:'';
       const rangeStr=`${wMon.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} — ${wEnd.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
       html+=`<div class="mcal-expansion${isOpen?' open':''}">
         <div class="mcal-expand-inner" onclick="event.stopPropagation()">
-          <div class="exp-range">${rangeStr}</div>
+          <div class="exp-range">${rangeStr}${reflection.travel?' · ✈ travel':''}</div>
           ${fields.join('')}${intentionHtml}
         </div>
       </div>`;
@@ -4926,13 +4926,13 @@ let html=`<div class="kk-outer ${_calThemeCls}">
   if(monthRef){
     const mFields=[];
     if(monthRef.working)  mFields.push(`<div class="exp-field"><div class="exp-label">what is working</div><div class="exp-text">${monthRef.working}</div></div>`);
-    if(monthRef.changing) mFields.push(`<div class="exp-field"><div class="exp-label">what needs to change</div><div class="exp-text">${monthRef.changing}</div></div>`);
+    if(monthRef.changing) mFields.push(`<div class="exp-field"><div class="exp-label">${monthRef.travel?'what you learned about yourself':'what needs to change'}</div><div class="exp-text">${monthRef.changing}</div></div>`);
     if(monthRef.shifting) mFields.push(`<div class="exp-field"><div class="exp-label">what is shifting</div><div class="exp-text">${monthRef.shifting}</div></div>`);
     if(monthRef.notes)    mFields.push(`<div class="exp-field"><div class="exp-label">notes</div><div class="exp-text">${monthRef.notes}</div></div>`);
     if(mFields.length){
       html+=`<div class="mcal-expansion${_monthReflectExpanded?' open':''}">
         <div class="mcal-expand-inner" onclick="event.stopPropagation()">
-          <div class="exp-range" style="letter-spacing:2px;font-size:9px;text-transform:uppercase;opacity:.55">月 · ${monthName} · monthly reflection</div>
+          <div class="exp-range" style="letter-spacing:2px;font-size:9px;text-transform:uppercase;opacity:.55">月 · ${monthName} · monthly reflection${monthRef.travel?' · ✈ travel':''}</div>
           ${mFields.join('')}
         </div>
       </div>`;
@@ -7330,11 +7330,13 @@ function saveReflection(type){
     entry.showingUp=c.querySelector('#opt-c-q2')?.value.trim()||'';
     entry.notes=c.querySelector('.reflect-textarea')?.value||'';
     entry.intention=c.querySelector('#weekly-intention')?.value.trim()||'';
+    entry.travel=isTravelWeek(_saveDate);   // (b): stamp the travel-week framing at seal — the timeline reads this flag, never a live recompute
   } else if(type==='monthly'){
     const areas=c.querySelectorAll('.reflect-textarea');
     entry.working=areas[0]?.value||'';
     entry.changing=areas[1]?.value||'';
     entry.shifting=areas[2]?.value||'';
+    entry.travel=isTravelMonth(_saveDate.substring(0,7));   // (b): stamp the travel-month framing at seal
   } else if(type==='annual'){
     const areas=c.querySelectorAll('.reflect-textarea');
     entry.ryughi=areas[0]?.value||'';
@@ -7407,9 +7409,10 @@ function showReflection(type){
         const rate=Math.round(w.rate*100);
         if(rate>=80) return `<div style="margin-bottom:24px;padding:12px 18px;border-left:2px solid rgba(204,53,41,.2);font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);opacity:.75">your crafts all had strong momentum this week.</div>`;
         const others=state.shokunin.filter(s=>s.id!==w.craft.id);
+        const travelWeek=isTravelWeek(_reflectedWeekDate());   // (b): a mostly-travel week reframes the deficit prompt below (one-for-one, no added prompt)
         return `<div class="momentum-card" id="momentum-card" data-craft-id="${w.craft.id}">
           <div class="momentum-craft-lbl">${w.craft.text.substring(0,45)}</div>
-          <div class="momentum-stmt">has been quiet this week.</div>
+          <div class="momentum-stmt">${travelWeek?'rested while you were travelling.':'has been quiet this week.'}</div>
           <div class="momentum-bar-wrap">
             <div class="momentum-bar"><div class="momentum-fill" style="width:${rate}%"></div></div>
             <span class="momentum-pct">${rate}% this week</span>
@@ -7417,8 +7420,8 @@ function showReflection(type){
           ${others.length?`<div class="opt-c-switch">focus on a different craft: <select onchange="if(this.value)switchFocusCraft(+this.value)"><option value="">—</option>${others.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('')}</select></div>`:''}
         </div>
         <div class="reflect-q">
-          <div class="reflect-label">what got in the way?</div>
-          <textarea class="reflect-textarea" id="opt-c-q1" placeholder="Be honest with yourself..."></textarea>
+          <div class="reflect-label">${travelWeek?'what did you enjoy?':'what got in the way?'}</div>
+          <textarea class="reflect-textarea" id="opt-c-q1" placeholder="${travelWeek?'the good parts of being away…':'Be honest with yourself...'}"></textarea>
         </div>
         <div class="reflect-q">
           <div class="reflect-label">what would showing up look like next week?</div>
@@ -7444,8 +7447,8 @@ function showReflection(type){
       ${weeklyNotesCascade()}
       <div class="reflect-q"><div class="reflect-label">What is working?</div>
         <textarea class="reflect-textarea" placeholder="The practices that are bearing fruit..."></textarea></div>
-      <div class="reflect-q"><div class="reflect-label">What is changing in you?</div>
-        <textarea class="reflect-textarea" placeholder="How your mentality is evolving..."></textarea></div>
+      <div class="reflect-q"><div class="reflect-label">${isTravelMonth(getDateStr().slice(0,7))?'What did you learn about yourself?':'What is changing in you?'}</div>
+        <textarea class="reflect-textarea" placeholder="${isTravelMonth(getDateStr().slice(0,7))?'What the road showed you about who you are...':'How your mentality is evolving...'}"></textarea></div>
       <div class="reflect-q"><div class="reflect-label">What needs to shift?</div>
         <textarea class="reflect-textarea" placeholder="Adjustments to the path..."></textarea></div>
       <div class="form-actions"><button class="btn" onclick="saveReflection('monthly')">Seal reflection</button></div>`;
@@ -7507,7 +7510,7 @@ function showReflectionReview(editable){
     ${craftEl}
     ${entry.whatGotInWay!==undefined?`
     <div class="reflect-q">
-      <div class="reflect-label">what got in the way?</div>
+      <div class="reflect-label">${entry.travel?'what you enjoyed':'what got in the way?'}</div>
       <textarea class="reflect-textarea${roClass}" id="rev-q1" ${ro}>${entry.whatGotInWay||''}</textarea>
     </div>
     <div class="reflect-q">
@@ -7970,6 +7973,39 @@ function setTravelActive(on){
 // Normalize the anchor + backfill the gap. Called from checkDailyReset (load + daily) and after a
 // reconcile adopts cloud. Returns true if travelDays grew (so the caller can fold it into `changed`).
 function syncTravelHistory(){ normalizeTravelState(); return backfillTravelDays(); }
+
+// ── Travel Mode (b): is a reflection PERIOD a travel period? ─────────────────────────
+// Reads the (a) `travelDays` HISTORY for the period's day-strings — NOT the live travelMode
+// boolean — so a period reflected on AFTER returning home (live boolean already false) is
+// still recognised as travel. ≥50% of the period's days in travelDays counts as travel
+// (one clean majority rule). travelDays only began 2026-08-02, so every earlier period has
+// zero travel days and these return false — (b) never fires retroactively (no invented history).
+function _travelShare(dayStrs){
+  if(!dayStrs || !dayStrs.length) return 0;
+  const t = state.travelDays || {};
+  let n = 0; for(const d of dayStrs) if(t[d] === true) n++;
+  return n / dayStrs.length;
+}
+function _weekDayStrs(anyDateInWeek){   // the Mon–Sun week containing anyDateInWeek ('YYYY-MM-DD')
+  const d = new Date((anyDateInWeek || '') + 'T12:00:00'); if(isNaN(d)) return [];
+  const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  const o = []; for(let i = 0; i < 7; i++){ const x = new Date(mon); x.setDate(mon.getDate() + i); o.push(getDateStr(x)); }
+  return o;
+}
+function _monthDayStrs(ymStr){          // every day of a 'YYYY-MM' month
+  const p = String(ymStr || '').split('-'); const y = +p[0], m = +p[1]; if(!y || !m) return [];
+  const last = new Date(y, m, 0).getDate(); const o = [];
+  for(let dd = 1; dd <= last; dd++) o.push(`${y}-${String(m).padStart(2, '0')}-${String(dd).padStart(2, '0')}`);
+  return o;
+}
+function isTravelWeek(anyDateInWeek){ return _travelShare(_weekDayStrs(anyDateInWeek)) >= 0.5; }
+function isTravelMonth(ymStr){ return _travelShare(_monthDayStrs(ymStr)) >= 0.5; }
+// The reflected WEEK's anchor date: today, or (on the Monday grace day) the prior Sunday — the
+// same rule saveReflection uses to file a weekly entry, so form/seal/gating agree on the period.
+function _reflectedWeekDate(){
+  if(typeof todayIdx === 'function' && todayIdx() === 0){ const wEnd = new Date(getWeekStart(-1)); wEnd.setDate(wEnd.getDate() + 6); return getDateStr(wEnd); }
+  return getDateStr();
+}
 
 function handleTravelToggle(){
   const setupDone=state.kaizen.some(k=>k.core===true||k.core===false);
