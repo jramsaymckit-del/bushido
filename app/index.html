@@ -2050,6 +2050,41 @@ li.goal.hd-open .habit-detail{display:block}
 .ua-lin-skanji{font-style:normal;margin-right:3px;font-size:12px}
 .ua-add-chain:not(:empty){margin-top:8px}
 .ua-add-chain .ua-lineage{margin-bottom:0}
+/* ── User Autonomy 2a — cascade browser (re-home + add) ── */
+.ua-lineage.ua-tap{cursor:pointer;border:1px dashed transparent;border-radius:4px;padding:6px 8px;margin:0 -8px 10px;transition:background .15s,border-color .15s}
+.ua-lineage.ua-tap:hover{background:rgba(139,26,26,.05);border-color:var(--edge)}
+.ua-lin-tap{font-style:normal;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--red);opacity:.6;margin-left:auto;white-space:nowrap}
+.ua-rehome-msg{font-family:'Noto Serif JP',serif;font-style:italic;font-size:11px;color:#2f6b57;margin:0 0 10px}
+.ua-add-sec{margin-bottom:12px}
+.ua-add-lbl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65;margin-bottom:6px}
+.ua-casc-btn{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;border:1px solid var(--edge);border-radius:2px;background:rgba(0,0,0,.02);padding:9px 11px;font-family:'Noto Sans JP',sans-serif;text-align:left}
+.ua-casc-btn:hover{border-color:var(--ink-faint)}
+.ua-casc-btn.open{border-color:var(--red);border-bottom-left-radius:0;border-bottom-right-radius:0}
+.ua-casc-btn-l{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65;flex-shrink:0}
+.ua-casc-btn-v{flex:1 1 100%;min-width:0;text-align:left;font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;color:var(--ink-light);display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.ua-casc-btn-ph{opacity:.6}
+.ua-casc-btn-chev{color:var(--ink-faint);font-size:10px;flex-shrink:0}
+.ua-casc-panel{border:1px solid var(--red);border-top:none;border-radius:0 0 2px 2px;background:var(--white);padding:12px}
+.ua-casc-crumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:11px;margin-bottom:12px;min-height:20px}
+.ua-casc-crumb button{appearance:none;border:none;background:none;font:inherit;cursor:pointer;color:var(--ink-light);padding:2px 4px;border-radius:3px;display:inline-flex;align-items:center;gap:3px}
+.ua-casc-crumb button:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+.ua-casc-crumb .cur{color:var(--ink);font-weight:600;padding:2px 4px}
+.ua-casc-crumb .sep{color:var(--ink-faint)}
+.ua-casc-crumb .bk{color:var(--red);opacity:.8}
+.ua-casc-q{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.65;margin:0 0 8px}
+.ua-casc-list{display:flex;flex-direction:column;gap:6px}
+.ua-casc-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid var(--edge);border-radius:3px;background:var(--scroll);cursor:pointer;transition:border-color .12s,background .12s;text-align:left;width:100%;font:inherit}
+.ua-casc-row:hover{border-color:var(--ink-faint);background:#fff}
+.ua-casc-row.cur{border-color:var(--red);background:rgba(139,26,26,.04)}
+.ua-casc-kanji{font-family:'Noto Serif JP',serif;font-size:19px;line-height:1;flex-shrink:0}
+.ua-casc-kanji.sm{font-size:13px;opacity:.5}
+.ua-casc-row-body{flex:1;min-width:0}
+.ua-casc-row-name{font-size:14px;color:var(--ink);display:block}
+.ua-casc-row-sub{font-size:10px;color:var(--ink-light);opacity:.7;margin-top:1px;display:block}
+.ua-casc-row-go{font-size:14px;color:var(--ink-faint);flex-shrink:0}
+.ua-casc-row.dest .ua-casc-row-go{color:var(--red)}
+.ua-casc-row-check{color:var(--red);font-size:13px;flex-shrink:0}
+.ua-casc-empty{font-size:12px;color:var(--ink-light);font-style:italic;padding:14px 4px;text-align:center;opacity:.75}
 .ua-freq-btn{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;border:1px solid var(--edge);border-radius:2px;background:rgba(0,0,0,.02);padding:8px 10px;transition:border-color .15s;font-family:'Noto Sans JP',sans-serif}
 .ua-freq-btn:hover{border-color:var(--ink-faint)}
 .ua-freq-btn.open{border-color:var(--red);border-bottom-left-radius:0;border-bottom-right-radius:0}
@@ -3781,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Day\'s Word composer fix · 2026-08-01 · portrait POST button no longer clipped off-screen (compose row reflows — input full-width, "Speak to the Clan" wraps below, right-aligned) + hint line cut · 375px reachability gate · on User Autonomy Phase 1 (fix round)';
+const BUILD_ID = 'User Autonomy 2a · 2026-08-01 · cascade browser (browse strand→goal→craft, land on a craft) — re-home a habit by tapping its chain (writes only its craft) + choose placement when adding + cadence-on-add (pre-filled every day) · on Day\'s Word composer fix';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5646,7 +5681,7 @@ function _uaKanjiForGoal(goal){                          // still used by the Sh
 }
 // Build the upward chain craft → goal → strand (+ optional leading habit). Renders nothing
 // when there is no upward chain at all (never a lone habit name, never 'undefined').
-function _uaChainHtml(habitText, craft){
+function _uaChainHtml(habitText, craft, tapId){
   const up = [];
   let goal=null, si=null;
   if(craft){
@@ -5661,11 +5696,16 @@ function _uaChainHtml(habitText, craft){
     const nm = escapeHtml((state.strands&&state.strands[si])||'');
     up.push(`<span class="ua-lin-strand" style="color:${_UA_STRAND_COLOR[si]}"><span class="ua-lin-skanji">${_UA_KANJI[si]}</span>${nm}</span>`);
   }
-  if(!up.length) return '';                               // fully orphaned → render nothing
+  if(!up.length && tapId==null) return '';               // read-only + fully orphaned → render nothing
   const nodes = (habitText && habitText.trim())
     ? [`<span class="ua-lin-node ua-lin-self">${escapeHtml(habitText.trim())}</span>`, ...up]
     : up;
-  return `<div class="ua-lineage">${nodes.join('<span class="ua-lin-arrow">→</span>')}</div>`;
+  const body = nodes.join('<span class="ua-lin-arrow">→</span>');
+  if(tapId!=null){                                        // tappable → opens the cascade browser (re-home, 2a)
+    const hint = `<span class="ua-lin-tap">${up.length?'move ▸':'choose where this belongs ▸'}</span>`;
+    return `<div class="ua-lineage ua-tap" onclick="event.stopPropagation();_uaCascOpen('rehome',${tapId})">${body}${hint}</div>`;
+  }
+  return `<div class="ua-lineage">${body}</div>`;
 }
 function _uaLineageHtml(kind, item){
   if(!item) return '';
@@ -5765,6 +5805,123 @@ function _uaPickerHtml(){
   </div>`;
 }
 
+// ============ USER AUTONOMY 2a — cascade browser (re-home + add) ============
+// Browse strand → goal → craft and land on a craft. Strand & goal are navigation; the craft is the
+// destination. The ONLY field written is parentShok (a habit's craft) — NEVER a craft's parentAnnual —
+// so re-homing one habit can never drag its siblings. Two hosts: the tappable lineage chain in the
+// detail editor (re-home) and the Kaizen add flow. Both land through resolveParentLink (no orphan is
+// creatable) and the habit keeps its id, so its completionLog history (id-keyed) survives the move.
+let _uaCasc = { open:false, level:'strand', strand:null, goal:null, ctx:null, habitId:null, landed:null };
+function _uaGoalById(id){ return (state.annualGoals||[]).find(g=>String(g.id)===String(id)); }
+function _uaCraftById(id){ return (state.shokunin||[]).find(c=>String(c.id)===String(id)); }
+function _uaStrandOfGoal(g){ if(!g||g.parentMs==null||g.parentMs==='')return null; const n=Number(g.parentMs); return (Number.isInteger(n)&&n>=0&&n<5)?n:null; }
+function _uaGoalsInStrand(si){ return (state.annualGoals||[]).filter(g=>_uaStrandOfGoal(g)===si); }
+function _uaCraftsInGoal(gid){ return (state.shokunin||[]).filter(c=>String(c.parentAnnual)===String(gid)); }
+function _uaStrandOfCraft(cid){ const c=_uaCraftById(cid); return c?_uaStrandOfGoal(_uaGoalById(c.parentAnnual)):null; }
+function _uaRehomeParent(){ if(_uaCasc.ctx!=='rehome')return null; const g=state.kaizen.find(k=>k.id===_uaCasc.habitId); return g?Number(g.parentShok):null; }
+
+function _uaCascOpen(ctx, habitId){
+  _uaCasc.ctx=ctx; _uaCasc.open=true; _uaCasc.habitId=(habitId!=null?habitId:null);
+  if(ctx==='rehome'){
+    const p=_uaRehomeParent(); const c=(p!=null)?_uaCraftById(p):null; const si=(p!=null)?_uaStrandOfCraft(p):null;
+    _uaCasc.strand=si; _uaCasc.goal=c?Number(c.parentAnnual):null;
+    _uaCasc.level = c ? 'craft' : (si!=null ? 'goal' : 'strand');   // open at the current home (siblings visible)
+  } else {
+    _uaCasc.strand=null; _uaCasc.goal=null; _uaCasc.level='strand'; // add: browse from the top
+  }
+  _uaCascRender();
+}
+function _uaCascClose(){ _uaCasc.open=false; _uaCascRender(); }
+function _uaCascCrumb(level){ if(level==='strand'){_uaCasc.strand=null;_uaCasc.goal=null;} else if(level==='goal'){_uaCasc.goal=null;} _uaCasc.level=level; _uaCascRender(); }
+function _uaCascPickStrand(si){ _uaCasc.strand=Number(si); _uaCasc.level='goal'; _uaCascRender(); }
+function _uaCascPickGoal(gid){ _uaCasc.goal=Number(gid); _uaCasc.level='craft'; _uaCascRender(); }
+function _uaCascLand(cid){
+  cid=Number(cid);
+  if(!_uaCraftById(cid)) return;                          // only land on an EXISTING craft (never an orphan)
+  if(_uaCasc.ctx==='rehome'){
+    const id=_uaCasc.habitId, g=state.kaizen.find(k=>k.id===id);
+    if(g){ g.parentShok=cid; saveState(); }               // write ONLY parentShok — craft's parentAnnual untouched
+    _uaCasc.open=false;
+    _uaRenderRehome(id, g?('Moved to '+((_uaCraftById(cid)||{}).text||'')+'. Your streak and history are intact.'):'');
+  } else {
+    _uaCasc.landed=cid; _uaCasc.open=false; _uaCascRender();
+  }
+}
+function _uaRehomeHtml(id){
+  const g=state.kaizen.find(k=>k.id===id); if(!g) return '';
+  return `<div id="ua-rehome-${id}" class="ua-rehome">${_uaChainHtml(g.text||null, _uaCraftById(g.parentShok), id)}<div id="ua-casc-host"></div></div>`;
+}
+function _uaRenderRehome(id, msg){
+  const host=document.getElementById('ua-rehome-'+id); const g=state.kaizen.find(k=>k.id===id);
+  if(!host||!g) return;
+  host.innerHTML = _uaChainHtml(g.text||null, _uaCraftById(g.parentShok), id)
+    + (msg?`<div class="ua-rehome-msg">${escapeHtml(msg)}</div>`:'')
+    + `<div id="ua-casc-host"></div>`;
+}
+function _uaCascBtnValue(craft){
+  if(!craft) return '<span class="ua-casc-btn-ph">choose a strand, goal, and craft</span>';
+  const g=_uaGoalById(craft.parentAnnual); const si=_uaStrandOfGoal(g);
+  const k = si!=null ? `<span style="color:${_UA_STRAND_COLOR[si]};font-style:normal">${_UA_KANJI[si]}</span> ` : '';
+  return `${k}${escapeHtml(craft.text||'')}${g?` <span style="opacity:.5">·</span> ${escapeHtml(g.text||'')}`:''}`;
+}
+function _uaCascAddButtonHtml(){
+  const c=(_uaCasc.landed!=null)?_uaCraftById(_uaCasc.landed):null;
+  return `<button type="button" class="ua-casc-btn${_uaCasc.open?' open':''}" onclick="event.stopPropagation();${_uaCasc.open?"_uaCascClose()":"_uaCascOpen('add')"}">
+    <span class="ua-casc-btn-l">where</span>
+    <span class="ua-casc-btn-v">${_uaCascBtnValue(c)}</span>
+    <span class="ua-casc-btn-chev">${_uaCasc.open?'▲':'▸'}</span></button>`;
+}
+function _uaCascRender(){
+  if(_uaCasc.ctx==='add'){ const btn=document.getElementById('ua-casc-btn'); if(btn) btn.innerHTML=_uaCascAddButtonHtml(); }
+  const host=document.getElementById('ua-casc-host');
+  if(host) host.innerHTML = _uaCasc.open ? _uaCascPanelHtml() : '';
+}
+function _uaCascPanelHtml(){
+  const b=_uaCasc, curCraft=(b.ctx==='rehome')?_uaRehomeParent():null;
+  const curGoal = (curCraft!=null && _uaCraftById(curCraft)) ? Number(_uaCraftById(curCraft).parentAnnual) : null;
+  const curStrand = (curCraft!=null) ? _uaStrandOfCraft(curCraft) : null;
+  // breadcrumb
+  let crumb=`<div class="ua-casc-crumb"><button class="bk" onclick="event.stopPropagation();_uaCascCrumb('strand')">strands</button>`;
+  if(b.strand!=null){ const nm=escapeHtml((state.strands&&state.strands[b.strand])||''); const col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+    crumb += `<span class="sep">›</span>` + (b.level==='goal'
+      ? `<span class="cur" style="color:${col}">${kj} ${nm}</span>`
+      : `<button onclick="event.stopPropagation();_uaCascCrumb('goal')" style="color:${col}">${kj} ${nm}</button>`); }
+  if(b.goal!=null){ const g=_uaGoalById(b.goal); crumb += `<span class="sep">›</span><span class="cur">${escapeHtml(g?g.text:'')}</span>`; }
+  crumb += `</div>`;
+  // level body
+  let body='';
+  if(b.level==='strand'){
+    body = `<div class="ua-casc-q">Which strand?</div><div class="ua-casc-list">`;
+    (state.strands||[]).forEach((nm,si)=>{ if(si>4) return; const n=_uaGoalsInStrand(si).length;
+      body += `<button class="ua-casc-row${curStrand===si?' cur':''}" onclick="event.stopPropagation();_uaCascPickStrand(${si})">`
+        + `<span class="ua-casc-kanji" style="color:${_UA_STRAND_COLOR[si]}">${_UA_KANJI[si]}</span>`
+        + `<span class="ua-casc-row-body"><span class="ua-casc-row-name">${escapeHtml(nm)}</span><span class="ua-casc-row-sub">${n} goal${n===1?'':'s'}</span></span>`
+        + `<span class="ua-casc-row-go">›</span></button>`; });
+    body += `</div>`;
+  } else if(b.level==='goal'){
+    const gs=_uaGoalsInStrand(b.strand), col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+    body = `<div class="ua-casc-q">Which goal?</div><div class="ua-casc-list">`;
+    if(!gs.length) body += `<div class="ua-casc-empty">No goals here yet.</div>`;
+    gs.forEach(g=>{ const n=_uaCraftsInGoal(g.id).length;
+      body += `<button class="ua-casc-row${curGoal===Number(g.id)?' cur':''}" onclick="event.stopPropagation();_uaCascPickGoal(${g.id})">`
+        + `<span class="ua-casc-kanji sm" style="color:${col}">${kj}</span>`
+        + `<span class="ua-casc-row-body"><span class="ua-casc-row-name">${escapeHtml(g.text)}</span><span class="ua-casc-row-sub">${n} craft${n===1?'':'s'}</span></span>`
+        + `<span class="ua-casc-row-go">›</span></button>`; });
+    body += `</div>`;
+  } else {
+    const cs=_uaCraftsInGoal(b.goal), col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+    body = `<div class="ua-casc-q">Which craft?</div><div class="ua-casc-list">`;
+    if(!cs.length) body += `<div class="ua-casc-empty">No crafts here yet.</div>`;
+    cs.forEach(c=>{ const isCur=(curCraft===Number(c.id));
+      body += `<button class="ua-casc-row dest${isCur?' cur':''}" onclick="event.stopPropagation();_uaCascLand(${c.id})">`
+        + `<span class="ua-casc-kanji sm" style="color:${col}">${kj}</span>`
+        + `<span class="ua-casc-row-body"><span class="ua-casc-row-name">${escapeHtml(c.text)}</span><span class="ua-casc-row-sub">${isCur?'current home':'place here'}</span></span>`
+        + (isCur?`<span class="ua-casc-row-check">✓</span>`:`<span class="ua-casc-row-go">→</span>`) + `</button>`; });
+    body += `</div>`;
+  }
+  return `<div class="ua-casc-panel" onclick="event.stopPropagation()">${crumb}${body}</div>`;
+}
+
 function buildHabitDetailHtml(g){
   const bullets = g.bullets && g.bullets.length ? g.bullets : null;
   const why = g.why && g.why.trim() ? g.why : null;
@@ -5817,7 +5974,7 @@ function openHabitEdit(id){
   const bulletsVal = (g.bullets||[]).join('\n');
   const whyVal = g.why||'';
   panel.innerHTML = `
-    ${_uaLineageHtml('kaizen', g)}
+    ${_uaRehomeHtml(id)}
     <div style="margin-bottom:8px">
       <div class="hd-why-label" style="margin-bottom:5px">practice</div>
       <input class="hd-ta" id="hd-text-${id}" value="${escapeHtml(g.text||'')}" style="min-height:0;font-style:normal">
@@ -6063,10 +6220,15 @@ function showAdd(){
   const err=document.getElementById('add-form-error'); if(err){ err.style.display='none'; err.textContent=''; }
   const ex=document.getElementById('form-extras');
   if(currentTab==='kaizen'){
-    const opts=state.shokunin.map(s=>`<option value="${s.id}">${s.text.substring(0,40)}</option>`).join('');
-    // Read-only cascade context: picking a craft previews where this new habit will sit —
-    // craft → goal → strand — so placement reads "this feeds Capital and Building," not a bare dropdown.
-    ex.innerHTML=`<select id="link-select" onchange="_uaAddChainPreview()"><option value="">feeds which craft?</option>${opts}</select><div id="ua-add-chain" class="ua-add-chain"></div>`;
+    // 2a — the cascade browser (browse strand→goal→craft, land on a craft) replaces the flat craft
+    // dropdown, and the Frequency ▸ picker is added (pre-filled every day, never blocks). addGoal reads
+    // the landed craft (through resolveParentLink) + the cadence draft.
+    _uaCasc = { open:false, level:'strand', strand:null, goal:null, ctx:'add', habitId:null, landed:null };
+    _uaEditId='add'; _uaDraft=_uaNewDraft({}); _uaFreqOpen=false;
+    ex.innerHTML=`
+      <div class="ua-add-sec"><div class="ua-add-lbl">where does it belong?</div><div id="ua-casc-btn"></div><div id="ua-casc-host"></div></div>
+      <div class="ua-add-sec"><div class="ua-add-lbl">how often?</div><div class="ua-freq-section" id="ua-freq-section-add">${_uaFreqSectionHtml()}</div></div>`;
+    _uaCascRender();
   } else if(currentTab==='shokunin'){
     const opts=state.annualGoals.map(a=>`<option value="${a.id}">${a.text.substring(0,40)}</option>`).join('');
     ex.innerHTML=`<select id="link-select"><option value="">serves which annual goal?</option>${opts}</select>
@@ -6089,6 +6251,8 @@ function hideAdd(){
   document.getElementById('add-form').classList.remove('visible');
   document.getElementById('new-input').value='';
   const err=document.getElementById('add-form-error'); if(err){ err.style.display='none'; err.textContent=''; }
+  _uaCasc.open=false; _uaCasc.landed=null; _uaCasc.ctx=null;   // 2a — clear add-flow browser choice
+  if(_uaEditId==='add'){ _uaDraft=null; _uaEditId=null; _uaFreqOpen=false; }   // and the cadence draft
 }
 // C1-root — the single gate that stops orphaned cascade items. Both the in-app add-flow
 // (addGoal) and onboarding save (saveObStep) route every parent link through this, so no
@@ -6108,31 +6272,46 @@ function showAddError(kind){
   const noParents = kind==='kaizen' ? !((state.shokunin||[]).length)
                   : kind==='shokunin' ? !((state.annualGoals||[]).length) : false;
   const msg = noParents
-    ? (kind==='kaizen' ? 'Create a craft first — every habit must serve one.'
+    ? (kind==='kaizen' ? 'Create a craft first — every habit needs a home.'
                        : 'Create an annual goal first — every craft must serve one.')
-    : (kind==='kaizen' ? 'Choose which craft this habit feeds.'
+    : (kind==='kaizen' ? 'Choose where this habit belongs.'
        : kind==='shokunin' ? 'Choose which annual goal this craft serves.'
        : 'Choose which 5-year milestone this goal serves.');
   const el=document.getElementById('add-form-error');
   if(el){ el.textContent=msg; el.style.display='block'; }
-  const sel=document.getElementById('link-select');
-  if(sel){ sel.classList.add('shake'); setTimeout(()=>sel.classList.remove('shake'),350); }
+  // 2a — kaizen add has no #link-select (it uses the cascade browser); shake that instead
+  const shakeTarget = kind==='kaizen' ? document.getElementById('ua-casc-btn') : document.getElementById('link-select');
+  if(shakeTarget){ shakeTarget.classList.add('shake'); setTimeout(()=>shakeTarget.classList.remove('shake'),350); }
 }
 function addGoal(){
   const text=document.getElementById('new-input').value.trim();
   if(!text)return;
   const kind = currentTab==='kaizen' ? 'kaizen' : currentTab==='shokunin' ? 'shokunin' : 'annual';
-  const rawLink=document.getElementById('link-select')?.value||'';
-  const res=resolveParentLink(kind, rawLink, state);
-  if(!res.ok){ showAddError(kind); return; }   // block — never create an orphan
   if(kind==='kaizen'){
+    // 2a — parent comes from the cascade browser (the landed craft), routed through the SAME C1-root
+    // guard so an orphan is still impossible; cadence comes from the Frequency ▸ draft (pre-filled daily).
+    const res=resolveParentLink('kaizen', _uaCasc.landed, state);
+    if(!res.ok){ showAddError('kaizen'); return; }   // block — never create an orphan
+    const sched=(_uaEditId==='add'&&_uaDraft)?_uaDraftToSched():{days:'daily'};
     // userAdded:true flags habits added through the UI so reviews & migrations never lose them
-    state.kaizen.push({id:state.nextId++,text,parentShok:res.value,streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true});
-  } else if(kind==='shokunin'){
-    const tf=document.getElementById('tf-select')?.value||'monthly';
-    state.shokunin.push({id:state.nextId++,text,parentAnnual:res.value,progress:0,timeframe:tf,done:false,userAdded:true});
+    const habit={id:state.nextId++,text,parentShok:res.value,streak:0,done:false,lastDone:null,bullets:[],why:'',userAdded:true};
+    if(sched.days==='daily'){ habit.days='daily'; }
+    else {
+      const days=(sched.days||[]).slice().sort((a,b)=>a-b);
+      if(!(Array.isArray(days)&&days.length)){ showAddError('kaizen'); return; }   // interval-days guard (parity with saveHabitDetail)
+      habit.days=days; if(sched.freq){ habit.freq=sched.freq; habit.freqAnchor=sched.freqAnchor||getDateStr(); }
+    }
+    state.kaizen.push(habit);
   } else {
-    state.annualGoals.push({id:state.nextId++,text,parentMs:res.value,progress:0,done:false,userAdded:true});
+    const rawLink=document.getElementById('link-select')?.value||'';
+    const res=resolveParentLink(kind, rawLink, state);
+    if(!res.ok){ showAddError(kind); return; }   // block — never create an orphan
+    if(kind==='shokunin'){
+      const tf=document.getElementById('tf-select')?.value||'monthly';
+      state.shokunin.push({id:state.nextId++,text,parentAnnual:res.value,progress:0,timeframe:tf,done:false,userAdded:true});
+    } else {
+      state.annualGoals.push({id:state.nextId++,text,parentMs:res.value,progress:0,done:false,userAdded:true});
+    }
   }
   saveState();hideAdd();renderTab();
 }
