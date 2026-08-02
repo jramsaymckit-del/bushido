@@ -3816,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Travel Mode (a) · 2026-08-02 · travelDays history capture — day-keyed set {YYYY-MM-DD:true} (same shape as completionLog), REGISTERED MERGEABLE (union net, monotonic-add, no tombstone) · travelMode now an anchor {active,since} with backfill on load+checkDailyReset (gap-proof mid-trip) · boolean→object migration (isTravelling shape-tolerant) · additive, no new UI · on User Autonomy 2a';
+const BUILD_ID = 'Add-flow cadence fix · 2026-08-02 · a Kaizen habit could carry an empty day-mask (days:[]) → invisible in "show up today" forever (habitOnDay never matches) though it saved. FIX: checkDailyReset repairs days:[] → daily on load (heals live-broken habits); saveHabitDetail coerces an empty mask to daily (parity with addGoal, which already blocked it). Add default already writes daily — verified. Gate verify_addflow_visible asserts the USER-VISIBLE outcome (habit appears in the rendered #goals-list + survives reload) · on Travel Mode (a) + 2a';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4441,6 +4441,12 @@ function checkDailyReset(){
   // a backfill that grows travelDays folds into `changed` so the new days persist + sync.
   if(syncTravelHistory()) changed=true;
   state.kaizen.forEach(k=>{
+    // REPAIR a never-firing day-mask. days:[] matches NO day — habitOnDay does days.includes(idx),
+    // always false — so the habit is invisible in "show up today" forever while still sitting in
+    // state and in unfiltered views (its calendar row, the stats box). An empty mask is never an
+    // intended schedule: the picker can't produce one and addGoal blocks it, so any that exist are
+    // data damage. Coerce to 'daily' on load so a live-broken habit becomes visible again.
+    if(Array.isArray(k.days) && k.days.length===0){ k.days='daily'; changed=true; }
     if(k.bestStreak===undefined){k.bestStreak=k.streak||0;changed=true;} // backward compat
     const before={streak:k.streak||0,done:k.done||false};
     // k.done = was it done today?
@@ -6024,11 +6030,17 @@ function saveHabitDetail(id){
     if(_uaDraft.mode==='daily'){
       sched = {days:'daily', freq:undefined, freqAnchor:undefined};
     } else {
-      const days = _uaDraft.days.slice().sort((a,b)=>a-b);
-      const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
-      // GUARD — an interval cadence must never save with days absent/'daily' (it would fire all 7 days of the on-week).
-      if(freq && !(Array.isArray(days) && days.length)) return;
-      sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
+      const days = (_uaDraft.days||[]).slice().sort((a,b)=>a-b);
+      // GUARD — an empty day-mask means "never" (habitOnDay never matches), so it must NEVER be
+      // persisted from EITHER path (the add path blocks it; here we coerce). Only reachable when a
+      // habit already carries days:[] and is edited without changing cadence — coerce to 'daily' so
+      // the edit can't re-persist an unschedulable, invisible habit. (Parity: addGoal + this path.)
+      if(!(Array.isArray(days) && days.length)){
+        sched = {days:'daily', freq:undefined, freqAnchor:undefined};
+      } else {
+        const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
+        sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
+      }
     }
   }
   const textEl = document.getElementById('hd-text-'+id);
