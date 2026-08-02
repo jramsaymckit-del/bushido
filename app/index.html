@@ -3816,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'User Autonomy 2a · 2026-08-01 · cascade browser (browse strand→goal→craft, land on a craft) — re-home a habit by tapping its chain (writes only its craft) + choose placement when adding + cadence-on-add (pre-filled every day) · on Day\'s Word composer fix';
+const BUILD_ID = 'Travel Mode (a) · 2026-08-02 · travelDays history capture — day-keyed set {YYYY-MM-DD:true} (same shape as completionLog), REGISTERED MERGEABLE (union net, monotonic-add, no tombstone) · travelMode now an anchor {active,since} with backfill on load+checkDailyReset (gap-proof mid-trip) · boolean→object migration (isTravelling shape-tolerant) · additive, no new UI · on User Autonomy 2a';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3937,6 +3937,8 @@ const DEFAULT_STATE = {
   clanObligations: [],          // clan events added to Ikigai as obligations
   clanRemovals: {},             // {entryId: true} tombstones — persisted so a removed clan entry is never resurrected by the union (Finding #1)
   yearStartDate: null,          // set on first onboarding completion, used for anniversary mode
+  travelMode: { active: false, since: null }, // ✈︎ anchor {active, since} — was a bare boolean; normalizeTravelState() migrates a legacy true/false
+  travelDays: {},               // day-keyed set {'YYYY-MM-DD':true} — SAME shape as completionLog; MERGEABLE (monotonic-add union, no tombstone)
 };
 
 // ============ STATE ============
@@ -3962,7 +3964,8 @@ let state = {
   lastSeasonalReview: null,
   srSnoozeUntil: '2026-05-31',
   nextId: 100,
-  travelMode: false,
+  travelMode: { active: false, since: null },  // ✈︎ anchor — normalizeTravelState() migrates a legacy boolean on load
+  travelDays: {},                              // day-keyed travel history {'YYYY-MM-DD':true} — MERGEABLE union net
 };
 
 const PILLARS = {
@@ -4433,6 +4436,10 @@ function recomputeStreak(habitId){
 function checkDailyReset(){
   const todayStr=getDateStr();
   let changed=false;
+  // ✈︎ Travel Mode (a): migrate a legacy boolean anchor and backfill any days the trip spanned
+  // while the app was closed. Runs on load (renderDashboard) AND each daily reset. Monotonic —
+  // a backfill that grows travelDays folds into `changed` so the new days persist + sync.
+  if(syncTravelHistory()) changed=true;
   state.kaizen.forEach(k=>{
     if(k.bestStreak===undefined){k.bestStreak=k.streak||0;changed=true;} // backward compat
     const before={streak:k.streak||0,done:k.done||false};
@@ -4609,7 +4616,7 @@ function buildKaizenGrid(){
   const todayDayIdx=todayIdx();
 
   const habits=state.kaizen.filter(k=>{
-    if(state.travelMode&&k.core!==true)return false;
+    if(isTravelling()&&k.core!==true)return false;
     if(k.startDate){
       const s=new Date(k.startDate);s.setHours(0,0,0,0);
       const today=new Date();today.setHours(0,0,0,0);
@@ -5452,16 +5459,16 @@ function renderGoals(){
     const travelSetupDone=state.kaizen.some(k=>k.core===true||k.core===false);
     const coreCount=state.kaizen.filter(k=>k.core===true).length;
     const travelToggleHtml=`<div class="travel-toggle-bar">
-      <button class="travel-toggle-btn${state.travelMode?' active':''}" onclick="handleTravelToggle()">
-        <span>✈︎</span><span>${state.travelMode?'Travelling':'Travel Mode'}</span>
+      <button class="travel-toggle-btn${isTravelling()?' active':''}" onclick="handleTravelToggle()">
+        <span>✈︎</span><span>${isTravelling()?'Travelling':'Travel Mode'}</span>
       </button></div>`;
-    const travelBannerHtml=state.travelMode?`<div class="travel-banner">
+    const travelBannerHtml=isTravelling()?`<div class="travel-banner">
       <span>✈︎ &nbsp;Travelling — ${coreCount} of ${state.kaizen.length} practices</span>
       <a onclick="openTravelSetup(true)">Edit core practices</a>
     </div>`:'';
     const todayItems=state.kaizen.filter(k=>{
       if(!habitOnDay(k,todayIdx2,new Date()))return false;
-      if(state.travelMode&&k.core!==true)return false;
+      if(isTravelling()&&k.core!==true)return false;
       return true;
     });
     // Compute strand-linked IDs for glow (no filtering — all habits stay visible)
@@ -7886,10 +7893,76 @@ let _filterStrandIdx=null;
 let _travelPending={};
 
 // ── TRAVEL MODE ──
+// travelMode was a bare boolean that remembered nothing — every travel day that passed
+// unrecorded was permanently lost. It is now an ANCHOR { active, since } plus a day-keyed
+// history set `travelDays` ({'YYYY-MM-DD':true}, MERGEABLE). The anchor + backfill make the
+// record gap-proof: days are filled since→today even if the app is never opened mid-trip.
+// travelDays is monotonic-add (there is no per-day un-mark UI — toggle-off closes the anchor
+// but keeps stamped days), so it merges by pure key-union with NO tombstone (like
+// milestoneStamps). A FUTURE per-day un-mark would need a travelRemovals tombstone mirroring
+// clanRemovals — decided explicitly, not by omission (Finding #1 lesson).
+
+// Shape-tolerant read — the ONE truth for "am I travelling now?". An {active:false} object is
+// truthy, so a bare `state.travelMode` check would wrongly hide non-core habits after migration;
+// every consumer routes through here. Also tolerates a stale legacy boolean a reconcile may
+// re-introduce from an un-migrated cloud doc (that path doesn't run normalizeTravelState).
+function isTravelling(){
+  const t=state.travelMode;
+  return t===true || !!(t && typeof t==='object' && t.active===true);
+}
+// Coerce a legacy boolean → { active, since } and guarantee travelDays is a plain object.
+// Idempotent (an already-normalized object passes through unchanged) and reload-surviving.
+// A bare `true` anchors TODAY — never invents past history.
+function normalizeTravelState(){
+  let t=state.travelMode;
+  if(typeof t==='boolean'){
+    state.travelMode = t ? { active:true, since:getDateStr() } : { active:false, since:null };
+  } else if(t==null || typeof t!=='object' || Array.isArray(t)){
+    state.travelMode = { active:false, since:null };
+  } else {
+    if(typeof t.active!=='boolean') t.active=!!t.active;
+    if(t.active && !t.since) t.since=getDateStr();   // active but anchorless → anchor today
+    if(!t.active) t.since=null;                      // inactive → no dangling anchor
+  }
+  if(!state.travelDays || typeof state.travelDays!=='object' || Array.isArray(state.travelDays)) state.travelDays={};
+}
+// Fill travelDays from the active anchor's `since` through today (inclusive). Gap-proof: covers
+// days the app was never opened. Monotonic — only ADDS, never removes. Returns true if it changed.
+function backfillTravelDays(){
+  const t=state.travelMode;
+  if(!t || typeof t!=='object' || !t.active) return false;
+  if(!t.since) t.since=getDateStr();
+  const start=new Date(t.since+'T12:00:00'), end=new Date(getDateStr()+'T12:00:00');  // noon avoids DST edges
+  if(isNaN(start)||isNaN(end)||start>end) return false;                                // future `since` (clock skew) → no-op
+  let changed=false, guard=0;
+  for(let cur=start; cur<=end && guard<4000; cur.setDate(cur.getDate()+1), guard++){
+    const key=getDateStr(cur);
+    if(state.travelDays[key]!==true){ state.travelDays[key]=true; changed=true; }
+  }
+  return changed;
+}
+// Turn Travel Mode on/off. ON: anchor (preserve an existing anchor when editing core practices
+// mid-trip — never re-stamp `since` to today) and backfill (stamps today immediately). OFF:
+// backfill through the final day FIRST (while still active), THEN close the anchor — stamped
+// days remain. Callers persist via saveState().
+function setTravelActive(on){
+  const t=(state.travelMode && typeof state.travelMode==='object' && !Array.isArray(state.travelMode)) ? state.travelMode : {};
+  if(on){
+    state.travelMode = { active:true, since:(t.active && t.since) ? t.since : getDateStr() };
+    backfillTravelDays();
+  } else {
+    backfillTravelDays();                       // fill through today while the anchor is still active
+    state.travelMode = { active:false, since:null };
+  }
+}
+// Normalize the anchor + backfill the gap. Called from checkDailyReset (load + daily) and after a
+// reconcile adopts cloud. Returns true if travelDays grew (so the caller can fold it into `changed`).
+function syncTravelHistory(){ normalizeTravelState(); return backfillTravelDays(); }
+
 function handleTravelToggle(){
   const setupDone=state.kaizen.some(k=>k.core===true||k.core===false);
   if(!setupDone){openTravelSetup(false);}
-  else{state.travelMode=!state.travelMode;saveState();renderGoals();}
+  else{setTravelActive(!isTravelling());saveState();renderGoals();}
 }
 function openTravelSetup(isEdit){
   _travelPending={};
@@ -7928,7 +8001,7 @@ function confirmTravelSetup(){
     return;
   }
   state.kaizen.forEach(k=>{k.core=_travelPending[k.id]||false;});
-  state.travelMode=true;_travelPending={};
+  setTravelActive(true);_travelPending={};   // preserves the anchor if already travelling (edit core practices ≠ new trip)
   saveState();
   document.getElementById('travelBackdrop').classList.remove('show');
   renderGoals();
@@ -9510,7 +9583,7 @@ function mergeCompletionLogs(local, cloud, untickMap){ return applyPendingUntick
 // exact ties (strict >) so all clients converge. Missing timestamps (legacy) = 0 = oldest → any real edit
 // wins, no migration. PLAN fields are NOT merged here (3b adds CAS). Reflection DELETE has no UI today;
 // if one is added, mirror the note pattern (a '' sentinel or a per-reflKey tombstone) — documented, not built.
-const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals'];
+const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals','travelDays'];
 
 function _mondayOf(dateStr){ // Monday of dateStr's ISO week — the Mon–Sun bucket saveReflection dedups on
   const d = new Date((dateStr || '') + 'T12:00:00');
@@ -9598,6 +9671,7 @@ function mergeMergeableFields(local, cloud, untickMap){
     clanMilestones:      mergeClanEntries(local.clanMilestones, cloud.clanMilestones, clanRemovals),   // id-union − removals (Finding #1)
     clanObligations:     mergeClanEntries(local.clanObligations, cloud.clanObligations, clanRemovals), // id-union − removals (Finding #1)
     clanRemovals:        clanRemovals,
+    travelDays:          unionKeys(local.travelDays, cloud.travelDays),   // day-keyed travel history — monotonic-add key-union, no tombstone (Travel Mode a)
   };
 }
 
@@ -9809,6 +9883,7 @@ async function reconcileFromCloud(){
         else if(!localDirty) _planBaseSig = planSig(state); // adopted cloud plan → new base
       }
       Object.assign(state, merged);                        // mergeable fields ALWAYS take the merged view (never drop local-only data)
+      normalizeTravelState();                              // ✈︎ a reconcile may adopt a stale legacy boolean travelMode from cloud — re-coerce the anchor shape (idempotent; travelDays already unioned above)
       persistLocalState();
       // push our merged view up ONLY if it holds REAL data the cloud lacked (normalise a missing cloud
       // field to its empty default so a legacy doc doesn't trigger a spurious push every reconcile)
