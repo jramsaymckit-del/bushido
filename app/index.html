@@ -3816,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Travel Mode (b) · 2026-08-02 · travel-framed reflection prompts — a ≥50%-travel reflection period (reads travelDays HISTORY, not the live boolean, so a past travel week still swaps after you are home) reframes the deficit prompts: weekly "what got in the way?"→"what did you enjoy?", monthly "what is changing in you?"→"what did you learn about yourself?" (one-for-one, affirming prompts kept); entry.travel stamped at seal, timeline reads distinctly (✈); reflections stay in the merge net · on Add-flow cadence fix + Travel Mode (a) + 2a';
+const BUILD_ID = 'No-invented-schedule cadence fix · 2026-08-02 · few/weekly/fortnightly/every-4-weeks never pre-select a day (was silently [0,3] / [0]); commit is BLOCKED visibly on add AND edit until ≥1 day is picked — no substitute default anywhere; the picker shows "Choose at least one day" + shakes; the edit path no longer coerces an empty mask to daily, it blocks; the load-time heal of a pre-existing days:[] → daily is unchanged · on Travel Mode (b)';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5736,6 +5736,7 @@ function _uaLineageHtml(kind, item){
 let _uaDraft = null;       // {days:[], freq, freqAnchor, mode}
 let _uaEditId = null;      // habit id currently editing
 let _uaFreqOpen = false;   // is the picker expanded
+let _uaDayError = false;   // a commit was blocked for an empty day-mask — show the picker error until a day is picked
 
 function _uaModeOf(k){
   if(k.days==='daily' || !k.days || (Array.isArray(k.days)&&k.days.length===7)) return 'daily';
@@ -5766,6 +5767,7 @@ function _uaFmtNext(dt){
 function _uaReadback(){
   const d=_uaDraft, ds=d.days.slice().sort((a,b)=>a-b);
   if(d.mode==='daily') return 'Every day.';
+  if(!ds.length) return 'Choose at least one day.';
   const names=ds.map(x=>_UA_DAYFULL[x]);
   const list=names.length===1?names[0]:names.slice(0,-1).join(', ')+' and '+names.slice(-1);
   if(d.mode==='fortnightly') return 'Every other '+list+'.';
@@ -5773,21 +5775,35 @@ function _uaReadback(){
   return names.length>1?list+' each week.':list+' — every week.';
 }
 function _uaSetMode(m){
-  const d=_uaDraft; d.mode=m;
+  const d=_uaDraft; d.mode=m; _uaDayError=false;
   if(m==='daily'){ d.days=[0,1,2,3,4,5,6]; d.freq=undefined; }
   else{
-    if(m==='weekly'||m==='fortnightly'||m==='monthly'){ d.days=[d.days.length?d.days[0]:0]; d.freqAnchor=d.freqAnchor||getDateStr(); }
-    if(m==='few' && d.days.length===7) d.days=[0,3];
+    // No mode invents a day the user didn't choose. Keep a REAL prior selection (1–6 specific days);
+    // otherwise start EMPTY so the user must pick — commit is blocked until they do (addGoal / saveHabitDetail).
+    const real = Array.isArray(d.days) && d.days.length>=1 && d.days.length<=6;
+    if(m==='weekly'||m==='fortnightly'||m==='monthly'){ d.days = real ? [d.days[0]] : []; d.freqAnchor=d.freqAnchor||getDateStr(); }
+    else { d.days = real ? d.days.slice() : []; }   // few
   }
   _uaRenderFreqSection();
 }
 function _uaToggleDay(dd){
   const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
+  _uaDayError=false;
   if(single) d.days=[dd];
   else{ const i=d.days.indexOf(dd); if(i>=0){ if(d.days.length>1) d.days.splice(i,1); } else d.days.push(dd); }
   _uaRenderFreqSection();
 }
-function _uaPickCount(n){ _uaDraft.days=({2:[0,3],3:[0,2,4],4:[0,1,3,5],5:[0,1,2,3,4],6:[0,1,2,3,4,5]})[n].slice(); _uaRenderFreqSection(); }
+function _uaPickCount(n){ _uaDayError=false; _uaDraft.days=({2:[0,3],3:[0,2,4],4:[0,1,3,5],5:[0,1,2,3,4],6:[0,1,2,3,4,5]})[n].slice(); _uaRenderFreqSection(); }
+// A commit was attempted with a day-selecting mode but no day chosen. Open the picker, show the
+// error, and shake the frequency button — the SAME visible, non-silent block the add flow uses for
+// a missing craft. Works for add (_uaEditId==='add') and edit (_uaEditId===habit id) alike.
+function _uaShowDayError(){
+  _uaDayError=true; _uaFreqOpen=true;
+  _uaRenderFreqSection();
+  const host=document.getElementById('ua-freq-section-'+_uaEditId);
+  const btn=host&&host.querySelector('.ua-freq-btn');
+  if(btn){ btn.classList.add('shake'); setTimeout(()=>btn.classList.remove('shake'),350); }
+}
 function _uaToggleFreqOpen(){ _uaFreqOpen=!_uaFreqOpen; _uaRenderFreqSection(); }
 function _uaRenderFreqSection(){
   const host=document.getElementById('ua-freq-section-'+_uaEditId);
@@ -5814,6 +5830,7 @@ function _uaPickerHtml(){
     <div class="ua-modes">${modeBtn('daily','Every day')}${modeBtn('few','A few days a week')}${modeBtn('weekly','Weekly')}${modeBtn('fortnightly','Fortnightly')}${modeBtn('monthly','Every 4 weeks')}</div>
     ${d.mode==='few'?`<div class="ua-q">How many?</div><div class="ua-counts">${counts}</div>`:''}
     ${d.mode!=='daily'?`<div class="ua-q">${single?'Which day?':'Which days?'}</div><div class="ua-daystrip">${strip}</div>`:''}
+    ${_uaDayError&&d.mode!=='daily'?`<div class="ua-day-err" style="color:var(--red);font-size:11px;letter-spacing:.3px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">Choose at least one day to save this cadence.</div>`:''}
     <div class="ua-readback">${escapeHtml(_uaReadback())}</div>${nextNote}
   </div>`;
 }
@@ -6031,16 +6048,15 @@ function saveHabitDetail(id){
       sched = {days:'daily', freq:undefined, freqAnchor:undefined};
     } else {
       const days = (_uaDraft.days||[]).slice().sort((a,b)=>a-b);
-      // GUARD — an empty day-mask means "never" (habitOnDay never matches), so it must NEVER be
-      // persisted from EITHER path (the add path blocks it; here we coerce). Only reachable when a
-      // habit already carries days:[] and is edited without changing cadence — coerce to 'daily' so
-      // the edit can't re-persist an unschedulable, invisible habit. (Parity: addGoal + this path.)
+      // GUARD — a day-selecting mode with NO day chosen is blocked VISIBLY (never invent a schedule):
+      // the save aborts entirely and the picker shows the day-error, exactly parity with addGoal. This
+      // is reachable only when the user actively picks few/weekly/… and chooses no day — a pre-existing
+      // days:[] from old data is healed to 'daily' on load (checkDailyReset), so it opens in daily mode.
       if(!(Array.isArray(days) && days.length)){
-        sched = {days:'daily', freq:undefined, freqAnchor:undefined};
-      } else {
-        const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
-        sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
+        _uaShowDayError(); return;
       }
+      const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
+      sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
     }
   }
   const textEl = document.getElementById('hd-text-'+id);
@@ -6317,7 +6333,7 @@ function addGoal(){
     if(sched.days==='daily'){ habit.days='daily'; }
     else {
       const days=(sched.days||[]).slice().sort((a,b)=>a-b);
-      if(!(Array.isArray(days)&&days.length)){ showAddError('kaizen'); return; }   // interval-days guard (parity with saveHabitDetail)
+      if(!(Array.isArray(days)&&days.length)){ _uaShowDayError(); return; }   // no day picked — block visibly, never invent a schedule
       habit.days=days; if(sched.freq){ habit.freq=sched.freq; habit.freqAnchor=sched.freqAnchor||getDateStr(); }
     }
     state.kaizen.push(habit);
