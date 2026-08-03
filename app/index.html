@@ -2104,10 +2104,6 @@ li.goal.hd-open .habit-detail{display:block}
 .ua-day{flex:1;text-align:center;padding:7px 0;border:1px solid var(--edge);border-radius:2px;background:var(--scroll);cursor:pointer;font-size:11px;font-weight:700;color:var(--ink-light);transition:all .12s;user-select:none}
 .ua-day:hover{border-color:var(--ink-faint)}
 .ua-day.on{background:var(--red);color:var(--white);border-color:var(--red)}
-.ua-counts{display:flex;gap:5px}
-.ua-cnt{width:27px;height:27px;line-height:25px;text-align:center;border:1px solid var(--edge);border-radius:50%;background:var(--scroll);cursor:pointer;font-size:11px;transition:all .12s}
-.ua-cnt:hover{border-color:var(--ink-faint)}
-.ua-cnt.on{background:var(--ink-light);color:var(--white);border-color:var(--ink-light)}
 .ua-readback{font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;color:var(--ink);margin-top:11px}
 .ua-next{font-size:10px;color:var(--ink-light);font-style:italic;margin-top:5px}
 
@@ -3818,7 +3814,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Reflection: empty-seal block + passive monthly reminder · 2026-08-02 · a completely BLANK reflection can no longer consume its one-shot window — a seal (weekly add, monthly add) or a weekly re-seal that would leave every field empty is blocked with an on-tone inline note + shake, never creating/blanking an entry (annual left as-is). AND the monthly reminder is now passive ("reveal & invite, never require"): a quiet dot on an ACTIVE 月 button across the WHOLE window — incl. the grace days (Aug 1–4 → July), which previously showed a disabled "Opens 29 Aug" while the nudge said "reflect on July" (getMonthlyWindowStatus migrated to _reflectedMonth) — with the demanding nudge card firing only in the final 2 days (_monthlyNudgeActive). Both vanish the moment the month is filed · on Monthly reflection window fix';
+const BUILD_ID = 'Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5774,7 +5770,10 @@ function _uaReadback(){
   const list=names.length===1?names[0]:names.slice(0,-1).join(', ')+' and '+names.slice(-1);
   if(d.mode==='fortnightly') return 'Every other '+list+'.';
   if(d.mode==='monthly') return 'Every 4 weeks, on '+list+'.';
-  return names.length>1?list+' each week.':list+' — every week.';
+  // 'few' → count-led, so someone who thinks in counts still sees their number (the count picker CONTROL is gone;
+  // the day strip is the only mechanism). Short day names, e.g. "3 days a week — Mon, Wed, Fri".
+  if(d.mode==='few'){ const shorts=ds.map(x=>_UA_DAYFULL[x].slice(0,3)); return ds.length+' day'+(ds.length>1?'s':'')+' a week — '+shorts.join(', '); }
+  return names.length>1?list+' each week.':list+' — every week.';   // weekly (single day)
 }
 function _uaSetMode(m){
   const d=_uaDraft; d.mode=m; _uaDayError=false;
@@ -5795,7 +5794,7 @@ function _uaToggleDay(dd){
   else{ const i=d.days.indexOf(dd); if(i>=0){ if(d.days.length>1) d.days.splice(i,1); } else d.days.push(dd); }
   _uaRenderFreqSection();
 }
-function _uaPickCount(n){ _uaDayError=false; _uaDraft.days=({2:[0,3],3:[0,2,4],4:[0,1,3,5],5:[0,1,2,3,4],6:[0,1,2,3,4,5]})[n].slice(); _uaRenderFreqSection(); }
+// (count picker removed — the day strip is the single control; the count lives in _uaReadback only)
 // A commit was attempted with a day-selecting mode but no day chosen. Open the picker, show the
 // error, and shake the frequency button — the SAME visible, non-silent block the add flow uses for
 // a missing craft. Works for add (_uaEditId==='add') and edit (_uaEditId===habit id) alike.
@@ -5824,13 +5823,11 @@ function _uaPickerHtml(){
   const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
   const modeBtn=(m,l)=>`<div class="ua-mode${d.mode===m?' on':''}" onclick="event.stopPropagation();_uaSetMode('${m}')">${l}</div>`;
   const strip=_UA_DAYINIT.map((ini,i)=>`<div class="ua-day${d.days.includes(i)?' on':''}" title="${_UA_DAYFULL[i]}" onclick="event.stopPropagation();_uaToggleDay(${i})">${ini}</div>`).join('');
-  const counts=[2,3,4,5,6].map(n=>`<div class="ua-cnt${d.days.length===n&&!single?' on':''}" onclick="event.stopPropagation();_uaPickCount(${n})">${n}</div>`).join('');
   let nextNote='';
   if(d.mode==='fortnightly'||d.mode==='monthly'){ const nd=_uaNextOccurrence(_uaDraftToSched()); if(nd) nextNote=`<div class="ua-next">Next: <b>${_uaFmtNext(nd)}</b></div>`; }
   return `<div class="ua-picker" onclick="event.stopPropagation()">
     <div class="ua-q">How often?</div>
     <div class="ua-modes">${modeBtn('daily','Every day')}${modeBtn('few','A few days a week')}${modeBtn('weekly','Weekly')}${modeBtn('fortnightly','Fortnightly')}${modeBtn('monthly','Every 4 weeks')}</div>
-    ${d.mode==='few'?`<div class="ua-q">How many?</div><div class="ua-counts">${counts}</div>`:''}
     ${d.mode!=='daily'?`<div class="ua-q">${single?'Which day?':'Which days?'}</div><div class="ua-daystrip">${strip}</div>`:''}
     ${_uaDayError&&d.mode!=='daily'?`<div class="ua-day-err" style="color:var(--red);font-size:11px;letter-spacing:.3px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">Choose at least one day to save this cadence.</div>`:''}
     <div class="ua-readback">${escapeHtml(_uaReadback())}</div>${nextNote}
@@ -6503,7 +6500,9 @@ function renderWeeklyBtn(){
   if(!slot) return;
   const status=getWeeklyWindowStatus();
   if(status==='sealed'){
-    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showReflectionReview(false)" title="review this week&#39;s sealed reflection">週 &nbsp;Review</button>`;
+    // Open EDITABLE while the week's window is still open (matches the dashboard review card) — read-only only after.
+    const rv=getReviewableWeeklyReflection(); const ed=!!(rv&&rv.editable);
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showReflectionReview(${ed})" title="${ed?'review and edit this week&#39;s sealed reflection':'review this week&#39;s sealed reflection'}">週 &nbsp;Review</button>`;
   } else if(status==='in-window'){
     slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('weekly')">週 &nbsp;Weekly</button>`;
   } else {
@@ -6603,26 +6602,56 @@ function showMonthlyReflectionReview(){
   m.classList.add('active');
   const monthLabel=new Date(entry.date+'T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const safeVal=v=>(v||'').replace(/"/g,'&quot;');
+  // Editable while THIS reflection's month window is still open (mirrors the weekly Re-seal) — a premature
+  // seal or typo is correctable until the window closes; read-only (final) afterward.
+  const rm=_reflectedMonth();
+  const editable=!!(rm && entry.date && entry.date.startsWith(rm.ym));
+  const ro=editable?'':'readonly'; const roClass=editable?'':' reflect-readonly';
   c.innerHTML=`
     <div class="modal-kanji">月</div>
     <div class="modal-title">Monthly Reflection</div>
     <div class="modal-sub">${monthLabel}</div>
-    <div class="reflect-review-badge">sealed · ${monthLabel}</div>
+    <div class="reflect-review-badge">${editable?'sealed · edit and re-seal until the window closes':'sealed · '+monthLabel}</div>
     <div class="reflect-q">
-      <div class="reflect-label">What was working?</div>
-      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.working)}</textarea>
+      <div class="reflect-label">What ${editable?'is':'was'} working?</div>
+      <textarea class="reflect-textarea${roClass}" id="mrev-working" ${ro}>${safeVal(entry.working)}</textarea>
     </div>
     <div class="reflect-q">
-      <div class="reflect-label">What was changing in you?</div>
-      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.changing)}</textarea>
+      <div class="reflect-label">What ${editable?'is':'was'} changing in you?</div>
+      <textarea class="reflect-textarea${roClass}" id="mrev-changing" ${ro}>${safeVal(entry.changing)}</textarea>
     </div>
     <div class="reflect-q">
-      <div class="reflect-label">What needed to shift?</div>
-      <textarea class="reflect-textarea reflect-readonly" readonly>${safeVal(entry.shifting)}</textarea>
+      <div class="reflect-label">What ${editable?'needs':'needed'} to shift?</div>
+      <textarea class="reflect-textarea${roClass}" id="mrev-shifting" ${ro}>${safeVal(entry.shifting)}</textarea>
     </div>
     <div class="form-actions">
-      <button class="btn" onclick="closeReflection()">close</button>
+      ${editable
+        ?`<button class="btn btn-ghost" onclick="closeReflection()">close</button>
+          <button class="btn" onclick="resealMonthlyReflection('${entry.date}',${entry.ts||0})">Re-seal</button>`
+        :`<button class="btn" onclick="closeReflection()">close</button>`}
     </div>`;
+}
+function resealMonthlyReflection(date,ts){
+  // Update the existing monthly entry in-place (matched by date+ts), same empty-seal guard as everywhere:
+  // a re-seal that blanks every field must not erase the reflection. Re-stamps travel framing (parity w/ save).
+  const c=document.getElementById('reflect-content');
+  if(_reflectionEmpty()){ _reflectShowSealErr(); return; }
+  const idx=(state.reflections||[]).findIndex(r=>r.type==='monthly'&&r.date===date&&(ts?r.ts===ts:true));
+  if(idx===-1) return;
+  const entry=state.reflections[idx];
+  if(c.querySelector('#mrev-working'))  entry.working=c.querySelector('#mrev-working').value;
+  if(c.querySelector('#mrev-changing')) entry.changing=c.querySelector('#mrev-changing').value;
+  if(c.querySelector('#mrev-shifting')) entry.shifting=c.querySelector('#mrev-shifting').value;
+  entry.travel=isTravelMonth((date||'').substring(0,7));
+  entry.ts=Date.now();   // bump so the sync merge picks this edit as newest (mirrors resealReflection)
+  saveState();
+  if(typeof renderClanCards==='function') renderClanCards();
+  c.innerHTML=`<div style="text-align:center;padding:56px 0">
+    <div style="font-family:'Noto Serif JP',serif;font-size:56px;color:var(--red);opacity:.2;margin-bottom:20px">印</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint)">your reflection has been kept</div>
+  </div>`;
+  setTimeout(()=>{ closeReflection(); if(currentTab==='kaizen') renderGoals(); }, 1800);
 }
 
 // The month whose reflection window is open right now: the LAST 3 DAYS of a month, OR the FIRST 4
