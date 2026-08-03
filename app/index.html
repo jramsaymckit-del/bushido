@@ -439,6 +439,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .reflect-nudge.review-card .reflect-nudge-btn{border-color:rgba(204,53,41,.3);color:var(--ink-faint)}
 .reflect-nudge.review-card .reflect-nudge-btn:hover{background:none;color:var(--red);border-color:var(--red)}
 .reflect-textarea.reflect-readonly{border-bottom-color:rgba(204,53,41,.2);opacity:.6;cursor:default;resize:none}
+/* quiet "reflection window open" marker on the 月 button — same shape as a tab unread dot; present, never demanding */
+.reflect-open-dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--red);opacity:.9;pointer-events:none}
 .reflect-review-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.55;display:block;text-align:center;margin-bottom:24px}
 
 /* ===== HABIT GRID (Kaizen week view) ===== */
@@ -3816,7 +3818,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Monthly reflection window · 2026-08-02 · the window is now the LAST 3 DAYS of a month + the FIRST 4 of the next (e.g. Jul 29 – Aug 4), so a reflection filed on the 1st–4th keys the REFLECTED (prior) month, never the current one — an Aug-2 submission files m:2026-07 (mirrors the weekly Monday-grace R08; "last 3" counts back from month end so it is uniform across 28/29/30/31-day months, and a month window never overlaps the next). The existing daily nudge names the reflected month and runs through the window, stopping once a reflection EXISTS for that month — entry-based, so it is union-merged and cannot be resurrected by a stale client (audit Finding #3: lastMonthlyComplete is LWW/regressable, but that is only the ≥90% celebration gate, not this reminder) · on no-invented-schedule cadence fix';
+const BUILD_ID = 'Reflection: empty-seal block + passive monthly reminder · 2026-08-02 · a completely BLANK reflection can no longer consume its one-shot window — a seal (weekly add, monthly add) or a weekly re-seal that would leave every field empty is blocked with an on-tone inline note + shake, never creating/blanking an entry (annual left as-is). AND the monthly reminder is now passive ("reveal & invite, never require"): a quiet dot on an ACTIVE 月 button across the WHOLE window — incl. the grace days (Aug 1–4 → July), which previously showed a disabled "Opens 29 Aug" while the nudge said "reflect on July" (getMonthlyWindowStatus migrated to _reflectedMonth) — with the demanding nudge card firing only in the final 2 days (_monthlyNudgeActive). Both vanish the moment the month is filed · on Monthly reflection window fix';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5560,7 +5562,7 @@ function renderGoals(){
     else if(isAnnualReviewMonth11()) nudgeHtml+=buildReflectionNudgeCard('annual-preview');
     if(needsWeeklyReflection()) nudgeHtml+=buildReflectionNudgeCard('weekly');
     else{ const wkr=getReviewableWeeklyReflection(); if(wkr) nudgeHtml+=buildReflectionNudgeCard('weekly-review',wkr); }
-    if(needsMonthlyReflection()) nudgeHtml+=buildReflectionNudgeCard('monthly');
+    if(_monthlyNudgeActive()) nudgeHtml+=buildReflectionNudgeCard('monthly');   // quiet dot covers the rest of the window; card only near the end
     list.innerHTML=travelToggleHtml+travelBannerHtml+checklistHtml+addTriggerHtml()+gridSeparator+noteHtml+buildKaizenGrid()+nudgeHtml;
     reApplyHabitDetails();
     const _dnta=document.getElementById('daily-note-ta');
@@ -6517,16 +6519,32 @@ function renderWeeklyBtn(){
 }
 
 function getMonthlyWindowStatus(){
-  // Returns 'sealed' | 'in-window' | 'outside'
-  const today=new Date();
-  const monthStr=getDateStr(today).substring(0,7);
-  const sealed=(state.reflections||[]).some(r=>
-    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
-  );
-  if(sealed) return 'sealed';
-  const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
-  if(today.getDate()>=lastDay-2) return 'in-window';
+  // Returns 'sealed' | 'in-window' | 'outside'. Aligned with _reflectedMonth() so the launcher button
+  // agrees with the dashboard nudge across the FULL 7-day window: during grace (e.g. Aug 1–4) the window
+  // is open for JULY, so the button stays active and "sealed" means the REFLECTED month is filed — not
+  // the current calendar month. (Before this, grace days read 'outside' and the button said "Opens 29 Aug"
+  // while the nudge said "reflect on July".)
+  const rm=_reflectedMonth();
+  if(rm){
+    const sealed=(state.reflections||[]).some(r=>r.type==='monthly'&&r.date&&r.date.startsWith(rm.ym));
+    return sealed?'sealed':'in-window';
+  }
   return 'outside';
+}
+function _monthlyWindowEnd(){
+  // Last calendar day of the open monthly window = the 4th of the month AFTER the reflected month.
+  const rm=_reflectedMonth(); if(!rm) return null;
+  const a=new Date(rm.anchor+'T12:00:00');
+  return new Date(a.getFullYear(),a.getMonth()+1,4);
+}
+function _monthlyNudgeActive(){
+  // The DEMANDING nudge card fires only in the final 2 days of the window (near the end). The rest of the
+  // window is covered by the quiet dot on the 月 button — "reveal & invite, never require; ask once then
+  // go quiet." Stops the moment the month is filed (needsMonthlyReflection() goes false).
+  if(!needsMonthlyReflection()) return false;
+  const end=_monthlyWindowEnd(); if(!end) return false;
+  const t=new Date(); t.setHours(0,0,0,0); end.setHours(0,0,0,0);
+  return Math.round((end-t)/86400000)<=1;
 }
 
 function getReviewableMonthlyReflection(){
@@ -6553,7 +6571,8 @@ function renderMonthlyBtn(){
   if(status==='sealed'){
     slot.innerHTML=`<button class="btn btn-ghost weekly-btn-review" onclick="showMonthlyReflectionReview()" title="review this month&#39;s sealed reflection">月 &nbsp;Review</button>`;
   } else if(status==='in-window'){
-    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" onclick="showReflection('monthly')">月 &nbsp;Monthly</button>`;
+    // Active all window long, with the quiet open-dot — the persistent, non-demanding "reflection open" marker.
+    slot.innerHTML=`<button class="btn btn-ghost weekly-btn-active" style="position:relative" onclick="showReflection('monthly')">月 &nbsp;Monthly<span class="reflect-open-dot"></span></button>`;
   } else {
     const today=new Date();
     const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
@@ -7344,8 +7363,36 @@ function playEnsoMoment(kanji){
     k.textContent='春'; // restore 春 (spring/EOY default)
   }, 2150);
 }
+// A one-shot reflection window must never be spent on a no-op. A seal (or re-seal) is blocked
+// unless the user wrote SOMETHING — same class as blocking a habit with no days / an add with no
+// craft. "Empty" = every writable field in the open modal is blank once trimmed; the auto-derived
+// weakest-craft pick and focus-craft select don't count as content.
+function _reflectionEmpty(){
+  const c=document.getElementById('reflect-content');
+  if(!c) return true;
+  const fields=[...c.querySelectorAll('.reflect-textarea')];
+  return fields.length===0 || fields.every(el=>!((el.value||'').trim()));
+}
+function _reflectShowSealErr(){
+  const c=document.getElementById('reflect-content');
+  if(c){
+    let e=c.querySelector('.reflect-seal-err');
+    if(!e){
+      e=document.createElement('div');
+      e.className='reflect-seal-err';
+      e.style.cssText='font-family:\'Noto Sans JP\',sans-serif;font-size:10px;letter-spacing:1px;color:var(--red);text-align:center;margin:16px 0 -4px;opacity:.9';
+      e.textContent='write something before sealing — a blank reflection can’t be kept.';
+      const fa=c.querySelector('.form-actions');
+      if(fa&&fa.parentNode) fa.parentNode.insertBefore(e,fa); else c.appendChild(e);
+    }
+  }
+  const m=document.getElementById('reflect-modal');
+  if(m){ m.classList.add('shake'); setTimeout(()=>m.classList.remove('shake'),350); }
+}
 function saveReflection(type){
   const c=document.getElementById('reflect-content');
+  // Empty-seal block (weekly + monthly). Annual is deliberately not guarded here — separate flow.
+  if((type==='weekly'||type==='monthly') && _reflectionEmpty()){ _reflectShowSealErr(); return; }
   // On Monday grace day, anchor weekly reflections to the prior Sunday (last day of the
   // reflected week) so needsWeeklyReflection()'s date-range check finds the entry correctly.
   let _saveDate=getDateStr();
@@ -7573,6 +7620,8 @@ function showReflectionReview(editable){
 function resealReflection(date,ts){
   // Update the existing weekly entry in-place (matched by date+ts), save, show seal screen.
   const c=document.getElementById('reflect-content');
+  // A re-seal that blanks every field would silently erase a real reflection — block it, same as add.
+  if(_reflectionEmpty()){ _reflectShowSealErr(); return; }
   const idx=(state.reflections||[]).findIndex(r=>r.type==='weekly'&&r.date===date&&(ts?r.ts===ts:true));
   if(idx===-1) return;
   const entry=state.reflections[idx];
