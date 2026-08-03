@@ -4137,6 +4137,7 @@ const PROVERBS = [
   {jp:null,rom:null,en:'It is not about the answer, but the process of searching for the answer.',attr:'— Carl Johnson, PhD'},
   {jp:null,rom:null,en:'Furthermore, with your spirit attuned to the Way you will triumph over the enemy with your mind. Having come so far, how can you be beaten by anyone?',attr:'— Miyamoto Musashi, Go Rin No Sho'},
   {jp:null,rom:null,en:'The secret to your future is hidden in your daily routine.',attr:'— Mike Murdock (attributed)'},
+  {jp:null,rom:null,en:'The only opponent you have to beat is yourself, the way you used to be.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
 ];
 function _buildProverbPlaylist(){
   // Rotation = array indices 0–92, natural order. (The old hand-tuned reorder
@@ -4145,6 +4146,7 @@ function _buildProverbPlaylist(){
   // Nonet plays 1→9; Triptych (心持→身→観) and Diptych (Blake→有構無構) stay contiguous.
   const o=[];
   for(let i=0;i<=92;i++) o.push(i);
+  o.push(162);   // surface the appended Murakami "beat yourself, the way you used to be" entry (array index 162) in the daily rotation
   return o.map(i=>PROVERBS[i]);
 }
 const PROVERB_PLAYLIST=_buildProverbPlaylist();
