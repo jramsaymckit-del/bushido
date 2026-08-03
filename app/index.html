@@ -3816,7 +3816,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'No-invented-schedule cadence fix · 2026-08-02 · few/weekly/fortnightly/every-4-weeks never pre-select a day (was silently [0,3] / [0]); commit is BLOCKED visibly on add AND edit until ≥1 day is picked — no substitute default anywhere; the picker shows "Choose at least one day" + shakes; the edit path no longer coerces an empty mask to daily, it blocks; the load-time heal of a pre-existing days:[] → daily is unchanged · on Travel Mode (b)';
+const BUILD_ID = 'Monthly reflection window · 2026-08-02 · the window is now the LAST 3 DAYS of a month + the FIRST 4 of the next (e.g. Jul 29 – Aug 4), so a reflection filed on the 1st–4th keys the REFLECTED (prior) month, never the current one — an Aug-2 submission files m:2026-07 (mirrors the weekly Monday-grace R08; "last 3" counts back from month end so it is uniform across 28/29/30/31-day months, and a month window never overlaps the next). The existing daily nudge names the reflected month and runs through the window, stopping once a reflection EXISTS for that month — entry-based, so it is union-merged and cannot be resurrected by a stale client (audit Finding #3: lastMonthlyComplete is LWW/regressable, but that is only the ≥90% celebration gate, not this reminder) · on no-invented-schedule cadence fix';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -6606,13 +6606,27 @@ function showMonthlyReflectionReview(){
     </div>`;
 }
 
+// The month whose reflection window is open right now: the LAST 3 DAYS of a month, OR the FIRST 4
+// DAYS of the next month (grace — mirrors the weekly Monday-grace R08). Returns {ym, anchor} where
+// anchor is the reflected month's LAST DAY ('YYYY-MM-DD'), or null when outside any window. "Last 3"
+// counts back from month end, so it's uniform across 28/29/30/31-day months, and a month's window
+// (e.g. Jul 29 – Aug 4) never overlaps the next month's (Aug 29 – Sep 4).
+function _reflectedMonth(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const y=today.getFullYear(), mo=today.getMonth(), d=today.getDate();
+  const lastDay=new Date(y,mo+1,0).getDate();
+  if(d>=lastDay-2){ const end=new Date(y,mo+1,0);   return { ym:getDateStr(end).slice(0,7), anchor:getDateStr(end) }; } // last 3 → this month
+  if(d<=4){        const end=new Date(y,mo,0);       return { ym:getDateStr(end).slice(0,7), anchor:getDateStr(end) }; } // first 4 → prior month (grace)
+  return null;
+}
 function needsMonthlyReflection(){
-  const today=new Date();
-  const lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
-  if(today.getDate()<lastDay-2) return false; // Not in last 3 days
-  const monthStr=getDateStr(today).substring(0,7);
+  const rm=_reflectedMonth();
+  if(!rm) return false;                              // outside the window → no nudge
+  // Open until a reflection EXISTS for the reflected month. That entry is union-merged (mergeReflections),
+  // so the "stop the daily reminder once filed" signal can't be regressed by a stale client — this is the
+  // entry-based path, NOT lastMonthlyComplete (audit Finding #3: lastMonthlyComplete is LWW/regressable).
   return !(state.reflections||[]).some(r=>
-    r.type==='monthly'&&r.date&&r.date.startsWith(monthStr)
+    r.type==='monthly'&&r.date&&r.date.startsWith(rm.ym)
   );
 }
 
@@ -7079,8 +7093,10 @@ function buildReflectionNudgeCard(type,data){
     <span class="reflect-nudge-text" style="opacity:.7">your year-end is approaching. the Annual Reflection unlocks next month.</span>
     <button class="reflect-nudge-btn" onclick="openEOYReview()" style="opacity:${hasCompletedAnnualReflection()?1:.4};pointer-events:${hasCompletedAnnualReflection()?'auto':'none'}">年 &nbsp;review</button>
   </div>`;
+  const _rm=_reflectedMonth();
+  const _mName=_rm?new Date(_rm.ym+'-01T12:00:00').toLocaleDateString('en-GB',{month:'long'}):'';
   return `<div class="reflect-nudge">
-    <span class="reflect-nudge-text">the month is ending. seal your reflection.</span>
+    <span class="reflect-nudge-text">${_mName?('reflect on '+_mName+'. seal it before the window closes.'):'the month is ending. seal your reflection.'}</span>
     <button class="reflect-nudge-btn" onclick="showReflection('monthly')">月 &nbsp;reflect</button>
   </div>`;
 }
@@ -7338,6 +7354,11 @@ function saveReflection(type){
     wEnd.setDate(wEnd.getDate()+6);
     _saveDate=getDateStr(wEnd);
   }
+  // Monthly period-key discipline (mirrors the weekly Monday-grace above): a reflection filed in a
+  // month's window ALWAYS keys the REFLECTED month, so a submission on the 1st–4th of the next month
+  // files under the prior month (Aug 1–4 → m:2026-07), never the current one. Anchored to the reflected
+  // month's last day so entry.date, the dedup, and isTravelMonth() all agree on the period.
+  if(type==='monthly'){ const _rm=_reflectedMonth(); if(_rm) _saveDate=_rm.anchor; }
   const entry={type, date:_saveDate, ts:Date.now()};
   if(type==='weekly'){
     const card=c.querySelector('#momentum-card');
