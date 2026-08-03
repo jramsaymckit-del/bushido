@@ -7660,6 +7660,7 @@ function resealReflection(date,ts){
   if(c.querySelector('#rev-q2'))  entry.showingUp=c.querySelector('#rev-q2').value.trim();
   if(c.querySelector('#rev-notes')) entry.notes=c.querySelector('#rev-notes').value;
   if(c.querySelector('#rev-intention')) entry.intention=c.querySelector('#rev-intention').value.trim();
+  entry.travel=isTravelWeek(date);   // re-stamp travel framing from CURRENT travelDays (parity w/ save + resealMonthlyReflection) — a Re-seal after a travel backfill picks up the framing, never leaves a stale flag
   entry.ts=Date.now(); // P2-1 3a: an in-place reseal must bump ts so the sync merge picks this edit as newest
   saveState();
   c.innerHTML=`<div style="text-align:center;padding:56px 0">
