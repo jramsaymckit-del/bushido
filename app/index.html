@@ -854,6 +854,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .daily-note-label{font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s3);opacity:.85;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .daily-note-kanji{font-size:18px;opacity:.65}
 .daily-note::placeholder{color:var(--ink);opacity:.18;font-weight:400;font-style:normal}
+/* Peace number selector (1–10) — writes a "Peace N/10" first line into the daily note */
+.peace-sel-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 4px;min-width:0}
+.peace-sel-lbl{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+.peace-sel-btn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(26,20,16,.18);background:transparent;color:var(--ink-light);font-family:'Noto Serif JP',serif;font-size:11px;cursor:pointer;padding:0;line-height:1;transition:border-color .2s,background .2s,color .2s}
+.peace-sel-btn:hover{border-color:var(--red);color:var(--red)}
+.peace-sel-btn.cur{border-color:var(--red);background:var(--red);color:#fff;font-weight:700}
+body.dark .peace-sel-btn{border-color:rgba(255,255,255,.22);color:rgba(255,255,255,.55)}
+body.dark .peace-sel-btn.cur{color:#fff}
+/* Milestone drill-down rows (vision drawer) */
+.ms-goal-row{display:flex;gap:10px;align-items:flex-start;padding:4px 0 4px 28px;font-size:11px;line-height:1.7;color:var(--ink-light);text-align:left}
+.ms-goal-mark{font-family:'Noto Serif JP',serif;color:var(--red);min-width:30px;opacity:.75}
 /* ── Weekly/Monthly reflection button states (R1/R2 restore) ── */
 .weekly-btn-active{font-size:10px!important;letter-spacing:2px!important;border:1.5px solid var(--red)!important;padding:10px 20px!important;color:var(--red)!important;background:none!important;cursor:pointer}
 .weekly-btn-active:hover{background:var(--red)!important;color:var(--white)!important}
@@ -3535,8 +3546,8 @@ if (FIREBASE_CONFIGURED) {
         <div class="ryughi-label">My Ryughi</div>
         <div class="ryughi-kanji">流儀</div>
       </div>
-      <div style="font-family:'Noto Serif JP',serif;font-size:12px;letter-spacing:3px;color:var(--ink-faint);margin-top:20px;opacity:.4">千里の道も一歩から</div>
-      <div style="font-size:10px;letter-spacing:2px;color:var(--ink-faint);margin-top:4px;opacity:.3">even a journey of a thousand ri begins with a single step</div>
+      <div id="ryughi-tagline" style="font-family:'Noto Serif JP',serif;font-size:12px;letter-spacing:3px;color:var(--ink-faint);margin-top:20px;opacity:.4">千里の道も一歩から</div>
+      <div id="ryughi-tagline-sub" style="font-size:10px;letter-spacing:2px;color:var(--ink-faint);margin-top:4px;opacity:.3">even a journey of a thousand ri begins with a single step</div>
       <div id="ryughiDrawer"><div id="ryughiDrawerInner"></div></div>
     </section>
     <div class="divider"></div>
@@ -3814,7 +3825,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5417,6 +5428,7 @@ function renderDashboard(){
   srInitBanner();
   // Ryughi strands
   renderStrandArms();
+  renderRyughiVisionLine();
   const greetEl=document.getElementById('greeting-display');
   if(greetEl) greetEl.textContent=getGreeting();
   const ws=document.getElementById('week-strip');
@@ -5548,6 +5560,7 @@ function renderGoals(){
           <span class="daily-note-label-sub">${todayLabel}</span>
         </div>
       </div>
+      <div class="peace-sel-row" id="peace-sel-row">${_peaceRowHtml(todayNoteStr)}</div>
       <textarea class="daily-note" id="daily-note-ta" rows="2" placeholder="write freely..."
         onfocus="dismissDailyNudge()"
         oninput="growDailyNote(this);updateDailySealRow('${todayNoteStr}');persistDailyNoteLocal('${todayNoteStr}',this.value)"
@@ -7710,9 +7723,13 @@ function toggleVisionDrawer(e){
         </div>
         <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:16px;opacity:.6">Five Year Milestones</div>
         ${state.milestones5yr.map((ms,i)=>`
-          <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
-            <span style="font-family:'Noto Serif JP',serif;font-size:15px;color:var(--red);opacity:.22;min-width:14px;margin-top:2px">${i+1}</span>
-            <span style="font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink-light);line-height:1.8;font-style:italic">${ms}</span>
+          <div style="cursor:pointer;margin-bottom:14px" onclick="_msGoalsToggle(event,${i})">
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <span style="font-family:'Noto Serif JP',serif;font-size:15px;color:var(--red);opacity:.22;min-width:14px;margin-top:2px">${i+1}</span>
+              <span style="font-family:'Noto Serif JP',serif;font-size:12px;color:var(--ink-light);line-height:1.8;font-style:italic">${ms}</span>
+              <span style="font-size:12px;color:var(--ink-faint);opacity:.6;margin-top:3px">›</span>
+            </div>
+            <div class="ms-goals" id="ms-goals-${i}" style="display:none;padding-top:4px"></div>
           </div>`).join('')}
       </div>`;
     if(typeof renderRyughiConstellation==='function') renderRyughiConstellation();
@@ -7731,6 +7748,70 @@ document.addEventListener('click',function(){
   _visionDrawerOpen=false;
   if(inner) setTimeout(function(){ inner.innerHTML=''; },700);
 });
+
+// ── Chark-session UX triple (2026-08-11) ────────────────────────────────────
+// (1) Vision line always visible under 流儀 — first sentence of tenYearVision;
+//     the static proverb pair remains the fallback when no vision exists yet.
+function renderRyughiVisionLine(){
+  const a=document.getElementById('ryughi-tagline');
+  const b=document.getElementById('ryughi-tagline-sub');
+  if(!a||!b) return;
+  const v=(state.tenYearVision||'').trim();
+  if(!v) return; // no vision yet — leave the proverb pair untouched
+  const m=v.match(/^[^.!?]{1,240}[.!?]?/);
+  let first=(m?m[0]:v).trim();
+  if(first.length>170) first=first.slice(0,167).trim()+'…';
+  a.textContent=first;
+  a.style.letterSpacing='0.5px';
+  a.style.fontSize='13px';
+  a.style.fontStyle='italic';
+  a.style.opacity='.75';
+  a.style.cursor='pointer';
+  a.style.maxWidth='560px';
+  a.style.margin='20px auto 0';
+  a.onclick=toggleVisionDrawer;
+  b.style.display='none';
+}
+
+// (2) Milestone drill-down in the vision drawer — tap a milestone, see its annual goals.
+//     Uses the same parentMs===milestone-index convention as the constellation (CLAUDE.md).
+function _msGoalsToggle(e,i){
+  if(e) e.stopPropagation(); // the document click listener closes the drawer otherwise
+  const el=document.getElementById('ms-goals-'+i);
+  if(!el) return;
+  if(el.style.display!=='none'){ el.style.display='none'; return; }
+  const gs=(state.annualGoals||[]).filter(g=>Number(g.parentMs)===i);
+  el.innerHTML = gs.length
+    ? gs.map(g=>`<div class="ms-goal-row"><span class="ms-goal-mark">${g.done?'✓':(Number(g.progress)||0)+'%'}</span><span>${escapeHtml(g.text)}</span></div>`).join('')
+    : `<div class="ms-goal-row" style="opacity:.5">No goals under this milestone yet.</div>`;
+  el.style.display='block';
+}
+
+// (3) Peace number 1–10 — rides the daily note as a "Peace N/10" first line. dailyNotes is
+//     already in the MERGEABLE net (newest-ts per key); a new state field would sit in
+//     neither merge net and silently lose data — so no new field, ever, for this.
+function _peaceCur(dateStr){
+  const v=((state.dailyNotes||{})[dateStr]||'');
+  const m=v.match(/^Peace\s+(\d{1,2})\/10/);
+  return m?Number(m[1]):null;
+}
+function _peaceRowHtml(dateStr){
+  const cur=_peaceCur(dateStr);
+  let btns='';
+  for(let n=1;n<=10;n++) btns+=`<button class="peace-sel-btn${cur===n?' cur':''}" onclick="_setPeaceNumber('${dateStr}',${n})">${n}</button>`;
+  return `<span class="peace-sel-lbl">peace</span>${btns}`;
+}
+function _setPeaceNumber(dateStr,n){
+  const ta=document.getElementById('daily-note-ta');
+  let val=ta?ta.value:(((state.dailyNotes||{})[dateStr])||'');
+  val=val.replace(/^Peace\s+\d{1,2}\/10[ \t]*\n?/,'');
+  val=`Peace ${n}/10`+(val.trim()?'\n'+val:'');
+  if(ta){ ta.value=val; growDailyNote(ta); }
+  persistDailyNoteLocal(dateStr,val);
+  updateDailySealRow(dateStr);
+  const row=document.getElementById('peace-sel-row');
+  if(row) row.innerHTML=_peaceRowHtml(dateStr);
+}
 
 // ============ GREETING ============
 function getGreeting(){
