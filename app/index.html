@@ -3817,7 +3817,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -7707,22 +7707,20 @@ function toggleVisionDrawer(e){
   if(!drawer||!inner) return;
   _visionDrawerOpen=!_visionDrawerOpen;
   if(_visionDrawerOpen){
-    // The dashboard already shows sentence one (the creed) directly above the drawer, so the drawer
-    // renders the DESTINATION — sentence two onward — never repeating the line above it. Same split as
-    // renderRyughiVisionLine so the two stay consistent. Gate: a single-sentence (creed-only) vision has
-    // no sentence two → OMIT the vision block entirely (no empty box, no duplicate); the drawer still
-    // holds the constellation + milestones. Only a wholly-empty vision shows the placeholder.
-    const _v=(state.tenYearVision||'').trim();
-    const _m=_v.match(/^[^.!?]{1,240}[.!?]?/);
-    const _rest=_m?_v.slice(_m[0].length).trim():'';
-    const _visionInner = !_v ? '<span style="opacity:.3">Your ten-year vision lives here.</span>' : _rest;
-    const _drawerVisionHtml = _visionInner
-      ? `<div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;line-height:2;color:var(--ink-light);margin-bottom:32px;border-left:2px solid rgba(204,53,41,.2);padding-left:18px">${_visionInner}</div>`
-      : '';
+    // The drawer holds the vision WHOLE — tenYearVision in full, never split. The dashboard line above is a
+    // glance (sentence one, or the proverb fallback) — a headline over an article, not a duplicate; they do
+    // different jobs. (An earlier same-day de-dup rendered sentence two onward, but splitting the paragraph
+    // opens the drawer mid-thought — worse than the repetition it avoided. Resolves for good once the
+    // orienting line is a DEDICATED field — roadmap §5b — not "whatever sentence one happens to be": then the
+    // dashboard shows the orienting sentence and the drawer the full vision, no repeat and no split. Until
+    // then a creed-only vision intentionally shows twice — it self-resolves when the destination is added.)
     inner.innerHTML=`
       <div style="padding:24px 0 8px;border-top:1px solid rgba(26,18,16,.08);margin-top:16px">
         <div id="ryughiConstellation" style="margin:0 auto 20px;display:flex;justify-content:center;"></div>
-        ${_drawerVisionHtml}
+        <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;line-height:2;
+          color:var(--ink-light);margin-bottom:32px;border-left:2px solid rgba(204,53,41,.2);padding-left:18px">
+          ${state.tenYearVision||'<span style="opacity:.3">Your ten-year vision lives here.</span>'}
+        </div>
         <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:16px;opacity:.6">Five Year Milestones</div>
         ${state.milestones5yr.map((ms,i)=>`
           <div style="cursor:pointer;margin-bottom:14px" onclick="_msGoalsToggle(event,${i})">
