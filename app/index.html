@@ -3814,7 +3814,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -12063,13 +12063,15 @@ function srSaveState() { saveState(); }
 var SR_SEASON_NAMES  = {spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter'};
 var SR_SEASON_KANJI  = {spring:'春',summer:'夏',autumn:'秋',winter:'冬'};
 
-function srGetCurrentSeason() {
-  var m = new Date().getMonth();
+function srSeasonForDate(d) {
+  var m = d.getMonth();
   if (m >= 2 && m <= 4) return 'spring';
   if (m >= 5 && m <= 7) return 'summer';
   if (m >= 8 && m <= 10) return 'autumn';
   return 'winter';
 }
+function srGetCurrentSeason() { return srSeasonForDate(new Date()); }
+function srSeasonKeyForDate(d) { return srSeasonForDate(d) + '-' + d.getFullYear(); }
 function srGetSeasonKanji() { return SR_SEASON_KANJI[srGetCurrentSeason()]; }
 function srGetSeasonLabel() {
   var now = new Date();
@@ -12077,7 +12079,7 @@ function srGetSeasonLabel() {
        + now.toLocaleString('en-GB',{month:'long'}) + ' ' + now.getFullYear();
 }
 function srGetSeasonKey() {
-  return srGetCurrentSeason() + '-' + new Date().getFullYear();
+  return srSeasonKeyForDate(new Date());
 }
 
 // ── Review gate ───────────────────────────────────────────────────────────────
@@ -12085,6 +12087,17 @@ function srShouldShowReview() {
   var s = srGetState();
   if (s.lastSeasonalReview === srGetSeasonKey()) return false;  // done this season
   if (s.srSnoozeUntil && new Date(s.srSnoozeUntil) > new Date()) return false; // snoozed
+  // Lived-history gate (queue #14) — never surface a seasonal review to an account
+  // that hasn't lived a season yet. Two INDEPENDENT suppressors:
+  //   (a) no completion history at all — a brand-new account, and
+  //   (b) the account began INSIDE the current season — joined mid-season, so
+  //       there is no full season actually lived to review yet (the stricter half:
+  //       it fires even when (a) doesn't, i.e. a few ticks but started this season).
+  if (!Object.keys(s.completionLog || {}).length) return false;                             // (a)
+  if (s.yearStartDate &&
+      srSeasonKeyForDate(new Date(s.yearStartDate + 'T12:00:00')) === srGetSeasonKey()) {   // (b)
+    return false;
+  }
   return true;
 }
 
