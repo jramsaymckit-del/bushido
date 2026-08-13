@@ -3531,6 +3531,7 @@ if (FIREBASE_CONFIGURED) {
       <div class="ob-kanji" style="font-size:80px;opacity:.25">印</div>
       <div class="ob-question">Your path is set.<br>The scroll is written. Now walk it — one day at a time.</div>
       <div class="ob-sub">every stroke of ink began with stillness</div>
+      <div id="ob-parity-msg" style="display:none;margin:18px auto 0;max-width:440px;font-size:12px;line-height:1.7;color:var(--red);font-style:italic"></div>
       <div class="ob-nav"><div></div><button class="btn btn-red" onclick="finishOnboarding()">Begin</button></div>
     </div>
 
@@ -3814,7 +3815,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4275,7 +4276,7 @@ function initMs5(){
       d.innerHTML=`<span class="ob-strand-num">${i+1}</span><input class="ob-input" value="${m.replace(/"/g,'&quot;')}" placeholder="A 5-year milestone..."/>`;
       c.appendChild(d);
     });
-  } else { for(let i=0;i<2;i++) appendMs5(c); }
+  } else { for(let i=0;i<3;i++) appendMs5(c); }   // #13 Tier 1(c): default milestone rows match the 3 default strand rows (parity)
 }
 function addMs5(){appendMs5(document.getElementById('ms5-list'))}
 function appendMs5(c){
@@ -4288,7 +4289,7 @@ function initAnnual(){
   const c=document.getElementById('annual-list');c.innerHTML='';
   if(state.annualGoals&&state.annualGoals.length){
     state.annualGoals.forEach(g=>{
-      const opts=state.milestones5yr.map((m,i)=>`<option value="${i}"${g.parentMs==i?' selected':''} >${m.substring(0,40)}</option>`).join('');
+      const opts=state.milestones5yr.slice(0,(state.strands||[]).length).map((m,i)=>`<option value="${i}"${g.parentMs==i?' selected':''} >${m.substring(0,40)}</option>`).join('');   // #13 Tier 1(b): only offer milestones with a matching strand (index < strands.length)
       const d=document.createElement('div');d.className='annual-row';d.style.cssText='margin-bottom:16px';
       d.innerHTML=`<input class="ob-input" value="${g.text.replace(/"/g,'&quot;')}" style="margin-bottom:6px"/>
         <div class="ob-link-section"><div class="ob-link-label">serves which 5-year milestone?</div>
@@ -4299,7 +4300,7 @@ function initAnnual(){
 }
 function addAnnual(){appendAnnual(document.getElementById('annual-list'))}
 function appendAnnual(c){
-  const opts=state.milestones5yr.map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');
+  const opts=state.milestones5yr.slice(0,(state.strands||[]).length).map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');   // #13 Tier 1(b): only offer milestones with a matching strand
   const d=document.createElement('div');d.className='annual-row';d.style.cssText='margin-bottom:16px';
   d.innerHTML=`<input class="ob-input" placeholder="This year I will..." style="margin-bottom:6px"/>
     <div class="ob-link-section"><div class="ob-link-label">serves which 5-year milestone?</div>
@@ -4381,6 +4382,18 @@ function obSelectMonth(month, btn){
 
 function finishOnboarding(){
   saveObStep();
+  // #13 Tier 1(a) cascade-parity guard — block completion while the strand and 5-year-
+  // milestone counts differ. parentMs doubles as the strand index, so an unmatched count
+  // silently orphans any goal whose milestone index sits beyond the strands (invisible in
+  // the constellation + strand stats). Framed as the APP's structural constraint — NEVER
+  // the user's mistake (they may well have chosen the right milestone). Band-aid: delete
+  // when the milestone.strandIndex schema fix (Tier 2, roadmap §5b) lands.
+  const _sN=(state.strands||[]).length, _mN=(state.milestones5yr||[]).length;
+  if(_sN!==_mN){
+    const _pm=document.getElementById('ob-parity-msg');
+    if(_pm){ _pm.textContent='BUSHIDO anchors each strand to a single 5-year milestone, so these two move together — right now there are '+_sN+' strands and '+_mN+' milestones. Even up their counts and your path will hold.'; _pm.style.display='block'; }
+    return;
+  }
   state.onboarded=true;
   state.yearEndMode=_obYearEndMode;
   state.yearEndMonth=_obYearEndMonth;
@@ -6268,7 +6281,7 @@ function showAdd(){
     ex.innerHTML=`<select id="link-select"><option value="">serves which annual goal?</option>${opts}</select>
       <select id="tf-select"><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option></select>`;
   } else {
-    const opts=state.milestones5yr.map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');
+    const opts=state.milestones5yr.slice(0,(state.strands||[]).length).map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');   // #13 Tier 1(b): only offer milestones with a matching strand
     ex.innerHTML=`<select id="link-select"><option value="">serves which 5-year milestone?</option>${opts}</select>`;
   }
 }
@@ -6299,7 +6312,7 @@ function resolveParentLink(kind, rawLink, st){
   if(!Number.isInteger(n)) return {ok:false, reason:'nan'};
   if(kind==='kaizen')   return ((st.shokunin||[]).some(c=>c.id===n))      ? {ok:true,value:n} : {ok:false,reason:'missing'};
   if(kind==='shokunin') return ((st.annualGoals||[]).some(g=>g.id===n))   ? {ok:true,value:n} : {ok:false,reason:'missing'};
-  if(kind==='annual')   return (n>=0 && n<(st.milestones5yr||[]).length)  ? {ok:true,value:n} : {ok:false,reason:'range'};
+  if(kind==='annual')   return (n>=0 && n<(st.milestones5yr||[]).length && n<(st.strands||[]).length)  ? {ok:true,value:n} : {ok:false,reason:'range'};   // #13 Tier 1(d): parentMs doubles as a strand index, so bound it by strands.length too
   return {ok:false, reason:'kind'};
 }
 function showAddError(kind){
