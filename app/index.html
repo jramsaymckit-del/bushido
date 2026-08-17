@@ -3815,7 +3815,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4253,7 +4253,7 @@ function initStrands(){
   if(state.strands&&state.strands.length){
     state.strands.forEach((s,i)=>{
       const d=document.createElement('div');d.className='ob-strand';
-      d.innerHTML=`<span class="ob-strand-num">${i+1}</span><input class="ob-input" value="${s.replace(/"/g,'&quot;')}" placeholder="A strand of your purpose..."/>`;
+      d.innerHTML=`<span class="ob-strand-num">${i+1}</span><input class="ob-input" value="${strandName(s).replace(/"/g,'&quot;')}" placeholder="A strand of your purpose..."/>`;
       c.appendChild(d);
     });
   } else { for(let i=0;i<3;i++) appendStrand(c,i+1); }
@@ -5373,6 +5373,18 @@ function habitOnDay(k, d, dateObj){
 
 // ============ DASHBOARD ============
 
+// ── Strand identity read-compat helpers (Phase 1 — 2026-08-17) ───────────────
+// state.strands entries may be EITHER a bare string (legacy) OR a {name,kanji,colour}
+// object (post strand-objects migration). These three helpers tolerate BOTH. During the
+// transition the kanji/colour fall back to the canonical positional arrays — byte-identical
+// to the 9 duplicated local copies (all verified === ['志','史','鍛','匠','愛']) they route
+// through. The positional fallback is retired in Phase 4, once every strand is an object.
+var _STRAND_KANJI_FALLBACK  = ['志','史','鍛','匠','愛'];
+var _STRAND_COLOUR_FALLBACK = ['#2C5282','#7A5C1E','#276749','#553C9A','#922B21'];
+function strandName(s){ return (s && typeof s === 'object') ? (s.name != null ? s.name : '') : s; }
+function strandKanji(s, i){ return (s && typeof s === 'object' && s.kanji) ? s.kanji : _STRAND_KANJI_FALLBACK[i]; }
+function strandColour(s, i){ return (s && typeof s === 'object' && s.colour) ? s.colour : _STRAND_COLOUR_FALLBACK[i]; }
+
 // ── STRAND ARMS ──────────────────────────────────────────────────────────────
 function renderStrandArms(){
   var el=document.getElementById('strand-arms-strip');
@@ -5385,7 +5397,7 @@ function renderStrandArms(){
   var colors=CSS_V.map(function(v){return cs.getPropertyValue(v).trim();});
   el.innerHTML=(state.strands||[]).map(function(name,si){
     var color=colors[si]||'#888';
-    var kanji=KANJI[si]||'';
+    var kanji=strandKanji(name,si)||'';
     var goalIds=new Set((state.annualGoals||[]).filter(function(g){return Number(g.parentMs)===si;}).map(function(g){return g.id;}));
     var shokIds=new Set((state.shokunin||[]).filter(function(s){return goalIds.has(Number(s.parentAnnual));}).map(function(s){return s.id;}));
     var habits=(state.kaizen||[]).filter(function(k){return shokIds.has(Number(k.parentShok));});
@@ -5415,7 +5427,7 @@ function renderStrandArms(){
       arms+='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+sw.toFixed(1)+'" opacity="'+opacity.toFixed(2)+'" stroke-linecap="round"/>';
     });
     var activeCls=_filterStrandIdx===null?'':(_filterStrandIdx===si?' sa-active':' sa-faded');
-    return '<div class="sa-item'+activeCls+'" onclick="setStrandFilter(event,'+si+')" title="'+name+'">'+
+    return '<div class="sa-item'+activeCls+'" onclick="setStrandFilter(event,'+si+')" title="'+strandName(name)+'">'+
       '<svg class="sa-svg" viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">'+
         arms+
         '<circle cx="'+CX+'" cy="'+CY+'" r="'+SEAL_R+'" fill="rgba(255,255,255,0.6)" stroke="'+color+'" stroke-width="1" opacity="0.5"/>'+
@@ -5499,7 +5511,7 @@ function renderGoals(){
     }
     let checklistHtml='';
     if(strandLinkedIds!==null){
-      const sName=state.strands[_filterStrandIdx]||'';
+      const sName=strandName(state.strands[_filterStrandIdx])||'';
       checklistHtml=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 14px;border-left:2px solid rgba(204,53,41,.3)">
         <span style="font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint)">${sName}</span>
         <button onclick="clearStrandFilter()" style="font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);background:none;border:1.5px solid var(--red);padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--red)';this.style.color='var(--white)'" onmouseout="this.style.background='none';this.style.color='var(--red)'">× clear</button>
@@ -5704,7 +5716,7 @@ const _UA_STRAND_COLOR = ['#2C5282','#7A5C1E','#276749','#553C9A','#922B21']; //
 function _uaKanjiForGoal(goal){                          // still used by the Shokunin craft card
   if(!goal || goal.parentMs==null || goal.parentMs==='') return '';
   const si = Number(goal.parentMs);
-  return (si>=0 && si<5) ? _UA_KANJI[si] : '';
+  return (si>=0 && si<5) ? strandKanji((state.strands||[])[si], si) : '';
 }
 // Build the upward chain craft → goal → strand (+ optional leading habit). Renders nothing
 // when there is no upward chain at all (never a lone habit name, never 'undefined').
@@ -5720,8 +5732,8 @@ function _uaChainHtml(habitText, craft, tapId){
     if(goal.parentMs!=null && goal.parentMs!==''){ const n=Number(goal.parentMs); if(Number.isInteger(n)&&n>=0&&n<5) si=n; }
   }
   if(si!=null){
-    const nm = escapeHtml((state.strands&&state.strands[si])||'');
-    up.push(`<span class="ua-lin-strand" style="color:${_UA_STRAND_COLOR[si]}"><span class="ua-lin-skanji">${_UA_KANJI[si]}</span>${nm}</span>`);
+    const nm = escapeHtml(strandName((state.strands||[])[si])||'');
+    up.push(`<span class="ua-lin-strand" style="color:${strandColour((state.strands||[])[si],si)}"><span class="ua-lin-skanji">${strandKanji((state.strands||[])[si],si)}</span>${nm}</span>`);
   }
   if(!up.length && tapId==null) return '';               // read-only + fully orphaned → render nothing
   const nodes = (habitText && habitText.trim())
@@ -5906,7 +5918,7 @@ function _uaRenderRehome(id, msg){
 function _uaCascBtnValue(craft){
   if(!craft) return '<span class="ua-casc-btn-ph">choose a strand, goal, and craft</span>';
   const g=_uaGoalById(craft.parentAnnual); const si=_uaStrandOfGoal(g);
-  const k = si!=null ? `<span style="color:${_UA_STRAND_COLOR[si]};font-style:normal">${_UA_KANJI[si]}</span> ` : '';
+  const k = si!=null ? `<span style="color:${strandColour((state.strands||[])[si],si)};font-style:normal">${strandKanji((state.strands||[])[si],si)}</span> ` : '';
   return `${k}${escapeHtml(craft.text||'')}${g?` <span style="opacity:.5">·</span> ${escapeHtml(g.text||'')}`:''}`;
 }
 function _uaCascAddButtonHtml(){
@@ -5927,7 +5939,7 @@ function _uaCascPanelHtml(){
   const curStrand = (curCraft!=null) ? _uaStrandOfCraft(curCraft) : null;
   // breadcrumb
   let crumb=`<div class="ua-casc-crumb"><button class="bk" onclick="event.stopPropagation();_uaCascCrumb('strand')">strands</button>`;
-  if(b.strand!=null){ const nm=escapeHtml((state.strands&&state.strands[b.strand])||''); const col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+  if(b.strand!=null){ const nm=escapeHtml(strandName((state.strands||[])[b.strand])||''); const col=strandColour((state.strands||[])[b.strand],b.strand), kj=strandKanji((state.strands||[])[b.strand],b.strand);
     crumb += `<span class="sep">›</span>` + (b.level==='goal'
       ? `<span class="cur" style="color:${col}">${kj} ${nm}</span>`
       : `<button onclick="event.stopPropagation();_uaCascCrumb('goal')" style="color:${col}">${kj} ${nm}</button>`); }
@@ -5939,12 +5951,12 @@ function _uaCascPanelHtml(){
     body = `<div class="ua-casc-q">Which strand?</div><div class="ua-casc-list">`;
     (state.strands||[]).forEach((nm,si)=>{ if(si>4) return; const n=_uaGoalsInStrand(si).length;
       body += `<button class="ua-casc-row${curStrand===si?' cur':''}" onclick="event.stopPropagation();_uaCascPickStrand(${si})">`
-        + `<span class="ua-casc-kanji" style="color:${_UA_STRAND_COLOR[si]}">${_UA_KANJI[si]}</span>`
-        + `<span class="ua-casc-row-body"><span class="ua-casc-row-name">${escapeHtml(nm)}</span><span class="ua-casc-row-sub">${n} goal${n===1?'':'s'}</span></span>`
+        + `<span class="ua-casc-kanji" style="color:${strandColour(nm,si)}">${strandKanji(nm,si)}</span>`
+        + `<span class="ua-casc-row-body"><span class="ua-casc-row-name">${escapeHtml(strandName(nm))}</span><span class="ua-casc-row-sub">${n} goal${n===1?'':'s'}</span></span>`
         + `<span class="ua-casc-row-go">›</span></button>`; });
     body += `</div>`;
   } else if(b.level==='goal'){
-    const gs=_uaGoalsInStrand(b.strand), col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+    const gs=_uaGoalsInStrand(b.strand), col=strandColour((state.strands||[])[b.strand],b.strand), kj=strandKanji((state.strands||[])[b.strand],b.strand);
     body = `<div class="ua-casc-q">Which goal?</div><div class="ua-casc-list">`;
     if(!gs.length) body += `<div class="ua-casc-empty">No goals here yet.</div>`;
     gs.forEach(g=>{ const n=_uaCraftsInGoal(g.id).length;
@@ -5954,7 +5966,7 @@ function _uaCascPanelHtml(){
         + `<span class="ua-casc-row-go">›</span></button>`; });
     body += `</div>`;
   } else {
-    const cs=_uaCraftsInGoal(b.goal), col=_UA_STRAND_COLOR[b.strand], kj=_UA_KANJI[b.strand];
+    const cs=_uaCraftsInGoal(b.goal), col=strandColour((state.strands||[])[b.strand],b.strand), kj=strandKanji((state.strands||[])[b.strand],b.strand);
     body = `<div class="ua-casc-q">Which craft?</div><div class="ua-casc-list">`;
     if(!cs.length) body += `<div class="ua-casc-empty">No crafts here yet.</div>`;
     cs.forEach(c=>{ const isCur=(curCraft===Number(c.id));
@@ -9363,7 +9375,7 @@ function renderClanCards(){
       var rates=m.strandRates||[];
       var emberHtml=strands.map(function(s,i){
         var op=Math.max(0.2,Math.min(1,(rates[i]||0)/100));
-        var k=KANJI[i%5];
+        var k=strandKanji(s,i%5);
         return '<div class="shin-ember"><span class="shin-kanji">'+k+'</span>'
           +'<div class="shin-ember-dot" style="background:var(--red);opacity:'+op.toFixed(2)+'"></div></div>';
       }).join('');
@@ -9402,9 +9414,9 @@ function renderClanCards(){
       var rates=m.strandRates||[];
       var strandHtml=strands.map(function(s,i){
         var color='var('+COLORS[i%5]+')';
-        var k=KANJI[i%5];
+        var k=strandKanji(s,i%5);
         var pct=rates[i]||0;
-        var label=s.split(' \u2014 ')[0].split(' \u2013 ')[0].trim();
+        var label=strandName(s).split(' \u2014 ')[0].split(' \u2013 ')[0].trim();
         return '<div class="clan-strand-chip">'
           +'<span class="kanji" style="color:'+color+'">'+k+'</span>'
           +'<div><div style="font-size:9px;letter-spacing:1px">'+escapeHtml(label)+'</div>'
@@ -12198,8 +12210,8 @@ function srBuildPhase0() {
     var pct = stats.byStrand['s'+i] !== undefined ? stats.byStrand['s'+i] : 0;
     html += '<div class="sr-stat-row">'
            + '<div class="sr-stat-strand">'
-           + '<span class="sr-stat-kanji">' + (SR_KANJI[i]||'') + '</span>'
-           + '<span class="sr-stat-name">'  + srEscape(strand) + '</span>'
+           + '<span class="sr-stat-kanji">' + (strandKanji(strand,i)||'') + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strandName(strand)) + '</span>'
            + '</div>'
            + '<div class="sr-stat-bar-wrap">'
            + '<div class="sr-stat-bar' + (pct>=65?' high':'') + '" style="width:'+pct+'%"></div>'
@@ -12254,8 +12266,8 @@ function srBuildPhase1() {
     var prompt = prompts[i] || prompts[0];
     html += '<div class="sr-strand-block">'
            + '<div class="sr-strand-head">'
-           + '<span class="sr-stat-kanji">' + (SR_KANJI[i]||'') + '</span>'
-           + '<span class="sr-stat-name">'  + srEscape(strand) + '</span>'
+           + '<span class="sr-stat-kanji">' + (strandKanji(strand,i)||'') + '</span>'
+           + '<span class="sr-stat-name">'  + srEscape(strandName(strand)) + '</span>'
            + '</div>'
            + '<div class="sr-prompt">' + srEscape(prompt) + '</div>'
            + '<div class="sr-rating-row">'
@@ -12332,7 +12344,7 @@ async function srSendNotificationEmail(dateVal, timeVal) {
     var r = srState.ratings[i] ? srState.ratings[i].toUpperCase() : '—';
     var n = srState.notes[i]   ? ' — ' + srState.notes[i] : '';
     var SR_KANJI=['志','史','鍛','匠','愛'];
-    return (SR_KANJI[i]||'') + ' ' + strand + ': ' + r + n;
+    return (strandKanji(strand,i)||'') + ' ' + strandName(strand) + ': ' + r + n;
   }).join('\n');
   if (srState.seasonLesson) lines += '\n\nSeason: ' + srState.seasonLesson;
 
@@ -12484,7 +12496,7 @@ function srBuildSummary() {
     var rating = srState.ratings[i]||'holding';
     var note   = srState.notes[i]  ||'';
     html += '<div class="sr-summary-row">'
-           + '<div class="sr-summary-kanji">'+(SR_KANJI[i]||'')+'</div>'
+           + '<div class="sr-summary-kanji">'+(strandKanji(strand,i)||'')+'</div>'
            + '<div class="sr-summary-right">'
            + '<div class="sr-summary-rating '+rating+'">'+rating.toUpperCase()+'</div>'
            + (note?'<div class="sr-summary-note">'+srEscape(note)+'</div>':'')
@@ -12536,7 +12548,7 @@ async function srConfirmSchedule() {
     var desc = 'BUSHIDO Seasonal Review — '+srGetSeasonLabel()+'\n\n';
     (s.strands||[]).forEach(function(strand,i){
       var r=srState.ratings[i]||'—'; var n=srState.notes[i]||'';
-      desc+=(SR_KANJI[i]||'')+' '+strand+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
+      desc+=(strandKanji(strand,i)||'')+' '+strandName(strand)+': '+r.toUpperCase()+(n?'\n'+n:'')+'\n\n';
     });
     if(srState.seasonLesson) desc+='Season lesson: '+srState.seasonLesson;
     var calId = (typeof csCurrentCalendarId!=='undefined'&&csCurrentCalendarId)?csCurrentCalendarId:'primary';
@@ -12605,6 +12617,7 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
   var RC_KANJI_IDX=['志','史','鍛','匠','愛'];
   function rcNorm(s){ return s.replace(/[''ʼ''ʼ]/g,"'").trim(); }
   function rcKanji(n,idx){
+    if(n && typeof n==='object'){ if(n.kanji) return n.kanji; n=strandName(n); }
     var nk=rcNorm(n);
     if(KANJI_MAP[nk]) return KANJI_MAP[nk];
     for(var key in KANJI_MAP){ if(rcNorm(key)===nk) return KANJI_MAP[key]; }
@@ -12780,7 +12793,7 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
     var hc=rcHabits();
     var strands=state.strands.map(function(name,i){
       var wf=hc[i].reduce(function(acc,k){ return acc+rcWeekly(k.days); },0);
-      return {kanji:rcKanji(name,i),name:name,weeklyFreq:wf,habits:hc[i].map(function(k){ return {s:rcStreak(k.id)}; })};
+      return {kanji:rcKanji(name,i),name:strandName(name),weeklyFreq:wf,habits:hc[i].map(function(k){ return {s:rcStreak(k.id)}; })};
     });
     var sorted=rcSort(strands),pos=rcPos(sorted);
     var bg=night?'<rect width="320" height="300" fill="#08080f" rx="4"/>':'';
