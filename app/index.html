@@ -3204,6 +3204,48 @@ body.dark .sr-phase-dot {
 .hi-unpair-btn-cancel:hover{border-color:var(--ink);background:rgba(0,0,0,.04)}
 .hi-unpair-btn-go{background:none;border:1.5px solid var(--red);color:var(--red)}
 .hi-unpair-btn-go:hover{background:var(--red);color:var(--white)}
+/* ══════════ YOUR ESSENCE — vision-drawer colonnade (feature C) ══════════
+   Ported from the approved Workshop/CANVAS.html prototype. Quality columns side by
+   side, divided by tapered ink "posts" (sumi-e), not hairlines — the post is the
+   point. Descriptive of who the user already IS; VERBATIM evidence beneath each
+   quality. renderEssenceDrawer() returns '' for absent/empty state.essence, so this
+   block never appears for a user without an essence (the whole existing fleet).
+   SIZE RULE (mirrors the canvas): every line STRICTLY SMALLER than the drawer
+   milestone text (12px) AND VISIBLY LIGHTER — roman + tracking reads heavier than
+   italic at equal px, so a smaller px alone is not enough. 10px is the FLOOR on
+   evidence + framing (legibility at --ink-faint on parchment; low contrast is live
+   user feedback). Hierarchy rides colour + roman/italic, never fading.
+   The posts are built from var(--ink) via color-mix, so they invert with the theme
+   (dark ink on the light scroll; light ink on the dark scroll) instead of vanishing.
+   RESPONSIVE: column count follows width AND n. JS sets ess-dc{N} (desktop: n when
+   n<=3, else ceil(n/2) capped 4) and ess-pc{N} (phone: 2, or 1 when n==1); the post
+   is hidden on the first column of each row, which differs per count — hence one
+   :nth-child rule per count, split cleanly across the 600px breakpoint. */
+.essence-sec{margin-top:34px}
+.essence-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);opacity:.6;margin-bottom:10px}
+.essence-frame{font-family:'Noto Serif JP',serif;font-size:10px;font-style:italic;color:var(--ink-faint);letter-spacing:.3px;margin-bottom:24px;line-height:1.6}
+.essence-colonnade{display:grid;grid-template-columns:repeat(2,1fr);column-gap:22px;row-gap:26px;margin-top:2px}
+.essence-col{position:relative;min-width:0}
+.essence-col::before{content:"";position:absolute;left:-12px;top:1px;bottom:1px;width:3px;background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 35%,transparent),color-mix(in srgb,var(--ink) 12%,transparent) 62%,transparent);border-radius:2px 2px 0 0}
+.essence-quality{font-family:'Noto Serif JP',serif;font-size:10.5px;font-weight:400;color:var(--ink);letter-spacing:1px;line-height:1.3}
+.essence-evidence{font-family:'Noto Serif JP',serif;font-size:10px;font-style:italic;color:var(--ink-faint);line-height:1.65;margin-top:6px;overflow-wrap:anywhere}
+@media(max-width:599.98px){
+  .essence-colonnade.ess-pc1{grid-template-columns:repeat(1,1fr)}
+  .essence-colonnade.ess-pc2{grid-template-columns:repeat(2,1fr)}
+  .ess-pc1 .essence-col::before{display:none}
+  .ess-pc2 .essence-col:nth-child(2n+1)::before{display:none}
+}
+@media(min-width:600px){
+  .essence-colonnade.ess-dc1{grid-template-columns:repeat(1,1fr)}
+  .essence-colonnade.ess-dc2{grid-template-columns:repeat(2,1fr)}
+  .essence-colonnade.ess-dc3{grid-template-columns:repeat(3,1fr)}
+  .essence-colonnade.ess-dc4{grid-template-columns:repeat(4,1fr)}
+  .essence-col::before{left:-16px}
+  .ess-dc1 .essence-col::before{display:none}
+  .ess-dc2 .essence-col:nth-child(2n+1)::before{display:none}
+  .ess-dc3 .essence-col:nth-child(3n+1)::before{display:none}
+  .ess-dc4 .essence-col:nth-child(4n+1)::before{display:none}
+}
 </style>
 
 <!-- ═══ FIREBASE CDN ═══════════════════════════════════════════════════════
@@ -3825,7 +3867,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'Your Essence — descriptive drawer block (C) · 2026-08-21 · state.essence = [{quality,evidence}] renders a colonnade beneath the vision-drawer milestones: the Sensei\'s read of who the user already IS, evidence VERBATIM (HTML-escaped, never paraphrased); an entry missing quality or evidence is dropped, hard ceiling 7; absent/empty renders NOTHING (every existing user has none today); essence joins PLAN_KEYS so an edit rides the plan CAS net the day it ships (Finding #1) yet a pre-essence doc still signs as default (R15); responsive ess-dc/ess-pc grid with theme-safe color-mix ink posts. Gated verify_essence_drawer 35/35. Not yet deployed — rides the post-migration deploy. · on: Day\'s Word response note (D2.1) · 2026-08-21 · a clan member may acknowledge the word with an OPTIONAL one-line note (<=200 chars — client maxlength + the Firestore rule cap D, verified DENY in production); reply and acknowledge are a SINGLE act; the uid-keyed acks map makes threading impossible by construction; the note dies with the word at 24h and raises no notification; a seal-only ack stays fully valid. Gated verify_dayword_response. Feature shipped to /app/ 2026-08-21; this stamp rides the next deploy. · on: strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3925,6 +3967,7 @@ const DEFAULT_STATE = {
   annualGoals: [],
   shokunin: [],
   kaizen: [],
+  essence: [],                  // [{quality,evidence}] — the Sensei's descriptive read of who you already ARE (never aspirational); evidence VERBATIM, never paraphrased. In PLAN_KEYS → joins the plan CAS net the day it ships (Finding #1). Absent/empty renders nothing.
   completionLog: {},
   dailyNotes: {},
   dailyNotesMeta: {},           // P2-1 3a: {'YYYY-MM-DD': lastEdited ms} — per-note edit time; a CLEARED day is '' with a fresh ts, so the newest-ts note merge handles clear/re-add/cross-tab (no tombstone map)
@@ -3962,6 +4005,7 @@ let state = {
   annualGoals: [],    // {id, text, parentMs}
   shokunin: [],       // {id, text, parentAnnual, progress, timeframe, done}
   kaizen: [],         // {id, text, parentShok, streak, done, lastDone}
+  essence: [],        // [{quality,evidence}] — descriptive, not aspirational; see DEFAULT_STATE + renderEssenceDrawer
   completionLog: {},  // {'YYYY-MM-DD': [id, ...]}
   dailyNotes: {},     // {'YYYY-MM-DD': 'note text'}  ('' = cleared, treated as no-note on read)
   dailyNotesMeta: {},      // P2-1 3a: {'YYYY-MM-DD': lastEdited ms}
@@ -7727,6 +7771,46 @@ initKaizenDrag();
 
 // ============ VISION DRAWER ============
 var _visionDrawerOpen=false;
+// ── YOUR ESSENCE (drawer) ────────────────────────────────────────────────────
+// state.essence = [{quality, evidence}] — the Sensei's DESCRIPTIVE read of who the
+// user already IS (never aspirational). Evidence is a VERBATIM onboarding line, so
+// it is HTML-escaped (it can carry <, &, quotes) and the quotation marks are the
+// design's, added at render — the stored value stays the user's exact words. An
+// entry missing EITHER half is DROPPED (never paraphrased); hard ceiling of 7.
+function essenceList(){
+  const arr = Array.isArray(state.essence) ? state.essence : [];
+  const out = [];
+  for(const it of arr){
+    if(!it || typeof it!=='object') continue;
+    const quality  = (it.quality ==null ? '' : String(it.quality )).trim();
+    const evidence = (it.evidence==null ? '' : String(it.evidence)).trim();
+    if(!quality || !evidence) continue;          // no verbatim line → no column
+    out.push({ quality, evidence });
+    if(out.length >= 7) break;                   // hard ceiling
+  }
+  return out;
+}
+// Absent/empty → '' (renders NOTHING: no header, no block — every existing user has
+// none). Column count follows n: n<=3 → one row of n; else ceil(n/2) capped at 4 on
+// desktop, 2 on phone (ess-dc*/ess-pc* drive the responsive grid + divider CSS).
+function renderEssenceDrawer(){
+  const items = essenceList();
+  if(!items.length) return '';
+  const n = items.length;
+  const dc = n<=3 ? n : Math.min(4, Math.ceil(n/2));
+  const pc = n<=1 ? 1 : 2;
+  const cols = items.map(it => `
+          <div class="essence-col">
+            <div class="essence-quality">${escapeHtml(it.quality)}</div>
+            <div class="essence-evidence">"${escapeHtml(it.evidence)}"</div>
+          </div>`).join('');
+  return `
+      <div class="essence-sec">
+        <div class="essence-label">Your Essence</div>
+        <div class="essence-frame">what the Sensei saw in you — not what you are aiming at</div>
+        <div class="essence-colonnade ess-dc${dc} ess-pc${pc}">${cols}</div>
+      </div>`;
+}
 function toggleVisionDrawer(e){
   if(e) e.stopPropagation();
   const drawer=document.getElementById('ryughiDrawer');
@@ -7758,6 +7842,7 @@ function toggleVisionDrawer(e){
             </div>
             <div class="ms-goals" id="ms-goals-${i}" style="display:none;padding-top:4px"></div>
           </div>`).join('')}
+        ${renderEssenceDrawer()}
       </div>`;
     if(typeof renderRyughiConstellation==='function') renderRyughiConstellation();
     drawer.classList.add('open');
@@ -9963,7 +10048,7 @@ function mergeMergeableFields(local, cloud, untickMap){
 // order (order is meaningful in a plan), so an UNCHANGED plan can never raise a spurious conflict. CAS touches
 // ONLY PLAN_KEYS; the append-only merge (3a), completion union (incident) and un-tick tombstone (P6-1) are
 // untouched and still run on every write.
-const PLAN_KEYS = ['strands','tenYearVision','milestones5yr','annualGoals','shokunin','kaizen',
+const PLAN_KEYS = ['strands','tenYearVision','milestones5yr','annualGoals','shokunin','kaizen','essence',
                    'yearEndMode','yearEndMonth','calThemeShokunin','calThemeIkigai','calThemeKaizen',
                    'showPeaceBar','yearStartDate','name'];
 // clanMilestones/clanObligations are deliberately NOT CAS-guarded — clan-event code writes them, so including
@@ -10970,6 +11055,7 @@ let csTokenClient = null;    // Cached Google Identity Services token client
 let csCurrentCalendarId = null; // Set after sync; used by reset to delete
 let csIsSyncing = false;     // Guard against double-clicks during async work
 let csUserScrollDates = [];  // Editable Calendar Scroll annual dates: [{md, name}]
+let csLastSyncedMs = null;   // epoch-ms of the last sync; hydrated from Firestore. null = unknown (never render "just now")
 let csScrollInited = false;  // Flag — has the auto-populate from Hiyoku run yet?
 
 // OAuth Web Client ID for the bushido-4e8ca GCP project.
@@ -11086,6 +11172,52 @@ function openCalSync(){
   document.getElementById('csWizardBackdrop').classList.add('show');
 }
 
+// ── "last synced" meta — real time, honest fallbacks (sync-time-label fix) ──
+// The truth is written to users/{uid}/sync/calendar.lastSyncedAt on every sync and
+// hydrated into csLastSyncedMs (csLoadSyncState). Before this, #csConnectedMeta was
+// the literal "last synced · just now" for everyone, forever. Every function below is
+// built to NEVER throw and NEVER invent "just now" for an unknown time.
+
+// Coerce a stored lastSyncedAt (Firestore Timestamp | millis number | Date) to
+// epoch-millis. Anything unparseable — null, a string, a Timestamp whose .toMillis()
+// throws — returns null. NEVER throws: this feeds the sign-in hydration path.
+function csTsToMillis(v){
+  try {
+    if(v == null) return null;
+    if(typeof v === 'number') return isFinite(v) ? v : null;
+    if(v instanceof Date){ const m = v.getTime(); return isFinite(m) ? m : null; }
+    if(typeof v.toMillis === 'function'){ const m = v.toMillis(); return (typeof m === 'number' && isFinite(m)) ? m : null; }
+    if(typeof v.toDate === 'function'){ const d = v.toDate(); const m = d && d.getTime(); return (typeof m === 'number' && isFinite(m)) ? m : null; }
+    if(typeof v.seconds === 'number' && isFinite(v.seconds)) return v.seconds * 1000;
+    return null;
+  } catch(e){ return null; }
+}
+
+// Human copy for the "last synced" line. Unknown/unparseable → neutral text, NEVER
+// "just now". Just-synced (serverTimestamp not yet resolved) is stamped to now by the
+// sync path, so it lands in the < 1h "just now" bucket honestly.
+function csFormatSyncMeta(ms){
+  try {
+    if(ms == null || typeof ms !== 'number' || !isFinite(ms)) return 'sync time unavailable';
+    const delta = Date.now() - ms;
+    if(delta < 3600000)   return 'last synced · just now';          // < 1h
+    if(delta < 86400000){ const h = Math.max(1, Math.floor(delta / 3600000)); return 'last synced · ' + h + (h === 1 ? ' hour ago' : ' hours ago'); }
+    if(delta < 172800000) return 'last synced · yesterday';         // < 48h
+    return 'last synced · ' + Math.floor(delta / 86400000) + ' days ago';
+  } catch(e){ return 'sync time unavailable'; }
+}
+
+// Paint the current sync time into #csConnectedMeta. Any throw degrades to neutral
+// text — never the "just now" lie, never a bubble.
+function csRenderConnectedMeta(){
+  const el = document.getElementById('csConnectedMeta');
+  if(!el) return;
+  let text;
+  try { text = csFormatSyncMeta(csLastSyncedMs); }
+  catch(e){ text = 'sync time unavailable'; }
+  el.textContent = text;
+}
+
 // Connected-state panel — failsafe entry. Re-sync or Reset.
 function csShowConnectedPanel(){
   document.querySelectorAll('#csWizardBackdrop .cs-step').forEach(s=>s.classList.remove('active'));
@@ -11102,6 +11234,8 @@ function csShowConnectedPanel(){
   // And clear any prior reset error message.
   const errEl = document.getElementById('csResetError');
   if(errEl){ errEl.textContent = ''; errEl.style.display = 'none'; }
+  // Paint the real "last synced" time (replaces the old hardcoded "just now").
+  csRenderConnectedMeta();
 }
 function csHideConnectedPanel(){
   const panel = document.getElementById('csConnectedPanel');
@@ -12013,6 +12147,9 @@ async function csConfirmSync(){
 
     // 5. Mark connected and update dropdown so future opens land on connected panel.
     csHasEverSynced = true;
+    // We just synced — the local serverTimestamp() reads null until the server
+    // round-trip, so stamp the client's now; a reload rehydrates the real time.
+    csLastSyncedMs = Date.now();
     const status = document.getElementById('ddCalSyncStatus');
     if(status) status.textContent = '· connected';
 
@@ -12042,6 +12179,12 @@ async function csLoadSyncState(user){
       if(data && data.calendarId){
         csHasEverSynced = true;
         csCurrentCalendarId = data.calendarId;
+        // Remember the real last-sync time for the connected panel's meta line.
+        // Double-wrapped (csTsToMillis is itself throw-safe) so a malformed
+        // lastSyncedAt can NEVER break calendar hydration — this runs on the
+        // sign-in path for every user.
+        try { csLastSyncedMs = csTsToMillis(data.lastSyncedAt); }
+        catch(e){ csLastSyncedMs = null; }
         // Hydrate user's Calendar Scroll edits from previous sync.
         if(Array.isArray(data.scrollDates)){
           csUserScrollDates = data.scrollDates
