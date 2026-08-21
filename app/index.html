@@ -5661,7 +5661,7 @@ function renderGoals(){
           <div class="goal-meta">
             <span class="goal-tf">${g.timeframe||'monthly'}</span>
             ${parent?`<span class="goal-parent">${_uaKanjiForGoal(parent)?_uaKanjiForGoal(parent)+' ':''}\u2192 ${escapeHtml(parent.text.substring(0,30))}</span>`:''}
-            ${activeStreaks?`<span class="goal-streak">${activeStreaks} active habit${activeStreaks>1?'s':''}</span>`:''}
+            ${childKaizens.length?`<span class="goal-streak">${activeStreaks?`${activeStreaks} active habit${activeStreaks>1?'s':''}`:`${childKaizens.length} habit${childKaizens.length>1?'s':''} · none active`}</span>`:''}
           </div>
           ${cp!=null?`<div class="pbar"><div class="pfill" style="width:${cp}%"></div></div>
           <div class="plabel">${cp}% (last 30 days)</div>`:''}
