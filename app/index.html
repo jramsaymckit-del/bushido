@@ -285,6 +285,16 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .dw-seal.stamp{animation:dwStamp .5s cubic-bezier(.2,1.3,.4,1)}
 @keyframes dwStamp{0%{opacity:0;transform:scale(1.9) rotate(-12deg)}55%{opacity:1;transform:scale(.9) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
 .dw-seal-presence{color:var(--dw-ink-faint);font-size:15px;opacity:.75}
+/* Optional response note (D2.1 amendment). The composer reuses .dw-emptyrow so it inherits the
+   portrait reflow fix (input flex:1 1 100% + min-width:0 wraps, button drops below — no clip). The
+   notes list is the quiet voice beneath the seals; a long note wraps (min-width:0 + overflow-wrap)
+   rather than pushing the card wide on a portrait phone. */
+.dw-respond{margin-top:2px}
+.dw-notes{display:flex;flex-direction:column;gap:13px;margin:-4px 0 20px}
+.dw-note-row{display:flex;align-items:baseline;gap:9px;min-width:0;text-align:left}
+.dw-note-row .dw-seal{font-size:15px;flex-shrink:0}
+.dw-note-name{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dw-ink-faint);opacity:.7;flex-shrink:0;white-space:nowrap}
+.dw-note-text{flex:1;min-width:0;font-family:'Noto Serif JP',serif;font-style:italic;font-size:13px;color:var(--dw-ink-light);line-height:1.55;overflow-wrap:anywhere}
 
 /* Pillar tabs */
 .tabs{display:flex;margin-bottom:36px;border-bottom:1px solid rgba(0,0,0,.06)}
@@ -12886,13 +12896,19 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
 // Members ACKNOWLEDGE once — each ack stamps that member's highest PRACTICE_MILESTONE
 // seal (sub-7-day member → ○ presence mark). Poster auto-acknowledges on claim.
 //   dayWord/{clanId} = { text, authorUid, authorName, postedAt,
-//                        acks: { <uid>: { sealDays, name, ackedAt } } }
+//                        acks: { <uid>: { sealDays, name, ackedAt, note? } } }
+// A member may ACKNOWLEDGE with an OPTIONAL one-line note — reply and acknowledge are a
+// SINGLE act (D2.1 amendment, 2026-08-16). The acks map is uid-keyed, so one member can only
+// ever hold one entry: accumulation/threading is impossible by construction, which is why free
+// text is permitted here when D2.1 banned it elsewhere. It dies with the word at 24h; no
+// notification is ever raised. Seal-only ack stays fully valid — the note is NEVER required.
 // Expiry (postedAt + 24h) is computed client-side. Mirrors cnCal* (onSnapshot-driven,
 // null-id BLOCKER-7 guard, isClanMember scoping). Seal derivation reuses PRACTICE_MILESTONES
 // (the same ladder renderMilestoneSeal renders from) — each member publishes only their
 // derived sealDays so every member can render the seal without reading private state.
 const DW_DAY_MS = 86400000;   // 24h
 const DW_MAX    = 140;        // single line
+const DW_NOTE_MAX = 200;      // optional response note (D2.1 amendment) — a sentence or two, not a paragraph
 let _dayWord   = null;        // latest snapshot data (raw; may be expired)
 let _dwUnsub   = null;        // onSnapshot handle
 let _dwEditing = false;       // author is editing (local UI state)
@@ -13006,6 +13022,22 @@ function dwSealsHtml2(acks, acted){
   if(!acted) html += '<span class="dw-add" title="add yours" onclick="dwAck()">＋</span>';
   return html || '<span class="dw-seals-empty">be the first to answer</span>';
 }
+// The optional response notes — the voices beneath the seals. One line per member who left a
+// word (the acks map is uid-keyed ⇒ one each, no threading); dies with the word; renders nothing
+// when nobody has spoken, so a seal-only day looks exactly as it does today.
+function dwNotesHtml(acks){
+  var keys = Object.keys(acks || {}).filter(function(uid){ return acks[uid] && acks[uid].note; });
+  if(!keys.length) return '';
+  keys.sort(function(a,b){ return (acks[a].ackedAt||0) - (acks[b].ackedAt||0); });
+  return '<div class="dw-notes">' + keys.map(function(uid){
+    var a = acks[uid];
+    return '<div class="dw-note-row">' +
+        dwSealMarkup(a.sealDays, a.name, false) +
+        '<span class="dw-note-name">' + escapeHtml((a.name||'').toLowerCase()) + '</span>' +
+        '<span class="dw-note-text">' + escapeHtml(a.note) + '</span>' +
+      '</div>';
+  }).join('') + '</div>';
+}
 // Item 3: the My Clan nav unread dot — shown when an active word exists AND I haven't answered.
 // Derived purely from acks (no stored state); created lazily on the clan nav button.
 function dwUpdateNavDot(){
@@ -13072,7 +13104,12 @@ function renderDayWord(){
 
   var action = (isAuthor && !_dwEditing)
     ? '<div class="dw-action"><button class="dw-btn dw-btn-edit" onclick="dwEdit()">edit</button></div>'
-    : ((!isAuthor && !acted) ? '<div class="dw-action"><button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button></div>' : '');
+    : ((!isAuthor && !acted)
+        ? '<div class="dw-respond dw-emptyrow">' +                       // reuses .dw-emptyrow ⇒ inherits the portrait reflow fix
+            '<input id="dw-note" class="dw-input" maxlength="' + DW_NOTE_MAX + '" placeholder="add a word — optional"/>' +
+            '<button class="dw-btn dw-btn-ack" onclick="dwAck()">acknowledge</button>' +
+          '</div>'
+        : '');
 
   // Re-collapse (2026-07-26): once I've answered (member ack / author auto-ack), the expanded card gets a
   // subtle chevron-up top-right that tucks it back to the pill — so expand ↔ collapse is freely reversible
@@ -13094,6 +13131,7 @@ function renderDayWord(){
       '<div class="dw-divider2"></div>' +
       '<div class="dw-answered-lbl">those who answered</div>' +
       '<div class="dw-seals2">' + dwSealsHtml2(acks, acted) + '</div>' +
+      dwNotesHtml(acks) +
       action +
     '</div>';
   dwUpdateNavDot();
@@ -13160,6 +13198,8 @@ window.dwAck = function(){
   if(w.acks && w.acks[uid]) return;             // once per member
   var cid = dwClanId(); if(!cid) return;
   var ackObj = { sealDays: dwMySealDays(), name: dwMyName(), ackedAt: Date.now() };
+  var noteEl = document.getElementById('dw-note');                    // OPTIONAL note — reply + acknowledge are one act
+  if(noteEl){ var note = (noteEl.value||'').trim().replace(/\s+/g,' ').slice(0, DW_NOTE_MAX); if(note) ackObj.note = note; }   // seal-only ack stays valid: empty ⇒ no note key
   w.acks = w.acks || {}; w.acks[uid] = ackObj; _dwLastAck = uid; _dwExpanded = false; renderDayWord(); dwUpdateNavDot();   // Item 4: collapse to pill · Item 3: clear the dot
   var upd = {}; upd['acks.' + uid] = ackObj;
   db.collection('dayWord').doc(cid).update(upd).catch(function(err){
