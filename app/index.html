@@ -3867,7 +3867,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Day\'s Word — comment + stamp (D2.1 revision) · 2026-08-21 · the response act is reframed from "acknowledge" to a COMMENT + a STAMP (button "stamp"; the note field invites — "leave a word", no longer "optional"); the AUTHOR, auto-stamped on posting, may add their ONE comment to that stamp IN ADDITION to editing, so the person who speaks the word can answer its answers (Susan\'s "what are your intentions?" case), writing only their own acks key (satisfies live rule D branch (b) — affectedKeys hasOnly self, no rule change); acting still auto-collapses to the pill (no chevron), one response per member incl. the author, no threading, note dies with the word at 24h, ≤200 (client + rule D). Gated verify_dayword_comment_stamp 17/17 (verify_dayword_response still 10/10). Not yet deployed. · on: Your Essence — descriptive drawer block (C) · 2026-08-21 · state.essence = [{quality,evidence}] renders a colonnade beneath the vision-drawer milestones: the Sensei\'s read of who the user already IS, evidence VERBATIM (HTML-escaped, never paraphrased); an entry missing quality or evidence is dropped, hard ceiling 7; absent/empty renders NOTHING (every existing user has none today); essence joins PLAN_KEYS so an edit rides the plan CAS net the day it ships (Finding #1) yet a pre-essence doc still signs as default (R15); responsive ess-dc/ess-pc grid with theme-safe color-mix ink posts. Gated verify_essence_drawer 35/35. Not yet deployed — rides the post-migration deploy. · on: Day\'s Word response note (D2.1) · 2026-08-21 · a clan member may acknowledge the word with an OPTIONAL one-line note (<=200 chars — client maxlength + the Firestore rule cap D, verified DENY in production); reply and acknowledge are a SINGLE act; the uid-keyed acks map makes threading impossible by construction; the note dies with the word at 24h and raises no notification; a seal-only ack stays fully valid. Gated verify_dayword_response. Feature shipped to /app/ 2026-08-21; this stamp rides the next deploy. · on: strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'Monthly Nth-weekday cadence — the 2nd Friday of each month · 2026-08-22 · new habit cadence freq:monthlyNth + weekOfMonth (1..4, or -1 = last): a Kaizen habit fires ONLY on the Nth occurrence of its weekday within each CALENDAR month — calendar-absolute, so it never drifts (unlike monthly = every 4 weeks). New picker mode "Once a month" + a 1st/2nd/3rd/4th/Last ordinal selector; readback "The 2nd Friday of each month", live Next: preview; round-trip safe (_uaModeOf reads it back, no clobber; switching away clears weekOfMonth). No new top-level state key — weekOfMonth rides the kaizen item projection (plan CAS covered, deep-copy preserved); every calendar/today surface is state.kaizen.filter(habitOnDay), so it rolls up everywhere for free. Gate verify_monthly_nth 18/18 (RED 7/18 pre-feature). Not yet deployed. · on: Day\'s Word — comment + stamp (D2.1 revision) · 2026-08-21 · the response act is reframed from "acknowledge" to a COMMENT + a STAMP (button "stamp"; the note field invites — "leave a word", no longer "optional"); the AUTHOR, auto-stamped on posting, may add their ONE comment to that stamp IN ADDITION to editing, so the person who speaks the word can answer its answers (Susan\'s "what are your intentions?" case), writing only their own acks key (satisfies live rule D branch (b) — affectedKeys hasOnly self, no rule change); acting still auto-collapses to the pill (no chevron), one response per member incl. the author, no threading, note dies with the word at 24h, ≤200 (client + rule D). Gated verify_dayword_comment_stamp 17/17 (verify_dayword_response still 10/10). Not yet deployed. · on: Your Essence — descriptive drawer block (C) · 2026-08-21 · state.essence = [{quality,evidence}] renders a colonnade beneath the vision-drawer milestones: the Sensei\'s read of who the user already IS, evidence VERBATIM (HTML-escaped, never paraphrased); an entry missing quality or evidence is dropped, hard ceiling 7; absent/empty renders NOTHING (every existing user has none today); essence joins PLAN_KEYS so an edit rides the plan CAS net the day it ships (Finding #1) yet a pre-essence doc still signs as default (R15); responsive ess-dc/ess-pc grid with theme-safe color-mix ink posts. Gated verify_essence_drawer 35/35. Not yet deployed — rides the post-migration deploy. · on: Day\'s Word response note (D2.1) · 2026-08-21 · a clan member may acknowledge the word with an OPTIONAL one-line note (<=200 chars — client maxlength + the Firestore rule cap D, verified DENY in production); reply and acknowledge are a SINGLE act; the uid-keyed acks map makes threading impossible by construction; the note dies with the word at 24h and raises no notification; a seal-only ack stays fully valid. Gated verify_dayword_response. Feature shipped to /app/ 2026-08-21; this stamp rides the next deploy. · on: strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5410,6 +5410,16 @@ function habitOnDay(k, d, dateObj){
   }
   if(k.days === 'daily' || !k.days) return true;
   if(!(Array.isArray(k.days) && k.days.includes(d))) return false;
+  // Monthly Nth-weekday (freq:'monthlyNth' + weekOfMonth): fires ONLY on the Nth occurrence of this
+  // weekday within its CALENDAR month — 1..4 = that ordinal, -1 = the last one. Calendar-absolute, so
+  // it never drifts (unlike 'monthly' = every 4 weeks). days.includes above already pinned the weekday;
+  // here we only test the ordinal. No dateObj → behave permissively (never over-hide), as the interval branch does.
+  if(k.freq === 'monthlyNth'){
+    if(!dateObj) return true;
+    const dom = dateObj.getDate();
+    if(k.weekOfMonth === -1){ const dim = new Date(dateObj.getFullYear(), dateObj.getMonth()+1, 0).getDate(); return dom + 7 > dim; }
+    return (Math.floor((dom - 1) / 7) + 1) === (k.weekOfMonth || 1);
+  }
   // Frequency gate — weekly (default/absent) fires on every matching week; fortnightly/monthly
   // fire only on their ON-weeks, measured in Monday-anchored weeks from freqAnchor (every-4-weeks
   // for monthly). dateObj is the date being asked about; without it we behave weekly (never over-hide).
@@ -5747,6 +5757,8 @@ document.addEventListener('click', function(e){
 const _UA_DAYFULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const _UA_DAYINIT = ['M','T','W','T','F','S','S'];
 const _UA_KANJI   = ['志','史','鍛','匠','愛'];   // 志 史 鍛 匠 愛
+// Ordinal word for the monthly Nth-weekday cadence: 1..4 → "1st".."4th", -1 → "last".
+function _uaOrdinal(n){ return n===-1 ? 'last' : ({1:'1st',2:'2nd',3:'3rd',4:'4th'}[n] || '1st'); }
 
 // Human cadence label off the canonical fields — reads day NAMES, never "2x/wk" (James, Jul 31).
 // daily / absent / all-7 → 'Daily'.
@@ -5757,6 +5769,7 @@ function cadenceLabel(k){
   const abbr = ds.map(d=>DAYS[d]);
   if(k.freq==='fortnightly') return 'Every other ' + (ds.length===1?_UA_DAYFULL[ds[0]]:abbr.join(' & '));
   if(k.freq==='monthly')     return 'Every 4 weeks · ' + (ds.length===1?_UA_DAYFULL[ds[0]]:abbr.join(' & '));
+  if(k.freq==='monthlyNth')  return _uaOrdinal(k.weekOfMonth) + ' ' + _UA_DAYFULL[ds[0]] + ' of the month';
   if(ds.length===1) return _UA_DAYFULL[ds[0]] + 's';   // "Tuesdays"
   return abbr.join(', ');                                // "Mon, Thu"
 }
@@ -5822,16 +5835,18 @@ function _uaModeOf(k){
   if(k.days==='daily' || !k.days || (Array.isArray(k.days)&&k.days.length===7)) return 'daily';
   if(k.freq==='fortnightly') return 'fortnightly';
   if(k.freq==='monthly') return 'monthly';
+  if(k.freq==='monthlyNth') return 'monthlyNth';
   if(Array.isArray(k.days) && k.days.length===1) return 'weekly';
   return 'few';
 }
 function _uaNewDraft(k){
   return { days:(k.days==='daily'||!k.days||!Array.isArray(k.days))?[0,1,2,3,4,5,6]:k.days.slice(),
-           freq:k.freq, freqAnchor:k.freqAnchor, mode:_uaModeOf(k) };
+           freq:k.freq, freqAnchor:k.freqAnchor, weekOfMonth:k.weekOfMonth, mode:_uaModeOf(k) };
 }
 function _uaDraftToSched(){
   const d=_uaDraft;
   if(d.mode==='daily') return {days:'daily'};
+  if(d.mode==='monthlyNth') return {days:d.days, freq:'monthlyNth', weekOfMonth:(d.weekOfMonth||1)};   // calendar-absolute — no freqAnchor
   return {days:d.days, freq:(d.mode==='fortnightly'?'fortnightly':d.mode==='monthly'?'monthly':undefined), freqAnchor:d.freqAnchor||getDateStr()};
 }
 function _uaNextOccurrence(sched){
@@ -5852,6 +5867,7 @@ function _uaReadback(){
   const list=names.length===1?names[0]:names.slice(0,-1).join(', ')+' and '+names.slice(-1);
   if(d.mode==='fortnightly') return 'Every other '+list+'.';
   if(d.mode==='monthly') return 'Every 4 weeks, on '+list+'.';
+  if(d.mode==='monthlyNth') return 'The '+_uaOrdinal(d.weekOfMonth)+' '+list+' of each month.';
   // 'few' → count-led, so someone who thinks in counts still sees their number (the count picker CONTROL is gone;
   // the day strip is the only mechanism). Short day names, e.g. "3 days a week — Mon, Wed, Fri".
   if(d.mode==='few'){ const shorts=ds.map(x=>_UA_DAYFULL[x].slice(0,3)); return ds.length+' day'+(ds.length>1?'s':'')+' a week — '+shorts.join(', '); }
@@ -5864,13 +5880,14 @@ function _uaSetMode(m){
     // No mode invents a day the user didn't choose. Keep a REAL prior selection (1–6 specific days);
     // otherwise start EMPTY so the user must pick — commit is blocked until they do (addGoal / saveHabitDetail).
     const real = Array.isArray(d.days) && d.days.length>=1 && d.days.length<=6;
-    if(m==='weekly'||m==='fortnightly'||m==='monthly'){ d.days = real ? [d.days[0]] : []; d.freqAnchor=d.freqAnchor||getDateStr(); }
+    if(m==='weekly'||m==='fortnightly'||m==='monthly'||m==='monthlyNth'){ d.days = real ? [d.days[0]] : []; d.freqAnchor=d.freqAnchor||getDateStr(); if(m==='monthlyNth'&&!d.weekOfMonth) d.weekOfMonth=1; }
     else { d.days = real ? d.days.slice() : []; }   // few
   }
   _uaRenderFreqSection();
 }
+function _uaSetOrd(v){ if(!_uaDraft) return; _uaDraft.weekOfMonth=v; _uaDayError=false; _uaRenderFreqSection(); }
 function _uaToggleDay(dd){
-  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
+  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly'||d.mode==='monthlyNth');
   _uaDayError=false;
   if(single) d.days=[dd];
   else{ const i=d.days.indexOf(dd); if(i>=0){ if(d.days.length>1) d.days.splice(i,1); } else d.days.push(dd); }
@@ -5902,14 +5919,16 @@ function _uaFreqSectionHtml(){
   return btn + (_uaFreqOpen ? _uaPickerHtml() : '');
 }
 function _uaPickerHtml(){
-  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly');
+  const d=_uaDraft, single=(d.mode==='weekly'||d.mode==='fortnightly'||d.mode==='monthly'||d.mode==='monthlyNth');
   const modeBtn=(m,l)=>`<div class="ua-mode${d.mode===m?' on':''}" onclick="event.stopPropagation();_uaSetMode('${m}')">${l}</div>`;
   const strip=_UA_DAYINIT.map((ini,i)=>`<div class="ua-day${d.days.includes(i)?' on':''}" title="${_UA_DAYFULL[i]}" onclick="event.stopPropagation();_uaToggleDay(${i})">${ini}</div>`).join('');
+  const ordSel=d.mode==='monthlyNth' ? `<div class="ua-q">Which one?</div><div class="ua-modes ua-ords">${[[1,'1st'],[2,'2nd'],[3,'3rd'],[4,'4th'],[-1,'Last']].map(([v,l])=>`<div class="ua-mode${(d.weekOfMonth||1)===v?' on':''}" onclick="event.stopPropagation();_uaSetOrd(${v})">${l}</div>`).join('')}</div>` : '';
   let nextNote='';
-  if(d.mode==='fortnightly'||d.mode==='monthly'){ const nd=_uaNextOccurrence(_uaDraftToSched()); if(nd) nextNote=`<div class="ua-next">Next: <b>${_uaFmtNext(nd)}</b></div>`; }
+  if(d.mode==='fortnightly'||d.mode==='monthly'||d.mode==='monthlyNth'){ const nd=_uaNextOccurrence(_uaDraftToSched()); if(nd) nextNote=`<div class="ua-next">Next: <b>${_uaFmtNext(nd)}</b></div>`; }
   return `<div class="ua-picker" onclick="event.stopPropagation()">
     <div class="ua-q">How often?</div>
-    <div class="ua-modes">${modeBtn('daily','Every day')}${modeBtn('few','A few days a week')}${modeBtn('weekly','Weekly')}${modeBtn('fortnightly','Fortnightly')}${modeBtn('monthly','Every 4 weeks')}</div>
+    <div class="ua-modes">${modeBtn('daily','Every day')}${modeBtn('few','A few days a week')}${modeBtn('weekly','Weekly')}${modeBtn('fortnightly','Fortnightly')}${modeBtn('monthly','Every 4 weeks')}${modeBtn('monthlyNth','Once a month')}</div>
+    ${ordSel}
     ${d.mode!=='daily'?`<div class="ua-q">${single?'Which day?':'Which days?'}</div><div class="ua-daystrip">${strip}</div>`:''}
     ${_uaDayError&&d.mode!=='daily'?`<div class="ua-day-err" style="color:var(--red);font-size:11px;letter-spacing:.3px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">Choose at least one day to save this cadence.</div>`:''}
     <div class="ua-readback">${escapeHtml(_uaReadback())}</div>${nextNote}
@@ -6136,8 +6155,10 @@ function saveHabitDetail(id){
       if(!(Array.isArray(days) && days.length)){
         _uaShowDayError(); return;
       }
-      const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':undefined;
-      sched = {days:days, freq:freq, freqAnchor: freq?(_uaDraft.freqAnchor||getDateStr()):undefined};
+      const freq = (_uaDraft.mode==='fortnightly')?'fortnightly':(_uaDraft.mode==='monthly')?'monthly':(_uaDraft.mode==='monthlyNth')?'monthlyNth':undefined;
+      sched = {days:days, freq:freq,
+               freqAnchor: (freq && freq!=='monthlyNth')?(_uaDraft.freqAnchor||getDateStr()):undefined,   // monthlyNth is calendar-absolute
+               weekOfMonth: freq==='monthlyNth'?(_uaDraft.weekOfMonth||1):undefined};
     }
   }
   const textEl = document.getElementById('hd-text-'+id);
@@ -6150,6 +6171,7 @@ function saveHabitDetail(id){
     g.days = sched.days;
     if(sched.freq===undefined) delete g.freq; else g.freq = sched.freq;
     if(sched.freqAnchor===undefined) delete g.freqAnchor; else g.freqAnchor = sched.freqAnchor;
+    if(sched.weekOfMonth===undefined) delete g.weekOfMonth; else g.weekOfMonth = sched.weekOfMonth;   // clear stale ordinal when switching away from monthlyNth
     recomputeStreak(id);   // a cadence change alters the streak maths
   }
   saveState();
@@ -6412,7 +6434,7 @@ function addGoal(){
     else {
       const days=(sched.days||[]).slice().sort((a,b)=>a-b);
       if(!(Array.isArray(days)&&days.length)){ _uaShowDayError(); return; }   // no day picked — block visibly, never invent a schedule
-      habit.days=days; if(sched.freq){ habit.freq=sched.freq; habit.freqAnchor=sched.freqAnchor||getDateStr(); }
+      habit.days=days; if(sched.freq){ habit.freq=sched.freq; if(sched.freq==='monthlyNth'){ habit.weekOfMonth=(sched.weekOfMonth||1); } else { habit.freqAnchor=sched.freqAnchor||getDateStr(); } }
     }
     state.kaizen.push(habit);
   } else {
