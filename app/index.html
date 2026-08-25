@@ -13400,8 +13400,55 @@ window.dwAck = function(){
 // The active clan id for calendar reads/writes — sourced from _activeClanId (C3a · design §2.5), never a
 // baked slug. null = clanless → cnCalFirestoreOn() is false and the SDK .doc() is never reached (§8 BLOCKER-7).
 function cnCalClanId(){ return (typeof _activeClanId !== 'undefined') ? _activeClanId : null; }
-let cnCalEvents = {};
+// ── clanCalendar doc shape (reshaped 2026-08-25 · clancal-merge-net) ──────────
+// Mutable state moved OUT of the events array into flat, doc-root maps so (a) the
+// merge is three independent flat merges instead of a nested walk, and (b) the
+// per-uid write rule becomes expressible in rules (dayWord `acks` pattern):
+//   events:          [ {id,type,title,dates,createdBy,createdAt} ]  ← immutable after create
+//   rsvps:           { <uid>: { <eventId>: 'accepted'|'declined'|'pending' } }  ← uid-FIRST
+//   removalRequests: { <eventId>: {by,at} }
+//   removedIds:      { <eventId>: true }   ← monotonic tombstones (id-union − removals)
+// cnCalEvents holds VISIBLE events (tombstoned excluded). The other three mirror the doc.
+let cnCalEvents = {};                 // cid -> visible events array
+let cnCalRsvps  = {};                 // cid -> { uid: { eventId: status } }
+let cnCalRemReq = {};                 // cid -> { eventId: {by,at} }
+let cnCalRemoved= {};                 // cid -> { eventId: true }
+let cnCalPendingRem = null;           // one-commit delta for a removalRequests change: {eid, val|null}
 let cnCalUnsub  = null;               // Firestore listener unsubscribe handle
+
+// Fold an on-the-wire doc (OLD shape — rsvps/removalRequest ON events — OR new) into
+// the new shape. Root fields win over legacy per-event fields (root is the newer writer).
+function cnCalNormalizeDoc(data){
+  data = data || {};
+  const events = Array.isArray(data.events) ? data.events.map(e => Object.assign({}, e)) : [];
+  const rsvps  = (data.rsvps && typeof data.rsvps === 'object') ? JSON.parse(JSON.stringify(data.rsvps)) : {};
+  const remReq = (data.removalRequests && typeof data.removalRequests === 'object') ? JSON.parse(JSON.stringify(data.removalRequests)) : {};
+  const removed= (data.removedIds && typeof data.removedIds === 'object') ? Object.assign({}, data.removedIds) : {};
+  events.forEach(function(e){
+    if(e && e.rsvps){                                   // legacy fold — root wins
+      Object.keys(e.rsvps).forEach(function(uid){
+        rsvps[uid] = rsvps[uid] || {};
+        if(rsvps[uid][e.id] === undefined) rsvps[uid][e.id] = e.rsvps[uid];
+      });
+      delete e.rsvps;
+    }
+    if(e && e.removalRequest){
+      if(remReq[e.id] === undefined) remReq[e.id] = e.removalRequest;
+      delete e.removalRequest;
+    }
+  });
+  return { events: events, rsvps: rsvps, removalRequests: remReq, removedIds: removed };
+}
+// Per-uid RSVP accessors on the root map (the reshape's read side).
+function cnCalRsvpMapFor(cid){ if(!cnCalRsvps[cid]) cnCalRsvps[cid] = {}; return cnCalRsvps[cid]; }
+function cnCalMyRsvp(evId){ const cid = cnCalClanId(); const m = cid && cnCalRsvps[cid]; const me = cnCalMe();
+  return (m && m[me] && m[me][evId]) || 'pending'; }
+function cnCalSetMyRsvp(evId, decision){ const cid = cnCalClanId(); if(!cid) return;
+  const m = cnCalRsvpMapFor(cid); const me = cnCalMe(); if(!m[me]) m[me] = {}; m[me][evId] = decision; }
+// The per-event status map { uid: status }, reconstructed from the uid-first root map (for the "N of M in" count).
+function cnCalEventRsvps(evId){ const cid = cnCalClanId(); const m = (cid && cnCalRsvps[cid]) || {}; const out = {};
+  Object.keys(m).forEach(function(uid){ if(m[uid] && m[uid][evId] !== undefined) out[uid] = m[uid][evId]; }); return out; }
+function cnCalRemReqFor(evId){ const cid = cnCalClanId(); const m = (cid && cnCalRemReq[cid]) || {}; return m[evId] || null; }
 
 // ── Add-modal state ──────────────────────────────────────────────────────────
 let cnCalKind = 'recurring';   // 'recurring' | 'oneoff'
@@ -13423,29 +13470,64 @@ function cnCalSubscribe(){
   cnCalUnsub = db.collection('clanCalendar').doc(cid).onSnapshot(
     function(snap){
       const data = (snap && snap.exists) ? (snap.data() || {}) : {};
-      cnCalEvents[cid] = Array.isArray(data.events) ? data.events : [];
+      const norm = cnCalNormalizeDoc(data);                     // tolerant: old OR new shape
+      cnCalRemoved[cid] = norm.removedIds;
+      cnCalEvents[cid]  = norm.events.filter(function(e){ return e && e.id && !norm.removedIds[e.id]; }); // VISIBLE
+      cnCalRsvps[cid]   = norm.rsvps;
+      cnCalRemReq[cid]  = norm.removalRequests;
       cnCalRender();
     },
     function(err){ console.warn('Clan calendar listener failed:', err); }
   );
 }
-// Push the whole events array back to Firestore.
+// Persist via a TRANSACTION that reads fresh cloud and MERGES — never a blind whole-doc
+// set() (that was the clobber: two writers, the loser vanishes). Three independent flat
+// merges: events id-union − removedIds · rsvps per-uid (cloud authoritative except MY key)
+// · removalRequests via a one-commit delta. runTransaction's retries are SDK-bounded; on
+// exhaustion we surface and DROP — we NEVER fall back to set() (that reintroduces the clobber).
 function cnCalSaveToFirestore(){
   if(!cnCalFirestoreOn()) return;
   var cid = cnCalClanId();
   if(!cid) return;   // §8 BLOCKER-7 — guard the .doc() id
-  try{
-    db.collection('clanCalendar').doc(cid).set({
-      events: cnCalCurrentEvents(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(e){
-      console.warn('Clan calendar save failed:', e);
-      showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
-    });
-  }catch(e){
+  var me          = cnCalMe();
+  // Normalize the LOCAL view too (defensive): folds any stray per-event rsvps into the
+  // root map and strips them, so events written are always immutable/clean.
+  var localDoc    = cnCalNormalizeDoc({ events: (cnCalEvents[cid] || []).slice(),
+                      rsvps: cnCalRsvps[cid] || {}, removedIds: cnCalRemoved[cid] || {} });
+  var localEvents = localDoc.events;                           // visible (incl. my optimistic add), rsvps stripped
+  var localRsvps  = localDoc.rsvps;
+  var localRemoved= localDoc.removedIds;
+  var pendingRem  = cnCalPendingRem;  cnCalPendingRem = null;  // consume this commit's removal delta
+  var ref = db.collection('clanCalendar').doc(cid);
+  function fail(e){
     console.warn('Clan calendar save failed:', e);
     showCloudSyncError('Clan calendar didn\'t sync — your local change is saved.');
+    // NO set() fallback by design — a blind set would clobber a concurrent writer.
   }
+  try{
+    db.runTransaction(function(tx){
+      return tx.get(ref).then(function(snap){
+        var cloud = cnCalNormalizeDoc((snap && snap.exists) ? (snap.data() || {}) : {});
+        // removedIds — monotonic union (a stale client can never un-tombstone)
+        var removed = Object.assign({}, cloud.removedIds, localRemoved);
+        // events — id-union(cloud, my visible), cloud wins for shared ids (immutable), minus tombstones
+        var byId = {};
+        cloud.events.forEach(function(e){ if(e && e.id) byId[e.id] = e; });
+        localEvents.forEach(function(e){ if(e && e.id && !byId[e.id]) byId[e.id] = e; });
+        var events = Object.keys(byId).filter(function(id){ return !removed[id]; }).map(function(id){ return byId[id]; });
+        // rsvps — cloud authoritative for every uid EXCEPT mine (I'm the only writer of my key)
+        var rsvps = Object.assign({}, cloud.rsvps);
+        rsvps[me] = (localRsvps[me] || cloud.rsvps[me] || {});
+        // removalRequests — cloud base + only THIS commit's delta (avoids a stale re-add of a cleared request)
+        var remReq = Object.assign({}, cloud.removalRequests);
+        if(pendingRem){ if(pendingRem.val) remReq[pendingRem.eid] = pendingRem.val; else delete remReq[pendingRem.eid]; }
+        tx.set(ref, {
+          events: events, rsvps: rsvps, removalRequests: remReq, removedIds: removed,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    }).then(function(){}, fail);
+  }catch(e){ fail(e); }
 }
 // Mutations call this: render optimistically, then persist.
 function cnCalCommit(){
@@ -13572,15 +13654,16 @@ function cnCalRenderLine(ev, me){
   if(ev.type === 'recurring'){
     h += '<div class="cn-cal-meta">every year &middot; added by ' + cnCalEsc(cnCalName(ev.createdBy)) + '</div>';
   } else {
-    const r = ev.rsvps || {};
-    const total = Object.keys(r).length;
+    const r = cnCalEventRsvps(ev.id);                     // reconstruct { uid: status } from the root map
+    const members = cnCalClanMembers();
+    const total = members.length || Object.keys(r).length;
     const inCount = Object.keys(r).filter(k => r[k] === 'accepted').length;
     let meta = 'proposed by ' + cnCalEsc(cnCalName(ev.createdBy)) + ' &middot; ' + inCount + ' of ' + total + ' in';
     if(ev.note) meta += ' &middot; ' + cnCalEsc(ev.note);
     h += '<div class="cn-cal-meta">' + meta + '</div>';
   }
 
-  if(ev.removalRequest){
+  if(cnCalRemReqFor(ev.id)){
     h += cnCalRenderRemoval(ev, me);
   } else {
     h += '<button type="button" class="cn-cal-link req" onclick="cnCalRequestRemoval(\'' + ev.id + '\')">request removal</button>';
@@ -13597,7 +13680,7 @@ function cnCalRenderLine(ev, me){
 }
 
 function cnCalRenderRsvp(ev, me){
-  const status = (ev.rsvps && ev.rsvps[me]) || 'pending';
+  const status = cnCalMyRsvp(ev.id);
   let h = '<div class="cn-cal-rsvp">';
   if(status === 'accepted'){
     h += '<span class="cn-cal-state in">&#10003; you&rsquo;re in</span>';
@@ -13639,7 +13722,8 @@ function cnCalIkigaiPromptHtml(ev){
 }
 
 function cnCalRenderRemoval(ev, me){
-  const rr = ev.removalRequest;
+  const rr = cnCalRemReqFor(ev.id);
+  if(!rr) return '';
   const canResolve = (me === ev.createdBy);
   const selfRequest = (rr.by === ev.createdBy);
   let h = '<div class="cn-cal-removal">';
@@ -13661,8 +13745,7 @@ function cnCalRsvp(id, decision){
   const ev = cnCalFind(id);
   if(!ev || ev.type !== 'oneoff') return;
   if(decision !== 'accepted' && decision !== 'declined') return;
-  if(!ev.rsvps) ev.rsvps = {};
-  ev.rsvps[cnCalMe()] = decision;
+  cnCalSetMyRsvp(id, decision);                    // root map: rsvps[me][id] — my own key only
   cnCalCommit();
   // on accept, open the Ikigai prompt immediately (unless already added)
   if(decision === 'accepted' && typeof cnCalIkigaiHasEntry === 'function' && !cnCalIkigaiHasEntry(id)){
@@ -13673,36 +13756,48 @@ function cnCalRsvp(id, decision){
 function cnCalChange(id){
   const ev = cnCalFind(id);
   if(!ev || ev.type !== 'oneoff') return;
-  if(!ev.rsvps) ev.rsvps = {};
-  ev.rsvps[cnCalMe()] = 'pending';
+  cnCalSetMyRsvp(id, 'pending');
   cnCalCommit();
 }
 
 // ── Request-removal flow ──────────────────────────────────────────────────────
+// removalRequests lives in a doc-root map now; each of these records a one-commit
+// delta (cnCalPendingRem) that the transactional save applies onto FRESH cloud, so a
+// stale client can't re-add a request the creator already cleared.
 function cnCalRequestRemoval(id){
   const ev = cnCalFind(id);
-  if(!ev || ev.removalRequest) return;          // guard: one pending request at a time
-  ev.removalRequest = { by: cnCalMe(), at: new Date().toISOString() };
+  if(!ev || cnCalRemReqFor(id)) return;          // guard: one pending request at a time
+  const cid = cnCalClanId(); if(!cid) return;
+  const val = { by: cnCalMe(), at: new Date().toISOString() };
+  if(!cnCalRemReq[cid]) cnCalRemReq[cid] = {};
+  cnCalRemReq[cid][id] = val;
+  cnCalPendingRem = { eid: id, val: val };
   cnCalCommit();
 }
 function cnCalResolveRemoval(id, action){
   const ev = cnCalFind(id);
-  if(!ev || !ev.removalRequest) return;
+  const rr = cnCalRemReqFor(id);
+  if(!ev || !rr) return;
   if(cnCalMe() !== ev.createdBy) return;         // guard: only the event's creator resolves
+  const cid = cnCalClanId(); if(!cid) return;
   if(action === 'remove'){
-    const list = cnCalCurrentEvents();
+    if(!cnCalRemoved[cid]) cnCalRemoved[cid] = {};
+    cnCalRemoved[cid][id] = true;                 // tombstone — monotonic, survives the merge
+    const list = cnCalCurrentEvents();            // drop from the visible list optimistically
     const idx = list.findIndex(e => e.id === id);
     if(idx !== -1) list.splice(idx, 1);
-  } else {
-    delete ev.removalRequest;
   }
+  if(cnCalRemReq[cid]) delete cnCalRemReq[cid][id];  // the request is resolved either way
+  cnCalPendingRem = { eid: id, val: null };
   cnCalCommit();
 }
 function cnCalWithdrawRemoval(id){
-  const ev = cnCalFind(id);
-  if(!ev || !ev.removalRequest) return;
-  if(ev.removalRequest.by !== cnCalMe()) return;   // guard: requester only
-  delete ev.removalRequest;
+  const rr = cnCalRemReqFor(id);
+  if(!rr) return;
+  if(rr.by !== cnCalMe()) return;                  // guard: requester only
+  const cid = cnCalClanId(); if(!cid) return;
+  if(cnCalRemReq[cid]) delete cnCalRemReq[cid][id];
+  cnCalPendingRem = { eid: id, val: null };
   cnCalCommit();
 }
 
@@ -13779,13 +13874,14 @@ function cnCalSubmitAdd(){
       if(!/^\d{4}-\d{2}-\d{2}$/.test(end)){ fail('That end date looks wrong.'); return; }
       if(end < start){ fail('The end date falls before the start date.'); return; }
     }
-    const rsvps = {};
-    cnCalClanMembers().forEach(function(uid){ rsvps[uid] = (uid === me) ? 'accepted' : 'pending'; });
-    rsvps[me] = 'accepted';                       // the proposer is always in
+    // Event is immutable after create — NO rsvps on it. The proposer's RSVP seeds the
+    // root map (their OWN key only; others default to 'pending' by absence — never seed
+    // another member's key, which the per-uid write rule forbids).
     ev = { id:id, type:'oneoff', title:title, startDate:start,
-           createdBy:me, createdAt:new Date().toISOString(), rsvps:rsvps };
+           createdBy:me, createdAt:new Date().toISOString() };
     if(end) ev.endDate = end;
     if(note) ev.note = note;
+    cnCalSetMyRsvp(id, 'accepted');               // the proposer is always in
   }
   cnCalCurrentEvents().push(ev);
   cnCalCloseAdd();
