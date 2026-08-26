@@ -4193,16 +4193,18 @@ const PROVERBS = [
   {jp:null,rom:null,en:'It is not about the answer, but the process of searching for the answer.',attr:'— Carl Johnson, PhD'},
   {jp:null,rom:null,en:'Furthermore, with your spirit attuned to the Way you will triumph over the enemy with your mind. Having come so far, how can you be beaten by anyone?',attr:'— Miyamoto Musashi, Go Rin No Sho'},
   {jp:null,rom:null,en:'The secret to your future is hidden in your daily routine.',attr:'— Mike Murdock (attributed)'},
-  {jp:null,rom:null,en:'The only opponent you have to beat is yourself, the way you used to be.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},
+  {jp:null,rom:null,en:'The only opponent you have to beat is yourself, the way you used to be.',attr:'— Haruki Murakami, What I Talk About When I Talk About Running (2007)'},  {jp:null,rom:null,en:'Tibi confide, fratrem tuere, amore ducere. Trust yourself. Protect your brother. Be led by love.',attr:'— J.W.R.M.'},
 ];
 function _buildProverbPlaylist(){
-  // Rotation = array indices 0–92, natural order. (The old hand-tuned reorder
-  // ended at 84 and was tuned to the pre-Nonet layout; after the restructure it
-  // scrambled the Nine Principles and evicted 8 entries, so it is retired.)
-  // Nonet plays 1→9; Triptych (心持→身→観) and Diptych (Blake→有構無構) stay contiguous.
+  // Rotation = THE WHOLE BANK, natural array order.
+  // Was `0..92` plus a hand-pushed 162, which left 69 curated entries — 40% of the bank —
+  // permanently invisible. Fixed 2026-08-26.
+  // Natural order also keeps the locked runs intact for free: Nonet 70-78, Triptych 79-81,
+  // Diptych 82-83 are already contiguous and in order.
+  // APPEND new proverbs to the END of PROVERBS and they enter the rotation automatically.
+  // NEVER insert into the middle — that renumbers the locked runs and scrambles them.
   const o=[];
-  for(let i=0;i<=92;i++) o.push(i);
-  o.push(162);   // surface the appended Murakami "beat yourself, the way you used to be" entry (array index 162) in the daily rotation
+  for(let i=0;i<PROVERBS.length;i++) o.push(i);
   return o.map(i=>PROVERBS[i]);
 }
 const PROVERB_PLAYLIST=_buildProverbPlaylist();
