@@ -284,6 +284,104 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .dw-seal{font-family:'Noto Serif JP',serif;font-size:19px;line-height:1;cursor:default}
 .dw-seal.stamp{animation:dwStamp .5s cubic-bezier(.2,1.3,.4,1)}
 @keyframes dwStamp{0%{opacity:0;transform:scale(1.9) rotate(-12deg)}55%{opacity:1;transform:scale(.9) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+
+/* ══════════ SPECIAL PROJECTS · THE ROOM + doors (solo v1) — scoped spr-* ══════════ */
+.spr-overlay,.spr-door{--spr-scroll:#F5F0E8;--spr-edge:#E8DFD0;--spr-ink:#1A1A1A;--spr-ink-light:#3A3A3A;--spr-ink-faint:#8A8578;--spr-red:#CC3529;--spr-red-deep:#7d1a12;--spr-white:#FEFCF8;--spr-amber:#8A6E2F}
+.spr-overlay{display:none;position:fixed;inset:0;z-index:210;background:rgba(26,22,18,.30);overflow-y:auto;font-family:'Noto Sans JP',sans-serif}
+.spr-overlay.spr-open{display:block}
+.spr-sheet{max-width:620px;margin:0 auto;min-height:100vh;background:var(--spr-scroll);border-left:1px solid var(--spr-edge);border-right:1px solid var(--spr-edge);box-shadow:0 0 40px rgba(26,26,26,.16)}
+.spr-room{background:var(--spr-scroll)}
+.spr-roombar{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--spr-edge);background:rgba(255,255,255,.55);position:sticky;top:0;z-index:2}
+.spr-close{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--spr-ink-faint);cursor:pointer;background:none;border:none;display:inline-flex;align-items:center;gap:6px}
+.spr-rt{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--spr-ink);letter-spacing:.3px}
+.spr-rc{margin-left:auto}
+.spr-status{font-size:8.5px;letter-spacing:2px;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid var(--spr-edge);color:var(--spr-ink-faint)}
+.spr-status.live{border-color:var(--spr-red);color:var(--spr-red)}
+.spr-status.setdown{border-style:dashed}
+.spr-roomsub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--spr-ink-faint);padding:10px 16px 0;text-align:right}
+.spr-roomsub .spr-rehome{cursor:pointer}
+.spr-roombody{padding:16px 16px 22px}
+.spr-sechead{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--spr-red);opacity:.55;margin:22px 0 10px}
+.spr-msblock{margin-bottom:16px}
+.spr-msname{font-family:'Noto Serif JP',serif;font-size:13.5px;color:var(--spr-ink);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.spr-mseal{width:18px;height:18px;border-radius:50%;border:1.3px solid var(--spr-red);flex:none;display:grid;place-items:center;font-size:9px;color:transparent;cursor:pointer;background:none;padding:0}
+.spr-mseal.ready{box-shadow:0 0 0 3px rgba(204,53,41,.10)}
+.spr-mseal[disabled]{cursor:default}
+.spr-msblock.sealed .spr-mseal{background:rgba(204,53,41,.09);color:var(--spr-red)}
+.spr-bname{cursor:text}
+.spr-who-chip{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-light);border:1px solid var(--spr-edge);border-radius:2px;padding:2px 7px;background:rgba(255,255,255,.4)}
+.spr-ms-date{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);margin-left:auto}
+.spr-ms-date.unset{opacity:.55;font-style:italic}
+.spr-subs{margin:9px 0 0 27px;border-left:1px solid var(--spr-edge);padding-left:14px}
+.spr-subtask{display:flex;align-items:center;gap:9px;padding:6px 0;flex-wrap:wrap}
+.spr-tk{width:18px;height:18px;border-radius:50%;border:1.3px solid var(--spr-ink-faint);flex:none;display:grid;place-items:center;font-size:9px;color:transparent;cursor:pointer;background:none;padding:0}
+.spr-subtask.done .spr-tk{border-color:var(--spr-red);color:var(--spr-red);background:rgba(204,53,41,.06)}
+.spr-subtask.unclaimed .spr-tk{border-style:dashed;opacity:.6}
+.spr-st2{font-size:12.5px;color:var(--spr-ink-light)}
+.spr-subtask.done .spr-st2{color:var(--spr-ink)}
+.spr-owner{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-ink-faint);margin-left:auto}
+.spr-subtask.unclaimed .spr-owner{color:var(--spr-red);opacity:.85}
+.spr-subtask.outside .spr-owner{color:var(--spr-amber)}
+.spr-gate{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);border:1px solid rgba(204,53,41,.4);border-radius:2px;padding:2px 6px;display:inline-flex;align-items:center;gap:4px;background:rgba(204,53,41,.05)}
+.spr-gate::before{content:"⟐";font-size:10px}
+.spr-consult{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-ink-faint);border:1px dotted var(--spr-edge);border-radius:2px;padding:1px 6px}
+.spr-consult.outside{color:var(--spr-amber);border-color:rgba(138,110,47,.4)}
+.spr-hands{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-amber);opacity:.9}
+.spr-blocker{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);font-weight:700}
+.spr-slot{border:1px solid var(--spr-edge);border-radius:2px;background:var(--spr-white);padding:7px 10px;font-family:'Noto Serif JP',serif;font-size:12.5px;color:var(--spr-ink)}
+.spr-composer{margin:8px 0 0}
+.spr-crow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spr-chip{border:1px solid var(--spr-edge);border-radius:2px;padding:5px 10px;font-size:10.5px;color:var(--spr-ink-light);background:rgba(255,255,255,.5);cursor:pointer}
+.spr-chip.on{border-color:var(--spr-red);color:var(--spr-ink);background:rgba(204,53,41,.05)}
+.spr-btn{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 13px;border-radius:2px;border:1px solid var(--spr-red);color:var(--spr-red);background:transparent;cursor:pointer}
+.spr-btn.solid{background:var(--spr-red);color:var(--spr-white)}
+.spr-btn.ghost{border-color:var(--spr-edge);color:var(--spr-ink-faint)}
+.spr-del{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);cursor:pointer;background:none;border:none;opacity:.6;margin-top:4px}
+.spr-del:hover{color:var(--spr-red);opacity:1}
+.spr-hours{margin-top:22px;border-top:1px solid var(--spr-edge);padding-top:14px}
+.spr-hours .spr-hrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.spr-cap2{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--spr-ink-faint)}
+.spr-val{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--spr-ink-light);cursor:pointer}
+.spr-gauge{height:3px;background:rgba(0,0,0,.07);border-radius:2px;overflow:hidden}
+.spr-gauge > i{display:block;height:100%;background:var(--spr-ink-faint);opacity:.7}
+.spr-forge{margin-top:22px;border-top:1px solid var(--spr-edge);padding-top:14px}
+.spr-forgeline{display:flex;align-items:baseline;gap:9px;font-size:12px;color:var(--spr-ink-light);padding:5px 0}
+.spr-forgeline .spr-when{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);margin-left:auto;white-space:nowrap}
+.spr-roomfoot{padding:16px;border-top:1px solid var(--spr-edge);background:rgba(255,255,255,.25);font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--spr-ink-faint);text-align:center;line-height:1.6}
+/* doors / shelf (chunk 3 + 5) */
+.spr-door{margin-top:20px}
+.spr-doorhead{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--spr-red);opacity:.55;margin-bottom:10px}
+.spr-projcard{border:1px solid var(--spr-edge);border-radius:2px;background:rgba(255,255,255,.45);padding:12px 14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px}
+.spr-projcard .spr-pn{font-family:'Noto Serif JP',serif;font-size:13.5px;color:var(--spr-ink)}
+.spr-projcard .spr-pmeta{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);margin-top:4px}
+.spr-shelf .spr-work{display:flex;align-items:center;gap:14px;padding:12px 2px;border-bottom:1px solid rgba(0,0,0,.06)}
+.spr-shelf .spr-work:last-child{border-bottom:0}
+.spr-work .spr-wbody{flex:1;min-width:0}
+.spr-work .spr-wn{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--spr-ink)}
+.spr-work .spr-ws{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--spr-ink-faint);margin-top:4px}
+.spr-shelf-empty{text-align:center;padding:22px 16px;border:1px dashed rgba(138,133,120,.4);border-radius:3px;font-family:'Noto Serif JP',serif;font-size:12.5px;font-style:italic;color:var(--spr-ink-light)}
+.spr-seal{width:34px;height:34px;border:1.5px solid var(--spr-red);border-radius:50%;display:grid;place-items:center;font-family:'Noto Serif JP',serif;color:var(--spr-red);font-size:15px;transform:rotate(-4deg);flex:none;background:rgba(204,53,41,.04)}
+.spr-ring{width:34px;height:34px;border:1.4px solid var(--spr-ink-faint);border-radius:50%;border-top-color:transparent;transform:rotate(28deg);flex:none;opacity:.7}
+/* the phone Works pill — sibling chrome to the Day's-Word pill, in the clan band */
+#sp-works-row{padding:0 0 12px}
+.sp-works-pin{display:inline-flex;flex:none}
+.sp-works-pill{display:inline-flex;align-items:center;gap:8px;background:#FEFCF8;border:1px solid #E8DFD0;border-left:2.5px solid #CC3529;border-radius:999px;padding:7px 13px 7px 11px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);font-family:'Noto Sans JP',sans-serif}
+.sp-works-pill .wk{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#CC3529;opacity:.85}
+.sp-works-pill .wct{min-width:16px;height:16px;padding:0 5px;border-radius:8px;background:#CC3529;color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.sp-works-pill.empty{border-style:dashed;border-left-style:dashed;background:transparent}
+.sp-works-pill.empty .wplus{color:#CC3529;font-size:13px;line-height:1}
+.sp-works-pill.empty .wlbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#8A8578}
+/* the feature's introduction — quiet, in-register (A23) */
+.spr-intro{font-family:'Noto Serif JP',serif;font-size:12.5px;font-style:italic;color:var(--spr-ink-light);line-height:1.75}
+/* ending a work — the seal beat, the set-down row, the sealed hero (chunk 5) */
+.spr-sealbeat{margin-top:24px;border-top:1px solid var(--spr-edge);padding-top:20px;text-align:center}
+.spr-sealmark{display:flex;justify-content:center;margin-bottom:14px}
+.spr-sealcopy{font-family:'Noto Serif JP',serif;font-size:12.5px;font-style:italic;color:var(--spr-ink-light);line-height:1.7;max-width:34ch;margin:0 auto}
+.spr-setdownrow{margin-top:18px;text-align:center}
+.spr-sealhero{text-align:center;padding:20px 0 24px}
+.spr-sealhero .spr-seal,.spr-sealhero .spr-ring{margin:0 auto;width:58px;height:58px}
+.spr-sealhero .spr-seal{font-size:26px;border-width:2px}
+.spr-sealhero-copy{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--spr-ink-faint);margin-top:14px}
 .dw-seal-presence{color:var(--dw-ink-faint);font-size:15px;opacity:.75}
 /* Optional response note (D2.1 amendment). The composer reuses .dw-emptyrow so it inherits the
    portrait reflow fix (input flex:1 1 100% + min-width:0 wraps, button drops below — no clip). The
@@ -3388,6 +3486,10 @@ if (FIREBASE_CONFIGURED) {
     </button>
   </div>
 
+  <!-- ══════════ SPECIAL PROJECTS · THE ROOM (solo v1) — full-screen overlays ══════════ -->
+  <div id="sp-room-overlay" class="spr-overlay" style="display:none" aria-hidden="true"></div>
+  <div id="sp-works-overlay" class="spr-overlay" style="display:none" aria-hidden="true"></div>
+
   <!-- ══════════ MY BUSHIDO PANEL ══════════ -->
   <div id="primary-bushido" style="display:block">
 
@@ -3640,6 +3742,9 @@ if (FIREBASE_CONFIGURED) {
     <!-- Habit grid tooltip — lives outside overflow:hidden grid -->
     <div id="hg-tooltip"></div>
 
+    <!-- Shokunin door — Special Projects under their crafts; UNCONDITIONAL (renders clanless + at zero projects; A22) -->
+    <div id="sp-shokunin-door" class="spr-door"></div>
+
     <div class="divider-thin"></div>
     <div style="text-align:center;padding:8px 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.5">reflection</div>
     <div style="display:flex;justify-content:center;gap:32px;padding:8px 0 20px">
@@ -3867,7 +3972,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Clan year calendar — clan events restored + person colours de-collided · 2026-08-25 · FIXES a live Task-1 regression + a pre-existing bug. (A) one-off clan events vanished from the clan year view (cnYcBuildByDate gated them on the per-event rsvps map the merge-net reshape had STRIPPED off each event) → now reads the root rsvps map via cnCalEventRsvps. (B) the year view was built before the first Firestore snapshot and never rebuilt, so clan events (every birthday/meeting/trip) were ABSENT ON FIRST LOAD SINCE THE FEATURE SHIPPED — only the 5-min refresh or a manual date-click/year-nav revealed them; the first-load dots people saw were member milestones from local state → the clan-event snapshot now rebuilds the year view. (2) cnYearColour hashed uid%palette and COLLIDED (James/Elijah/Antonella all one orange, blue+red unused) → now roster-index assignment, so ≤palette members are distinct and SOME MEMBERS’ DOT COLOURS VISIBLY CHANGE. Class-fix: gate_clancal_event_fields forbids per-event rsvps/removalRequest reads outside cnCalNormalizeDoc; verify_year_cal_render asserts the rendered DOM (7/7 GREEN, 4/7 RED pre-fix). Deploy fast tier 15/15. ⚠️ The 2b clan-scope-mirrors + clan-switcher work is NOT in this build. · on: Monthly Nth-weekday cadence — the 2nd Friday of each month · 2026-08-22 · new habit cadence freq:monthlyNth + weekOfMonth (1..4, or -1 = last): a Kaizen habit fires ONLY on the Nth occurrence of its weekday within each CALENDAR month — calendar-absolute, so it never drifts (unlike monthly = every 4 weeks). New picker mode "Once a month" + a 1st/2nd/3rd/4th/Last ordinal selector; readback "The 2nd Friday of each month", live Next: preview; round-trip safe (_uaModeOf reads it back, no clobber; switching away clears weekOfMonth). No new top-level state key — weekOfMonth rides the kaizen item projection (plan CAS covered, deep-copy preserved); every calendar/today surface is state.kaizen.filter(habitOnDay), so it rolls up everywhere for free. Gate verify_monthly_nth 18/18 (RED 7/18 pre-feature). Not yet deployed. · on: Day\'s Word — comment + stamp (D2.1 revision) · 2026-08-21 · the response act is reframed from "acknowledge" to a COMMENT + a STAMP (button "stamp"; the note field invites — "leave a word", no longer "optional"); the AUTHOR, auto-stamped on posting, may add their ONE comment to that stamp IN ADDITION to editing, so the person who speaks the word can answer its answers (Susan\'s "what are your intentions?" case), writing only their own acks key (satisfies live rule D branch (b) — affectedKeys hasOnly self, no rule change); acting still auto-collapses to the pill (no chevron), one response per member incl. the author, no threading, note dies with the word at 24h, ≤200 (client + rule D). Gated verify_dayword_comment_stamp 17/17 (verify_dayword_response still 10/10). Not yet deployed. · on: Your Essence — descriptive drawer block (C) · 2026-08-21 · state.essence = [{quality,evidence}] renders a colonnade beneath the vision-drawer milestones: the Sensei\'s read of who the user already IS, evidence VERBATIM (HTML-escaped, never paraphrased); an entry missing quality or evidence is dropped, hard ceiling 7; absent/empty renders NOTHING (every existing user has none today); essence joins PLAN_KEYS so an edit rides the plan CAS net the day it ships (Finding #1) yet a pre-essence doc still signs as default (R15); responsive ess-dc/ess-pc grid with theme-safe color-mix ink posts. Gated verify_essence_drawer 35/35. Not yet deployed — rides the post-migration deploy. · on: Day\'s Word response note (D2.1) · 2026-08-21 · a clan member may acknowledge the word with an OPTIONAL one-line note (<=200 chars — client maxlength + the Firestore rule cap D, verified DENY in production); reply and acknowledge are a SINGLE act; the uid-keyed acks map makes threading impossible by construction; the note dies with the word at 24h and raises no notification; a seal-only ack stays fully valid. Gated verify_dayword_response. Feature shipped to /app/ 2026-08-21; this stamp rides the next deploy. · on: strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
+const BUILD_ID = 'Special Projects v1 (SOLO) · 2026-08-27 · a craft takes on a WORK — the first BUSHIDO object that ENDS. state.projects[] + projectRemovals{} join the mergeable net (recursive id-union project→branch→sub-task, forge append-only, per-entity updatedAt CAS, single removal tombstone — the Finding #1 discipline; registered in §7.2). The room is fully editable in v1 (add branch/sub-task, edit text, re-home to a craft, set steward, set due, tick, seal branch 印, forge-post, delete-unsealed→tombstone). FOUR rendered-DOM boundaries enforced: no freeform input outside structured slots, an UNCLAIMED sub-task renders visibly distinct, the outside-hand rows show NO seal/tick affordance (A13), a decider renders as a GATE MARKER not prose (A14). steward/consult carry {name,uid,outside} so the clan layer is ADDITIVE, never a rewrite. Endings: seal offer→confirm, set-down (open ring), reopen; read-only sealed room; finished-works shelf (empty said in words). Entry points: the phone WORKS pill in the clan Day\'s-Word band (CLAN-GATED, state-aware placement — shares the row when the word is collapsed, pins top-left when expanded; empty→dashed "＋ Raise a work", one/several→solid "Works · N") + the UNCONDITIONAL Shokunin door (renders clanless AND at zero projects, A22). Raise flow: name→craft→optional hours→room. Empty state introduces the feature in-register (A23, James-approved copy). Room overlay is position:fixed with a live containing-block trap guard (transform/filter/contain/will-change), verified un-trapped in situ from both tabs. Clan SHARING — invitations, other-user visibility, milestones on the clan calendar, person colours — PARKED to B2. This deploy writes ZERO user data: DEFAULT_STATE gains projects:[]/projectRemovals:{} only. Gates, all RED-first: verify_projects_merge, verify_project_room 15/15, verify_project_entrypoints 11/11, verify_raise_flow 6/6, verify_seal_flow 8/8, verify_room_placement 2/2; deploy fast tier 15/15. · on: Clan year calendar — clan events restored + person colours de-collided · 2026-08-25 · FIXES a live Task-1 regression + a pre-existing bug. (A) one-off clan events vanished from the clan year view (cnYcBuildByDate gated them on the per-event rsvps map the merge-net reshape had STRIPPED off each event) → now reads the root rsvps map via cnCalEventRsvps. (B) the year view was built before the first Firestore snapshot and never rebuilt, so clan events (every birthday/meeting/trip) were ABSENT ON FIRST LOAD SINCE THE FEATURE SHIPPED — only the 5-min refresh or a manual date-click/year-nav revealed them; the first-load dots people saw were member milestones from local state → the clan-event snapshot now rebuilds the year view. (2) cnYearColour hashed uid%palette and COLLIDED (James/Elijah/Antonella all one orange, blue+red unused) → now roster-index assignment, so ≤palette members are distinct and SOME MEMBERS’ DOT COLOURS VISIBLY CHANGE. Class-fix: gate_clancal_event_fields forbids per-event rsvps/removalRequest reads outside cnCalNormalizeDoc; verify_year_cal_render asserts the rendered DOM (7/7 GREEN, 4/7 RED pre-fix). Deploy fast tier 15/15. ⚠️ The 2b clan-scope-mirrors + clan-switcher work is NOT in this build. · on: Monthly Nth-weekday cadence — the 2nd Friday of each month · 2026-08-22 · new habit cadence freq:monthlyNth + weekOfMonth (1..4, or -1 = last): a Kaizen habit fires ONLY on the Nth occurrence of its weekday within each CALENDAR month — calendar-absolute, so it never drifts (unlike monthly = every 4 weeks). New picker mode "Once a month" + a 1st/2nd/3rd/4th/Last ordinal selector; readback "The 2nd Friday of each month", live Next: preview; round-trip safe (_uaModeOf reads it back, no clobber; switching away clears weekOfMonth). No new top-level state key — weekOfMonth rides the kaizen item projection (plan CAS covered, deep-copy preserved); every calendar/today surface is state.kaizen.filter(habitOnDay), so it rolls up everywhere for free. Gate verify_monthly_nth 18/18 (RED 7/18 pre-feature). Not yet deployed. · on: Day\'s Word — comment + stamp (D2.1 revision) · 2026-08-21 · the response act is reframed from "acknowledge" to a COMMENT + a STAMP (button "stamp"; the note field invites — "leave a word", no longer "optional"); the AUTHOR, auto-stamped on posting, may add their ONE comment to that stamp IN ADDITION to editing, so the person who speaks the word can answer its answers (Susan\'s "what are your intentions?" case), writing only their own acks key (satisfies live rule D branch (b) — affectedKeys hasOnly self, no rule change); acting still auto-collapses to the pill (no chevron), one response per member incl. the author, no threading, note dies with the word at 24h, ≤200 (client + rule D). Gated verify_dayword_comment_stamp 17/17 (verify_dayword_response still 10/10). Not yet deployed. · on: Your Essence — descriptive drawer block (C) · 2026-08-21 · state.essence = [{quality,evidence}] renders a colonnade beneath the vision-drawer milestones: the Sensei\'s read of who the user already IS, evidence VERBATIM (HTML-escaped, never paraphrased); an entry missing quality or evidence is dropped, hard ceiling 7; absent/empty renders NOTHING (every existing user has none today); essence joins PLAN_KEYS so an edit rides the plan CAS net the day it ships (Finding #1) yet a pre-essence doc still signs as default (R15); responsive ess-dc/ess-pc grid with theme-safe color-mix ink posts. Gated verify_essence_drawer 35/35. Not yet deployed — rides the post-migration deploy. · on: Day\'s Word response note (D2.1) · 2026-08-21 · a clan member may acknowledge the word with an OPTIONAL one-line note (<=200 chars — client maxlength + the Firestore rule cap D, verified DENY in production); reply and acknowledge are a SINGLE act; the uid-keyed acks map makes threading impossible by construction; the note dies with the word at 24h and raises no notification; a seal-only ack stays fully valid. Gated verify_dayword_response. Feature shipped to /app/ 2026-08-21; this stamp rides the next deploy. · on: strand identity read-compat layer (Phase 1 of the strand-objects migration) · 2026-08-17 · state.strands entries may now be a legacy string OR a {name,kanji,colour} object; three hoisted helpers (strandName/strandKanji/strandColour) absorb BOTH across all nine duplicated positional-kanji arrays plus the colour array (30 read-sites), and the Ryughi rcKanji gained an object short-circuit. ZERO data change — behaviour-neutral today (string parity byte-identical, the object path unreachable until the Phase-3 migration). Ships the guard BEFORE any data migrates: a clan card did strand.split(...) which would TypeError on a viewer app the moment one migrated user object-strands reached their card. Gate verify_strand_identity 21/21 (RED 4/21 on the pre-Phase-1 build). · on: cascade parity — self-serve onboarding can no longer orphan a goal (queue #13 Tier 1, prevent-only) · 2026-08-13 · parentMs doubles as the strand index, so more milestones than strands silently orphaned any goal whose milestone index sat past the strand count (invisible in the constellation + strand stats — hit Mark, 4th occurrence). Now: the milestone dropdowns offer only indices < strands.length, resolveParentLink\'s annual branch rejects out-of-range, the wizard defaults to 3 strands · 3 milestones, and finishOnboarding blocks completion on a count mismatch with an APP-framed message (never the user\'s fault — Mark chose the right milestone). Prevent-only — existing docs untouched; a band-aid until the milestone.strandIndex schema fix (Tier 2, §5b), whose close-out is this guard\'s deletion. Gate verify_cascade_parity 6/6 on the rendered constellation (RED on pre-fix). · on: seasonal review no longer fires on a brand-new account · 2026-08-13 · srShouldShowReview now gates on lived history — the seasonal-review banner stays hidden when (a) completionLog is empty (no history at all) OR (b) the account began INSIDE the current season (joined mid-season, no full season lived to review yet); it still shows for a returning/lived-in account and still honours the done-this-season + snoozed suppressors. Retires the onboarding workaround where every new user had to snooze it or burn the season\'s one-shot review on zero completions. No new state field. Gate verify_sr_new_account 5/5 (RED on pre-fix: the two new-account fixtures showed the banner). · on: time-of-day greeting removed from the dashboard · 2026-08-12 · the decorative greeting bar on the dashboard is gone (James\'s call — a quiet surface); the account bar keeps the name only; the daily seal + evening nudge (their own separate getHours branch) are untouched · on: vision glance ↔ drawer are exclusive states · 2026-08-12 · opening the vision drawer now HIDES the dashboard glance line (restored on close, every close path) so the vision\'s first sentence shows once on screen, never twice · on: vision drawer holds the FULL vision · 2026-08-12 · the same-day drawer de-dup (destination-only) was REVERSED (James\'s call) — a split drawer opens mid-thought, worse than the repetition; the drawer renders tenYearVision whole, the dashboard line stays sentence one (a headline, not a duplicate). Temporary until the orienting line is a dedicated field (§5b). · on: peace bar Settings toggle · 2026-08-12 · a new Settings toggle (設 Settings ▸ "Peace bar") shows/hides the peace 1–10 selector in the daily reflection block — default ON fleet-wide (showPeaceBar!==false), so nothing people just gained is silently removed; persisted as showPeaceBar in PLAN_KEYS (calTheme* precedent → joins the plan CAS net the day it ships, Finding #1) · on: known-limitations note removed · 2026-08-11 · the always-visible static two-paragraph "known-limitations" note by Export/Import is gone (James\'s call); the PLAN_CONFLICT_MSG runtime conflict message — which surfaces contextually only when a two-device plan edit actually collides — STAYS · on: Chark-session UX triple · 2026-08-11 · (1) the first sentence of your ten-year vision now shows permanently under 流儀 on the dashboard (tap it to open the full vision; the proverb remains for users with no vision yet) · (2) milestones in the vision drawer are now tappable — tap one to see the annual goals serving it (parentMs===index, same convention as the constellation) · (3) a peace 1–10 selector sits in the daily reflection block — tapping N writes "Peace N/10" as the note\'s first line (rides dailyNotes/dailyNotesMeta newest-ts merge; NO new state field) · gate verify_chark_ux_triple 15/15 + full suite 13/13 (§7.2 fixture taught travelDays — pre-existing drift caught on baseline) · on: Reflection editability + single cadence control · 2026-08-03 · (a) MONTHLY reflections are now editable within their window — the 月 Review opens edit + Re-seal (resealMonthlyReflection, empty-guarded, re-stamps travel) until the window closes, read-only after, so a premature seal or typo is recoverable (matches the weekly Re-seal). (b) the 週 Review LAUNCHER button now opens EDITABLE within the window (was hardcoded showReflectionReview(false) read-only while the dashboard card opened editable — two paths to one action where one silently did nothing). (c) the cadence COUNT picker ("How many? 2–6", _uaPickCount) is REMOVED — the day strip is the single control, and the count lives only in the readback ("3 days a week — Mon, Wed, Fri") so a count-thinker still sees their number · on empty-seal block + passive monthly reminder';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -3992,6 +4097,8 @@ const DEFAULT_STATE = {
   yearStartDate: null,          // set on first onboarding completion, used for anniversary mode
   travelMode: { active: false, since: null }, // ✈︎ anchor {active, since} — was a bare boolean; normalizeTravelState() migrates a legacy true/false
   travelDays: {},               // day-keyed set {'YYYY-MM-DD':true} — SAME shape as completionLog; MERGEABLE (monotonic-add union, no tombstone)
+  projects: [],                 // Special Projects — a commission a craft takes on (parentShok, like a habit). MERGEABLE: recursive id-union + per-entity updatedAt CAS (Finding #1, widened to a nested, MUTABLE object)
+  projectRemovals: {},          // {entityId:true} tombstones across ALL project levels (project/branch/sub-task ids are globally unique) — persisted so a delete is never resurrected by the union
 };
 
 // ============ STATE ============
@@ -4020,6 +4127,8 @@ let state = {
   nextId: 100,
   travelMode: { active: false, since: null },  // ✈︎ anchor — normalizeTravelState() migrates a legacy boolean on load
   travelDays: {},                              // day-keyed travel history {'YYYY-MM-DD':true} — MERGEABLE union net
+  projects: [],                                // Special Projects — commissions a craft takes on; MERGEABLE (recursive id-union + per-entity CAS)
+  projectRemovals: {},                         // {entityId:true} delete tombstones across all project levels
 };
 
 const PILLARS = {
@@ -5543,6 +5652,7 @@ function renderTab(){
     renderWeeklyBtn();
     renderMonthlyBtn();
   }
+  try{ renderShokuninDoor(); }catch(e){}   // UNCONDITIONAL door — paints on every My BUSHIDO render (A22); kept out of the launcher finally so the launcher-hotfix pattern stays byte-exact
 }
 
 function getShrIdx(prog){return prog>=66?2:prog>=33?1:0}
@@ -9962,7 +10072,7 @@ function mergeCompletionLogs(local, cloud, untickMap){ return applyPendingUntick
 // exact ties (strict >) so all clients converge. Missing timestamps (legacy) = 0 = oldest → any real edit
 // wins, no migration. PLAN fields are NOT merged here (3b adds CAS). Reflection DELETE has no UI today;
 // if one is added, mirror the note pattern (a '' sentinel or a per-reflKey tombstone) — documented, not built.
-const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals','travelDays'];
+const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals','travelDays','projects','projectRemovals'];
 
 function _mondayOf(dateStr){ // Monday of dateStr's ISO week — the Mon–Sun bucket saveReflection dedups on
   const d = new Date((dateStr || '') + 'T12:00:00');
@@ -10033,11 +10143,44 @@ function mergeClanEntries(local, cloud, removals){
   }
   return [...byId.values()];
 }
+// ── Special Projects merge — Finding #1 discipline widened to a NESTED, MUTABLE object ────────────────
+// state.projects is multi-writer-ready from day one (solo = two devices/tabs; the clan layer later = several
+// walkers). A pure id-union (mergeClanEntries) is add-safe but NOT edit-safe here — a sub-task's text/steward/
+// due/done edited on one device must not be lost to a stale copy on another. So: UNION by id at every level
+// (project → branch → sub-task; forge append-only), minus the projectRemovals tombstone (ONE id-set, all
+// levels — ids are globally unique), and for an entity present in BOTH copies its SCALAR fields come from the
+// newer `updatedAt` (per-entity CAS). Cloud wins an exact tie so all clients converge. forge never CAS — it is
+// a one-way log of record, union only. The render sorts, so merged array-order is not load-bearing.
+function _projNewer(l, c){ return ((l&&l.updatedAt)||0) > ((c&&c.updatedAt)||0) ? l : c; } // strict > → cloud wins a tie
+function _unionEntities(localArr, cloudArr, removals, resolve){
+  const C = new Map(), L = new Map();
+  (Array.isArray(localArr)?localArr:[]).forEach(e=>{ if(e&&e.id) L.set(e.id,e); });
+  (Array.isArray(cloudArr)?cloudArr:[]).forEach(e=>{ if(e&&e.id) C.set(e.id,e); });
+  const out=[], seen=new Set();
+  const push=(id,e)=>{ if(!removals[id] && !seen.has(id)){ seen.add(id); out.push(e); } };
+  (Array.isArray(cloudArr)?cloudArr:[]).forEach(e=>{ if(e&&e.id){ const l=L.get(e.id); push(e.id, l?resolve(l,e):e); } }); // cloud order first
+  (Array.isArray(localArr)?localArr:[]).forEach(e=>{ if(e&&e.id && !C.has(e.id)) push(e.id, e); });                        // then local-only
+  return out;
+}
+function _mergeBranch(l, c, removals){
+  return Object.assign({}, _projNewer(l,c), { subtasks: _unionEntities(l.subtasks, c.subtasks, removals, _projNewer) });
+}
+function _mergeProject(l, c, removals){
+  return Object.assign({}, _projNewer(l,c), {
+    branches: _unionEntities(l.branches, c.branches, removals, (bl,bc)=>_mergeBranch(bl,bc,removals)),
+    forge:    _unionEntities(l.forge,    c.forge,    removals, (fl)=>fl),   // append-only — an identical id keeps the existing immutable line
+  });
+}
+function mergeProjects(local, cloud, removals){
+  removals = removals || {};
+  return _unionEntities(local, cloud, removals, (l,c)=>_mergeProject(l,c,removals));
+}
 // The single place that produces every merged field, used by BOTH the save txn and the reconcile.
 function mergeMergeableFields(local, cloud, untickMap){
   local = local || {}; cloud = cloud || {};
   const notes = mergeDailyNotes(local.dailyNotes, cloud.dailyNotes, local.dailyNotesMeta, cloud.dailyNotesMeta);
   const clanRemovals = unionKeys(local.clanRemovals, cloud.clanRemovals); // monotonic removal tombstones (both clients')
+  const projectRemovals = unionKeys(local.projectRemovals, cloud.projectRemovals); // project/branch/sub-task delete tombstones (both clients')
   return {
     completionLog:       mergeCompletionLogs(local.completionLog, cloud.completionLog, untickMap), // union + un-ticks (snapshot when a save passes one; else live global)
     reflections:         mergeReflections(local.reflections, cloud.reflections),
@@ -10051,6 +10194,8 @@ function mergeMergeableFields(local, cloud, untickMap){
     clanObligations:     mergeClanEntries(local.clanObligations, cloud.clanObligations, clanRemovals), // id-union − removals (Finding #1)
     clanRemovals:        clanRemovals,
     travelDays:          unionKeys(local.travelDays, cloud.travelDays),   // day-keyed travel history — monotonic-add key-union, no tombstone (Travel Mode a)
+    projects:            mergeProjects(local.projects, cloud.projects, projectRemovals),   // recursive id-union + per-entity CAS − tombstones (Special Projects)
+    projectRemovals:     projectRemovals,
   };
 }
 
@@ -13221,6 +13366,488 @@ function dwUpdateNavDot(){
 // Item 4: tapping the pill re-expands the full card (LOCAL, this session only — never synced).
 window.dwToggleExpand = function(){ _dwExpanded = !_dwExpanded; renderDayWord(); };
 
+/* ══════════════════════════════════════════════════════════════════════════
+   SPECIAL PROJECTS · THE ROOM — solo v1 (chunk 2)
+   A project hangs off a craft (parentShok). The room renders + edits one project:
+   branches (milestones) → sub-tasks, a loose "Open" bucket, the weekly-hours gauge,
+   the append-only forge log, and branch sealing (印). Built so the clan layer is an
+   ADDITIVE layer later, never a rewrite: every steward/consult carries {name,uid,outside}
+   so uid can be filled by the clan layer without a migration.
+   Four rendered-DOM boundaries the room MUST honour (see verify_project_room):
+     #1 no freeform text input outside the structured .spr-slot inputs (no <textarea>)
+     #2 an UNCLAIMED sub-task (steward null) renders visibly different from a claimed one
+     #3 an OUTSIDE-HAND row (steward.outside) shows NO seal/tick affordance at all (A13)
+     #4 a sub-task with a decider renders as a GATE MARKER (.spr-gate), never as prose (A14)
+   ══════════════════════════════════════════════════════════════════════════ */
+let SPR_OPEN = null;   // id of the open project (null = room closed)
+let SPR_EDIT = null;   // single active inline editor key, e.g. 'text:<sid>' | 'steward:<bid>:<sid>' | 'rehome' | 'due:<bid>' | 'delst:<bid>:<sid>'
+
+function sprProjects(){ return Array.isArray(state.projects) ? state.projects : (state.projects = []); }
+function sprRemovals(){ return (state.projectRemovals && typeof state.projectRemovals==='object') ? state.projectRemovals : (state.projectRemovals = {}); }
+function sprGetProject(id){ return sprProjects().find(function(p){ return p && p.id===id; }) || null; }
+function sprBranch(p, bid){ return p && (p.branches||[]).find(function(b){ return b && b.id===bid; }); }
+function sprSubtaskIn(b, sid){ return b && (b.subtasks||[]).find(function(s){ return s && s.id===sid; }); }
+function sprFindSubtask(p, sid){ var out=null; (p.branches||[]).forEach(function(b){ var s=sprSubtaskIn(b,sid); if(s) out=s; }); return out; }
+function sprNewId(pfx){ return pfx + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7); }
+function sprTouch(o){ if(o) o.updatedAt = Date.now(); }
+function sprEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function sprIsOutside(w){ return !!(w && w.outside===true); }
+function sprCraftName(pid){ var c=(state.shokunin||[]).find(function(s){ return s.id==pid; }); return c ? c.text : 'a craft'; }
+function sprCount(){ return sprProjects().filter(function(p){ return sprIsActive(p); }).length; }
+
+function sprFmtDate(iso){ if(!iso) return ''; try{ return new Date(iso+'T00:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){ return iso; } }
+function sprFmtWhen(ms){ if(!ms) return ''; try{ return new Date(ms).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){ return ''; } }
+
+function sprSave(){ try{ saveState(); }catch(e){} }
+function sprRerender(){ if(SPR_OPEN) renderProjectRoom(SPR_OPEN); }
+function sprMutate(fn){ var p=sprGetProject(SPR_OPEN); if(!p) return; fn(p); sprTouch(p); sprSave(); sprRerender(); }
+
+/* ── open / close ─────────────────────────────────────────────────────── */
+// A position:fixed overlay is anchored to the viewport UNTIL an ancestor establishes a
+// containing block (transform / filter / perspective / backdrop-filter / contain / will-change) —
+// then it's trapped and clipped to that ancestor. This app is full of animation, so guard at
+// open time: return the trapping ancestor (or null). The room gate asserts null; a runtime
+// warning fails loudly if someone later animates a wrapper around #sp-room-overlay.
+function sprContainingBlockTrap(el){
+  var node = el && el.parentElement;
+  while(node && node !== document.documentElement){
+    var cs; try{ cs = getComputedStyle(node); }catch(e){ node = node.parentElement; continue; }
+    if((cs.transform && cs.transform!=='none') ||
+       (cs.perspective && cs.perspective!=='none') ||
+       (cs.filter && cs.filter!=='none') ||
+       (cs.backdropFilter && cs.backdropFilter!=='none') ||
+       (cs.webkitBackdropFilter && cs.webkitBackdropFilter!=='none') ||
+       (cs.contain && /paint|layout|strict|content/.test(cs.contain)) ||
+       (cs.willChange && /transform|perspective|filter/.test(cs.willChange))){
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+}
+function openProjectRoom(id){
+  if(!sprGetProject(id)) return;
+  SPR_OPEN = id; SPR_EDIT = null;
+  sprEnsureDelegation();
+  renderProjectRoom(id);
+  var ov=document.getElementById('sp-room-overlay');
+  if(ov){ ov.classList.add('spr-open'); ov.style.display='block'; ov.setAttribute('aria-hidden','false'); }
+  try{ document.body.style.overflow='hidden'; }catch(e){}
+  try{ var trap=sprContainingBlockTrap(ov); if(trap) console.error('[spr] room overlay trapped by a containing-block ancestor <'+(trap.id||trap.className||trap.tagName)+'> — position:fixed will clip. Move #sp-room-overlay out of it, or drop transform/filter/contain/will-change on that ancestor.'); }catch(e){}
+}
+function closeProjectRoom(){
+  SPR_OPEN=null; SPR_EDIT=null;
+  var ov=document.getElementById('sp-room-overlay');
+  if(ov){ ov.classList.remove('spr-open'); ov.style.display='none'; ov.setAttribute('aria-hidden','true'); ov.innerHTML=''; }
+  try{ document.body.style.overflow=''; }catch(e){}
+  try{ if(typeof renderTab==='function') renderTab(); }catch(e){}   // refresh entry points (Works pill count)
+}
+
+/* ── event delegation (safer than dozens of inline onclick strings) ───── */
+function sprEnsureDelegation(){
+  var ov=document.getElementById('sp-room-overlay');
+  if(!ov || ov._sprWired) return;
+  ov._sprWired=true;
+  ov.addEventListener('click', sprOnClick);
+  ov.addEventListener('keydown', sprOnKey);
+  ov.addEventListener('change', sprOnChange);
+}
+function sprOnKey(e){
+  if(e.key!=='Enter') return;
+  var bId=e.target && e.target.getAttribute && e.target.getAttribute('data-enter');
+  if(bId){ e.preventDefault(); var btn=document.getElementById(bId); if(btn) btn.click(); }
+}
+function sprOnChange(e){
+  var t=e.target; if(!t || !t.id) return;
+  if(t.id==='spr-due-input'){ sprSetDue(t.getAttribute('data-b'), t.value); }
+  else if(t.id==='spr-hours-input'){ sprSetHours(t.value); }
+}
+function sprOnClick(e){
+  var t=e.target.closest && e.target.closest('[data-act]'); if(!t) return;
+  var act=t.getAttribute('data-act');
+  var bid=t.getAttribute('data-b'), sid=t.getAttribute('data-s'), v=t.getAttribute('data-v');
+  if(act==='close'){ closeProjectRoom(); return; }
+  if(!sprGetProject(SPR_OPEN)) return;
+  switch(act){
+    case 'tick':            sprToggleDone(bid,sid); break;
+    case 'seal':            sprSealBranch(bid); break;
+    case 'edit-text':       SPR_EDIT='text:'+sid; sprRerender(); break;
+    case 'edit-name':       SPR_EDIT='name:'+bid; sprRerender(); break;
+    case 'edit-due':        SPR_EDIT='due:'+bid; sprRerender(); break;
+    case 'edit-hours':      SPR_EDIT='hours'; sprRerender(); break;
+    case 'edit-steward':    SPR_EDIT='steward:'+bid+':'+(sid||''); sprRerender(); break;
+    case 'rehome':          SPR_EDIT='rehome'; sprRerender(); break;
+    case 'rehome-pick':     sprRehome(v); break;
+    case 'add-subtask':     sprAddSubtaskCommit(bid); break;
+    case 'add-branch':      sprAddBranchCommit(v); break;
+    case 'forge':           sprForgeCommit(); break;
+    case 'commit-text':     sprCommitText(sid); break;
+    case 'commit-name':     sprCommitName(bid); break;
+    case 'commit-hours':    sprSetHours((document.getElementById('spr-hours-input')||{}).value); break;
+    case 'steward-set':     sprCommitSteward(bid,sid,false); break;
+    case 'steward-outside': sprCommitSteward(bid,sid,true); break;
+    case 'steward-unclaim': sprSetStewardVal(bid,sid,null); break;
+    case 'ask-del-subtask': SPR_EDIT='delst:'+bid+':'+sid; sprRerender(); break;
+    case 'delete-subtask':  sprDeleteSubtask(bid,sid); break;
+    case 'ask-del-branch':  SPR_EDIT='delbr:'+bid; sprRerender(); break;
+    case 'delete-branch':   sprDeleteBranch(bid); break;
+    case 'offer-seal':      SPR_EDIT='sealwork'; sprRerender(); break;
+    case 'seal-work':       sprSealProject(SPR_OPEN); break;
+    case 'ask-setdown':     SPR_EDIT='setdown'; sprRerender(); break;
+    case 'setdown-work':    sprSetDownProject(SPR_OPEN); break;
+    case 'reopen-work':     sprReopenProject(SPR_OPEN); break;
+    case 'cancel':          SPR_EDIT=null; sprRerender(); break;
+  }
+}
+
+/* ── mutations (each bumps updatedAt on the touched entity + the project) ─ */
+function sprToggleDone(bid,sid){
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(b&&b.sealed) return; var s=sprSubtaskIn(b,sid);
+    if(!s || sprIsOutside(s.steward)) return;               // #3 outside rows have no tick to fire
+    s.done=!s.done; s.doneAt=s.done?Date.now():null; sprTouch(s); sprTouch(b); });
+}
+function sprAddSubtaskCommit(bid){
+  var inp=document.getElementById('spr-addst-'+bid); if(!inp) return;
+  var txt=(inp.value||'').trim(); if(!txt) return;
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(!b||b.sealed) return; b.subtasks=b.subtasks||[];
+    b.subtasks.push({ id:sprNewId('st'), text:txt, steward:{name:'James',uid:null,outside:false},
+      consults:[], decider:null, outsideHands:[], blocker:false, done:false, doneAt:null, updatedAt:Date.now() });
+    sprTouch(b); });
+}
+function sprAddBranchCommit(kind){
+  var inp=document.getElementById('spr-addbr-'+kind); if(!inp) return;
+  var nm=(inp.value||'').trim(); if(!nm) return;
+  sprMutate(function(p){ p.branches=p.branches||[];
+    p.branches.push({ id:sprNewId('br'), name:nm, kind:(kind==='loose'?'loose':'milestone'), due:null,
+      steward:{name:'James',uid:null,outside:false}, sealed:false, sealedAt:null, updatedAt:Date.now(), subtasks:[] }); });
+}
+function sprCommitText(sid){
+  var inp=document.getElementById('spr-edit-input'); var txt=inp?(inp.value||'').trim():'';
+  SPR_EDIT=null; if(!txt){ sprRerender(); return; }
+  sprMutate(function(p){ var s=sprFindSubtask(p,sid); if(s){ s.text=txt; sprTouch(s); } });
+}
+function sprCommitName(bid){
+  var inp=document.getElementById('spr-edit-input'); var nm=inp?(inp.value||'').trim():'';
+  SPR_EDIT=null; if(!nm){ sprRerender(); return; }
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(b){ b.name=nm; sprTouch(b); } });
+}
+function sprSetDue(bid,val){
+  SPR_EDIT=null;
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(b){ b.due=val||null; sprTouch(b); } });
+}
+function sprSetHours(val){
+  var n=parseFloat(val); if(isNaN(n)||n<0) n=0;
+  SPR_EDIT=null;
+  sprMutate(function(p){ p.hoursPerWeek=n; });
+}
+function sprCommitSteward(bid,sid,outside){
+  var inp=document.getElementById('spr-steward-name'); var nm=inp?(inp.value||'').trim():'';
+  if(!nm) return;
+  sprSetStewardVal(bid,sid,{name:nm,uid:null,outside:!!outside});
+}
+function sprSetStewardVal(bid,sid,val){
+  SPR_EDIT=null;
+  sprMutate(function(p){
+    if(sid){ var s=sprFindSubtask(p,sid); if(s){ s.steward=val; sprTouch(s); } }
+    else { var b=sprBranch(p,bid); if(b){ b.steward=val; sprTouch(b); } }
+  });
+}
+function sprRehome(craftId){
+  SPR_EDIT=null;
+  var cid = /^-?\d+$/.test(String(craftId)) ? +craftId : craftId;
+  sprMutate(function(p){ p.parentShok=cid; });
+}
+function sprSealBranch(bid){
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(!b||b.sealed) return;
+    if(sprIsOutside(b.steward)) return;                                   // #3 / A13 — outside-run branch never seals in-app
+    var subs=(b.subtasks||[]).filter(function(s){ return !sprIsOutside(s.steward); });
+    if(subs.length===0 || !subs.every(function(s){ return s.done; })) return;   // seal only when its own tasks are done
+    b.sealed=true; b.sealedAt=Date.now(); sprTouch(b); });
+}
+function sprForgeCommit(){
+  var inp=document.getElementById('spr-forge-input'); if(!inp) return;
+  var txt=(inp.value||'').trim(); if(!txt) return;
+  sprMutate(function(p){ p.forge=p.forge||[]; p.forge.push({ id:sprNewId('fl'), branchId:null, text:txt, at:Date.now() }); });
+}
+function sprDeleteSubtask(bid,sid){
+  SPR_EDIT=null;
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(!b||b.sealed) return;
+    b.subtasks=(b.subtasks||[]).filter(function(s){ return s.id!==sid; });
+    sprRemovals()[sid]=true; sprTouch(b); });                             // tombstone → merge net won't resurrect
+}
+function sprDeleteBranch(bid){
+  SPR_EDIT=null;
+  sprMutate(function(p){ var b=sprBranch(p,bid); if(!b||b.sealed) return;  // sealed = one-way, not deletable
+    (b.subtasks||[]).forEach(function(s){ sprRemovals()[s.id]=true; });
+    sprRemovals()[bid]=true;
+    p.branches=(p.branches||[]).filter(function(x){ return x.id!==bid; }); });
+}
+
+/* ── render ───────────────────────────────────────────────────────────── */
+function renderProjectRoom(id){
+  var p=sprGetProject(id), ov=document.getElementById('sp-room-overlay');
+  if(!ov) return;
+  if(!p){ ov.style.display='none'; ov.classList.remove('spr-open'); ov.innerHTML=''; SPR_OPEN=null; return; }
+  if(p.status && p.status!=='live'){ return sprRenderSealedRoom(p, ov); }   // sealed / set-down → read-only view
+  var milestones=(p.branches||[]).filter(function(b){ return b.kind!=='loose'; });
+  var loose=(p.branches||[]).filter(function(b){ return b.kind==='loose'; });
+
+  var h='<div class="spr-sheet"><div class="spr-room">';
+  h+='<div class="spr-roombar">'
+    +'<button class="spr-close" data-act="close">✕ Close</button>'
+    +'<span class="spr-rt">'+sprEsc(p.name)+'</span>'
+    +'<span class="spr-rc"><span class="spr-status '+(p.status||'live')+'">'+({live:'Live',sealed:'Sealed',setdown:'Set down'}[p.status||'live']||'Live')+'</span></span>'
+    +'</div>';
+  h+='<div class="spr-roomsub"><span class="spr-rehome" data-act="rehome">'+sprEsc(sprCraftName(p.parentShok))+' ▾</span></div>';
+  h+=sprRehomePanel(p);
+  h+='<div class="spr-roombody">';
+
+  h+='<div class="spr-sechead">The branches</div>';
+  milestones.forEach(function(b){ h+=sprBranchHtml(p,b); });
+  h+=sprAddBranchHtml('milestone');
+
+  h+='<div class="spr-sechead">Open — not yet a branch</div>';
+  loose.forEach(function(b){ h+=sprBranchHtml(p,b); });
+  h+=sprAddBranchHtml('loose');
+
+  h+=sprHoursHtml(p);
+  h+=sprForgeHtml(p);
+  h+=sprSealOfferHtml(p);
+  h+=sprSetDownHtml(p);
+  h+='</div>'; // roombody
+  h+='<div class="spr-roomfoot">You seal your own branch when its tasks are done.<br>When the last one closes, the work offers its sealing to confirm.</div>';
+  h+='</div></div>';
+  ov.innerHTML=h;
+}
+/* ══════════════════════════════════════════════════════════════════════════
+   SPECIAL PROJECTS · ENDING A WORK — solo v1 (chunk 5)
+   A project is the first BUSHIDO object that ENDS. Three exits (PART 2 / A6 / A11):
+   · SEAL (印) — the completion moment, a sealing not confetti. Offered only when every
+     branch is sealed, then a confirm beat. Sealed → status 'sealed', rests on the shelf.
+   · SET DOWN (open ring) — the honourable third exit (Kire). Hours return to the craft,
+     what was built remains. Set down → status 'setdown', rests on the shelf with an open ring.
+   · REOPEN — a sealed/set-down work can be reopened (quiet), back to live + editable.
+   A sealed/set-down room is READ-ONLY. The shelf is the finished-works view in the Shokunin
+   door (empty said in words). sprCount / works list count only ACTIVE works.
+   ══════════════════════════════════════════════════════════════════════════ */
+function sprIsActive(p){ return !!(p && p.status!=='sealed' && p.status!=='setdown'); }
+function sprMilestonesOf(p){ return (p.branches||[]).filter(function(b){ return b.kind!=='loose'; }); }
+function sprProjectSealable(p){
+  var ms = sprMilestonesOf(p);
+  return sprIsActive(p) && ms.length>0 && ms.every(function(b){ return b.sealed; });
+}
+function sprSealProject(id){
+  var p=sprGetProject(id); if(!p||!sprIsActive(p)) return;
+  if(!sprProjectSealable(p)) return;                 // guard — only a finished work seals
+  p.status='sealed'; p.endedAt=Date.now(); sprTouch(p);
+  SPR_EDIT=null; sprSave(); renderProjectRoom(id); try{ renderShokuninDoor(); }catch(e){}
+}
+function sprSetDownProject(id){
+  var p=sprGetProject(id); if(!p||!sprIsActive(p)) return;
+  p.status='setdown'; p.endedAt=Date.now(); sprTouch(p);
+  SPR_EDIT=null; sprSave(); renderProjectRoom(id); try{ renderShokuninDoor(); }catch(e){}
+}
+function sprReopenProject(id){
+  var p=sprGetProject(id); if(!p||sprIsActive(p)) return;
+  p.status='live'; p.endedAt=null; sprTouch(p);
+  SPR_EDIT=null; sprSave(); renderProjectRoom(id); try{ renderShokuninDoor(); }catch(e){}
+}
+
+/* ── live-room endings: the seal offer + the set-down affordance ───────── */
+function sprSealOfferHtml(p){
+  if(!sprProjectSealable(p)) return '';
+  if(SPR_EDIT==='sealwork'){
+    return '<div class="spr-sealbeat"><div class="spr-sealmark"><span class="spr-seal">印</span></div>'
+      + '<div class="spr-sealcopy">Every branch is sealed. Seal the work to finish it — it takes its place on the shelf beneath its craft.</div>'
+      + '<div class="spr-crow" style="justify-content:center;margin-top:14px"><button class="spr-btn solid" data-act="seal-work">Seal this work 印</button> <button class="spr-btn ghost" data-act="cancel">not yet</button></div></div>';
+  }
+  return '<div class="spr-sealbeat"><div class="spr-sealcopy">This work is ready to be finished.</div>'
+    + '<div class="spr-crow" style="justify-content:center;margin-top:10px"><button class="spr-btn solid" data-act="offer-seal">Seal the work</button></div></div>';
+}
+function sprSetDownHtml(p){
+  if(!sprIsActive(p)) return '';
+  if(SPR_EDIT==='setdown'){
+    return '<div class="spr-setdownrow"><div class="spr-cap2" style="text-transform:none;letter-spacing:.3px;font-size:11px;line-height:1.6;margin-bottom:8px">Set this work down? The hours return to the craft; what you built stays on the shelf with an open ring.</div>'
+      + '<button class="spr-btn" data-act="setdown-work">Set it down ○</button> <button class="spr-btn ghost" data-act="cancel">keep it live</button></div>';
+  }
+  return '<div class="spr-setdownrow"><button class="spr-del" data-act="ask-setdown">set this work down ○</button></div>';
+}
+
+/* ── the sealed / set-down room — READ-ONLY ───────────────────────────── */
+function sprRenderSealedRoom(p, ov){
+  var isSet = p.status==='setdown';
+  var when  = p.endedAt ? sprFmtWhen(p.endedAt) : '';
+  var mark  = isSet ? '<span class="spr-ring"></span>' : '<span class="spr-seal">印</span>';
+  var h='<div class="spr-sheet"><div class="spr-room">';
+  h+='<div class="spr-roombar"><button class="spr-close" data-act="close">✕ Close</button>'
+    +'<span class="spr-rt">'+sprEsc(p.name)+'</span>'
+    +'<span class="spr-rc"><span class="spr-status '+(isSet?'setdown':'')+'">'+(isSet?'Set down':'Sealed')+'</span></span></div>';
+  h+='<div class="spr-roomsub">'+sprEsc(sprCraftName(p.parentShok))+'</div>';
+  h+='<div class="spr-roombody">';
+  h+='<div class="spr-sealhero">'+mark+'<div class="spr-sealhero-copy">'+(isSet?'Set down':'Sealed')+(when?' · '+when:'')+'</div></div>';
+  h+='<div class="spr-sechead">The branches</div>';
+  (p.branches||[]).forEach(function(b){ h+=sprBranchStatic(b); });
+  h+=sprForgeStaticHtml(p);
+  h+='<div class="spr-setdownrow"><button class="spr-del" data-act="reopen-work">↻ reopen this work</button></div>';
+  h+='</div>';
+  h+='<div class="spr-roomfoot">'+(isSet
+      ? 'A work set down rests on the shelf with an open ring — the hours returned to the craft, what you built remains.'
+      : 'A sealed work joins the finished works on the shelf beneath its craft.')+'</div>';
+  h+='</div></div>';
+  ov.innerHTML=h;
+}
+function sprBranchStatic(b){
+  var h='<div class="spr-msblock'+(b.sealed?' sealed':'')+'"><div class="spr-msname">';
+  if(b.kind!=='loose'){ h+='<span class="spr-mseal" style="cursor:default">'+(b.sealed?'印':'')+'</span>'; }
+  h+='<span class="spr-bname" style="cursor:default">'+sprEsc(b.name)+'</span></div>';
+  h+='<div class="spr-subs">';
+  (b.subtasks||[]).forEach(function(s){
+    var outside=sprIsOutside(s.steward), unclaimed=!s.steward;
+    var owner = unclaimed ? 'unclaimed' : (outside ? 'outside hand · '+sprEsc(s.steward.name) : (s.steward.name==='James'?'You':sprEsc(s.steward.name)));
+    h+='<div class="spr-subtask'+(s.done?' done':'')+(unclaimed?' unclaimed':'')+(outside?' outside':'')+'">'
+      +'<span class="spr-tk" style="cursor:default">'+((s.done&&!outside)?'✓':'')+'</span>'
+      +'<span class="spr-st2">'+sprEsc(s.text)+'</span>'
+      +((s.decider&&s.decider.name)?'<span class="spr-gate">'+sprEsc(s.decider.name)+' decides</span>':'')
+      +'<span class="spr-owner">'+owner+'</span></div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+function sprForgeStaticHtml(p){
+  var lines=(p.forge||[]).slice().sort(function(a,b){ return (b.at||0)-(a.at||0); });
+  if(!lines.length) return '';
+  return '<div class="spr-forge"><div class="spr-sechead">Forge log</div>'
+    + lines.map(function(f){ return '<div class="spr-forgeline"><span>'+sprEsc(f.text)+'</span><span class="spr-when">'+sprFmtWhen(f.at)+'</span></div>'; }).join('')
+    + '</div>';
+}
+
+function sprRehomePanel(p){
+  if(SPR_EDIT!=='rehome') return '';
+  var chips=(state.shokunin||[]).map(function(c){
+    return '<span class="spr-chip'+(c.id==p.parentShok?' on':'')+'" data-act="rehome-pick" data-v="'+sprEsc(c.id)+'">'+sprEsc(c.text)+'</span>';
+  }).join('');
+  return '<div class="spr-composer" style="margin:6px 16px 0">'+(chips||'<span class="spr-cap2">no crafts yet</span>')+' <button class="spr-btn ghost" data-act="cancel">cancel</button></div>';
+}
+function sprBranchHtml(p,b){
+  var isLoose=b.kind==='loose', subs=b.subtasks||[], sealed=!!b.sealed, stewardOutside=sprIsOutside(b.steward);
+  var sealable=subs.filter(function(s){ return !sprIsOutside(s.steward); });
+  var ready = !sealed && sealable.length>0 && sealable.every(function(s){ return s.done; });
+  var h='<div class="spr-msblock'+(sealed?' sealed':'')+'" data-branch-id="'+b.id+'">';
+  h+='<div class="spr-msname">';
+  if(!isLoose && !stewardOutside){
+    h+='<button class="spr-mseal'+(ready?' ready':'')+'" '+(sealed?'disabled':'data-act="seal" data-b="'+b.id+'"')+' title="'+(sealed?'sealed':(ready?'seal this branch':'seal when its tasks are done'))+'">'+(sealed?'印':'')+'</button>';
+  } else if(!isLoose && stewardOutside){
+    h+='<span class="spr-status" title="outside-run — no seal (A13)">outside</span>';   // #3: a marker, never a seal control
+  }
+  if(SPR_EDIT==='name:'+b.id){
+    h+='<input id="spr-edit-input" class="spr-slot" style="max-width:220px" data-slot="branch-name" data-enter="spr-edit-btn" value="'+sprEsc(b.name)+'" autocomplete="off">'
+      +'<button id="spr-edit-btn" class="spr-btn" data-act="commit-name" data-b="'+b.id+'">save</button>';
+  } else {
+    h+='<span class="spr-bname" '+(sealed?'':'data-act="edit-name" data-b="'+b.id+'"')+'>'+sprEsc(b.name)+'</span>';
+  }
+  h+=sprStewardChip(b.id,'',b.steward,sealed);
+  if(!isLoose){
+    if(SPR_EDIT==='due:'+b.id){
+      h+='<input id="spr-due-input" type="date" class="spr-slot" style="max-width:150px;margin-left:auto" data-b="'+b.id+'" value="'+sprEsc(b.due||'')+'">';
+    } else {
+      h+='<span class="spr-ms-date'+(b.due?'':' unset')+'" '+(sealed?'':'data-act="edit-due" data-b="'+b.id+'"')+'>'+(b.due?'◷ '+sprFmtDate(b.due):'set a date')+'</span>';
+    }
+  }
+  h+='</div>'; // msname
+
+  h+='<div class="spr-subs">';
+  subs.forEach(function(s){ h+=sprSubtaskHtml(p,b,s); });
+  if(!sealed) h+=sprAddSubtaskHtml(b);
+  if(!sealed && !isLoose && SPR_EDIT!=='delbr:'+b.id) h+='<button class="spr-del" data-act="ask-del-branch" data-b="'+b.id+'">remove branch ✕</button>';
+  if(SPR_EDIT==='delbr:'+b.id) h+='<div class="spr-composer"><span class="spr-owner" style="color:var(--spr-red)">Remove this branch and its tasks? This cannot be undone.</span> <button class="spr-btn solid" data-act="delete-branch" data-b="'+b.id+'">remove</button> <button class="spr-btn ghost" data-act="cancel">keep</button></div>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+function sprSubtaskHtml(p,b,s){
+  var outside=sprIsOutside(s.steward), unclaimed=!s.steward, sealed=!!b.sealed;
+  var cls='spr-subtask'+(s.done?' done':'')+(unclaimed?' unclaimed':'')+(outside?' outside':'');
+  var h='<div class="'+cls+'" data-subtask-id="'+s.id+'">';
+  if(!outside && !sealed){
+    h+='<button class="spr-tk" data-act="tick" data-b="'+b.id+'" data-s="'+s.id+'">'+(s.done?'✓':'')+'</button>';
+  } else if(!outside && sealed){
+    h+='<span class="spr-tk" style="cursor:default">'+(s.done?'✓':'')+'</span>';
+  } else {
+    h+='<span class="spr-tk" style="border-style:dotted;opacity:.4;cursor:default" title="outside hand — no seal (A13)"></span>';   // #3
+  }
+  if(SPR_EDIT==='text:'+s.id){
+    h+='<input id="spr-edit-input" class="spr-slot" style="max-width:240px" data-slot="subtask-text" data-enter="spr-edit-btn" value="'+sprEsc(s.text)+'" autocomplete="off">'
+      +'<button id="spr-edit-btn" class="spr-btn" data-act="commit-text" data-s="'+s.id+'">save</button>';
+  } else {
+    h+='<span class="spr-st2" '+(sealed?'':'data-act="edit-text" data-s="'+s.id+'"')+'>'+sprEsc(s.text)+'</span>';
+  }
+  if(s.decider && s.decider.name){ h+='<span class="spr-gate">'+sprEsc(s.decider.name)+' decides</span>'; }   // #4: marker, not prose
+  if(s.blocker){ h+='<span class="spr-blocker">⚠ blocker</span>'; }
+  (s.consults||[]).forEach(function(c){ h+='<span class="spr-consult'+(c.outside?' outside':'')+'">asked '+sprEsc(c.name)+(c.outside?' · outside':'')+'</span>'; });
+  if(s.outsideHands && s.outsideHands.length){ h+='<span class="spr-hands">hands: '+s.outsideHands.map(sprEsc).join(' · ')+'</span>'; }
+  h+=sprOwnerSlot(b.id,s.id,s.steward,sealed);
+  if(!sealed && SPR_EDIT!=='delst:'+b.id+':'+s.id) h+='<button class="spr-del" data-act="ask-del-subtask" data-b="'+b.id+'" data-s="'+s.id+'">remove ✕</button>';
+  if(SPR_EDIT==='delst:'+b.id+':'+s.id) h+='<span class="spr-owner" style="color:var(--spr-red)">remove?</span> <button class="spr-btn solid" data-act="delete-subtask" data-b="'+b.id+'" data-s="'+s.id+'">yes</button> <button class="spr-btn ghost" data-act="cancel">no</button>';
+  if(SPR_EDIT==='steward:'+b.id+':'+s.id) h+=sprStewardForm(b.id,s.id);
+  h+='</div>';
+  return h;
+}
+function sprOwnerSlot(bid,sid,steward,sealed){
+  var label;
+  if(!steward) label='unclaimed · needs a hand';
+  else if(steward.outside) label='outside hand · '+sprEsc(steward.name);
+  else label=(steward.name==='James'?'You':sprEsc(steward.name));
+  var interactive = !sealed && !(steward && steward.outside);
+  return '<span class="spr-owner" '+(interactive?'data-act="edit-steward" data-b="'+bid+'" data-s="'+sid+'"':'')+'>'+label+'</span>';
+}
+function sprStewardChip(bid,sid,steward,sealed){
+  var label = !steward ? 'unclaimed' : (steward.outside ? 'outside · '+sprEsc(steward.name) : (steward.name==='James'?'You':sprEsc(steward.name)));
+  var interactive = !sealed && !(steward && steward.outside);
+  var h='<span class="spr-who-chip" '+(interactive?'data-act="edit-steward" data-b="'+bid+'" data-s="'+(sid||'')+'"':'')+'>'+label+'</span>';
+  if(SPR_EDIT==='steward:'+bid+':'+(sid||'')) h+=sprStewardForm(bid,sid||'');
+  return h;
+}
+function sprStewardForm(bid,sid){
+  return '<span class="spr-composer" style="margin:6px 0 0;padding-left:10px"><span class="spr-crow">'
+    +'<input id="spr-steward-name" class="spr-slot" style="max-width:150px" data-slot="steward-name" placeholder="a name" autocomplete="off">'
+    +'<button class="spr-btn" data-act="steward-set" data-b="'+bid+'" data-s="'+(sid||'')+'">internal</button>'
+    +'<button class="spr-btn ghost" data-act="steward-outside" data-b="'+bid+'" data-s="'+(sid||'')+'">outside hand</button>'
+    +'<button class="spr-btn ghost" data-act="steward-unclaim" data-b="'+bid+'" data-s="'+(sid||'')+'">unclaim</button>'
+    +'<button class="spr-btn ghost" data-act="cancel">cancel</button>'
+    +'</span></span>';
+}
+function sprAddSubtaskHtml(b){
+  return '<div class="spr-composer"><div class="spr-crow">'
+    +'<input id="spr-addst-'+b.id+'" class="spr-slot" data-slot="subtask-text" data-enter="spr-addst-btn-'+b.id+'" placeholder="add a task" autocomplete="off">'
+    +'<button id="spr-addst-btn-'+b.id+'" class="spr-btn" data-act="add-subtask" data-b="'+b.id+'">add</button>'
+    +'</div></div>';
+}
+function sprAddBranchHtml(kind){
+  return '<div class="spr-composer"><div class="spr-crow">'
+    +'<input id="spr-addbr-'+kind+'" class="spr-slot" data-slot="branch-name" data-enter="spr-addbr-btn-'+kind+'" placeholder="'+(kind==='loose'?'add an open item':'add a branch')+'" autocomplete="off">'
+    +'<button id="spr-addbr-btn-'+kind+'" class="spr-btn" data-act="add-branch" data-v="'+kind+'">add</button>'
+    +'</div></div>';
+}
+function sprHoursHtml(p){
+  var n=p.hoursPerWeek||0;
+  var val = (SPR_EDIT==='hours')
+    ? '<input id="spr-hours-input" type="number" min="0" step="0.5" class="spr-slot" style="max-width:90px" data-enter="spr-hours-btn" value="'+n+'"><button id="spr-hours-btn" class="spr-btn" data-act="commit-hours">set</button>'
+    : '<span class="spr-val" data-act="edit-hours">'+(n?n+' hrs / week':'set a budget')+'</span>';
+  return '<div class="spr-hours"><div class="spr-hrow"><span class="spr-cap2">Weekly hours budget</span>'+val+'</div>'
+    +'<div class="spr-gauge"><i style="width:'+Math.min(100,n*10)+'%"></i></div></div>';
+}
+function sprForgeHtml(p){
+  var lines=(p.forge||[]).slice().sort(function(a,b){ return (b.at||0)-(a.at||0); });
+  var body = lines.length
+    ? lines.map(function(f){ return '<div class="spr-forgeline"><span>'+sprEsc(f.text)+'</span><span class="spr-when">'+sprFmtWhen(f.at)+'</span></div>'; }).join('')
+    : '<div class="spr-forgeline" style="opacity:.5;font-style:italic">No marks in the forge log yet.</div>';
+  return '<div class="spr-forge"><div class="spr-sechead">Forge log</div>'+body
+    +'<div class="spr-composer"><div class="spr-crow">'
+    +'<input id="spr-forge-input" class="spr-slot" data-slot="forge-text" data-enter="spr-forge-btn" placeholder="post a mark (permanent)" autocomplete="off">'
+    +'<button id="spr-forge-btn" class="spr-btn" data-act="forge">post</button>'
+    +'</div></div></div>';
+}
+
 function renderDayWord(){
   var panel = document.getElementById('dw-panel');
   if(!panel){ dwUpdateNavDot(); return; }
@@ -13401,6 +14028,191 @@ window.dwAck = function(){
 // the local cache the onSnapshot listener fills.
 // The active clan id for calendar reads/writes — sourced from _activeClanId (C3a · design §2.5), never a
 // baked slug. null = clanless → cnCalFirestoreOn() is false and the SDK .doc() is never reached (§8 BLOCKER-7).
+/* ══════════════════════════════════════════════════════════════════════════
+   SPECIAL PROJECTS · ENTRY POINTS — solo v1 (chunk 3)
+   Two doors into the room (A21/A22):
+   · the phone WORKS pill — lives in the clan Day's-Word band (CLAN-GATED); state-aware
+     placement so it shares the row with the 今日の言葉 pill when collapsed and pins
+     top-left when the card is expanded. Three states: empty→dashed "＋ Raise a work",
+     one/several→solid "Works · N". Tapping opens the works list → a card opens the room.
+   · the SHOKUNIN door — the project card + finished-works shelf under its craft, in My
+     BUSHIDO. UNCONDITIONAL: renders for a clanless user AND at zero projects (empty shelf
+     said in words). It is the only door some users ever have (A22).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── the phone Works pill (clan band) ─────────────────────────────────── */
+function sprWorksPillHtml(){
+  var n = sprCount();
+  if(n===0) return '<button class="sp-works-pill empty" onclick="sprOpenWorks()" aria-label="Raise a work"><span class="wplus">＋</span><span class="wlbl">Raise a work</span></button>';
+  return '<button class="sp-works-pill" onclick="sprOpenWorks()" aria-label="Works"><span class="wk">Works</span><span class="wct">'+n+'</span></button>';
+}
+function sprRenderWorksPill(){
+  var band = document.getElementById('clan-dayword');
+  var panel = document.getElementById('dw-panel');
+  var prevRow = document.getElementById('sp-works-row'); if(prevRow) prevRow.remove();     // idempotent
+  if(panel){ var pin = panel.querySelector('.sp-works-pin'); if(pin) pin.remove(); }
+  if(!band || !panel) return;
+  if(band.style.display==='none') return;                        // clan-gated — no band, no pill (A22)
+  var html = sprWorksPillHtml();
+  var pillrow = panel.querySelector('.dw-pillrow');
+  if(pillrow){                                                   // Day's Word COLLAPSED → two pills, one band
+    pillrow.style.justifyContent = 'space-between';
+    var span = document.createElement('span'); span.className = 'sp-works-pin'; span.innerHTML = html;
+    pillrow.insertBefore(span, pillrow.firstChild);
+  } else {                                                       // expanded / unacknowledged → Works pinned top-left, card beneath
+    var row = document.createElement('div'); row.id = 'sp-works-row'; row.innerHTML = html;
+    band.insertBefore(row, panel);
+  }
+}
+
+/* ── the works list overlay (rail) ────────────────────────────────────── */
+function sprEnsureWorksDelegation(){
+  var ov = document.getElementById('sp-works-overlay'); if(!ov || ov._sprWired) return; ov._sprWired = true;
+  ov.addEventListener('click', function(e){
+    var t = e.target.closest && e.target.closest('[data-act]'); if(!t) return;
+    var act = t.getAttribute('data-act');
+    if(act==='close-works') sprCloseWorks();
+    else if(act==='open-work'){ sprCloseWorks(); openProjectRoom(t.getAttribute('data-p')); }
+    else if(act==='raise-work') sprRaiseWork();
+    else if(act==='raise-craft'){ SPR_RAISE_CRAFT = t.getAttribute('data-v');   // toggle in place — re-rendering would wipe the typed name/hours
+      var ovv=document.getElementById('sp-works-overlay');
+      if(ovv) ovv.querySelectorAll('.spr-chip[data-act="raise-craft"]').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-v')===String(SPR_RAISE_CRAFT)); });
+    }
+    else if(act==='raise-commit') sprRaiseCommit();
+  });
+}
+function sprRenderWorksList(){
+  var ov = document.getElementById('sp-works-overlay'); if(!ov) return;
+  var live = sprProjects().filter(function(p){ return sprIsActive(p); });
+  var cards = live.length ? live.map(function(p){
+    var nb = (p.branches||[]).filter(function(b){ return b.kind!=='loose'; }).length;
+    return '<div class="spr-projcard" data-act="open-work" data-p="'+p.id+'"><div class="spr-wbody">'
+      +'<div class="spr-pn">'+sprEsc(p.name)+'</div>'
+      +'<div class="spr-pmeta">'+sprEsc(sprCraftName(p.parentShok))+' · '+nb+' branch'+(nb===1?'':'es')+'</div></div></div>';
+  }).join('') : '<div class="spr-intro" style="margin-bottom:14px">'+sprIntroLine()+'</div>';
+  ov.innerHTML = '<div class="spr-sheet"><div class="spr-room">'
+    +'<div class="spr-roombar"><button class="spr-close" data-act="close-works">✕ Close</button><span class="spr-rt">Works</span></div>'
+    +'<div class="spr-roombody">'+cards
+    +'<button class="spr-btn" style="margin-top:14px" data-act="raise-work">＋ Raise a work</button>'
+    +'</div></div></div>';
+}
+function sprOpenWorks(){
+  sprEnsureWorksDelegation();
+  sprRenderWorksList();
+  var ov = document.getElementById('sp-works-overlay');
+  if(ov){ ov.classList.add('spr-open'); ov.style.display='block'; ov.setAttribute('aria-hidden','false'); }
+  try{ document.body.style.overflow='hidden'; }catch(e){}
+}
+function sprCloseWorks(){
+  var ov = document.getElementById('sp-works-overlay');
+  if(ov){ ov.classList.remove('spr-open'); ov.style.display='none'; ov.setAttribute('aria-hidden','true'); ov.innerHTML=''; }
+  try{ document.body.style.overflow=''; }catch(e){}
+}
+/* ── the feature's introduction (A23) — the empty state is the ONLY explanation four of
+   five clan members get of what a work is. Copy FINAL, approved by James 2026-08-27:
+   matches the UI vocabulary (work/works, not "special project") and teaches the ratified
+   verbs commission/walk/seal (A10/A11); no em-dash. Centralised (raise form + both empty states). ── */
+function sprIntroLine(){
+  return 'A work is a commission one of your crafts takes on: something that finishes. '
+       + 'You raise it, walk it, and seal it when it is done. '
+       + 'Sealed works rest on a shelf beneath the craft that made them.';
+}
+
+/* ── raise a work (chunk 4) — structured flow: name → craft → optional hours → room ─ */
+var SPR_RAISE_CRAFT = null;
+function sprRaiseWork(preCraft){
+  SPR_RAISE_CRAFT = (preCraft!=null) ? String(preCraft) : null;
+  sprEnsureWorksDelegation();
+  sprRenderRaise();
+  var ov = document.getElementById('sp-works-overlay');
+  if(ov){ ov.classList.add('spr-open'); ov.style.display='block'; ov.setAttribute('aria-hidden','false'); }
+  try{ document.body.style.overflow='hidden'; }catch(e){}
+}
+function sprRenderRaise(){
+  var ov = document.getElementById('sp-works-overlay'); if(!ov) return;
+  var crafts = (state.shokunin||[]);
+  var chips = crafts.length
+    ? crafts.map(function(c){ return '<span class="spr-chip'+(String(c.id)===String(SPR_RAISE_CRAFT)?' on':'')+'" data-act="raise-craft" data-v="'+sprEsc(c.id)+'">'+sprEsc(c.text)+'</span>'; }).join('')
+    : '<span class="spr-cap2">You have no crafts yet — a work hangs off one. Add a craft in Shokunin first.</span>';
+  var canCommit = crafts.length > 0;
+  ov.innerHTML = '<div class="spr-sheet"><div class="spr-room">'
+    + '<div class="spr-roombar"><button class="spr-close" data-act="close-works">✕ Close</button><span class="spr-rt">Raise a work</span></div>'
+    + '<div class="spr-roombody">'
+    + '<div class="spr-intro">'+sprIntroLine()+'</div>'
+    + '<div class="spr-cap2" style="margin:18px 0 6px">What is it called</div>'
+    + '<input id="spr-raise-name" class="spr-slot" style="width:100%" data-slot="raise-name" placeholder="name this work" autocomplete="off">'
+    + '<div class="spr-cap2" style="margin:18px 0 6px">Which craft takes it on</div>'
+    + '<div class="spr-crow">'+chips+'</div>'
+    + '<div class="spr-cap2" style="margin:18px 0 6px">Weekly hours <span style="opacity:.6">(optional)</span></div>'
+    + '<input id="spr-raise-hours" type="number" min="0" step="0.5" class="spr-slot" style="max-width:110px" data-slot="raise-hours" placeholder="e.g. 5">'
+    + (canCommit ? '<div style="margin-top:22px"><button class="spr-btn solid" data-act="raise-commit">Raise this work</button></div>' : '')
+    + '</div></div></div>';
+}
+function sprRaiseCommit(){
+  var nameEl = document.getElementById('spr-raise-name');
+  var name = nameEl ? (nameEl.value||'').trim() : '';
+  if(!name){ if(nameEl) nameEl.focus(); return; }
+  if(SPR_RAISE_CRAFT == null){                         // require a craft — highlight the picker
+    var cap = document.querySelector('#sp-works-overlay .spr-crow'); if(cap) cap.scrollIntoView({block:'center'});
+    return;
+  }
+  var hoursEl = document.getElementById('spr-raise-hours');
+  var hours = hoursEl ? parseFloat(hoursEl.value) : 0; if(isNaN(hours) || hours < 0) hours = 0;
+  var craft = /^-?\d+$/.test(String(SPR_RAISE_CRAFT)) ? +SPR_RAISE_CRAFT : SPR_RAISE_CRAFT;
+  var id = sprNewId('pr');
+  sprProjects().push({ id:id, parentShok:craft, name:name, status:'live', raisedAt:Date.now(), endedAt:null,
+    hoursPerWeek:hours, updatedAt:Date.now(), branches:[], forge:[] });
+  sprSave();
+  SPR_RAISE_CRAFT = null;
+  sprCloseWorks();
+  openProjectRoom(id);                                 // land straight in the new room
+}
+
+/* ── the Shokunin door (My BUSHIDO) — UNCONDITIONAL ───────────────────── */
+function renderShokuninDoor(){
+  var el = document.getElementById('sp-shokunin-door'); if(!el) return;
+  var live = sprProjects().filter(function(p){ return p && p.status!=='sealed' && p.status!=='setdown'; });
+  var done = sprProjects().filter(function(p){ return p && (p.status==='sealed' || p.status==='setdown'); });
+  var h = '<div class="spr-doorhead">Special Projects</div>';
+  if(live.length){
+    var byCraft = {};
+    live.forEach(function(p){ var k = String(p.parentShok); (byCraft[k] = byCraft[k]||[]).push(p); });
+    Object.keys(byCraft).forEach(function(k){
+      h += '<div class="spr-cap2" style="margin:6px 0 8px">'+sprEsc(sprCraftName(k))+'</div>';
+      byCraft[k].forEach(function(p){
+        var nb = (p.branches||[]).filter(function(b){ return b.kind!=='loose'; }).length;
+        h += '<div class="spr-projcard" onclick="openProjectRoom(\''+p.id+'\')"><div class="spr-wbody">'
+          +'<div class="spr-pn">'+sprEsc(p.name)+'</div>'
+          +'<div class="spr-pmeta">'+nb+' branch'+(nb===1?'':'es')+' · '+(p.hoursPerWeek||0)+' hrs/wk</div></div></div>';
+      });
+    });
+  } else {
+    h += '<div class="spr-shelf-empty" style="text-align:left"><div class="spr-intro">'+sprIntroLine()+'</div></div>';
+  }
+  h += '<button class="spr-btn" style="margin-top:12px" onclick="sprRaiseWork()">＋ Raise a work</button>';
+  h += '<div class="spr-doorhead" style="margin-top:24px">Finished works</div>';
+  if(done.length){
+    h += '<div class="spr-shelf">'+done.map(function(p){
+      var mark = p.status==='setdown' ? '<span class="spr-ring" title="set down"></span>' : '<span class="spr-seal">印</span>';
+      return '<div class="spr-work" onclick="openProjectRoom(\''+p.id+'\')"><div class="spr-wbody">'
+        +'<div class="spr-wn">'+sprEsc(p.name)+'</div>'
+        +'<div class="spr-ws">'+(p.status==='setdown'?'set down':'sealed')+'</div></div>'+mark+'</div>';
+    }).join('')+'</div>';
+  } else {
+    h += '<div class="spr-shelf-empty">No finished works yet — the shelf fills as you seal a work.</div>';
+  }
+  el.innerHTML = h;
+}
+
+/* ── tie the Works pill to every Day's-Word render ────────────────────── */
+(function(){
+  if(typeof renderDayWord !== 'function') return;
+  var orig = renderDayWord; if(orig._sprWrapped) return;
+  var wrapped = function(){ var r = orig.apply(this, arguments); try{ sprRenderWorksPill(); }catch(e){} return r; };
+  wrapped._sprWrapped = true;
+  renderDayWord = wrapped;
+})();
+
 function cnCalClanId(){ return (typeof _activeClanId !== 'undefined') ? _activeClanId : null; }
 // ── clanCalendar doc shape (reshaped 2026-08-25 · clancal-merge-net) ──────────
 // Mutable state moved OUT of the events array into flat, doc-root maps so (a) the
