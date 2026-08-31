@@ -13410,6 +13410,22 @@ function sprCount(){ return sprProjects().filter(function(p){ return sprIsActive
 
 function sprFmtDate(iso){ if(!iso) return ''; try{ return new Date(iso+'T00:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){ return iso; } }
 function sprFmtWhen(ms){ if(!ms) return ''; try{ return new Date(ms).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){ return ''; } }
+// A6: format the clan-summary doc's updatedAt for the read-only clan view's "as of <date>" staleness line.
+// Accepts a Firestore Timestamp (.toDate), a raw {seconds,…}, a millis number, an ISO string, or a Date.
+// Unknown/unparseable → '' so the caller renders NOTHING rather than a false "as of" (the sync-time-label
+// lesson: a failed read degrades to neutral, never to a claim). An absent date is genuinely absent.
+function sprFmtAsOf(ts){
+  if(!ts) return '';
+  try{
+    var d;
+    if(typeof ts.toDate==='function') d=ts.toDate();
+    else if(typeof ts.seconds==='number') d=new Date(ts.seconds*1000);
+    else if(typeof ts==='number') d=new Date(ts);
+    else d=new Date(ts);
+    if(!d || isNaN(d.getTime())) return '';
+    return d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+  }catch(e){ return ''; }
+}
 
 function sprSave(){ try{ saveState(); }catch(e){} }
 function sprRerender(){ if(SPR_OPEN) renderProjectRoom(SPR_OPEN); }
@@ -13712,7 +13728,12 @@ function sprRenderSealedRoom(p, ov){
 function sprBranchStatic(b, literalNames){
   var h='<div class="spr-msblock'+(b.sealed?' sealed':'')+'"><div class="spr-msname">';
   if(b.kind!=='loose'){ h+='<span class="spr-mseal" style="cursor:default">'+(b.sealed?'印':'')+'</span>'; }
-  h+='<span class="spr-bname" style="cursor:default">'+sprEsc(b.name)+'</span></div>';
+  h+='<span class="spr-bname" style="cursor:default">'+sprEsc(b.name)+'</span>';
+  // A1: the branch's due date — a read-only viewer must SEE it, exactly as the owner does in sprBranchHtml.
+  // Read-only: display markup only, no data-act="edit-due" handler. Absent due renders nothing (genuinely
+  // absent for everyone — the owner's "set a date" is an affordance-prompt, not information to withhold).
+  if(b.kind!=='loose' && b.due){ h+='<span class="spr-ms-date">◷ '+sprFmtDate(b.due)+'</span>'; }
+  h+='</div>';
   h+='<div class="spr-subs">';
   (b.subtasks||[]).forEach(function(s){
     var outside=sprIsOutside(s.steward), unclaimed=!s.steward;
@@ -13722,8 +13743,15 @@ function sprBranchStatic(b, literalNames){
     h+='<div class="spr-subtask'+(s.done?' done':'')+(unclaimed?' unclaimed':'')+(outside?' outside':'')+'">'
       +'<span class="spr-tk" style="cursor:default">'+((s.done&&!outside)?'✓':'')+'</span>'
       +'<span class="spr-st2">'+sprEsc(s.text)+'</span>'
-      +((s.decider&&s.decider.name)?'<span class="spr-gate">'+sprEsc(s.decider.name)+' decides</span>':'')
-      +'<span class="spr-owner">'+owner+'</span></div>';
+      +((s.decider&&s.decider.name)?'<span class="spr-gate">'+sprEsc(s.decider.name)+' decides</span>':'');
+    // A1: every CONTENT field the owner's view (sprSubtaskHtml) shows must appear here too — the blocker,
+    // who was consulted, and the outside hands. Copied verbatim from sprSubtaskHtml; these emit no controls,
+    // so the read-only guarantee is untouched. A read-only view is correct only when the viewer sees every
+    // field the owner sees, minus the controls (NEVER RENDER PRESENCE AND ABSENCE IDENTICALLY).
+    if(s.blocker){ h+='<span class="spr-blocker">⚠ blocker</span>'; }
+    (s.consults||[]).forEach(function(c){ h+='<span class="spr-consult'+(c.outside?' outside':'')+'">asked '+sprEsc(c.name)+(c.outside?' · outside':'')+'</span>'; });
+    if(s.outsideHands && s.outsideHands.length){ h+='<span class="spr-hands">hands: '+s.outsideHands.map(sprEsc).join(' · ')+'</span>'; }
+    h+='<span class="spr-owner">'+owner+'</span></div>';
   });
   h+='</div></div>';
   return h;
@@ -13742,7 +13770,7 @@ function sprForgeStaticHtml(p){
    static renderers (sprBranchStatic/sprForgeStaticHtml) emit no inputs and no edit handlers.
    Not a disabled attribute — there is nothing to disable. Own projects route to the real
    editable room instead. */
-function sprRenderClanView(p, ownerName, ov){
+function sprRenderClanView(p, ownerName, ov, asOf){
   var statusLabel=({live:'Live',sealed:'Sealed',setdown:'Set down'}[p.status||'live']||'Live');
   var milestones=(p.branches||[]).filter(function(b){ return b.kind!=='loose'; });
   var loose=(p.branches||[]).filter(function(b){ return b.kind==='loose'; });
@@ -13753,13 +13781,21 @@ function sprRenderClanView(p, ownerName, ov){
   h+='<div class="spr-roomsub">'+sprEsc(p.craftName||sprCraftName(p.parentShok))+'</div>';
   h+='<div class="spr-roombody">';
   h+='<div style="font-size:11px;color:var(--ink-light);font-style:italic;margin-bottom:12px">'+sprEsc(ownerName)+'’s project · you’re viewing it.</div>';
+  // A6: the mirror republishes a project ONLY on the owner's save, so this snapshot can be days behind with
+  // nothing on screen saying so (a stale project and a current one would render identically — the house
+  // principle in a new costume). Stamp it with the summary doc's updatedAt. Interim only: the clan-record
+  // migration dissolves this (one live doc, no publish step to fall behind) — see SCP_CLAN_MIGRATION_DESIGN.
+  var asOfStr=sprFmtAsOf(asOf);
+  if(asOfStr){ h+='<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);margin:-6px 0 14px">as of '+sprEsc(asOfStr)+'</div>'; }
   h+='<div class="spr-sechead">The branches</div>';
   milestones.forEach(function(b){ h+=sprBranchStatic(b, true); });
   if(loose.length){ h+='<div class="spr-sechead">Open — not yet a branch</div>'; loose.forEach(function(b){ h+=sprBranchStatic(b, true); }); }
   if(p.hoursPerWeek){ h+='<div class="spr-roomsub" style="margin-top:14px">'+p.hoursPerWeek+' hrs a week</div>'; }
   h+=sprForgeStaticHtml(p);
   h+='</div>';
-  h+='<div class="spr-roomfoot">This project lives with '+sprEsc(ownerName)+'. You see all of it; only '+sprEsc(ownerName)+' can change it.</div>';
+  // A2: "You see all of it" was a false completeness claim that any future field addition silently falsifies.
+  // The ownership truths ("lives with X", "only X can change it") stay — they don't need to be re-proved.
+  h+='<div class="spr-roomfoot">This project lives with '+sprEsc(ownerName)+'. Only '+sprEsc(ownerName)+' can change it.</div>';
   h+='</div></div>';
   ov.innerHTML=h;
 }
@@ -13770,7 +13806,7 @@ function sprOpenClanView(uid, pid){
   var ov=document.getElementById('sp-room-overlay'); if(!ov) return;
   sprEnsureDelegation();
   SPR_OPEN=null; SPR_EDIT=null;                        // structural read-only: no owned project open → every edit act is a no-op
-  sprRenderClanView(p, m.name||'A clan member', ov);
+  sprRenderClanView(p, m.name||'A clan member', ov, m.updatedAt);   // A6: stamp with the summary doc's freshness
   ov.classList.add('spr-open'); ov.style.display='block'; ov.setAttribute('aria-hidden','false');
   try{ document.body.style.overflow='hidden'; }catch(e){}
 }
@@ -14178,6 +14214,9 @@ function sprIntroLine(){
 var SPR_RAISE_CRAFT = null;
 function sprRaiseWork(preCraft){
   SPR_RAISE_CRAFT = (preCraft!=null) ? String(preCraft) : null;
+  // A3: with exactly one craft there is nothing to choose — pre-select it so the user isn't forced to tap
+  // a chip whose only alternative is itself. (Multiple crafts still require a deliberate pick.)
+  var _cr=(state.shokunin||[]); if(SPR_RAISE_CRAFT==null && _cr.length===1) SPR_RAISE_CRAFT=String(_cr[0].id);
   sprEnsureWorksDelegation();
   sprRenderRaise();
   var ov = document.getElementById('sp-works-overlay');
@@ -14199,6 +14238,7 @@ function sprRenderRaise(){
     + '<input id="spr-raise-name" class="spr-slot" style="width:100%" data-slot="raise-name" placeholder="name this project" autocomplete="off">'
     + '<div class="spr-cap2" style="margin:18px 0 6px">Which craft takes it on</div>'
     + '<div class="spr-crow">'+chips+'</div>'
+    + '<div id="spr-raise-craft-msg" style="display:none;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);margin-top:6px">pick the craft this belongs to</div>'
     + '<div class="spr-cap2" style="margin:18px 0 6px">Weekly hours <span style="opacity:.6">(optional)</span></div>'
     + '<input id="spr-raise-hours" type="number" min="0" step="0.5" class="spr-slot" style="max-width:110px" data-slot="raise-hours" placeholder="e.g. 5">'
     + (canCommit ? '<div style="margin-top:22px"><button class="spr-btn solid" data-act="raise-commit">Raise this project</button></div>' : '')
@@ -14208,7 +14248,8 @@ function sprRaiseCommit(){
   var nameEl = document.getElementById('spr-raise-name');
   var name = nameEl ? (nameEl.value||'').trim() : '';
   if(!name){ if(nameEl) nameEl.focus(); return; }
-  if(SPR_RAISE_CRAFT == null){                         // require a craft — highlight the picker
+  if(SPR_RAISE_CRAFT == null){                         // A3: require a craft — SAY so, don't scroll in silence
+    var msg = document.getElementById('spr-raise-craft-msg'); if(msg) msg.style.display='block';
     var cap = document.querySelector('#sp-works-overlay .spr-crow'); if(cap) cap.scrollIntoView({block:'center'});
     return;
   }
