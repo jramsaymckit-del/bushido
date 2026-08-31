@@ -329,6 +329,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .spr-hands{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-amber);opacity:.9}
 .spr-blocker{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);font-weight:700}
 .spr-slot{border:1px solid var(--spr-edge);border-radius:2px;background:var(--spr-white);padding:7px 10px;font-family:'Noto Serif JP',serif;font-size:12.5px;color:var(--spr-ink)}
+/* SCP inputs had NO author placeholder rule → the UA default (#757575) rendered at ~4.06:1 on parchment /
+   ~4.50:1 on the field's own near-white bg, under WCAG AA 4.5. Set the lightest NEUTRAL existing token that
+   clears AA (--spr-ink-light #3A3A3A → ~10:1). opacity:1 so a browser's default placeholder fade can't
+   pull it back under. (Fixes #spr-steward-name and every sibling SCP input consistently.) */
+.spr-slot::placeholder{color:var(--spr-ink-light);opacity:1}
 .spr-composer{margin:8px 0 0}
 .spr-crow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .spr-chip{border:1px solid var(--spr-edge);border-radius:2px;padding:5px 10px;font-size:10.5px;color:var(--spr-ink-light);background:rgba(255,255,255,.5);cursor:pointer}
@@ -13699,7 +13704,10 @@ function sprSetDownHtml(p){
     return '<div class="spr-setdownrow"><div class="spr-cap2" style="text-transform:none;letter-spacing:.3px;font-size:11px;line-height:1.6;margin-bottom:8px">Set this project down? The hours return to the craft; what you built stays on the shelf with an open ring.</div>'
       + '<button class="spr-btn" data-act="setdown-work">Set it down ○</button> <button class="spr-btn ghost" data-act="cancel">keep it live</button></div>';
   }
-  return '<div class="spr-setdownrow"><button class="spr-del" data-act="ask-setdown">set this project down ○</button></div>';
+  // James's ruling (2026-08-31): a set-down is PRUNING, not failure — so its affordance reads as a real
+  // choice (outlined ghost button, ink text, no fill), visibly quieter than the filled-red SEAL but no
+  // longer a faint text-link footnote. Reuses the existing .spr-btn.ghost token — no new styling.
+  return '<div class="spr-setdownrow"><button class="spr-btn ghost" data-act="ask-setdown">set this project down ○</button></div>';
 }
 
 /* ── the sealed / set-down room — READ-ONLY ───────────────────────────── */
@@ -13793,8 +13801,9 @@ function sprRenderClanView(p, ownerName, ov, asOf){
   if(p.hoursPerWeek){ h+='<div class="spr-roomsub" style="margin-top:14px">'+p.hoursPerWeek+' hrs a week</div>'; }
   h+=sprForgeStaticHtml(p);
   h+='</div>';
-  // A2: "You see all of it" was a false completeness claim that any future field addition silently falsifies.
-  // The ownership truths ("lives with X", "only X can change it") stay — they don't need to be re-proved.
+  // A2: the old footer asserted the viewer saw the WHOLE project — a completeness claim that any future
+  // field addition silently falsifies. Dropped. The ownership truths ("lives with X", "only X can change
+  // it") stay — they don't need to be re-proved.
   h+='<div class="spr-roomfoot">This project lives with '+sprEsc(ownerName)+'. Only '+sprEsc(ownerName)+' can change it.</div>';
   h+='</div></div>';
   ov.innerHTML=h;
