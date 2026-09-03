@@ -85,3 +85,25 @@ back to them as **"You"**. Two different people both read as "You" on the same r
 `DIRECTION.md` A24 records the standing tension: the feature is called *Special **Clan** Project*
 while v1 shares nothing — the "Clan" was the aspiration, parked to B2. **This request is B2.**
 Building it closes that tension rather than working around it.
+
+---
+
+## ⚑ ALSO FOR CECE — live incident, SCP raise flow (2026-09-03, OPEN)
+
+Chark tapped "Raise this project" and nothing saved. He **has crafts**, so the commit button rendered
+and his tap did reach `sprRaiseCommit`. Cause still **unconfirmed** — narrowed to:
+
+1. **Empty name** — `sprRaiseCommit` does `if(!name){ nameEl.focus(); return; }`. Focus, **no message**.
+   Truly silent. (If he has exactly one craft it is auto-selected at `:14315`, which rules the craft
+   guard out entirely and leaves this as the only dead-tap path.)
+2. **No craft picked** (2+ crafts only) — there IS a message, but it is 9px uppercase micro-copy.
+3. **Signed out** — project lands in localStorage only; a ⚠ "not saved to cloud" chip offers a retry.
+   `saveStateToFirestore` returns early at `:10355`. **This one no copy fix helps.**
+
+The discriminator: *did the project room open?* Yes → created and stranded locally (#3).
+No → rejected by a guard (#1/#2), nothing written.
+
+**A patch for #1 and #2 is written and ready:** see `PATCH-raise-flow-silent-failure.md` in this repo.
+Not applied. It carries the one trap that matters — `sprRenderRaise` rebuilds `innerHTML` and the typed
+name/hours live only in the DOM, so surfacing a message via re-render **wipes what the user typed**.
+Every edit in the patch is an in-place style toggle for that reason.
