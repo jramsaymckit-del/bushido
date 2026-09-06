@@ -10,7 +10,8 @@
 
 ## ⚑ OPEN REQUEST FOR CECE — Special Clan Projects: full editability + real cross-user assignment
 
-**Raised by James, 2026-09-03. Nothing has been built. This is a note, not a change.**
+**Raised by James, 2026-09-03. RE-RAISED 2026-09-06 — he has now asked twice.**
+**Nothing has been built. This is a note, not a change.**
 
 **The ask, in his words:** *"Special projects needs to be all editable and assign other users other tasks."*
 
@@ -107,3 +108,44 @@ No → rejected by a guard (#1/#2), nothing written.
 Not applied. It carries the one trap that matters — `sprRenderRaise` rebuilds `innerHTML` and the typed
 name/hours live only in the DOM, so surfacing a message via re-render **wipes what the user typed**.
 Every edit in the patch is an in-place style toggle for that reason.
+
+---
+
+## ⚑ FOR CECE — SCP home-page placement: the door is not scoped to its own pillar (2026-09-06, OPEN)
+
+**James, on seeing it on his phone:** *"I don't like them cluttering up the home kaizen page."*
+Re-raised the same day as the editability ask above — **that request now stands twice.**
+
+### The finding (read 2026-09-06, `app/index.html` @ `7073b9f`)
+
+`#sp-shokunin-door` (`:3751`) sits in the **SHARED** scroll area — after `#goals-list`, before the
+REFLECTION row — **not inside any tab container**. `renderTab()` calls `renderShokuninDoor()` on every
+render. So the block called the *Shokunin* door paints identically on **Kaizen, Shokunin AND Ikigai**.
+
+On the Kaizen home that is: a "Special Clan Projects" heading, the craft caption, every live project
+card, a "＋ Raise a Special Clan Project" button, a "The shelf" heading, and — at zero sealed projects —
+a large dashed empty-shelf box. Six elements, none of them Kaizen.
+
+### Why this is probably a small fix, not a reversal of A22
+
+A22 ratified the door as UNCONDITIONAL, but read the wording: *"renders clanless AND at zero projects"*.
+The unconditionality is about **STATE**, not about **WHICH TAB**. Scoping the door to the Shokunin tab
+keeps it unconditional within its own home and honours the name it already has. That reading should be
+**put to James before building** — if A22 was meant to include tab-ubiquity, this becomes a deliberate
+reversal and needs his ruling, not a quiet tidy.
+
+### Options, cheapest first
+1. **Scope to the Shokunin tab.** Smallest diff, self-consistent with the door's name. Cost: the
+   feature loses its cross-tab discoverability — the exact thing the 2026-09-02 witness band was
+   built to solve. Weigh against that build before choosing.
+2. **Collapse the empty shelf.** The dashed "Nothing on the shelf yet" box is the single heaviest
+   element for zero information. "Empty said in words" was a v1 choice (A22-era) — revisit it.
+3. **Collapse the whole door to a one-line pill on non-Shokunin tabs**, expanding in place.
+   Most work, best of both; matches the existing WORKS-pill precedent in the clan band.
+
+### Traps
+- `renderShokuninDoor` is called inside `renderTab`'s `try{}catch{}` (deliberately kept OUT of the
+  launcher `finally` so the launcher-hotfix pattern stays byte-exact). Do not restructure that.
+- `verify_project_entrypoints` (11/11) asserts the door renders — it keys on the door being present
+  on a My BUSHIDO render. Tab-scoping WILL trip it. Update RED-first; do not weaken to green.
+- A23/A24 govern any new copy on this surface.
