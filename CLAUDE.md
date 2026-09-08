@@ -8,7 +8,78 @@
 
 ---
 
+## ⚑⚑⚑ READ FIRST — THE GOVERNING FRAME: SCP is ONE TREE for the whole clan (2026-09-06)
+
+**James, verbatim:** *"SCP should show the entire clan's work as one tree. I think that wasn't
+understood when it was built."*
+
+He is right, and the code already agrees with him. `sprRenderClanView:13875` calls the current
+shape scaffolding in as many words:
+
+> *"Interim only: the clan-record migration dissolves this (**one live doc**, no publish step to
+> fall behind) — see SCP_CLAN_MIGRATION_DESIGN."*
+
+**Everything else in this file is downstream of this section. Read it before acting on any of them.**
+
+### The mismatch, precisely: the ROOT is wrong
+
+| | Built (today) | Intended |
+|---|---|---|
+| Root | the **person** | the **clan** |
+| Path | `users/{uid}` → `state.projects[]` → branches → subtasks | clan → projects → branches → subtasks |
+| Count | **N trees**, one per member | **ONE tree** |
+| Ownership | a project belongs to a person | a project belongs to the clan; a person stewards **nodes** |
+| Transport | `writeClanSummary` copies each person's projects to their own `/clan/{uid}`, one-way, owner-republished | one live clan doc |
+
+### The three open requests are ONE request
+
+Each is a symptom of the person-as-root model. Do not build them separately.
+
+1. **"No one else can edit"** — not a permissions bug. In a per-user model a clan-mate's project
+   lives in a document you *cannot write*, so read-only was structurally forced. In one tree,
+   editing is the default and the real question is which nodes you may touch. The
+   `steward:{name,uid,outside}` shape was designed for exactly this.
+2. **"Too many homes"** — a symptom, not a UI problem. N per-person trees NEED N surfaces to show
+   them: the member card (per person), the witness band (per person, aggregated), the door (yours).
+   One tree needs one surface. The clutter is the data model showing through the interface.
+3. **"Shelf to the clan page, SCP only in that button"** — this is simply what one tree looks like
+   from the front: one door, one tree, sealed work resting at its base.
+
+### Corrections to the existing record
+- **A24 is NOT a naming tension.** It is recorded as *"the name says Clan while v1 shares nothing —
+  the name is the aspiration."* Wrong reading. The name was right; the **build** drifted solo. Close
+  A24 as a spec that was not implemented, not as a tension to be resolved by renaming.
+- **The `'James'` hardcoded identity bug cannot survive this migration** — one tree makes `uid`
+  mandatory (you must know whose node a node is). It dissolves rather than needing its own fix.
+- **The `"as of"` staleness stamp deletes itself** — one live doc has no publish step to fall behind.
+- **The read-only footer** (*"This project lives with X. Only X can change it."*) is the per-user
+  model stated as a promise to the user. It goes.
+
+### What must be DECIDED before code (James's calls, not cece's)
+1. **Shinobi.** `buildOwnClanData:9378` does `own.projects = []` — a shinobi member withholds SCPs
+   entirely. You cannot redact yourself out of a *shared* tree that way. What does shinobi mean here?
+2. **Clanless users.** If the tree is clan-scoped, what does a clanless user get? Today the
+   unconditional door is their only entry point (A22) — and it is the one being deleted. A clan of one?
+3. **Node-level write rules.** Who may add a branch, tick a sub-task, seal, delete? The four ratified
+   rendered-DOM boundaries (`:13475–13477`, esp. **A13** — outside-hand rows show no seal/tick
+   affordance) are the starting point and must survive.
+
+### The headline engineering risk
+This makes SCP the **first genuinely concurrent multi-writer object in BUSHIDO.** The merge net
+(recursive id-union → per-entity `updatedAt` CAS → tombstones) was built for this shape but has
+**never faced two live writers**. Incident A8 (2026-07-02) was exactly this class — a second writer
+clobbering newer data. Plus a real data migration: existing projects (James's *The Vaults*, 4
+branches; Chark's sealed *New things*) must move out of per-user arrays into the clan tree with
+zero loss.
+
+**Start at `SCP_CLAN_MIGRATION_DESIGN`, not at the UI.**
+
+---
+
 ## ⚑ OPEN REQUEST FOR CECE — Special Clan Projects: full editability + real cross-user assignment
+
+> **Downstream of the ONE TREE frame above — read that first.** This request is what the
+> person-as-root model makes structurally impossible.
 
 **Raised by James, 2026-09-03. RE-RAISED 2026-09-06 — he has now asked twice.**
 **Nothing has been built. This is a note, not a change.**
@@ -161,6 +232,10 @@ should be moved to clan page and SCP should only live in that button on the clan
 homes beyond the SCP button need to go. Goes against our brand philosophy of minimalism."*
 
 This is a **design ruling**, not a bug report. It supersedes the placement options noted above.
+
+> **Downstream of the ONE TREE frame at the top of this file — read that first.** The surface
+> count below is a SYMPTOM of the person-as-root data model. Deleting surfaces without inverting
+> the root treats the symptom and destroys cross-user visibility on the way (see the ⚠ below).
 
 ### The four surfaces, verified (`app/index.html` @ `7073b9f`)
 
