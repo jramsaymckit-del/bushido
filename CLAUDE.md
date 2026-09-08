@@ -111,7 +111,8 @@ Every edit in the patch is an in-place style toggle for that reason.
 
 ---
 
-## ⚑ FOR CECE — SCP home-page placement: the door is not scoped to its own pillar (2026-09-06, OPEN)
+## ⚑ FOR CECE — SCP home-page placement (2026-09-06) — **SUPERSEDED by the consolidation ruling below.**
+*Kept for its code findings only. James has since ruled on the whole surface set — build to that section, not this one.*
 
 **James, on seeing it on his phone:** *"I don't like them cluttering up the home kaizen page."*
 Re-raised the same day as the editability ask above — **that request now stands twice.**
@@ -149,3 +150,62 @@ reversal and needs his ruling, not a quiet tidy.
 - `verify_project_entrypoints` (11/11) asserts the door renders — it keys on the door being present
   on a My BUSHIDO render. Tab-scoping WILL trip it. Update RED-first; do not weaken to green.
 - A23/A24 govern any new copy on this surface.
+
+---
+
+## ⚑⚑ FOR CECE — RULING: SCP must have ONE home (2026-09-06) — highest priority of the three
+
+**James, verbatim:** *"Special clan projects lives in too many spaces. It's on the user card in the
+clan page, it has two other homes on the clan page, and it lives in the kaizen page. I think shelf
+should be moved to clan page and SCP should only live in that button on the clan page. All other
+homes beyond the SCP button need to go. Goes against our brand philosophy of minimalism."*
+
+This is a **design ruling**, not a bug report. It supersedes the placement options noted above.
+
+### The four surfaces, verified (`app/index.html` @ `7073b9f`)
+
+| # | Surface | Where | Code |
+|---|---|---|---|
+| 1 | **The Shokunin door** — heading, craft caption, project cards, raise button, "The shelf" | My BUSHIDO, **all three tabs** | `renderShokuninDoor:14367`, called `renderTab:5660` (+ 3 re-renders at `:13757/13762/13767`) |
+| 2 | **The SCP pill** — "＋ SCP" / "SCP · N" | My Clan, Day's-Word band | `sprWorksPillHtml:14223` → `sprOpenWorks:14278` → `sprRenderWorksList:14263`; wired by wrapping `renderDayWord` at `:14403` |
+| 3 | **Member-card project rows** | My Clan, on each clan-mate's card | `:9685` → `sprOpenClanView` |
+| 4 | **共作 SHARED WORK witness band** | My Clan, beneath the momentum strip | `renderClanProjectBand:9746`, called `:9716` → `sprOpenClanView` |
+
+James's count maps exactly: user card (3), two other clan homes (2 + 4), Kaizen page (1).
+
+### The ruling
+- **KEEP** — #2, the SCP button, as the single home.
+- **MOVE** — the shelf out of #1 and into the clan page (inside the button's overlay is the natural
+  place — `sprRenderWorksList` already renders there and currently shows live projects only).
+- **REMOVE** — #1 entirely, plus #3 and #4.
+
+### ⚠ THE ONE THING TO CONFIRM WITH JAMES BEFORE BUILDING
+
+**Removing #3 and #4 removes ALL cross-user SCP visibility.** `sprRenderWorksList` renders
+`sprProjects()` — the signed-in user's OWN projects only. The member-card rows and the witness band
+are the *only* two surfaces that show a clan-mate's projects. Delete both and the pill shows you
+nothing but your own work: **SCP becomes fully solo again**, undoing the 2026-08-28 clan-visibility
+build and the 2026-09-02 witness band, and re-opening the A24 tension (the name says "Clan" while
+nothing is shared).
+
+Note the witness band is **six days old** and was built precisely because Susan, Chark and Elijah
+each opened My Clan, scanned, saw nothing and said no. Removing it restores that exact condition.
+
+This is not an argument against the ruling — minimalism is a legitimate override, and it is James's
+call. But "one home" and "clan-mates' projects stay visible" can both be satisfied: fold the
+clan-mate list INTO the button's overlay (own projects + clan-mates in one place, one door, one tap)
+rather than deleting the capability. **Put that to James as the first question.**
+
+### Other consequences
+- **A22 is genuinely reversed here** (the unconditional door is deleted, not re-scoped). Record the
+  reversal in DIRECTION.md — do not let it happen silently.
+- The three post-mutation `renderShokuninDoor()` calls at `:13757/13762/13767` (seal / set-down /
+  reopen) become dead and must be removed with it, or they throw.
+- The pill is wired by **monkey-patching `renderDayWord`** (`:14403`). It is CLAN-GATED — a clanless
+  user currently reaches SCP only through the door being deleted. **A clanless user must not be left
+  with no entry point at all.** Decide what they get.
+
+### Gates — all will go RED, all deliberately
+`verify_project_entrypoints` (11/11, asserts the door), `verify_clan_project_visibility` (16/16,
+asserts the member-card rows), `verify_scp_witness_band` (asserts both band states),
+`verify_room_placement` (2/2). Update RED-first on the new contract; never weaken one to green.
