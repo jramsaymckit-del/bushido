@@ -4073,7 +4073,7 @@ if (FIREBASE_CONFIGURED) {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'Hokuto opening screen — the Night ritual at step 0 · 2026-10-11 · onboarding opens on the seven stars of the Dipper lighting one by one on a nobori banner, at true positions, sized by magnitude, with Alcor beside Mizar. "I am ready" opens the screen without advancing; "Begin" enters step 1. By day the night lifts as the stars light; from 21:00 to 06:00 it holds. isNightHours() is now the ONE 21:00–06:00 rule, shared with dark mode, extracted verbatim so dark mode is unchanged. #hk-stage is a body-level full-window layer because inside .scroll the clip-path scrollUnroll leaves behind would clip a fixed layer to the 800px column. ONLY NEW ACCOUNTS SEE IT: the if(state.onboarded) branch is untouched, and the one addition on the path of an already-onboarded user — hkHide() in showDashboard() — is null-safe, idempotent, and app.inert has exactly two users in the file, so clearing it cannot clobber another surface. Gate verify_hokuto_opening 85/85 on real taps at 375×667 through 1280×800. RIDING ALONG: firestore.rules.test.js:198 corrected — it asserted the behaviour the live per-uid RSVP rule forbids, so CI sat red on main for three weeks and every deploy shipped regardless; plus the eight per-uid RSVP tests that had never existed, and TWO DEPLOY GUARDS that refuse any ship whose exact sha has no successful CI run or whose BUILD_ID is already the one live. Tier 28→31. · on SCP collapsible branches — the whole row folds';
+const BUILD_ID = 'Account crossing closed · 2026-11-06 · a document can no longer be given another person\'s record. Signing out never reset the in-memory state, so the next person to sign in on the same tab met loadFirestoreState treating the PREVIOUS person\'s plan as their own unsynced local data: the merge branch unioned it into their document and wrote the result to the cloud, and the push-local-up branch replaced their whole document, plan included. Reproduced on the emulator against this file\'s own code: sign in, sign out, sign in as someone else, tick one practice, and the second person\'s document came back with 207 days of the first person\'s history and 80 of their daily notes. TWO GUARDS, because either alone can be defeated: resetStateForSignOut() returns the in-memory state to its defaults before auth.signOut() is called, and every local write stamps the uid it belongs to, which loadFirestoreState checks before it reads, merges or pushes that state for anybody else. The stamp catches what a reset cannot (a restored tab, a second tab, a crash in between, any future path that forgets the reset) and it travels into the document, where a value not matching the document\'s own uid is itself evidence of a crossed write. It lives INSIDE the state string, so the document\'s field set is unchanged and the owner-only users/{uid} rule, which validates no fields, is unaffected. SIGN-OUT FLUSHES BEFORE IT CLEARS: the first version removed the cached blob unconditionally and the backtest caught the cost, a note typed and abandoned inside the 800ms debounce gone from device and cloud both, so the pending state is pushed first and the cache dropped only once the cloud has it. A READ-ONLY AUDIT OF ALL TEN LIVE DOCUMENTS FOUND NO CROSSING: no two accounts share an identical note or log day, which is the signature this leaves. Gates: account_crossing 9/9 and crossing_guards 8/8, both red on the unfixed build at 4/9 and 6/8, and signout_keeps_work 2/2, plus the full suite 13/13 with the emulator and Chromium tiers.';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -4133,6 +4133,66 @@ let LOCAL_ME_KEY = null;   // Firebase uid post-auth
 // import path); now it surfaces the persistent storage-full indicator so the user knows the
 // change lives only in the cloud (or nowhere, if offline) and should export a backup. Returns
 // true on success, false if storage was full. setCloudSync is hoisted, but guard it defensively.
+/* ══════════ WHOSE STATE IS THIS? (James's ruling, 6 November) ══════════
+   Signing out never reset the in-memory `state`, so the next person to sign in on
+   the same tab was met by loadFirestoreState treating the PREVIOUS person's plan as
+   their own unsynced local data. It then merged it into their document and wrote the
+   result to the cloud. Reproduced on 6 November: sign in, sign out, sign in as
+   someone else, tick one practice, and the second person's document came back with
+   207 days of the first person's history and 80 of their daily notes.
+
+   Two guards, because either alone can be defeated:
+
+   1. SIGN-OUT CLEARS. The in-memory state goes back to its defaults and this
+      person's cached local blob is removed, before anyone else can reach the form.
+
+   2. THE STATE CARRIES ITS OWNER. Every local write stamps the uid it belongs to,
+      and loadFirestoreState refuses to merge it, or push it up, for anybody else.
+      This catches the cases a reset cannot: a tab restored from cache, a second tab,
+      a crash between sign-out and sign-in, and any future path that forgets to call
+      the reset. The stamp travels into the cloud document too, where a value that
+      does not match the document's own uid is itself evidence of a crossed write. */
+function stateOwnerOf(obj){ return obj && obj._owner ? String(obj._owner) : null; }
+function stampStateOwner(uid){ if(state && uid) state._owner = String(uid); }
+
+/* Clear the person who is leaving. Called before auth.signOut() rather than after,
+   so there is no window in which the form is reachable and the old state is live.
+
+   IT FLUSHES BEFORE IT CLEARS, and this is not a nicety. The first version removed
+   the cached blob unconditionally, and the backtest caught what that costs: type a
+   note and sign out inside the 800ms debounce, and the note was gone from the device
+   AND from the cloud. That trades a rare crossing for a loss anyone can hit in a
+   second, which is a worse app than the one with the bug.
+
+   So the pending state is pushed first, and the cache is dropped ONLY once the cloud
+   has it. If the push fails — offline, or signed out mid-flight — the cache stays.
+   Nothing is lost, and nothing is exposed either: the cache is keyed per uid
+   ('bushido_state_<uid>') and carries its owner stamp, so the next person to sign in
+   neither reads that key nor would accept it if they did. */
+async function resetStateForSignOut(){
+  let flushed = false;
+  try{
+    if(FIREBASE_CONFIGURED && _currentUser && typeof saveStateToFirestore === 'function'){
+      await saveStateToFirestore();
+      flushed = true;
+    }
+  }catch(e){ flushed = false; }
+  if(flushed){
+    try{ if(STORAGE_KEY) localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    try{ if(LKG_KEY)     localStorage.removeItem(LKG_KEY); }catch(e){}
+  } else {
+    console.warn('[owner] sign-out could not reach the cloud — keeping this device\'s cache so nothing is lost');
+  }
+  try{
+    Object.keys(state).forEach(function(k){ delete state[k]; });
+    Object.assign(state, JSON.parse(JSON.stringify(DEFAULT_STATE)));
+    state._owner = null;
+  }catch(e){}
+  STORAGE_KEY = null; LKG_KEY = null; LOCAL_ME_KEY = null;
+  try{ _planBaseSig = null; }catch(e){}
+  try{ _currentUser = null; }catch(e){}
+}
+
 function persistLocalState(){
   try{
     if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -4145,6 +4205,9 @@ function persistLocalState(){
 
 function saveState(){
   state.lastModified=Date.now();
+  /* Stamp on every write: an unstamped cache would be treated as nobody's and
+     therefore as safe to merge, which is the hole this closes. */
+  if(typeof LOCAL_ME_KEY !== 'undefined' && LOCAL_ME_KEY) stampStateOwner(LOCAL_ME_KEY);
   persistLocalState();
   if(FIREBASE_CONFIGURED){
     saveStateToFirestore(); // async fire-and-forget
@@ -10074,11 +10137,28 @@ async function loadFirestoreState(user){
     // Boot hydration — gives state a populated lastModified so the cloud gate
     // below can detect stale-cloud-overwrites-fresh-local. Without this, state
     // starts at the literal initializer (lastModified=0) and the gate is moot.
+    /* THE SECOND GUARD. Whatever is in memory at this point belongs to whoever was
+       here last. If that is not the person signing in, it is wiped before it can be
+       read as "local", and the per-uid cache below is only hydrated when its own
+       stamp matches. An UNSTAMPED cache is treated as this person's only when it was
+       read from THEIR key, which is the pre-stamp state of a returning user. */
+    const inMemoryOwner = stateOwnerOf(state);
+    if(inMemoryOwner && inMemoryOwner !== user.uid){
+      console.warn('[owner] in-memory state belongs to', inMemoryOwner, '— discarding before load for', user.uid);
+      Object.keys(state).forEach(function(k){ delete state[k]; });
+      Object.assign(state, JSON.parse(JSON.stringify(DEFAULT_STATE)));
+    }
     try{
       const raw = STORAGE_KEY ? localStorage.getItem(STORAGE_KEY) : null;
       if(raw){
         const local = JSON.parse(raw);
-        if(isValidStateShape(local)){
+        const localOwner = stateOwnerOf(local);
+        if(localOwner && localOwner !== user.uid){
+          // A cache under this person's key stamped with someone else's uid can only
+          // be the product of the bug this fixes. It is not theirs; do not read it.
+          console.warn('[owner] cached state under', STORAGE_KEY, 'is stamped', localOwner, '— refusing it');
+          try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+        } else if(isValidStateShape(local)){
           const mr = runSchemaMigrations(local);
           if(mr.ok){
             Object.assign(state, mr.state);
@@ -10087,6 +10167,8 @@ async function loadFirestoreState(user){
         }
       }
     }catch(e){ /* localStorage unreadable — fall through to cloud */ }
+    // From here on, whatever is in `state` is this person's.
+    stampStateOwner(user.uid);
 
     const docSnap = await db.collection('users').doc(user.uid).get();
     _docFetchSucceeded = true;   // C3b — reaching here means .get() resolved (exists OR new-user); the R1 gate stays open
@@ -10102,8 +10184,13 @@ async function loadFirestoreState(user){
         if(!isValidStateShape(saved)){
           console.warn('Cloud state failed shape validation — keeping local.');
           showCloudSyncError('Cloud state was invalid — kept your local data.');
-        } else if((saved.lastModified||0) < (state.lastModified||0)){
-          // Stale cloud — local is fresher. Push local up to heal the cloud.
+        } else if((saved.lastModified||0) < (state.lastModified||0) &&
+                  (stateOwnerOf(state) === user.uid || stateOwnerOf(state) === null)){
+          /* THE WORSE BRANCH. "Local is fresher, push it up" overwrites the whole
+             cloud document, plan included — so if `state` were still the previous
+             person's, this replaced the new person's plan with theirs rather than
+             merely merging into it. It now runs only when the local state is this
+             person's own. */
           console.warn('Cloud lastModified', saved.lastModified,
                        '< local', state.lastModified, '— keeping local, pushing up.');
           saveStateToFirestore();  // heal cloud with fresh local
@@ -10118,7 +10205,13 @@ async function loadFirestoreState(user){
             showCloudSyncError('Cloud data version unsupported — kept your local data.');
           } else {
             saveLastKnownGood();
-            const localSnap = Object.assign({}, state);           // boot-hydrated localStorage (may hold unsynced writes)
+            /* THE MERGE BRANCH. localSnap is whatever is in memory, which is only
+               safe to union into this person's cloud record if it is THEIRS. If it is
+               not, an empty snapshot is used: the cloud document is adopted whole and
+               nothing of anyone else's can come with it. */
+            const localIsOwned = (stateOwnerOf(state) === user.uid || stateOwnerOf(state) === null);
+            const localSnap = localIsOwned ? Object.assign({}, state) : {};   // boot-hydrated localStorage (may hold unsynced writes)
+            if(!localIsOwned) console.warn('[owner] local state is not', user.uid, '— merging nothing into their record');
             // PLAN compare-and-set on BOOT (3b): a reload = "get the latest", so we ADOPT the cloud plan. If the
             // boot-hydrated local held a genuinely CONFLICTING plan edit (we changed it AND cloud advanced past our
             // last-synced base), stash that edit first so it's recoverable + flag a re-apply. (A local plan edit
@@ -10155,6 +10248,7 @@ async function loadFirestoreState(user){
     // this base → never a spurious conflict. Runtime-only (not persisted): first load of a session has base=null
     // so its conflict detection is off (== pre-3b behavior, no regression); the LIVE two-device race — where
     // conflicts actually arise — always has a base by the time a second save/reconcile runs.
+    stampStateOwner(user.uid);   // the adopted cloud state is now this person's, by definition
     _planBaseSig = planSig(state);
   } catch(e){
     console.warn('Firestore load failed:', e);
@@ -10772,7 +10866,11 @@ function signInGoogle(){
     .catch(err => { if(!err.code?.includes('popup-closed')) showAuthError(humanizeAuthError(err)); });
 }
 
-function signOutUser(){
+async function signOutUser(){
+  // Clear BEFORE the auth call, so the auth screen is never reachable with the
+  // previous person's plan still in memory. Awaited, so the flush completes before
+  // the session that authorises it is torn down.
+  await resetStateForSignOut();
   if(!FIREBASE_CONFIGURED){
     document.getElementById('auth-screen').style.display = 'flex';
     document.getElementById('app').style.display         = 'none';
