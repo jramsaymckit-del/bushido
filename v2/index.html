@@ -121,6 +121,10 @@
   --scroll:#F9F4EA;--edge:#E8DFD0;--ink:#1A1A1A;--ink-light:#3A3A3A;
   --ink-faint:#66615A;--red:#CC3529;--red-light:#D94A3E;--white:#FEFCF8;
   --gold:#C9A94B;--seal:#CC3529;
+  /* THE SAME RED AS A TRIPLE. 219 CSS declarations wrote rgba(var(--red-rgb),...) as a
+     literal, so they could not follow --red when it lifted at night and could not
+     follow the dojo when the room changed. One token, two forms, one value. */
+  --red-rgb:204,53,41;
   --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;--navy:#1B2A4A;
 }
 body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100vh;color:var(--ink);
@@ -212,7 +216,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 /* ── Native kakejiku date header (Kaizen scroll) ──────────────────── */
 .kk-date-header{display:flex;align-items:baseline;gap:8px;padding:0 0 12px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .kk-date-text{font-family:'Noto Serif JP',serif;font-size:12px;color:rgba(255,255,255,.55);letter-spacing:1.5px}
-.kk-streak-whisper{font-size:9px;letter-spacing:1px;color:rgba(204,53,41,.6)}
+.kk-streak-whisper{font-size:9px;letter-spacing:1px;color:rgba(var(--red-rgb),.6)}
 /* ── Practice stamp badge (clan row) ─────────────────────────────── */
 .ps-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid currentColor;border-radius:3px;font-family:'Noto Serif JP',serif;font-size:11px;font-weight:900;margin-left:6px;transform:rotate(-3deg);vertical-align:middle;flex-shrink:0}
 .ik-arc-native{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
@@ -262,7 +266,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
 .dw-pill-seal{font-family:'Noto Serif JP',serif;font-size:17px;color:var(--dw-red);line-height:1}
 .dw-pill-check{font-size:12px;color:#3D6B5F}
 /* Item 3 — My Clan nav unread dot */
-.dw-navdot{position:absolute;top:7px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(204,53,41,.16)}
+.dw-navdot{position:absolute;top:7px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(var(--red-rgb),.16)}
 .dw-head{display:flex;align-items:baseline;gap:12px}
 .dw-head-jp{font-family:'Noto Serif JP',serif;font-size:14px;letter-spacing:5px;color:var(--dw-red);opacity:.85}
 .dw-head-en{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dw-ink-faint)}
@@ -561,7 +565,7 @@ body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,
 .rf-sensei-k{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--ink-faint)}
 .rf-sensei-lbl{flex:1;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
 .rf-sensei-stub{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--red);
-  border:1px solid rgba(204,53,41,.35);padding:2px 7px;opacity:.8}
+  border:1px solid rgba(var(--red-rgb),.35);padding:2px 7px;opacity:.8}
 .rf-sensei-body{font-family:'Noto Serif JP',serif;font-size:14px;line-height:2;color:var(--ink);margin:0 0 18px}
 .rf-sensei-rules{margin:0 0 14px;padding-left:18px}
 .rf-sensei-rules li{font-size:11px;line-height:1.95;color:var(--ink-light);margin-bottom:3px}
@@ -577,7 +581,7 @@ body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,
   font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
 
 .sensei-crisis-nums{display:flex;flex-direction:column;gap:14px;max-width:360px;margin:0 auto 26px}
-.sensei-crisis-num{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border:1px solid rgba(204,53,41,.22)}
+.sensei-crisis-num{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border:1px solid rgba(var(--red-rgb),.22)}
 .scn-n{font-family:'Noto Serif JP',serif;font-size:21px;color:var(--red);letter-spacing:1px}
 .scn-l{font-size:10px;letter-spacing:1px;color:var(--ink-faint);line-height:1.6}
 .sensei-crisis-foot{margin-top:14px;font-size:10px;letter-spacing:1px;color:var(--ink-faint);opacity:.75}
@@ -594,25 +598,41 @@ body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,
 .kk-outer.cal-white{filter:drop-shadow(0 10px 26px rgba(26,18,16,.12)) drop-shadow(0 2px 6px rgba(26,18,16,.08))}
 /* The deck's White calendar ink is #FEFCF8, paper that takes the light in rather
    than pure white (mobile deck slides 7 and 76). The build had #FBF8F1. */
-.kk-outer.cal-white .kk-body{background-color:#FEFCF8;background-image:
-    repeating-linear-gradient(45deg,transparent 0px,transparent 3px,rgba(26,18,16,.012) 3px,rgba(26,18,16,.012) 6px);
+/* CLEAN PAPER, AS THE RED ONE IS (James, 12 November: "make the white calendar
+   clean like the red one"). It carried a 45-degree hatch, a line of rgba(26,18,16,.012)
+   every 3 pixels across the whole scroll. At that alpha on near-white paper it does not
+   read as texture, it reads as dirt, and it is the one thing the Red scroll does not do:
+   cal-samurai sets background-image:none and is flat. The paper colour, the inset
+   shadows and the drop shadow all stay; only the hatch goes. */
+.kk-outer.cal-white .kk-body{background-color:#FEFCF8;background-image:none;
   box-shadow:inset 8px 0 20px rgba(26,18,16,.05),inset -8px 0 20px rgba(26,18,16,.05),
     inset 0 2px 8px rgba(26,18,16,.04),0 10px 30px rgba(26,18,16,.08)}
 .kk-outer.cal-white .kk-body::before{display:none}
 .kk-outer.cal-white .mcal-title{color:rgba(26,18,16,.5)}
-.kk-outer.cal-white .mcal-dh{color:rgba(26,18,16,.3)}
+/* .3 is 1.97:1 on this paper and .35 is 2.25:1, both under the 3:1 a label needs.
+   Lifted to the first value that clears it. Measured, not guessed: the figures are in
+   legibility.mjs, which fails the build if any of them slips back. */
+.kk-outer.cal-white .mcal-dh{color:rgba(26,18,16,.5)}
 .kk-outer.cal-white .mcal-num{color:rgba(26,18,16,.62)}
 .kk-outer.cal-white .mcal-cell{background:rgba(26,18,16,.035)}
 .kk-outer.cal-white .mcal-cell.mcal-empty{background:transparent}
-.kk-outer.cal-white .mcal-nav-btn{color:rgba(26,18,16,.35)}
+.kk-outer.cal-white .mcal-nav-btn{color:rgba(26,18,16,.5)}
 .kk-outer.cal-white .mcal-nav-btn:hover{color:rgba(26,18,16,.8)}
 .kk-outer.cal-white .mcal-nav-btn:disabled{opacity:.18}
 .kk-outer.cal-white .sh-shelf-lbl{color:rgba(26,18,16,.42)}
-.kk-outer.cal-white .mcal-note-mark{color:rgba(204,53,41,.8)}
+.kk-outer.cal-white .mcal-note-mark{color:rgba(var(--red-rgb),.8)}
 .kk-outer.cal-white .kk-rod{filter:brightness(.92)}
 body.dark .kk-outer.cal-white .kk-body{background-color:#201c18}
+/* THE MONTH ARROW WAS LEFT OUT OF THIS BLOCK. Everything else on the White scroll
+   flips for the night below: the title, the day headers, the numbers, the cells and
+   the date. The arrow kept its day ink, rgba(26,18,16,.35), a dark mark on the night
+   scroll's #201c18 paper: 1.03:1, which is no arrow at all. The forward arrow reads
+   as faint too, but that one is genuinely disabled when the next month is the future,
+   so it is left alone. */
+body.dark .kk-outer.cal-white .mcal-nav-btn{color:rgba(237,232,222,.5)}
+body.dark .kk-outer.cal-white .mcal-nav-btn:hover{color:rgba(237,232,222,.85)}
 body.dark .kk-outer.cal-white .mcal-title{color:rgba(237,232,222,.5)}
-body.dark .kk-outer.cal-white .mcal-dh{color:rgba(237,232,222,.3)}
+body.dark .kk-outer.cal-white .mcal-dh{color:rgba(237,232,222,.45)}
 body.dark .kk-outer.cal-white .mcal-num{color:rgba(237,232,222,.62)}
 body.dark .kk-outer.cal-white .mcal-cell{background:rgba(255,255,255,.04)}
 
@@ -694,7 +714,7 @@ body.dark .you-pill{border-color:rgba(255,255,255,.18)}
 .you-pill.on{background:var(--ink);color:var(--scroll);border-color:var(--ink)}
 .you-pill:hover:not(.on){border-color:var(--ink-light)}
 /* Deleting an account is typed, not tapped. */
-.you-del{margin-top:14px;padding:18px;border:1px solid rgba(204,53,41,.3)}
+.you-del{margin-top:14px;padding:18px;border:1px solid rgba(var(--red-rgb),.3)}
 .you-del p{font-size:12px;line-height:1.85;color:var(--ink-light);margin:0 0 12px}
 .you-del input{width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,.18);background:transparent;
   font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--ink)}
@@ -801,7 +821,7 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
 .spr-msname{font-family:'Noto Serif JP',serif;font-size:13.5px;color:var(--spr-ink);display:flex;
   align-items:center;gap:9px;flex-wrap:wrap;cursor:pointer;padding:4px 6px;margin:-4px -6px;
   border-radius:2px;transition:background .12s ease}
-.spr-msname:hover{background:rgba(204,53,41,.03)}
+.spr-msname:hover{background:rgba(var(--red-rgb),.03)}
 /* the chevron is the VISUAL affordance and the keyboard entry point; it carries NO act of
    its own, because the row folds and its click bubbles. Giving it both toggled twice. */
 .spr-fold{width:18px;height:18px;flex:none;display:grid;place-items:center;padding:0;background:none;
@@ -814,13 +834,13 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
    dashed signal .spr-subtask.unclaimed already uses). */
 .spr-count{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;padding:2px 7px;
   color:var(--spr-ink-light);border:1px solid var(--spr-edge);background:rgba(255,255,255,.4)}
-.spr-count.done{color:var(--spr-red);border-color:rgba(204,53,41,.35);background:rgba(204,53,41,.05)}
+.spr-count.done{color:var(--spr-red);border-color:rgba(var(--red-rgb),.35);background:rgba(var(--red-rgb),.05)}
 .spr-count.empty{color:var(--spr-ink-faint);border-style:dashed;font-style:italic;opacity:.75;letter-spacing:1px}
 .spr-msblock.folded .spr-subs{display:none}
 .spr-mseal{width:18px;height:18px;border-radius:50%;border:1.3px solid var(--spr-red);flex:none;display:grid;place-items:center;font-size:9px;color:transparent;cursor:pointer;background:none;padding:0}
-.spr-mseal.ready{box-shadow:0 0 0 3px rgba(204,53,41,.10)}
+.spr-mseal.ready{box-shadow:0 0 0 3px rgba(var(--red-rgb),.10)}
 .spr-mseal[disabled]{cursor:default}
-.spr-msblock.sealed .spr-mseal{background:rgba(204,53,41,.09);color:var(--spr-red)}
+.spr-msblock.sealed .spr-mseal{background:rgba(var(--red-rgb),.09);color:var(--spr-red)}
 .spr-bname[data-act]{cursor:text}   /* editable name only; read-only rooms fold, so inherit the row's pointer */
 .spr-who-chip{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-light);border:1px solid var(--spr-edge);border-radius:2px;padding:2px 7px;background:rgba(255,255,255,.4)}
 .spr-ms-date{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-ink-faint);margin-left:auto}
@@ -828,14 +848,14 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
 .spr-subs{margin:9px 0 0 27px;border-left:1px solid var(--spr-edge);padding-left:14px}
 .spr-subtask{display:flex;align-items:center;gap:9px;padding:6px 0;flex-wrap:wrap}
 .spr-tk{width:18px;height:18px;border-radius:50%;border:1.3px solid var(--spr-ink-faint);flex:none;display:grid;place-items:center;font-size:9px;color:transparent;cursor:pointer;background:none;padding:0}
-.spr-subtask.done .spr-tk{border-color:var(--spr-red);color:var(--spr-red);background:rgba(204,53,41,.06)}
+.spr-subtask.done .spr-tk{border-color:var(--spr-red);color:var(--spr-red);background:rgba(var(--red-rgb),.06)}
 .spr-subtask.unclaimed .spr-tk{border-style:dashed;opacity:.6}
 .spr-st2{font-size:12.5px;color:var(--spr-ink-light)}
 .spr-subtask.done .spr-st2{color:var(--spr-ink)}
 .spr-owner{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-ink-faint);margin-left:auto}
 .spr-subtask.unclaimed .spr-owner{color:var(--spr-red);opacity:.85}
 .spr-subtask.outside .spr-owner{color:var(--spr-amber)}
-.spr-gate{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);border:1px solid rgba(204,53,41,.4);border-radius:2px;padding:2px 6px;display:inline-flex;align-items:center;gap:4px;background:rgba(204,53,41,.05)}
+.spr-gate{font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--spr-red);border:1px solid rgba(var(--red-rgb),.4);border-radius:2px;padding:2px 6px;display:inline-flex;align-items:center;gap:4px;background:rgba(var(--red-rgb),.05)}
 .spr-gate::before{content:"⟐";font-size:10px}
 .spr-consult{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--spr-ink-faint);border:1px dotted var(--spr-edge);border-radius:2px;padding:1px 6px}
 .spr-consult.outside{color:var(--spr-amber);border-color:rgba(138,110,47,.4)}
@@ -850,7 +870,7 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
 .spr-composer{margin:8px 0 0}
 .spr-crow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .spr-chip{border:1px solid var(--spr-edge);border-radius:2px;padding:5px 10px;font-size:10.5px;color:var(--spr-ink-light);background:rgba(255,255,255,.5);cursor:pointer}
-.spr-chip.on{border-color:var(--spr-red);color:var(--spr-ink);background:rgba(204,53,41,.05)}
+.spr-chip.on{border-color:var(--spr-red);color:var(--spr-ink);background:rgba(var(--red-rgb),.05)}
 /* the raiser's/owner's own chip — selected and not a control. Default cursor, not
    `not-allowed`: it is not a disabled affordance, it is simply not a choice. */
 .spr-chip-fixed{cursor:default}
@@ -888,7 +908,7 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
 .spr-work .spr-wn{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--spr-ink)}
 .spr-work .spr-ws{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--spr-ink-faint);margin-top:4px}
 .spr-shelf-empty{text-align:center;padding:22px 16px;border:1px dashed rgba(138,133,120,.4);border-radius:3px;font-family:'Noto Serif JP',serif;font-size:12.5px;font-style:italic;color:var(--spr-ink-light)}
-.spr-seal{width:34px;height:34px;border:1.5px solid var(--spr-red);border-radius:50%;display:grid;place-items:center;font-family:'Noto Serif JP',serif;color:var(--spr-red);font-size:15px;transform:rotate(-4deg);flex:none;background:rgba(204,53,41,.04)}
+.spr-seal{width:34px;height:34px;border:1.5px solid var(--spr-red);border-radius:50%;display:grid;place-items:center;font-family:'Noto Serif JP',serif;color:var(--spr-red);font-size:15px;transform:rotate(-4deg);flex:none;background:rgba(var(--red-rgb),.04)}
 .spr-ring{width:34px;height:34px;border:1.4px solid var(--spr-ink-faint);border-radius:50%;border-top-color:transparent;transform:rotate(28deg);flex:none;opacity:.7}
 /* the phone Works pill — sibling chrome to the Day's-Word pill, in the clan band */
 #sp-works-row{padding:0 0 12px}
@@ -942,7 +962,7 @@ body.door-open .br-tab[data-dest="bushido"].active::before{background:rgba(0,0,0
 .reflect-nudge-btn.later{border-color:rgba(26,26,26,.18);color:var(--ink-faint)}
 .reflect-nudge-btn.later:hover{background:none;border-color:var(--ink);color:var(--ink)}
 .beta-sync-banner{display:flex;align-items:flex-start;gap:10px;margin:0 0 4px;padding:10px 14px;
-  border:1px solid rgba(204,53,41,.18);border-left:2px solid var(--red);background:rgba(204,53,41,.035)}
+  border:1px solid rgba(var(--red-rgb),.18);border-left:2px solid var(--red);background:rgba(var(--red-rgb),.035)}
 .beta-sync-banner[hidden]{display:none}
 .beta-sync-banner[data-kind="offline"]{border-color:rgba(26,26,26,.18);border-left-color:var(--ink-faint);background:rgba(26,26,26,.03)}
 .beta-sync-kanji{font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.2;opacity:.65;flex-shrink:0}
@@ -1155,6 +1175,37 @@ body.dark{
    standing in the one line the home page gives the vision, and everything else
    behind the same drawer. One shape, four contents, and the page keeps its
    proportions whichever door you are standing in. */
+/* ══════════ INSIDE A DOJO, RED BECOMES THE DOJO (James, 12 November) ══════════
+   "When you click on Ikigai or Shokunin in the side bar, they should be the
+   respective colours, and all of the things that would normally be red, in their
+   respective dojos, all that will be their respective colour."
+
+   This reads with the deck rather than against it, because the deck's two states are
+   two different moments. On My Bushido one tap LIGHTS a name and the rest dim: that
+   is still red, because you are standing outside the door. Once the door is OPEN you
+   are in the room, and the room has its own ink. On the phone those are the two taps;
+   in the rail from 900 up one click does both at once and you arrive inside.
+
+   It is done by moving the --red TOKEN for the subtree rather than by restyling the
+   things that use it. There are 208 colour declarations reading --red, and a list of
+   them maintained by hand would be wrong within a week. Two subtrees are scoped: the
+   page itself, which is the room, and the dojo names, which sit in the rail at desk
+   width and in the alcove on the phone.
+
+   WHAT DELIBERATELY DOES NOT CHANGE. The four tabs on the rail, because the rail is
+   the frame and the deck says it stays still. And every seal, because they stopped
+   reading --red when the night palette landed and read --seal instead, which is the
+   whole reason that token exists: a seal has an ink, and the ink does not follow the
+   room. */
+body.door-open.door-ikigai   #primary-bushido,
+body.door-open.door-ikigai   #beta-split,
+body.door-open.door-both     #primary-bushido,
+body.door-open.door-both     #beta-split   {--red:var(--side-ikigai-text);--red-rgb:var(--dojo-ikigai-rgb)}
+body.door-open.door-shokunin #primary-bushido,
+body.door-open.door-shokunin #beta-split   {--red:var(--side-shokunin-text);--red-rgb:var(--dojo-shokunin-rgb)}
+body.door-open.door-hiyoku   #primary-bushido,
+body.door-open.door-hiyoku   #beta-split   {--red:var(--side-hiyoku-text);--red-rgb:var(--dojo-hiyoku-rgb)}
+
 .beta-door-ikigai  {--door-wash:var(--side-ikigai-row-wash);  --door-edge:var(--side-ikigai-row-edge);  --door-ink:var(--side-ikigai-text)}
 .beta-door-hiyoku  {--door-wash:var(--side-hiyoku-row-wash);  --door-edge:var(--side-hiyoku-row-edge);  --door-ink:var(--side-hiyoku-text)}
 .beta-door-shokunin{--door-wash:var(--side-shokunin-row-wash);--door-edge:var(--side-shokunin-row-edge);--door-ink:var(--side-shokunin-text)}
@@ -1416,7 +1467,7 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
   margin-bottom:36px;letter-spacing:.5px;line-height:1.8}
 .rpc-actions{display:flex;gap:16px;justify-content:center}
 
-.reflect-nudge{margin-top:28px;padding:16px 20px;border:1px solid rgba(204,53,41,.15);
+.reflect-nudge{margin-top:28px;padding:16px 20px;border:1px solid rgba(var(--red-rgb),.15);
   border-left:2px solid var(--red);display:flex;align-items:center;
   justify-content:space-between;gap:16px;animation:fadeUp .4s ease}
 .reflect-nudge-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
@@ -1425,11 +1476,11 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
   text-transform:uppercase;color:var(--red);border:1px solid var(--red);background:none;
   padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
 .reflect-nudge-btn:hover{background:var(--red);color:var(--white)}
-.reflect-nudge.review-card{border-color:rgba(204,53,41,.08);border-left-color:rgba(204,53,41,.25)}
+.reflect-nudge.review-card{border-color:rgba(var(--red-rgb),.08);border-left-color:rgba(var(--red-rgb),.25)}
 .reflect-nudge.review-card .reflect-nudge-text{opacity:.7}
-.reflect-nudge.review-card .reflect-nudge-btn{border-color:rgba(204,53,41,.3);color:var(--ink-faint)}
+.reflect-nudge.review-card .reflect-nudge-btn{border-color:rgba(var(--red-rgb),.3);color:var(--ink-faint)}
 .reflect-nudge.review-card .reflect-nudge-btn:hover{background:none;color:var(--red);border-color:var(--red)}
-.reflect-textarea.reflect-readonly{border-bottom-color:rgba(204,53,41,.2);opacity:.6;cursor:default;resize:none}
+.reflect-textarea.reflect-readonly{border-bottom-color:rgba(var(--red-rgb),.2);opacity:.6;cursor:default;resize:none}
 /* quiet "reflection window open" marker on the 月 button — same shape as a tab unread dot; present, never demanding */
 .reflect-open-dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--red);opacity:.9;pointer-events:none}
 .reflect-review-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.55;display:block;text-align:center;margin-bottom:24px}
@@ -1477,51 +1528,51 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 
 /* == CALENDAR THEMES == */
 .kk-outer.cal-clan{filter:drop-shadow(0 6px 18px rgba(0,0,0,.10)) drop-shadow(0 1px 4px rgba(0,0,0,.07))}
-.kk-outer.cal-clan .kk-body{background-color:#FFFFFF;background-image:none;box-shadow:0 0 0 1px rgba(204,53,41,.1),0 2px 12px rgba(0,0,0,.06)}
+.kk-outer.cal-clan .kk-body{background-color:#FFFFFF;background-image:none;box-shadow:0 0 0 1px rgba(var(--red-rgb),.1),0 2px 12px rgba(0,0,0,.06)}
 .kk-outer.cal-clan .kk-body::before{display:none}
-.kk-outer.cal-clan .mcal-nav-btn{color:rgba(204,53,41,.4)}
+.kk-outer.cal-clan .mcal-nav-btn{color:rgba(var(--red-rgb),.4)}
 .kk-outer.cal-clan .mcal-nav-btn:hover{color:var(--red)}
 .kk-outer.cal-clan .mcal-nav-btn:disabled{opacity:.15}
-.kk-outer.cal-clan .mcal-title{color:rgba(204,53,41,.55)}
-.kk-outer.cal-clan .mcal-dh{color:rgba(204,53,41,.4)}
+.kk-outer.cal-clan .mcal-title{color:rgba(var(--red-rgb),.55)}
+.kk-outer.cal-clan .mcal-dh{color:rgba(var(--red-rgb),.4)}
 .kk-outer.cal-clan .mcal-cell{background:rgba(0,0,0,.025)}
 .kk-outer.cal-clan .mcal-cell.mcal-empty{background:transparent}
-.kk-outer.cal-clan .mcal-num{color:rgba(204,53,41,.65)}
+.kk-outer.cal-clan .mcal-num{color:rgba(var(--red-rgb),.65)}
 .kk-outer.cal-clan .mcal-cell.mcal-today .mcal-num{color:var(--red)}
 .kk-outer.cal-clan .mcal-cell.mcal-future{opacity:.2}
 .kk-outer.cal-clan .mcal-dot{background:var(--red)}
-.kk-outer.cal-clan .mcal-dots.all-done .mcal-dot{box-shadow:0 0 3px rgba(204,53,41,.5),0 0 6px rgba(204,53,41,.2)}
+.kk-outer.cal-clan .mcal-dots.all-done .mcal-dot{box-shadow:0 0 3px rgba(var(--red-rgb),.5),0 0 6px rgba(var(--red-rgb),.2)}
 .kk-outer.cal-clan .wk-dot{background:rgba(26,18,16,.1)}
 .kk-outer.cal-clan .mcal-expansion{border-top:1px solid rgba(0,0,0,.06)}
 .kk-outer.cal-clan .mcal-expand-inner{background:rgba(0,0,0,.02)}
 .kk-outer.cal-clan .exp-range{color:rgba(26,18,16,.3)}
 .kk-outer.cal-clan .exp-label{color:rgba(26,18,16,.3)}
 .kk-outer.cal-clan .exp-text{color:rgba(26,18,16,.65)}
-.kk-outer.cal-clan .exp-intention .exp-label{color:rgba(204,53,41,.5)}
+.kk-outer.cal-clan .exp-intention .exp-label{color:rgba(var(--red-rgb),.5)}
 .kk-outer.cal-clan .exp-intention .exp-text{color:rgba(26,18,16,.8)}
-.kk-outer.cal-clan .mcal-note-mark{color:rgba(204,53,41,.45)}
+.kk-outer.cal-clan .mcal-note-mark{color:rgba(var(--red-rgb),.45)}
 .kk-outer.cal-clan .sh-shelf-native{border-bottom-color:rgba(0,0,0,.07)}
-.kk-outer.cal-clan .sh-shelf-lbl{color:rgba(204,53,41,.4)}
+.kk-outer.cal-clan .sh-shelf-lbl{color:rgba(var(--red-rgb),.4)}
 .kk-outer.cal-clan .wk-sealed{color:var(--seal)}
-.kk-outer.cal-clan .kk-date-header{border-bottom-color:rgba(204,53,41,.12)}
-.kk-outer.cal-clan .kk-date-text{color:rgba(204,53,41,.65)}
-.kk-outer.cal-clan .kk-streak-whisper{color:rgba(204,53,41,.5)}
-.kk-outer.cal-clan .hg-nav-btn{color:rgba(204,53,41,.35)}
-.kk-outer.cal-clan .hg-nav-btn:hover{color:rgba(204,53,41,.8)}
-.kk-outer.cal-clan .hg-week-label{color:rgba(204,53,41,.45)}
+.kk-outer.cal-clan .kk-date-header{border-bottom-color:rgba(var(--red-rgb),.12)}
+.kk-outer.cal-clan .kk-date-text{color:rgba(var(--red-rgb),.65)}
+.kk-outer.cal-clan .kk-streak-whisper{color:rgba(var(--red-rgb),.5)}
+.kk-outer.cal-clan .hg-nav-btn{color:rgba(var(--red-rgb),.35)}
+.kk-outer.cal-clan .hg-nav-btn:hover{color:rgba(var(--red-rgb),.8)}
+.kk-outer.cal-clan .hg-week-label{color:rgba(var(--red-rgb),.45)}
 .kk-outer.cal-clan .hg-header{background:transparent}
 .kk-outer.cal-clan .hg-row{border-bottom-color:rgba(0,0,0,.04)}
-.kk-outer.cal-clan .hg-day-head{color:rgba(204,53,41,.4)}
+.kk-outer.cal-clan .hg-day-head{color:rgba(var(--red-rgb),.4)}
 .kk-outer.cal-clan .hg-day-head.is-today{color:var(--red)}
-.kk-outer.cal-clan .hg-label{color:rgba(204,53,41,.6)}
+.kk-outer.cal-clan .hg-label{color:rgba(var(--red-rgb),.6)}
 /* clan cell circles — red on white */
 .kk-outer.cal-clan .hg-cell.hg-off{background:transparent;border-radius:3px}
 .kk-outer.cal-clan .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .kk-outer.cal-clan .hg-cell.hg-done::after{background:var(--red)}
 @media (hover:hover){.kk-outer.cal-clan .hg-cell.hg-done:hover::after{background:var(--red-light)}}
-.kk-outer.cal-clan .hg-cell.hg-miss::after{border-color:rgba(204,53,41,.25)}
-@media (hover:hover){.kk-outer.cal-clan .hg-cell.hg-miss:hover::after{border-color:rgba(204,53,41,.6)}}
-.kk-outer.cal-clan .hg-cell.hg-future::after{border-color:rgba(204,53,41,.1)}
+.kk-outer.cal-clan .hg-cell.hg-miss::after{border-color:rgba(var(--red-rgb),.25)}
+@media (hover:hover){.kk-outer.cal-clan .hg-cell.hg-miss:hover::after{border-color:rgba(var(--red-rgb),.6)}}
+.kk-outer.cal-clan .hg-cell.hg-future::after{border-color:rgba(var(--red-rgb),.1)}
 .kk-outer.cal-samurai{filter:drop-shadow(0 10px 28px rgba(140,20,10,.35)) drop-shadow(0 2px 6px rgba(140,20,10,.2))}
 .kk-outer.cal-samurai .kk-body{background-color:#B52016;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.2),inset -4px 0 14px rgba(0,0,0,.12),0 12px 40px rgba(140,20,10,.3),0 4px 12px rgba(0,0,0,.2)}
 .kk-outer.cal-samurai .kk-body::before{display:none}
@@ -1546,7 +1597,10 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-samurai .exp-text{color:rgba(254,252,248,.78)}
 .kk-outer.cal-samurai .exp-intention .exp-label{color:rgba(254,252,248,.5)}
 .kk-outer.cal-samurai .exp-intention .exp-text{color:rgba(254,252,248,.9)}
-.kk-outer.cal-samurai .mcal-note-mark{color:rgba(254,252,248,.45)}
+/* .45 was never reached before today: the base rule overrode it, so the real alpha
+   had never been looked at. Measured at .45 it is 2.81:1 on the Shinobi paper, under
+   the 3:1 a control needs, so both dark inks are lifted to .62. */
+.kk-outer.cal-samurai .mcal-note-mark{color:rgba(254,252,248,.62)}
 .kk-outer.cal-samurai .sh-shelf-native{border-bottom-color:rgba(254,252,248,.1)}
 .kk-outer.cal-samurai .sh-shelf-lbl{color:rgba(254,252,248,.38)}
 .kk-outer.cal-samurai .wk-sealed{color:rgba(254,252,248,.65)}
@@ -1571,47 +1625,47 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-shinobi .mcal-cell{background:rgba(254,252,248,.04)}
 .kk-outer.cal-shinobi .mcal-cell.mcal-empty{background:transparent}
 .kk-outer.cal-shinobi .mcal-num{color:rgba(254,252,248,.7)}
-.kk-outer.cal-shinobi .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700;text-shadow:0 0 10px rgba(204,53,41,.35)}
-.kk-outer.cal-shinobi .mcal-cell.mcal-today{outline-color:rgba(204,53,41,.55)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700;text-shadow:0 0 10px rgba(var(--red-rgb),.35)}
+.kk-outer.cal-shinobi .mcal-cell.mcal-today{outline-color:rgba(var(--red-rgb),.55)}
 .kk-outer.cal-shinobi .mcal-cell.mcal-future{opacity:.2}
 .kk-outer.cal-shinobi .mcal-dot{background:var(--red)}
-.kk-outer.cal-shinobi .mcal-dots.all-done .mcal-dot{opacity:1;box-shadow:0 0 3px rgba(204,53,41,.7),0 0 7px rgba(204,53,41,.4)}
-.kk-outer.cal-shinobi .wk-dot{background:rgba(204,53,41,.12)}
-.kk-outer.cal-shinobi .mcal-expansion{border-top:1px solid rgba(204,53,41,.07)}
+.kk-outer.cal-shinobi .mcal-dots.all-done .mcal-dot{opacity:1;box-shadow:0 0 3px rgba(var(--red-rgb),.7),0 0 7px rgba(var(--red-rgb),.4)}
+.kk-outer.cal-shinobi .wk-dot{background:rgba(var(--red-rgb),.12)}
+.kk-outer.cal-shinobi .mcal-expansion{border-top:1px solid rgba(var(--red-rgb),.07)}
 .kk-outer.cal-shinobi .mcal-expand-inner{background:rgba(0,0,0,.2)}
 .kk-outer.cal-shinobi .exp-range{color:rgba(254,252,248,.35)}
 .kk-outer.cal-shinobi .exp-label{color:rgba(254,252,248,.35)}
 .kk-outer.cal-shinobi .exp-text{color:rgba(254,252,248,.8)}
 .kk-outer.cal-shinobi .exp-intention .exp-label{color:rgba(254,252,248,.55)}
 .kk-outer.cal-shinobi .exp-intention .exp-text{color:rgba(254,252,248,.95)}
-.kk-outer.cal-shinobi .mcal-note-mark{color:rgba(254,252,248,.45)}
-.kk-outer.cal-shinobi .sh-shelf-native{border-bottom-color:rgba(204,53,41,.08)}
+.kk-outer.cal-shinobi .mcal-note-mark{color:rgba(254,252,248,.62)}
+.kk-outer.cal-shinobi .sh-shelf-native{border-bottom-color:rgba(var(--red-rgb),.08)}
 .kk-outer.cal-shinobi .sh-shelf-lbl{color:rgba(254,252,248,.35)}
-.kk-outer.cal-shinobi .wk-sealed{color:rgba(204,53,41,.6)}
-.kk-outer.cal-shinobi .wk-sealed:hover{color:rgba(204,53,41,.95)}
-.kk-outer.cal-shinobi .wk-sealed.is-open{color:rgba(204,53,41,.95)}
-.kk-outer.cal-shinobi .hg-cell.hg-done::after{background:var(--red);box-shadow:0 0 4px rgba(204,53,41,.6)}
-@media (hover:hover){.kk-outer.cal-shinobi .hg-cell.hg-done:hover::after{background:var(--red-light);box-shadow:0 0 6px rgba(204,53,41,.8)}}
-.kk-outer.cal-shinobi .hg-cell.hg-miss::after{border-color:rgba(204,53,41,.18)}
-@media (hover:hover){.kk-outer.cal-shinobi .hg-cell.hg-miss:hover::after{border-color:rgba(204,53,41,.4)}}
-.kk-outer.cal-shinobi .hg-cell.hg-future::after{border-color:rgba(204,53,41,.07)}
+.kk-outer.cal-shinobi .wk-sealed{color:rgba(var(--red-rgb),.6)}
+.kk-outer.cal-shinobi .wk-sealed:hover{color:rgba(var(--red-rgb),.95)}
+.kk-outer.cal-shinobi .wk-sealed.is-open{color:rgba(var(--red-rgb),.95)}
+.kk-outer.cal-shinobi .hg-cell.hg-done::after{background:var(--red);box-shadow:0 0 4px rgba(var(--red-rgb),.6)}
+@media (hover:hover){.kk-outer.cal-shinobi .hg-cell.hg-done:hover::after{background:var(--red-light);box-shadow:0 0 6px rgba(var(--red-rgb),.8)}}
+.kk-outer.cal-shinobi .hg-cell.hg-miss::after{border-color:rgba(var(--red-rgb),.18)}
+@media (hover:hover){.kk-outer.cal-shinobi .hg-cell.hg-miss:hover::after{border-color:rgba(var(--red-rgb),.4)}}
+.kk-outer.cal-shinobi .hg-cell.hg-future::after{border-color:rgba(var(--red-rgb),.07)}
 .kk-outer.cal-shinobi .hg-cell.hg-off{background:transparent;border-radius:3px}
 .kk-outer.cal-shinobi .hg-cell.hg-today-col:not(.hg-off){background:transparent}
-.kk-outer.cal-shinobi .ycal-cell.ycal-today{outline-color:rgba(204,53,41,.55)}
+.kk-outer.cal-shinobi .ycal-cell.ycal-today{outline-color:rgba(var(--red-rgb),.55)}
 /* ── Shinobi — exhibition header text (1869. THE SAMURAI CLASS IS ABOLISHED.) ── */
 /* Kaizen: date + day count */
-.kk-outer.cal-shinobi .kk-date-text{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;color:var(--red);letter-spacing:.5px;text-shadow:0 0 8px rgba(204,53,41,.75),0 0 20px rgba(204,53,41,.38),0 0 42px rgba(204,53,41,.16)}
-.kk-outer.cal-shinobi .kk-streak-whisper{font-family:'Noto Serif JP',serif;font-size:11px;font-weight:600;color:rgba(204,53,41,.85);text-shadow:0 0 8px rgba(204,53,41,.65),0 0 18px rgba(204,53,41,.3)}
+.kk-outer.cal-shinobi .kk-date-text{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;color:var(--red);letter-spacing:.5px;text-shadow:0 0 8px rgba(var(--red-rgb),.75),0 0 20px rgba(var(--red-rgb),.38),0 0 42px rgba(var(--red-rgb),.16)}
+.kk-outer.cal-shinobi .kk-streak-whisper{font-family:'Noto Serif JP',serif;font-size:11px;font-weight:600;color:rgba(var(--red-rgb),.85);text-shadow:0 0 8px rgba(var(--red-rgb),.65),0 0 18px rgba(var(--red-rgb),.3)}
 /* Kaizen: this week nav label */
-.kk-outer.cal-shinobi .hg-week-label{font-family:'Noto Serif JP',serif;font-weight:600;font-size:12px;color:rgba(204,53,41,.8);text-transform:none;letter-spacing:.5px;text-shadow:0 0 8px rgba(204,53,41,.55),0 0 18px rgba(204,53,41,.26)}
+.kk-outer.cal-shinobi .hg-week-label{font-family:'Noto Serif JP',serif;font-weight:600;font-size:12px;color:rgba(var(--red-rgb),.8);text-transform:none;letter-spacing:.5px;text-shadow:0 0 8px rgba(var(--red-rgb),.55),0 0 18px rgba(var(--red-rgb),.26)}
 /* Shokunin: Milestones of continuance */
-.kk-outer.cal-shinobi .sh-shelf-lbl{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:var(--red);letter-spacing:.5px;text-shadow:0 0 8px rgba(204,53,41,.75),0 0 20px rgba(204,53,41,.35),0 0 42px rgba(204,53,41,.15)}
+.kk-outer.cal-shinobi .sh-shelf-lbl{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:var(--red);letter-spacing:.5px;text-shadow:0 0 8px rgba(var(--red-rgb),.75),0 0 20px rgba(var(--red-rgb),.35),0 0 42px rgba(var(--red-rgb),.15)}
 /* Shokunin: month title */
-.kk-outer.cal-shinobi .mcal-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:var(--red);text-transform:none;letter-spacing:.5px;text-shadow:0 0 8px rgba(204,53,41,.75),0 0 20px rgba(204,53,41,.35),0 0 42px rgba(204,53,41,.15)}
+.kk-outer.cal-shinobi .mcal-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:var(--red);text-transform:none;letter-spacing:.5px;text-shadow:0 0 8px rgba(var(--red-rgb),.75),0 0 20px rgba(var(--red-rgb),.35),0 0 42px rgba(var(--red-rgb),.15)}
 /* Ikigai: 2026 — the arc */
-.kk-outer.cal-shinobi .ik-arc-label-sm{font-family:'Noto Serif JP',serif;font-weight:700;font-size:16px;color:var(--red);text-transform:none;letter-spacing:.5px;text-shadow:0 0 10px rgba(204,53,41,.8),0 0 24px rgba(204,53,41,.42),0 0 52px rgba(204,53,41,.18)}
+.kk-outer.cal-shinobi .ik-arc-label-sm{font-family:'Noto Serif JP',serif;font-weight:700;font-size:16px;color:var(--red);text-transform:none;letter-spacing:.5px;text-shadow:0 0 10px rgba(var(--red-rgb),.8),0 0 24px rgba(var(--red-rgb),.42),0 0 52px rgba(var(--red-rgb),.18)}
 /* Ikigai: year label above grid */
-.kk-outer.cal-shinobi .ycal-year-label{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:rgba(204,53,41,.85);text-transform:none;letter-spacing:2px;text-shadow:0 0 8px rgba(204,53,41,.65),0 0 22px rgba(204,53,41,.3)}
+.kk-outer.cal-shinobi .ycal-year-label{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;color:rgba(var(--red-rgb),.85);text-transform:none;letter-spacing:2px;text-shadow:0 0 8px rgba(var(--red-rgb),.65),0 0 22px rgba(var(--red-rgb),.3)}
 
 /* ── Shared header font upgrade — all four calendar themes ── */
 .kk-outer .kk-date-text{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;letter-spacing:.5px}
@@ -1626,11 +1680,11 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer:not([class*="cal-"]) .hg-week-label{color:rgba(255,255,255,.55)}
 .kk-outer:not([class*="cal-"]) .mcal-title{color:rgba(255,255,255,.65)}
 /* Seals — red on parchment (default theme) */
-.kk-outer:not([class*="cal-"]) .wk-sealed{color:rgba(204,53,41,.75)}
-.kk-outer:not([class*="cal-"]) .wk-sealed:hover{color:rgba(204,53,41,1)}
-.kk-outer:not([class*="cal-"]) .wk-sealed.is-open{color:rgba(204,53,41,1)}
-.kk-outer:not([class*="cal-"]) .wk-sealed-prev{color:rgba(204,53,41,.45)}
-.kk-outer:not([class*="cal-"]) .wk-sealed-prev:hover{color:rgba(204,53,41,.8)}
+.kk-outer:not([class*="cal-"]) .wk-sealed{color:rgba(var(--red-rgb),.75)}
+.kk-outer:not([class*="cal-"]) .wk-sealed:hover{color:rgba(var(--red-rgb),1)}
+.kk-outer:not([class*="cal-"]) .wk-sealed.is-open{color:rgba(var(--red-rgb),1)}
+.kk-outer:not([class*="cal-"]) .wk-sealed-prev{color:rgba(var(--red-rgb),.45)}
+.kk-outer:not([class*="cal-"]) .wk-sealed-prev:hover{color:rgba(var(--red-rgb),.8)}
 .kk-outer:not([class*="cal-"]) .mcal-dot{background:rgba(255,255,255,.5)}
 .kk-outer:not([class*="cal-"]) .mcal-dots.all-done .mcal-dot{background:rgba(255,255,255,.85);box-shadow:0 0 3px rgba(255,255,255,.4),0 0 6px rgba(255,255,255,.18)}
 .kk-outer:not([class*="cal-"]) .sh-shelf-lbl{color:rgba(255,255,255,.65)}
@@ -1646,20 +1700,20 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-samurai .ycal-year-label{color:rgba(254,252,248,.8);text-shadow:0 0 8px rgba(254,252,248,.32)}
 /* Clan (white scroll) — red, no glow */
 .kk-outer.cal-clan .kk-date-text{color:var(--red)}
-.kk-outer.cal-clan .kk-streak-whisper{color:rgba(204,53,41,.72)}
-.kk-outer.cal-clan .hg-week-label{color:rgba(204,53,41,.78)}
+.kk-outer.cal-clan .kk-streak-whisper{color:rgba(var(--red-rgb),.72)}
+.kk-outer.cal-clan .hg-week-label{color:rgba(var(--red-rgb),.78)}
 .kk-outer.cal-clan .sh-shelf-lbl{color:var(--red)}
 .kk-outer.cal-clan .mcal-title{color:var(--red)}
 .kk-outer.cal-clan .ik-arc-label-sm{color:var(--red)}
-.kk-outer.cal-clan .ycal-year-label{color:rgba(204,53,41,.85)}
+.kk-outer.cal-clan .ycal-year-label{color:rgba(var(--red-rgb),.85)}
 /* Shinobi Kaizen grid — base text glow */
-.kk-outer.cal-shinobi .kk-date-header{border-bottom-color:rgba(204,53,41,.06)}
+.kk-outer.cal-shinobi .kk-date-header{border-bottom-color:rgba(var(--red-rgb),.06)}
 .kk-outer.cal-shinobi .hg-nav-btn{color:rgba(254,252,248,.3)}
 .kk-outer.cal-shinobi .hg-nav-btn:hover{color:rgba(254,252,248,.8)}
 .kk-outer.cal-shinobi .hg-header{background:rgba(0,0,0,.2)}
-.kk-outer.cal-shinobi .hg-row{border-bottom-color:rgba(204,53,41,.04)}
+.kk-outer.cal-shinobi .hg-row{border-bottom-color:rgba(var(--red-rgb),.04)}
 .kk-outer.cal-shinobi .hg-day-head{color:rgba(254,252,248,.35)}
-.kk-outer.cal-shinobi .hg-day-head.is-today{color:var(--red);text-shadow:0 0 10px rgba(204,53,41,.5)}
+.kk-outer.cal-shinobi .hg-day-head.is-today{color:var(--red);text-shadow:0 0 10px rgba(var(--red-rgb),.5)}
 .kk-outer.cal-shinobi .hg-label{color:rgba(254,252,248,.6)}
 /* all-done column glow — base (navy default) */
 .hg-day-head.hg-col-complete{color:rgba(255,255,255,.75);text-shadow:0 0 8px rgba(255,255,255,.45),0 0 18px rgba(255,255,255,.18)}
@@ -1668,33 +1722,33 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-samurai .hg-day-head.hg-col-complete{color:rgba(254,252,248,.9);text-shadow:0 0 8px rgba(254,252,248,.55),0 0 20px rgba(254,252,248,.22)}
 .kk-outer.cal-samurai .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(254,252,248,.6),0 0 14px rgba(254,252,248,.25)}
 /* clan — red glow on white */
-.kk-outer.cal-clan .hg-day-head.hg-col-complete{color:var(--red);text-shadow:0 0 8px rgba(204,53,41,.4),0 0 18px rgba(204,53,41,.18)}
-.kk-outer.cal-clan .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(204,53,41,.5),0 0 12px rgba(204,53,41,.22)}
+.kk-outer.cal-clan .hg-day-head.hg-col-complete{color:var(--red);text-shadow:0 0 8px rgba(var(--red-rgb),.4),0 0 18px rgba(var(--red-rgb),.18)}
+.kk-outer.cal-clan .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(var(--red-rgb),.5),0 0 12px rgba(var(--red-rgb),.22)}
 /* shinobi — red glow on black (strongest) */
-.kk-outer.cal-shinobi .hg-day-head.hg-col-complete{color:rgba(204,53,41,.75);text-shadow:0 0 10px rgba(204,53,41,.5),0 0 22px rgba(204,53,41,.25)}
-.kk-outer.cal-shinobi .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(204,53,41,.7),0 0 12px rgba(204,53,41,.4)}
+.kk-outer.cal-shinobi .hg-day-head.hg-col-complete{color:rgba(var(--red-rgb),.75);text-shadow:0 0 10px rgba(var(--red-rgb),.5),0 0 22px rgba(var(--red-rgb),.25)}
+.kk-outer.cal-shinobi .hg-cell.hg-done.hg-col-complete::after{box-shadow:0 0 5px rgba(var(--red-rgb),.7),0 0 12px rgba(var(--red-rgb),.4)}
 .mcal-num{font-size:9px;color:rgba(255,255,255,.6);line-height:1}
 .mcal-cell.mcal-today .mcal-num{color:var(--red);font-weight:700}
 .mcal-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5px;padding-top:2px;max-width:100%}
 .mcal-dot{width:3px;height:3px;border-radius:50%;background:var(--red);opacity:.55;flex-shrink:0}
-.mcal-dots.all-done .mcal-dot{opacity:.9;box-shadow:0 0 3px rgba(204,53,41,.55),0 0 6px rgba(204,53,41,.25)}
+.mcal-dots.all-done .mcal-dot{opacity:.9;box-shadow:0 0 3px rgba(var(--red-rgb),.55),0 0 6px rgba(var(--red-rgb),.25)}
 /* Week reflection indicator */
 .wk-indicator{display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
 .wk-sealed{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--seal);opacity:.75;cursor:pointer;line-height:1;transition:opacity .15s,transform .15s;user-select:none}
 .wk-sealed:hover{opacity:1}
 .wk-sealed.is-open{opacity:1;transform:scale(1.15)}
-.wk-sealed-month{font-size:15px;letter-spacing:0;color:rgba(204,53,41,.45)}
-.wk-sealed-month:hover{color:rgba(204,53,41,.75)}
-.wk-sealed-month.is-open{color:rgba(204,53,41,.75)}
+.wk-sealed-month{font-size:15px;letter-spacing:0;color:rgba(var(--red-rgb),.45)}
+.wk-sealed-month:hover{color:rgba(var(--red-rgb),.75)}
+.wk-sealed-month.is-open{color:rgba(var(--red-rgb),.75)}
 /* prev-month reflection seal — dimmer twin, always red-visible */
-.wk-sealed-prev{font-size:11px;opacity:.5;color:rgba(204,53,41,.65)}
-.wk-sealed-prev:hover{opacity:.85;color:rgba(204,53,41,.9)}
+.wk-sealed-prev{font-size:11px;opacity:.5;color:rgba(var(--red-rgb),.65)}
+.wk-sealed-prev:hover{opacity:.85;color:rgba(var(--red-rgb),.9)}
 .kk-outer.cal-clan .wk-sealed-prev{color:var(--seal);opacity:.55}
 .kk-outer.cal-clan .wk-sealed-prev:hover{opacity:1}
 .kk-outer.cal-samurai .wk-sealed-prev{color:rgba(254,252,248,.55);opacity:1}
 .kk-outer.cal-samurai .wk-sealed-prev:hover{color:rgba(254,252,248,.9)}
-.kk-outer.cal-shinobi .wk-sealed-prev{color:rgba(204,53,41,.55);opacity:1}
-.kk-outer.cal-shinobi .wk-sealed-prev:hover{color:rgba(204,53,41,.95)}
+.kk-outer.cal-shinobi .wk-sealed-prev{color:rgba(var(--red-rgb),.55);opacity:1}
+.kk-outer.cal-shinobi .wk-sealed-prev:hover{color:rgba(var(--red-rgb),.95)}
 .wk-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.12);margin-top:4px}
 /* Weekly reflection expansion panel */
 .mcal-expansion{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}
@@ -1704,8 +1758,8 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .exp-field{margin-bottom:10px}
 .exp-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:3px}
 .exp-text{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:rgba(255,255,255,.62);line-height:1.75}
-.exp-intention{margin-top:12px;padding-top:11px;border-top:1px solid rgba(204,53,41,.15)}
-.exp-intention .exp-label{color:rgba(204,53,41,.5)}
+.exp-intention{margin-top:12px;padding-top:11px;border-top:1px solid rgba(var(--red-rgb),.15)}
+.exp-intention .exp-label{color:rgba(var(--red-rgb),.5)}
 .exp-intention .exp-text{color:rgba(255,255,255,.8)}
 
 /* ===== YEAR VIEW (Ikigai) ===== */
@@ -1721,7 +1775,7 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .ycal-cell.ycal-future{background:rgba(255,255,255,.04)}
 .ycal-cell.ycal-noscheduled{background:rgba(255,255,255,.04)}
 .ycal-cell.ycal-full{background:var(--red)}
-.ycal-cell.ycal-partial{background:rgba(204,53,41,.5)}
+.ycal-cell.ycal-partial{background:rgba(var(--red-rgb),.5)}
 .ycal-cell.ycal-miss{background:rgba(245,240,232,.1)}
 .ycal-cell.ycal-today{outline:1.5px solid var(--red);outline-offset:0}
 
@@ -1932,7 +1986,7 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
 @keyframes origamiCheck{
   0%  {transform:scale(1);background:transparent;border-color:rgba(26,26,26,.4);opacity:.4;box-shadow:none}
   12% {transform:scaleX(0.12) scaleY(1.35) rotate(-8deg);opacity:1;border-color:var(--red)}
-  35% {transform:scaleX(1.3) scaleY(0.7) rotate(6deg);background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px rgba(204,53,41,.12)}
+  35% {transform:scaleX(1.3) scaleY(0.7) rotate(6deg);background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px rgba(var(--red-rgb),.12)}
   58% {transform:scaleX(0.9) scaleY(1.12) rotate(-2deg);background:var(--ink);border-color:var(--ink);box-shadow:none}
   78% {transform:scaleX(1.06) scaleY(0.95)}
   100%{transform:scale(1);background:var(--red);border-color:var(--red);opacity:1}
@@ -1979,7 +2033,7 @@ body.edit-mode .edit-mode-bar{display:flex}
   margin-bottom:8px;letter-spacing:.5px}
 .blade-item-name{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
   color:var(--ink-faint);margin-bottom:24px;padding:0 8px;line-height:1.6;
-  border-left:2px solid rgba(204,53,41,.25);text-align:left}
+  border-left:2px solid rgba(var(--red-rgb),.25);text-align:left}
 .blade-actions{display:flex;gap:10px}
 .blade-confirm{flex:1;font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
   text-transform:uppercase;padding:13px 16px;cursor:pointer;
@@ -1996,7 +2050,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 .severed-flash{display:none;text-align:center;padding:14px 20px;
   font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;
   color:var(--ink-faint);line-height:1.7;letter-spacing:.3px;
-  border-left:2px solid rgba(204,53,41,.3);margin:0 0 8px;
+  border-left:2px solid rgba(var(--red-rgb),.3);margin:0 0 8px;
   animation:fadeUp .3s ease}
 .severed-flash.show{display:block}
 
@@ -2008,7 +2062,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 .ryughi-header-click:hover .ryughi-label{opacity:1}
 
 /* Strand glow filter */
-.goal.strand-glow{background:rgba(204,53,41,.04);border-left:2px solid rgba(204,53,41,.28);margin-left:-2px;padding-left:14px;transition:all .3s}
+.goal.strand-glow{background:rgba(var(--red-rgb),.04);border-left:2px solid rgba(var(--red-rgb),.28);margin-left:-2px;padding-left:14px;transition:all .3s}
 .goal.strand-faint{opacity:.15;transition:opacity .3s}
 
 /* Strand active state when filtering */
@@ -2016,7 +2070,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 
 /* Kaizen filter indicator */
 .filter-indicator{display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;padding:8px 14px;background:rgba(204,53,41,.06);
+  margin-bottom:14px;padding:8px 14px;background:rgba(var(--red-rgb),.06);
   border-left:2px solid var(--red)}
 .filter-indicator-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;
   color:var(--red);font-family:'Noto Sans JP',sans-serif}
@@ -2217,11 +2271,11 @@ body.edit-mode .edit-mode-bar{display:flex}
   100%{opacity:0;transform:translateY(-16px)}
 }
 @keyframes inkBleed{
-  0%{background:rgba(204,53,41,0)}
-  20%{background:rgba(204,53,41,.07)}
-  50%{background:rgba(204,53,41,.13)}
-  80%{background:rgba(204,53,41,.07)}
-  100%{background:rgba(204,53,41,0)}
+  0%{background:rgba(var(--red-rgb),0)}
+  20%{background:rgba(var(--red-rgb),.07)}
+  50%{background:rgba(var(--red-rgb),.13)}
+  80%{background:rgba(var(--red-rgb),.07)}
+  100%{background:rgba(var(--red-rgb),0)}
 }
 @keyframes washContent{
   0%{opacity:0;transform:scale(.92)}
@@ -2292,21 +2346,21 @@ body.edit-mode .edit-mode-bar{display:flex}
 @keyframes sealStampIn{
   0%  {opacity:0;transform:rotate(-4deg) scale(2);filter:none}
   30% {opacity:1;transform:rotate(-4deg) scale(.9);
-       filter:drop-shadow(0 0 24px rgba(204,53,41,.7)) drop-shadow(0 0 48px rgba(204,53,41,.4))}
+       filter:drop-shadow(0 0 24px rgba(var(--red-rgb),.7)) drop-shadow(0 0 48px rgba(var(--red-rgb),.4))}
   55% {transform:rotate(-4deg) scale(1.06)}
   75% {transform:rotate(-4deg) scale(.98)}
   100%{transform:rotate(-4deg) scale(1);
-       filter:drop-shadow(0 0 20px rgba(204,53,41,.55)) drop-shadow(0 0 40px rgba(204,53,41,.3))}
+       filter:drop-shadow(0 0 20px rgba(var(--red-rgb),.55)) drop-shadow(0 0 40px rgba(var(--red-rgb),.3))}
 }
 @keyframes sealGlowFloat{
   0%  {transform:rotate(-4deg) scale(1) translateY(0);
-       filter:drop-shadow(0 0 20px rgba(204,53,41,.55)) drop-shadow(0 0 40px rgba(204,53,41,.3))}
+       filter:drop-shadow(0 0 20px rgba(var(--red-rgb),.55)) drop-shadow(0 0 40px rgba(var(--red-rgb),.3))}
   35% {transform:rotate(-4deg) scale(1) translateY(-8px);
-       filter:drop-shadow(0 0 36px rgba(204,53,41,.8)) drop-shadow(0 0 72px rgba(204,53,41,.45))}
+       filter:drop-shadow(0 0 36px rgba(var(--red-rgb),.8)) drop-shadow(0 0 72px rgba(var(--red-rgb),.45))}
   70% {transform:rotate(-4deg) scale(1) translateY(4px);
-       filter:drop-shadow(0 0 24px rgba(204,53,41,.6)) drop-shadow(0 0 48px rgba(204,53,41,.35))}
+       filter:drop-shadow(0 0 24px rgba(var(--red-rgb),.6)) drop-shadow(0 0 48px rgba(var(--red-rgb),.35))}
   100%{transform:rotate(-4deg) scale(1) translateY(-5px);
-       filter:drop-shadow(0 0 32px rgba(204,53,41,.7)) drop-shadow(0 0 60px rgba(204,53,41,.4))}
+       filter:drop-shadow(0 0 32px rgba(var(--red-rgb),.7)) drop-shadow(0 0 60px rgba(var(--red-rgb),.4))}
 }
 @keyframes sealFadeOut{
   0%  {opacity:1}
@@ -2385,8 +2439,8 @@ body.edit-mode .edit-mode-bar{display:flex}
   color:var(--red) !important;
 }
 @keyframes psSamuraiPulse{
-  0%,100%{filter:drop-shadow(0 0 28px rgba(204,53,41,.65)) drop-shadow(0 0 56px rgba(204,53,41,.35))}
-  50%    {filter:drop-shadow(0 0 56px rgba(204,53,41,1.0)) drop-shadow(0 0 100px rgba(204,53,41,.6))}
+  0%,100%{filter:drop-shadow(0 0 28px rgba(var(--red-rgb),.65)) drop-shadow(0 0 56px rgba(var(--red-rgb),.35))}
+  50%    {filter:drop-shadow(0 0 56px rgba(var(--red-rgb),1.0)) drop-shadow(0 0 100px rgba(var(--red-rgb),.6))}
 }
 
 #proverb-overlay{display:none;position:fixed;inset:0;z-index:200;pointer-events:none;
@@ -2428,11 +2482,11 @@ body.edit-mode .edit-mode-bar{display:flex}
    would have drifted dark the moment the ground moved. */
 body.dark{
   --scroll:#24201C;--edge:#1B1815;--ink:#EDE8DE;--ink-light:#CFC8BB;
-  --ink-faint:#ADA393;--marks:#7E776C;--red:#E0574B;
+  --ink-faint:#ADA393;--marks:#7E776C;--red:#E0574B;--red-rgb:224,87,75;
   --white:#24201C;--shadow:rgba(0,0,0,.4);--grid-bg:#0D0B08;
 }
 /* R8 — kaizen "this week" separator: restore coreproject's dark-mode red-glow accent (class dropped on consolidation port) */
-body.dark .this-week-label{color:var(--red);text-shadow:0 0 8px rgba(204,53,41,.6),0 0 22px rgba(204,53,41,.25)}
+body.dark .this-week-label{color:var(--red);text-shadow:0 0 8px rgba(var(--red-rgb),.6),0 0 22px rgba(var(--red-rgb),.25)}
 body.dark .scroll{
   background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.01) 39px,rgba(255,255,255,.01) 40px);
   transition:background-color .5s}
@@ -2454,8 +2508,8 @@ body.dark .reflect-prompt-overlay{background:rgba(15,13,10,.75)}
 body.dark .stats-row{border-bottom-color:rgba(255,255,255,.04)}
 body.dark .stats-cols{border-bottom-color:rgba(255,255,255,.08)}
 body.dark .daily-note{border-bottom-color:rgba(255,255,255,.06)}
-body.dark .reflect-nudge{border-color:rgba(204,53,41,.25);border-left-color:var(--red)}
-body.dark .reflect-nudge.review-card{border-color:rgba(204,53,41,.12);border-left-color:rgba(204,53,41,.4)}
+body.dark .reflect-nudge{border-color:rgba(var(--red-rgb),.25);border-left-color:var(--red)}
+body.dark .reflect-nudge.review-card{border-color:rgba(var(--red-rgb),.12);border-left-color:rgba(var(--red-rgb),.4)}
 body.dark .add-trigger:hover{opacity:.5}
 body.dark .hanko{border-color:var(--seal)}
 
@@ -2501,7 +2555,7 @@ body.dark .hanko{border-color:var(--seal)}
   color:var(--red);opacity:.5;width:16px;text-align:center}
 .avatar-dd-divider{height:1px;background:var(--edge);margin:4px 0}
 .avatar-dd-item.dd-danger{color:var(--ink-faint)}
-.avatar-dd-item.dd-danger:hover{color:var(--red);background:rgba(204,53,41,.04)}
+.avatar-dd-item.dd-danger:hover{color:var(--red);background:rgba(var(--red-rgb),.04)}
 
 /* Manifesto overlay */
 .manifesto-overlay{display:none;position:fixed;inset:0;z-index:500;
@@ -2692,7 +2746,7 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 .shin-stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(254,252,248,.35);margin-top:4px}
 .shin-obscure{display:flex;gap:5px;align-items:center;margin-bottom:8px}
 .shin-glyph{width:18px;height:18px;border-radius:2px;background:rgba(255,255,255,.08)}
-.shin-glyph.lit{background:rgba(204,53,41,.5)}
+.shin-glyph.lit{background:rgba(var(--red-rgb),.5)}
 .shin-obscure-label{font-size:9px;color:rgba(254,252,248,.4);letter-spacing:2px;margin-left:8px}
 .shin-note{font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:rgba(254,252,248,.45)}
 
@@ -2755,8 +2809,8 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
   border-bottom:1.5px solid rgba(0,0,0,.12);padding:10px 0;color:var(--ink);outline:none}
 .invite-input:focus{border-bottom-color:var(--ink)}
 .invite-input::placeholder{color:var(--ink-faint);opacity:.4}
-.pending-card{margin-top:12px;padding:14px 18px;background:rgba(204,53,41,.04);
-  border:1px dashed rgba(204,53,41,.2);display:flex;align-items:center;
+.pending-card{margin-top:12px;padding:14px 18px;background:rgba(var(--red-rgb),.04);
+  border:1px dashed rgba(var(--red-rgb),.2);display:flex;align-items:center;
   justify-content:space-between;border-radius:2px}
 .pending-name{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-faint)}
 .pending-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);opacity:.7}
@@ -2791,7 +2845,7 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 .auth-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;letter-spacing:12px;color:var(--ink);margin-bottom:4px}
 .auth-tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--ink-faint)}
 .auth-config-notice{
-  background:rgba(204,53,41,.04);border:1px dashed rgba(204,53,41,.25);
+  background:rgba(var(--red-rgb),.04);border:1px dashed rgba(var(--red-rgb),.25);
   padding:12px 16px;margin-bottom:20px;border-radius:2px;
 }
 .auth-config-notice p{font-size:10px;line-height:1.8;color:var(--ink-faint)}
@@ -2859,7 +2913,7 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 /* A — Kaizen whisper */
 .kz-datebar{display:flex;align-items:baseline;gap:7px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.06)}
 .kz-date{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light);letter-spacing:1px}
-.kz-whisper{font-size:9px;letter-spacing:1px;color:rgba(204,53,41,.42)}
+.kz-whisper{font-size:9px;letter-spacing:1px;color:rgba(var(--red-rgb),.42)}
 .kz-dots{display:flex;gap:2px;margin-left:auto}
 .kz-dot-w{width:4px;height:4px;border-radius:50%;background:var(--red);opacity:.22}
 .kz-dot-w.lit{opacity:1}
@@ -2878,8 +2932,8 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 .ik-tl{display:flex;gap:2px;flex-wrap:wrap;margin:12px 0 4px}
 .ik-d{width:7px;height:7px;border-radius:1px;flex-shrink:0}
 .ik-d.full{background:var(--red)}
-.ik-d.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(204,53,41,.28)}
-.ik-d.partial{background:rgba(204,53,41,.36)}
+.ik-d.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(var(--red-rgb),.28)}
+.ik-d.partial{background:rgba(var(--red-rgb),.36)}
 .ik-d.miss{background:rgba(0,0,0,.09)}
 .ik-d.future{background:rgba(0,0,0,.04)}
 .ik-d.current{background:var(--red);outline:1.5px solid rgba(255,255,255,.65);outline-offset:0}
@@ -2887,7 +2941,7 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 .ik-anns{display:flex;flex-direction:column;gap:4px}
 .ik-ann-row{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--ink-faint)}
 .ik-swatch{width:18px;height:5px;border-radius:1px;flex-shrink:0}
-.ik-swatch.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(204,53,41,.25)}
+.ik-swatch.best{background:var(--red);box-shadow:0 0 0 1.5px rgba(var(--red-rgb),.25)}
 .ik-swatch.gap{background:rgba(0,0,0,.09)}
 .ik-swatch.current{background:var(--red);outline:1px solid rgba(0,0,0,.15)}
 
@@ -2909,31 +2963,31 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
 .sh-progress-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--ink-faint)}
 .sh-prog-bar{flex:1;height:3px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden}
 .sh-prog-fill{height:100%;background:var(--red);border-radius:2px}
-.sh-prog-pct{font-size:9px;color:rgba(204,53,41,.65);letter-spacing:1px;flex-shrink:0}
+.sh-prog-pct{font-size:9px;color:rgba(var(--red-rgb),.65);letter-spacing:1px;flex-shrink:0}
 
 /* D — Clan momentum */
-.clan-exp-wrap{background:#FFFFFF;border:1.5px solid rgba(204,53,41,.18);padding:16px 16px 14px}
+.clan-exp-wrap{background:#FFFFFF;border:1.5px solid rgba(var(--red-rgb),.18);padding:16px 16px 14px}
 .clan-exp-lbl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px}
 .clan-exp-members{display:flex;flex-direction:column;gap:10px}
-.clan-exp-row{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(204,53,41,.15)}
+.clan-exp-row{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(var(--red-rgb),.15)}
 .clan-exp-row:last-child{border-bottom:none;padding-bottom:0}
 .clan-exp-streak{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;color:var(--red);line-height:1}
 .clan-exp-streak-lbl{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--red)}
 .clan-exp-name{font-family:'Noto Serif JP',serif;font-size:11px;color:var(--red);letter-spacing:.5px;margin-bottom:4px}
 .clan-you{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-left:4px}
 .clan-exp-bars{display:flex;gap:3px;align-items:flex-end;height:20px}
-.clan-exp-bar{flex:1;border-radius:1px 1px 0 0;background:rgba(204,53,41,.08)}
+.clan-exp-bar{flex:1;border-radius:1px 1px 0 0;background:rgba(var(--red-rgb),.08)}
 .clan-exp-bar.done{background:var(--red)}
-.clan-exp-bar.partial{background:rgba(204,53,41,.38)}
-.clan-exp-bar.today{background:var(--red);outline:1px solid rgba(204,53,41,.4)}
+.clan-exp-bar.partial{background:rgba(var(--red-rgb),.38)}
+.clan-exp-bar.today{background:var(--red);outline:1px solid rgba(var(--red-rgb),.4)}
 .clan-exp-today{text-align:right}
 .clan-exp-today-num{font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;color:var(--red);line-height:1}
 .clan-exp-today-lbl{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-top:2px}
 /* Clan name inline edit */
 .clan-name-field{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);background:transparent;border:none;border-bottom:1px solid transparent;outline:none;cursor:pointer;letter-spacing:.5px;width:100%;transition:border-color .2s}
-.clan-name-field:hover{border-bottom-color:rgba(204,53,41,.3)}
+.clan-name-field:hover{border-bottom-color:rgba(var(--red-rgb),.3)}
 .clan-name-field:focus{border-bottom-color:var(--red);cursor:text}
-.clan-name-field::placeholder{color:rgba(204,53,41,.4);font-style:italic;font-weight:400}
+.clan-name-field::placeholder{color:rgba(var(--red-rgb),.4);font-style:italic;font-weight:400}
 .clan-agg-bar{width:100%;border-radius:1px 1px 0 0;transition:height .4s ease,background .3s ease}
 
 /* ════════════════════════════════════════════════════════════════════
@@ -3233,16 +3287,41 @@ li.goal.hd-open .habit-detail{display:block}
 
 /* ── Day journal tap ──────────────────────────────────────────────── */
 .mcal-cell.has-note{ cursor:pointer }
+/* ── 省, AND WHY IT KEPT DISAPPEARING (James, 12 November: "make sure in the
+   reflections page the white calendar's symbol for the daily reflection is in red so
+   the user can see it") ─────────────────────────────────────────────────────────
+
+   MEASURED BEFORE IT WAS TOUCHED: on the White calendar the mark was #F9F4EA on
+   #FEFCF8 paper, 1.07:1. Two of them were in the DOM and neither could be seen. On
+   Shinobi at night it was 1.03:1, the same fault in the other direction.
+
+   THE CAUSE WAS NOT A MISSING RULE, IT WAS FOUR RULES THAT NEVER APPLIED. Each ink
+   already sets its own mark colour: cal-white red at .8, cal-clan red at .45,
+   cal-samurai and cal-shinobi near-white at .45. Every one of them has the same
+   specificity as the base rule below, (0,3,0), and all four are written EARLIER in
+   the file, so the base rule's color:var(--scroll) beat all four. On Samurai that
+   happened to land near-white on red paper and looked deliberate, which is why it
+   survived review.
+
+   An override was written for this once before, for the default and clan inks, and
+   it carries a comment explaining the same thing. It skipped cal-white. When Navy
+   retired and White became the default ink, the bug came back for every user, which
+   is the shape this project's bugs keep taking: caught, fixed, then re-introduced by
+   a change nearby.
+
+   THE FIX IS TO STOP THE BASE RULE PAINTING. It keeps the type and the layout and
+   sets no colour, so each ink's own rule decides, which is what they were written to
+   do. The default calendar, which carries no ink class, still needs one, and keeps
+   the red it had. */
 .mcal-cell.has-note .mcal-note-mark{
-  font-family:'Noto Serif JP',serif;font-size:6px;color:var(--scroll);opacity:.7;
+  font-family:'Noto Serif JP',serif;font-size:6px;opacity:.7;
   line-height:1;margin-top:1px;display:block;
 }
-/* 省 reflection seal is invisible on the LIGHT calendar themes (default + clan) — the base
-   rule above colors it var(--scroll), which matches the white/parchment background. Force a
-   visible red there (higher specificity than the base + themed rules so it always wins).
-   Dark themes (samurai/shinobi) keep their own light-on-dark mark, untouched. */
 .kk-outer:not([class*="cal-"]) .mcal-cell.has-note .mcal-note-mark,
-.kk-outer.cal-clan .mcal-cell.has-note .mcal-note-mark{ color:rgba(204,53,41,.85); opacity:1; }
+.kk-outer.cal-clan .mcal-cell.has-note .mcal-note-mark{ color:rgba(var(--red-rgb),.85); opacity:1; }
+/* and the ink rules are no longer fighting the base rule, so they are given the
+   opacity they always meant to have */
+.kk-outer.cal-white .mcal-cell.has-note .mcal-note-mark{ opacity:1 }
 /* ── Milestone / obligation day ───────────────────────────────────── */
 .mcal-cell.skn-ms-day{cursor:pointer;position:relative}
 .mcal-cell.skn-ms-day:hover{background:rgba(255,255,255,.07)}
@@ -3367,7 +3446,7 @@ li.goal.hd-open .habit-detail{display:block}
 .cs-cal-pill[data-theme="clan"]{background:rgba(254,252,248,.12);border-color:rgba(254,252,248,.35);color:rgba(254,252,248,.55)}
 .cs-cal-pill[data-theme="clan"]:hover{background:rgba(254,252,248,.28);border-color:rgba(254,252,248,.7);color:#FEFCF8}
 .cs-cal-pill[data-theme="clan"].active{background:#FEFCF8;border-color:#FEFCF8;color:var(--red)}
-.cs-cal-pill[data-theme="samurai"]{background:rgba(181,32,22,.1);border-color:rgba(181,32,22,.35);color:rgba(204,53,41,.65)}
+.cs-cal-pill[data-theme="samurai"]{background:rgba(181,32,22,.1);border-color:rgba(181,32,22,.35);color:rgba(var(--red-rgb),.65)}
 .cs-cal-pill[data-theme="samurai"]:hover{background:rgba(181,32,22,.22);border-color:rgba(181,32,22,.6);color:#CC3529}
 .cs-cal-pill[data-theme="samurai"].active{background:#B52016;border-color:#B52016;color:#FEFCF8}
 .cs-cal-pill[data-theme="shinobi"]{background:rgba(26,26,46,.25);border-color:rgba(100,100,160,.22);color:rgba(180,180,220,.4)}
@@ -3398,7 +3477,7 @@ li.goal.hd-open .habit-detail{display:block}
   text-transform:uppercase;color:var(--ink-faint);text-align:center;padding-bottom:4px;border-bottom:1px solid var(--edge)}
 .cs-chip{background:rgba(255,255,255,.7);border:1px solid var(--edge);padding:5px 6px;
   transition:all .2s;text-align:left;border-radius:1px;display:block}
-.cs-chip:hover{border-color:var(--ink);background:rgba(204,53,41,.04)}
+.cs-chip:hover{border-color:var(--ink);background:rgba(var(--red-rgb),.04)}
 .cs-chip-time-input{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:1px;
   color:var(--red);font-weight:500;background:transparent;border:none;padding:0;width:100%;
   outline:none;cursor:pointer;display:block}
@@ -3432,7 +3511,7 @@ li.goal.hd-open .habit-detail{display:block}
 .cs-scroll-month:focus, .cs-scroll-day:focus{border-color:var(--ink)}
 .cs-scroll-day.cs-day-adjusted{animation:csDayPulse .9s ease}
 @keyframes csDayPulse{
-  0%{background:rgba(204,53,41,.18);border-color:var(--red)}
+  0%{background:rgba(var(--red-rgb),.18);border-color:var(--red)}
   100%{background:transparent;border-color:var(--edge)}
 }
 .cs-scroll-name{flex:1;font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink);
@@ -3493,8 +3572,8 @@ li.goal.hd-open .habit-detail{display:block}
 @keyframes stampIn{0%{opacity:0;transform:scale(0)}60%{opacity:1;transform:scale(1.15)}80%{transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
 
 /* Error / status copy used during real API calls */
-.cs-error{margin-top:18px;padding:14px 16px;background:rgba(204,53,41,.06);
-  border:1px solid rgba(204,53,41,.22);border-radius:2px;
+.cs-error{margin-top:18px;padding:14px 16px;background:rgba(var(--red-rgb),.06);
+  border:1px solid rgba(var(--red-rgb),.22);border-radius:2px;
   font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;
   color:var(--red);line-height:1.6;text-align:left}
 .cs-syncing{text-align:center;padding:60px 20px}
@@ -3508,8 +3587,8 @@ li.goal.hd-open .habit-detail{display:block}
 /* Connected-state panel + reset confirmation */
 .cs-connected-actions{display:flex;flex-direction:column;gap:12px;margin:32px 0 8px}
 .cs-btn-wide{width:100%;justify-content:center;text-align:center;padding:16px 28px}
-.cs-reset-confirm{margin-top:24px;padding:36px 28px;background:rgba(204,53,41,.045);
-  border:1px solid rgba(204,53,41,.22);border-radius:2px;text-align:center;animation:fadeUp .35s ease-out}
+.cs-reset-confirm{margin-top:24px;padding:36px 28px;background:rgba(var(--red-rgb),.045);
+  border:1px solid rgba(var(--red-rgb),.22);border-radius:2px;text-align:center;animation:fadeUp .35s ease-out}
 .cs-reset-kanji{font-family:'Noto Serif JP',serif;font-size:48px;color:var(--red);opacity:.85;margin-bottom:18px;line-height:1}
 .cs-reset-question{font-family:'Noto Serif JP',serif;font-size:18px;letter-spacing:1px;color:var(--ink);margin-bottom:18px;font-weight:700}
 .cs-reset-list{font-family:'Noto Serif JP',serif;font-size:13px;line-height:1.75;color:var(--ink-light);margin-bottom:28px;padding:0 12px}
@@ -3554,13 +3633,13 @@ li.goal.hd-open .habit-detail{display:block}
 /* /EXPERIMENT: CALENDAR SYNC + SETTINGS */
 /* Subtle red accent on the user's own card so it's findable at a glance
    without being loud — matches the BUSHIDO red used elsewhere for accents. */
-.clan-card.is-own{border-color:rgba(204,53,41,.3);box-shadow:0 0 0 1px rgba(204,53,41,.12)}
-.clan-card.shinobi.is-own{border-color:rgba(204,53,41,.4)}
+.clan-card.is-own{border-color:rgba(var(--red-rgb),.3);box-shadow:0 0 0 1px rgba(var(--red-rgb),.12)}
+.clan-card.shinobi.is-own{border-color:rgba(var(--red-rgb),.4)}
 .clan-you-badge{display:inline-block;margin-left:8px;padding:2px 8px;
   font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
   text-transform:uppercase;background:var(--red);color:var(--white);
   border-radius:2px;vertical-align:middle;font-weight:700}
-.clan-card.shinobi .clan-you-badge{background:rgba(204,53,41,.85);color:rgba(254,252,248,.95)}
+.clan-card.shinobi .clan-you-badge{background:rgba(var(--red-rgb),.85);color:rgba(254,252,248,.95)}
 /* Practice continuance milestone seal — kanji shown beside member name on
    clan cards and exp-rows. Color set inline from PRACTICE_MILESTONES.col
    (or .light for shinobi cards). */
@@ -3699,7 +3778,7 @@ li.goal.hd-open .habit-detail{display:block}
   transition: all .3s;
 }
 .sr-phase-dot.active { opacity: 1; background: var(--red); }
-.sr-phase-dot.done { background: rgba(204,53,41,0.3); }
+.sr-phase-dot.done { background: rgba(var(--red-rgb),0.3); }
 
 /* Phase panels */
 .sr-phase { display: none; }
@@ -3744,7 +3823,7 @@ li.goal.hd-open .habit-detail{display:block}
 .sr-stat-bar-wrap {
   flex: 1;
   height: 5px;
-  background: rgba(204,53,41,0.1);
+  background: rgba(var(--red-rgb),0.1);
   border-radius: 3px;
   margin: 0 16px;
   overflow: hidden;
@@ -3752,7 +3831,7 @@ li.goal.hd-open .habit-detail{display:block}
 .sr-stat-bar {
   height: 100%;
   border-radius: 3px;
-  background: rgba(204,53,41,0.3);
+  background: rgba(var(--red-rgb),0.3);
   transition: width .6s ease;
 }
 .sr-stat-bar.high { background: var(--red); opacity: 1; }
@@ -3776,7 +3855,7 @@ li.goal.hd-open .habit-detail{display:block}
 .sr-overall-bar-wrap {
   width: 100%;
   height: 48px;
-  background: rgba(204,53,41,0.1);
+  background: rgba(var(--red-rgb),0.1);
   border-radius: 3px;
   overflow: hidden;
   position: relative;
@@ -3857,7 +3936,7 @@ li.goal.hd-open .habit-detail{display:block}
 .sr-rating-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--white); }
 .sr-rating-btn.selected-advancing { border-color: #3D6B5F; background: rgba(61,107,95,0.09); color: #3D6B5F; font-weight: 700; }
 .sr-rating-btn.selected-holding   { border-color: #8A7A5A; background: rgba(138,122,90,0.09); color: #8A7A5A; font-weight: 700; }
-.sr-rating-btn.selected-falling   { border-color: var(--red); background: rgba(204,53,41,0.07); color: var(--red); font-weight: 700; }
+.sr-rating-btn.selected-falling   { border-color: var(--red); background: rgba(var(--red-rgb),0.07); color: var(--red); font-weight: 700; }
 .sr-note-input {
   width: 100%;
   background: none;
@@ -4099,13 +4178,13 @@ body.dark .sr-backdrop {
   background: rgba(8,6,4,0.78);
 }
 body.dark .sr-overall-bar-wrap {
-  background: rgba(204,53,41,0.18);
+  background: rgba(var(--red-rgb),0.18);
 }
 body.dark .sr-stat-bar-wrap {
-  background: rgba(204,53,41,0.14);
+  background: rgba(var(--red-rgb),0.14);
 }
 body.dark .sr-stat-bar {
-  background: rgba(204,53,41,0.4);
+  background: rgba(var(--red-rgb),0.4);
 }
 body.dark .sr-stat-row {
   border-bottom-color: rgba(255,255,255,0.06);
@@ -4209,27 +4288,27 @@ body.dark .sr-phase-dot {
 .cn-btn.ghost:hover{background:transparent;color:var(--ink);border-color:transparent}
 .cn-btn:disabled{opacity:.35;cursor:not-allowed}
 .cn-btn:disabled:hover{background:transparent;color:var(--ink)}
-.cn-error{margin-top:16px;padding:12px 14px;background:rgba(204,53,41,.06);
-  border:1px solid rgba(204,53,41,.22);border-radius:2px;
+.cn-error{margin-top:16px;padding:12px 14px;background:rgba(var(--red-rgb),.06);
+  border:1px solid rgba(var(--red-rgb),.22);border-radius:2px;
   font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;
   color:var(--red);line-height:1.6;text-align:left}
 /* ── CLAN CALENDAR — panel ─────────────────────────────────────────────── */
 /* White/snow surface + red accents — matches the clan tab, no parchment. */
-.cn-cal-panel{background:var(--white);border:1px solid rgba(204,53,41,.14);
+.cn-cal-panel{background:var(--white);border:1px solid rgba(var(--red-rgb),.14);
   border-radius:2px;padding:22px 24px 10px}
 .cn-cal-add{display:block;width:100%;margin-bottom:6px;
   font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
   text-transform:uppercase;color:var(--red);background:transparent;
-  border:1px dashed rgba(204,53,41,.32);border-radius:2px;padding:13px;
+  border:1px dashed rgba(var(--red-rgb),.32);border-radius:2px;padding:13px;
   cursor:pointer;transition:background .2s,border-color .2s}
-.cn-cal-add:hover{background:rgba(204,53,41,.05);border-color:var(--red)}
+.cn-cal-add:hover{background:rgba(var(--red-rgb),.05);border-color:var(--red)}
 .cn-cal-empty{text-align:center;font-family:'Noto Serif JP',serif;font-style:italic;
   font-size:13px;color:var(--ink-faint);line-height:1.7;padding:22px 10px 14px}
 .cn-cal-nudge{text-align:center;font-family:'Noto Serif JP',serif;font-size:13px;
   font-style:italic;color:var(--red);margin:14px 0 18px;letter-spacing:.3px}
 .cn-cal-nudge strong{font-style:normal;font-weight:700}
 .cn-cal-line{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;
-  padding:15px 2px;border-bottom:1px solid rgba(204,53,41,.09)}
+  padding:15px 2px;border-bottom:1px solid rgba(var(--red-rgb),.09)}
 .cn-cal-line:last-child{border-bottom:none}
 .cn-cal-when{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:700;
   color:var(--red);min-width:64px;white-space:nowrap;letter-spacing:.3px;padding-top:1px}
@@ -4256,7 +4335,7 @@ body.dark .sr-phase-dot {
 .cn-cal-link:hover{color:var(--red)}
 .cn-cal-link.req{display:inline-block;margin-top:8px}
 .cn-cal-removal{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:8px;
-  padding:8px 11px;background:rgba(204,53,41,.05);border:1px solid rgba(204,53,41,.18);
+  padding:8px 11px;background:rgba(var(--red-rgb),.05);border:1px solid rgba(var(--red-rgb),.18);
   border-radius:2px;font-family:'Noto Sans JP',sans-serif;font-size:9px;
   letter-spacing:.8px;color:var(--red)}
 .cn-cal-removal .cn-cal-link{color:var(--red)}
@@ -4272,7 +4351,7 @@ body.dark .sr-phase-dot {
   color:var(--ink-faint);line-height:1.6;margin-top:10px}
 /* ── CLAN → IKIGAI PROMPT ───────────────────────────────────────────────── */
 .cn-cal-ik-prompt{margin-top:10px;padding:12px 14px;
-  background:rgba(204,53,41,.04);border:1px solid rgba(204,53,41,.14);border-radius:2px}
+  background:rgba(var(--red-rgb),.04);border:1px solid rgba(var(--red-rgb),.14);border-radius:2px}
 .cn-cal-ik-q{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;
   color:var(--ink);margin-bottom:10px;line-height:1.5}
 .cn-cal-ik-row{display:flex;flex-wrap:wrap;gap:6px}
@@ -4319,7 +4398,7 @@ body.dark .sr-phase-dot {
 .cnyc-cell{aspect-ratio:1;border-radius:1px;background:rgba(254,252,248,.04);
   position:relative;overflow:visible}
 .cnyc-cell.cnyc-empty{background:transparent}
-.cnyc-cell.cnyc-today{outline:1.5px solid rgba(204,53,41,.55);outline-offset:0}
+.cnyc-cell.cnyc-today{outline:1.5px solid rgba(var(--red-rgb),.55);outline-offset:0}
 .cnyc-cell.cnyc-has-event{cursor:pointer}
 .cnyc-cell.cnyc-has-event:hover{background:rgba(254,252,248,.09)}
 .cnyc-cell.cnyc-selected{outline:1.5px solid rgba(254,252,248,.4);outline-offset:0}
@@ -4346,7 +4425,7 @@ body.dark .sr-phase-dot {
 
 /* Past done cells — muted dot so only today stands out */
 .hg-cell.hg-done:not(.hg-today-col)::after {
-  background: rgba(204,53,41,.75) !important;
+  background: rgba(var(--red-rgb),.75) !important;
 }
 /* Samurai theme: past done dots are opaque white, not red */
 .kk-outer.cal-samurai .hg-cell.hg-done:not(.hg-today-col)::after {
@@ -4354,7 +4433,7 @@ body.dark .sr-phase-dot {
 }
 /* Shinobi theme: past done dots slightly muted */
 .kk-outer.cal-shinobi .hg-cell.hg-done:not(.hg-today-col)::after {
-  background: rgba(204,53,41,.45) !important;
+  background: rgba(var(--red-rgb),.45) !important;
 }
 /* Past miss cells — keep faint, but slightly more visible so done/miss are still readable */
 .hg-cell.hg-miss:not(.hg-today-col)::after {
@@ -8832,27 +8911,29 @@ function betaRenderSplit(){
    ELSEWHERE -> a click on anything else clears the LENS (James, 20 Oct) but never
                 a door: a highlight is something you glance through, a door is a
                 place you stand in, and closing it on a tick would make it unusable. */
-/* ONE CLICK IN THE RAIL, THE LENS IN THE ALCOVE (James, 8 and 9 November).
+/* TWO CLICKS AT EVERY WIDTH (James, 12 November: "let's instate the double click
+   rule into Ikigai and Shokunin ... first click simply highlights the respective
+   tasks on the main page, click two takes you to dojo").
 
-   The two-step lens belongs to a bar of names sitting over the list, where lighting
-   the rows in place is a glance and nothing moves. That is still the phone's shape,
-   so below 900 the phone keeps it, unchanged. In the rail a dojo is a destination
-   beside Reflect and Clan, 92 pixels off at the left edge, and a destination that
-   needs two taps reads as broken, so from 900 up one click goes through and My
-   Bushido is the way out.
+   THIS REVERSES THE RULING OF 9 NOVEMBER, which kept the lens on the phone and sent
+   the rail straight through on one click. Both decks draw the two steps and neither
+   draws a width where they differ: the desktop deck's own dojo slide says "tap a name
+   in the alcove once and it lights red while the rest dims; tap again and My Bushido
+   slides back to the left like a fusuma". The earlier reasoning, that a destination in
+   a rail needing two taps reads as broken, was about the rail being a place like
+   Reflect and Clan. It is not: the dojo names sit apart from the four tabs and the
+   deck treats them as a lens over My Bushido that happens to be drawn in the rail.
 
-   THE WIDTH IS READ AT THE CLICK, never cached at load, because betaHomeSplit
-   re-homes the names on resize: a cached answer would leave the names sitting in the
-   alcove while taking the rail's behaviour after a window drag.
+   AND THE TWO STEPS NOW SAY TWO DIFFERENT THINGS IN COLOUR, which is the stronger
+   reason to make them the same everywhere. Since the dojo colour arrived inside the
+   room, the lit-but-outside state is red and the inside state is the dojo's own ink.
+   At one click in the rail the red state existed for nobody: the whole first half of
+   the deck's sequence was unreachable above 900.
 
-   The first cut of this ruling dropped the lens at EVERY width. That changed the
-   phone, which no ruling asked for and no screenshot had looked at, and left
-   betaTapSideTwoStep uncalled. Corrected by James on 9 November before it committed.
-   door_twostep runs at 390 and is the gate on this half; rail_dojos asserts the
-   boundary itself, that the same control does the two things at the two widths. */
+   betaSideRailWide() is still the test for WHERE the names live, in the rail or in
+   the alcove. It is no longer a test for what a click does. */
 function betaTapSide(k){
-  if(!betaSideRailWide()) return betaTapSideTwoStep(k);   // the alcove keeps the lens
-  betaOpenDoor(BETA_DOOR === k ? null : k);               // the rail goes straight in
+  return betaTapSideTwoStep(k);
 }
 function betaTapSideTwoStep(k){
   if(BETA_DOOR !== null){ betaOpenDoor(BETA_DOOR === k ? null : k); return; }
@@ -8968,6 +9049,12 @@ function betaOpenDoor(k){
   BETA_LENS = null;        // never both: the lens is the step before the door, not a layer under it
   _bdDrawerOpen = false;   // each door opens closed, the way the home page does
   document.body.classList.toggle('door-open', k !== null);
+  /* WHICH door, not just that one is open (James, 12 November). Inside a dojo every
+     red thing takes that dojo's colour, and the only way to say "inside Ikigai" in CSS
+     is to put it on the body. Toggled for all four so leaving one cannot leave its
+     class behind and paint the next room in the last room's ink. */
+  ['ikigai','shokunin','hiyoku','both'].forEach(x =>
+    document.body.classList.toggle('door-' + x, k === x));
   const al = document.getElementById('beta-alcove');
   let still = true;
   try{ still = window.matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){ still = false; }
@@ -13978,7 +14065,7 @@ function setupNavSquish(){
       <div class="clan-momentum-block">
         <div class="clan-exp-wrap" style="padding:18px 16px 16px">
           <!-- Box header: clan name + warrior count -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.18)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(var(--red-rgb),.18)">
             <div style="flex:1;min-width:0;margin-right:12px">
               <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:4px">YOUR CLAN</div>
               <input class="clan-name-field" id="clan-name-input" type="text" placeholder="—" maxlength="32" spellcheck="false" value="" readonly>
@@ -13989,39 +14076,39 @@ function setupNavSquish(){
             </div>
           </div>
           <!-- Group performance strip -->
-          <div id="clan-perf-strip" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(204,53,41,.12)">
+          <div id="clan-perf-strip" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(var(--red-rgb),.12)">
             <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
               <div style="display:flex;align-items:baseline;gap:7px">
                 <div id="clan-weekly-pct" style="font-family:'Noto Serif JP',serif;font-size:26px;font-weight:700;color:var(--red);line-height:1">74%</div>
-                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.5);align-self:center;line-height:1.5">Completion Rate<br>This Week</div>
+                <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.5);align-self:center;line-height:1.5">Completion Rate<br>This Week</div>
               </div>
-              <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(204,53,41,.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
+              <div id="clan-active-today" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(var(--red-rgb),.65);text-align:right;line-height:1.5">2 of 3 warriors active today</div>
             </div>
             <!-- Today's score -->
             <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
               <div id="clan-today-score" style="font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--red);line-height:1">—</div>
-              <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(204,53,41,.45);align-self:center">Today's Score</div>
+              <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.45);align-self:center">Today's Score</div>
             </div>
 
             <div>
-              <div style="font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(204,53,41,.38);margin-bottom:5px">CLAN AGGREGATE KAIZEN</div>
+              <div style="font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(var(--red-rgb),.38);margin-bottom:5px">CLAN AGGREGATE KAIZEN</div>
               <div id="clan-agg-bars" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;align-items:end;height:28px">
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
-                <div class="clan-agg-bar" style="height:3px;background:rgba(204,53,41,.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
+                <div class="clan-agg-bar" style="height:3px;background:rgba(var(--red-rgb),.08)"></div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:3px">
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">M</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">W</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">T</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">F</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
-                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(204,53,41,.3);text-align:center">S</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">M</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">T</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">W</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">T</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">F</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">S</div>
+                <div style="font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:rgba(var(--red-rgb),.3);text-align:center">S</div>
               </div>
             </div>
           </div>
@@ -14039,8 +14126,8 @@ function setupNavSquish(){
                   <span class="clan-you" style="flex-shrink:0">you</span>
                   <span id="clan-my-badge" class="ps-badge" style="display:none"></span>
                   <!-- Samurai / Shinobi two-state pill -->
-                  <div id="clan-vis-pill" style="display:flex;border:1px solid rgba(204,53,41,.25);border-radius:2px;overflow:hidden;flex-shrink:0">
-                    <button id="clan-vis-samurai" onclick="setVis('samurai')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;border-right:1px solid rgba(204,53,41,.2);background:var(--red);color:#FEFCF8;cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif;font-weight:700">Samurai</button>
+                  <div id="clan-vis-pill" style="display:flex;border:1px solid rgba(var(--red-rgb),.25);border-radius:2px;overflow:hidden;flex-shrink:0">
+                    <button id="clan-vis-samurai" onclick="setVis('samurai')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;border-right:1px solid rgba(var(--red-rgb),.2);background:var(--red);color:#FEFCF8;cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif;font-weight:700">Samurai</button>
                     <button id="clan-vis-shinobi" onclick="setVis('shinobi')" style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:none;background:transparent;color:rgba(26,26,26,.3);cursor:pointer;transition:all .2s ease;font-family:'Noto Sans JP',sans-serif">Shinobi</button>
                   </div>
                 </div>
@@ -14084,7 +14171,7 @@ function setupNavSquish(){
 
       <!-- CLAN CLOSED NOTE -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.06);text-align:center">
-        <div style="font-size:22px;color:rgba(204,53,41,.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
+        <div style="font-size:22px;color:rgba(var(--red-rgb),.18);margin-bottom:10px;font-family:'Noto Serif JP',serif">氏</div>
         <div class="serif" style="font-size:12px;color:var(--ink-faint);font-style:italic;line-height:1.7">The clan rides together.<br>No new blood until the clan calls for it.</div>
       </div>
 
