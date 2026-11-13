@@ -126,14 +126,37 @@
      follow the dojo when the room changed. One token, two forms, one value. */
   --red-rgb:204,53,41;
   --shadow:rgba(26,26,26,0.06);--grid-bg:#1A1A1A;--navy:#1B2A4A;
+  /* ══════════ THE FIVE STRAND HUES (mobile deck slide 76) ══════════
+     "Strand kanji keep one muted hue each: Capital #2D3D6B, Ancient wisdom #7A3828,
+     Warrior body #3D6B5F, Creative craft #8A6E2F, Faith and family #4A3F5C."
+
+     THEY WERE READ BEFORE THEY WERE DECLARED. renderStrandArms and renderClanCards
+     both read --s0..--s4 off the root and have done for months; the variables did not
+     exist, so every arm and every clan seal fell to the '#888' fallback and all five
+     strands were the same grey. A third place, the cascade lineage, carried its own
+     hardcoded set of five different hexes. One declaration, read by all three.
+
+     THE ORDER IS THE APP'S OWN, 志 史 鍛 匠 愛, which is the order the deck names
+     them in. A strand is identified by its INDEX, never by its name: people rename
+     their strands, and the hue belongs to the position in the braid. */
+  --s0:#2D3D6B;   /* 志  Capital */
+  --s1:#7A3828;   /* 史  Ancient wisdom */
+  --s2:#3D6B5F;   /* 鍛  Warrior body */
+  --s3:#8A6E2F;   /* 匠  Creative craft */
+  --s4:#4A3F5C;   /* 愛  Faith and family */
 }
 body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100vh;color:var(--ink);
   transition:background-color .5s,color .5s}
 
 /* Scroll */
-.scroll{max-width:800px;margin:0 auto;min-height:100vh;background:var(--scroll);
+/* ONE GUTTER, DECLARED ONCE PER WIDTH (James, 12 November: "the phone practice
+   row's side margin at 390 and 360"). The paper's side margin used to be written into
+   three padding shorthands and read by nobody, so the rail's own reservation below
+   could cancel it on one side and leave it on the other. It is a value now: whatever
+   reserves space on this element reads it rather than guessing. */
+.scroll{--gutter:48px;max-width:800px;margin:0 auto;min-height:100vh;background:var(--scroll);
   background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,.018) 39px,rgba(0,0,0,.018) 40px);
-  box-shadow:-4px 0 20px var(--shadow),4px 0 20px var(--shadow);position:relative;padding:60px 48px 100px;
+  box-shadow:-4px 0 20px var(--shadow),4px 0 20px var(--shadow);position:relative;padding:60px var(--gutter) 100px;
   overflow-x:clip;
   animation:scrollUnroll 1s cubic-bezier(0.22,1,0.36,1) forwards}
 @keyframes scrollUnroll{
@@ -365,7 +388,12 @@ body.app-on #app{padding-left:140px}
   .beta-rail{flex-direction:row;left:0;right:0;top:auto;bottom:0;width:auto;height:62px;
     padding:0;gap:0;border-right:0;border-top:1px solid rgba(0,0,0,.08);
     background:var(--scroll);box-shadow:0 -2px 14px var(--shadow)}
-  body.app-on #app{padding-left:0;padding-bottom:86px}
+  /* THE RAIL LIES DOWN, SO ITS RESERVATION GOES BACK TO THE GUTTER, NOT TO ZERO.
+     #app IS the scroll. This rule cancelled the 140px the rail reserves, and because
+     it is written with an id it also beat .scroll's own padding: the left margin went
+     to nothing while the right kept 24, at every width below 900. The practice, the
+     day's note, the week and the account name all sat on the screen's edge. */
+  body.app-on #app{padding-left:var(--gutter);padding-bottom:86px}
   .br-seal{display:none}
   .br-tab{padding:9px 0 7px;gap:2px}
   .br-kanji{font-size:21px}
@@ -471,7 +499,7 @@ body.dark .bd-alcove{background:rgba(255,255,255,.035);border-bottom-color:rgba(
   /* The paper runs from the rail to the edge, as the deck draws it: a centred 800
      column beside a rail is the phone layout wearing a desk, which is the thing the
      desktop concept exists to stop. The decorative margin rules go with it. */
-  .scroll{max-width:none;margin:0;padding:52px 56px 100px}
+  .scroll{--gutter:56px;max-width:none;margin:0;padding:52px var(--gutter) 100px}
   .scroll::before,.scroll::after{display:none}
   .bd-wide{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);
     gap:52px;align-items:start}
@@ -559,6 +587,26 @@ body.dark .bd-panel{border-left-color:rgba(255,255,255,.1)}
 body.dark .rf-btn{border-color:rgba(255,255,255,.16)}
 .rf-note{text-align:center;font-size:10px;line-height:1.9;color:var(--ink-faint);opacity:.7;margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto}
 .rf-record{margin-top:6px}
+/* ══════════ REFLECT, TWO COLUMNS ON THE DESK (desktop deck slide 15) ══════════
+   "the day's note always open on the left, and on the right the four reflections,
+   then the record". Below 1200 the page folds to one column (slide 24), and the DOM
+   order IS the phone's order, so the fold needs no rules of its own and the phone is
+   not touched by any of this. */
+.rf-grid{display:block}
+@media(min-width:1200px){
+  .rf-grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:64px;align-items:start}
+  .rf-col-left{position:sticky;top:24px}
+  .rf-col-left .rf-sec-label:first-child{margin-top:0}
+}
+/* THE RECORD SINCE JOINING. Every month from the one the person joined in, newest
+   first, each drawn by the SAME renderer as the month above it so a mark can never
+   mean one thing in the record and another in the calendar. The arrows come off: the
+   months are all here, so there is nowhere to navigate to. */
+.rf-history{margin-top:10px}
+.rf-history .mcal-nav-btn{display:none}
+.rf-history .kk-outer{margin-bottom:18px}
+.rf-history-label{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink-faint);opacity:.5;margin:26px 0 10px;text-align:center}
 .rf-sensei-card{border:1px solid rgba(0,0,0,.08);padding:24px 26px 20px;background:var(--paper-raised,rgba(255,255,255,.3))}
 body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
 .rf-sensei-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
@@ -622,19 +670,14 @@ body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,
 .kk-outer.cal-white .sh-shelf-lbl{color:rgba(26,18,16,.42)}
 .kk-outer.cal-white .mcal-note-mark{color:rgba(var(--red-rgb),.8)}
 .kk-outer.cal-white .kk-rod{filter:brightness(.92)}
-body.dark .kk-outer.cal-white .kk-body{background-color:#201c18}
-/* THE MONTH ARROW WAS LEFT OUT OF THIS BLOCK. Everything else on the White scroll
-   flips for the night below: the title, the day headers, the numbers, the cells and
-   the date. The arrow kept its day ink, rgba(26,18,16,.35), a dark mark on the night
-   scroll's #201c18 paper: 1.03:1, which is no arrow at all. The forward arrow reads
-   as faint too, but that one is genuinely disabled when the next month is the future,
-   so it is left alone. */
-body.dark .kk-outer.cal-white .mcal-nav-btn{color:rgba(237,232,222,.5)}
-body.dark .kk-outer.cal-white .mcal-nav-btn:hover{color:rgba(237,232,222,.85)}
-body.dark .kk-outer.cal-white .mcal-title{color:rgba(237,232,222,.5)}
-body.dark .kk-outer.cal-white .mcal-dh{color:rgba(237,232,222,.45)}
-body.dark .kk-outer.cal-white .mcal-num{color:rgba(237,232,222,.62)}
-body.dark .kk-outer.cal-white .mcal-cell{background:rgba(255,255,255,.04)}
+/* ══════════ WHITE HAS NO NIGHT OF ITS OWN ANY MORE (James, 12 November) ══════════
+   Thirteen rules stood here: a darkened #201c18 paper and the light-ink answers to
+   every White rule above it, for the month arrow, the title, the headers, the numbers,
+   the cells, the date, the week header and the practice names. White now resolves to
+   the Charcoal ink after dark, in _effectiveCalTheme, so none of them could ever paint
+   again, and a block of CSS that looks like it handles the night is worse than no
+   block at all. They are in the history, at the commit that removed them. */
+
 
 /* THE WEEK GRID HAS ITS OWN COLOURS, and they all assume a dark body. The first pass
    covered only the month calendar's .mcal- rules, which left the week scroll white on
@@ -652,13 +695,6 @@ body.dark .kk-outer.cal-white .mcal-cell{background:rgba(255,255,255,.04)}
 .kk-outer.cal-white .hg-cell.hg-miss::after{border-color:rgba(26,18,16,.2)}
 .kk-outer.cal-white .hg-cell.hg-future::after{border-color:rgba(26,18,16,.09)}
 .kk-outer.cal-white .hg-cell.hg-off{background:transparent}
-body.dark .kk-outer.cal-white .kk-date-text{color:rgba(237,232,222,.8)}
-body.dark .kk-outer.cal-white .hg-label{color:rgba(237,232,222,.68)}
-body.dark .kk-outer.cal-white .hg-day-head{color:rgba(237,232,222,.42)}
-body.dark .kk-outer.cal-white .hg-header{background:rgba(255,255,255,.05)}
-body.dark .kk-outer.cal-white .hg-nav-btn{color:rgba(237,232,222,.3)}
-body.dark .kk-outer.cal-white .hg-week-label{color:rgba(237,232,222,.42)}
-body.dark .kk-outer.cal-white .hg-cell.hg-miss::after{border-color:rgba(237,232,222,.2)}
 
 /* ══════════ 人 YOU (deck slide 19) ══════════
    Everything about the person, gathered from four corners of the app: the avatar
@@ -1504,7 +1540,45 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .hg-cell.hg-today-col:not(.hg-off){background:transparent}
 .hg-cell.hg-off{background:none}
 .hg-cell.hg-miss{cursor:pointer}
+/* The return moment. One screen, the proverb, and the choice. */
+.rt-overlay{position:fixed;inset:0;z-index:420;background:var(--scroll);
+  display:none;align-items:center;justify-content:center;padding:40px 24px;overflow-y:auto}
+.rt-inner{max-width:460px;width:100%;text-align:center}
+.rt-kanji{font-family:'Noto Serif JP',serif;font-size:34px;color:var(--ink);letter-spacing:4px;line-height:1.5}
+.rt-romaji{font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;
+  color:var(--ink-faint);letter-spacing:3px;margin-top:10px}
+.rt-gloss{font-family:'Noto Serif JP',serif;font-style:italic;font-size:15px;color:var(--ink-light);margin-top:16px}
+.rt-line{font-size:12px;line-height:1.9;color:var(--ink-light);margin:30px auto 26px;max-width:380px}
+/* THE LIST SCROLLS, THE QUESTION DOES NOT. A plan with twenty practices pushed the
+   words off the top of the screen when the picker was the whole of it. */
+.rt-inner.rt-step2{display:flex;flex-direction:column;max-height:84vh}
+.rt-picks{display:flex;flex-direction:column;gap:8px;text-align:left;
+  overflow-y:auto;min-height:0;padding:2px}
+.rt-acts{display:flex;flex-direction:column;align-items:center;gap:4px}
+.rt-go{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--white);background:var(--red);
+  border:1px solid var(--red);border-radius:2px;padding:14px 30px;cursor:pointer;transition:opacity .2s}
+.rt-go:hover{opacity:.88}
+.rt-pick{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink);background:none;
+  border:1px solid var(--edge);border-radius:2px;padding:14px 16px;cursor:pointer;
+  transition:border-color .2s,color .2s;text-align:left}
+.rt-pick:hover{border-color:var(--red);color:var(--red)}
+.rt-all{margin-top:26px;background:none;border:0;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
+  font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);padding:8px}
+.rt-all:hover{color:var(--ink)}
+.kk-rest-line{font-family:'Noto Serif JP',serif;font-style:italic;font-size:11px;
+  color:var(--ink-faint);opacity:.75;margin-top:4px;letter-spacing:.3px}
+.kk-outer.cal-samurai .kk-rest-line,.kk-outer.cal-shinobi .kk-rest-line{color:rgba(254,252,248,.6)}
+.kk-outer:not([class*="cal-"]) .kk-rest-line{color:rgba(255,255,255,.55)}
 .hg-cell.hg-miss::after{content:'';width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(245,240,232,.18);display:block;transition:border-color .2s}
+/* REST, DASHED (mobile deck slide 51: "one missed day per week counts as rest, shown
+   dashed in the week strip"). A miss is a solid thin ring; rest is the same ring drawn
+   as a dash, so the two read as different kinds of gap without a new colour.
+
+   IT HAS TO SIT AFTER THE RULE ABOVE, not with the other rest styles further up. That
+   rule writes the `border` SHORTHAND, which resets border-style to solid, and the two
+   selectors have the same specificity: written earlier, this was overruled and every
+   rest day drew solid. */
+.hg-cell.hg-rest::after{border-style:dashed}
 @media (hover:hover){.hg-cell.hg-miss:hover::after{border-color:rgba(245,240,232,.45)}}
 .hg-cell.hg-done{cursor:pointer}
 .hg-cell.hg-done::after{content:'';width:13px;height:13px;border-radius:50%;background:var(--red);display:block;transition:background .2s}
@@ -1576,11 +1650,22 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-samurai{filter:drop-shadow(0 10px 28px rgba(140,20,10,.35)) drop-shadow(0 2px 6px rgba(140,20,10,.2))}
 .kk-outer.cal-samurai .kk-body{background-color:#B52016;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.2),inset -4px 0 14px rgba(0,0,0,.12),0 12px 40px rgba(140,20,10,.3),0 4px 12px rgba(0,0,0,.2)}
 .kk-outer.cal-samurai .kk-body::before{display:none}
-.kk-outer.cal-samurai .mcal-nav-btn{color:rgba(254,252,248,.4)}
+/* ══════════ THE RED SCROLL'S THREE FAILING MARKS, BY DAY (James, 12 November:
+   "lift only its three failing marks to clear 3:1. Keep its look exactly as it is")
+   ══════════
+   Measured on #B52016, the paper itself: the day headers were 1.64:1 at .28 alpha,
+   the back arrow 2.09:1 at .4, and the 省 2.24:1 at .62 behind an opacity of .7.
+   Nothing else on this scroll is under 3:1, and nothing else is touched.
+
+   .6 IS NOT A GUESS. The day numbers on this same paper have always been .6 and
+   measure 3.14:1, so the three marks are lifted to the value the scroll already
+   proves is readable rather than to a new one. The forward arrow stays faint on
+   purpose: it is genuinely disabled whenever the next month is the future. */
+.kk-outer.cal-samurai .mcal-nav-btn{color:rgba(254,252,248,.6)}
 .kk-outer.cal-samurai .mcal-nav-btn:hover{color:rgba(254,252,248,.9)}
 .kk-outer.cal-samurai .mcal-nav-btn:disabled{opacity:.15}
 .kk-outer.cal-samurai .mcal-title{color:rgba(254,252,248,.5)}
-.kk-outer.cal-samurai .mcal-dh{color:rgba(254,252,248,.28)}
+.kk-outer.cal-samurai .mcal-dh{color:rgba(254,252,248,.6)}
 .kk-outer.cal-samurai .mcal-cell{background:rgba(0,0,0,.1)}
 .kk-outer.cal-samurai .mcal-cell.mcal-empty{background:transparent}
 .kk-outer.cal-samurai .mcal-num{color:rgba(254,252,248,.6)}
@@ -1600,7 +1685,10 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 /* .45 was never reached before today: the base rule overrode it, so the real alpha
    had never been looked at. Measured at .45 it is 2.81:1 on the Shinobi paper, under
    the 3:1 a control needs, so both dark inks are lifted to .62. */
-.kk-outer.cal-samurai .mcal-note-mark{color:rgba(254,252,248,.62)}
+/* .86 BECAUSE THE BASE RULE CARRIES opacity:.7. The mark a person receives is the
+   product of the two, and .86 x .7 is the .6 the other marks here use. The opacity
+   is shared by every ink, so it is left alone. */
+.kk-outer.cal-samurai .mcal-note-mark{color:rgba(254,252,248,.86)}
 .kk-outer.cal-samurai .sh-shelf-native{border-bottom-color:rgba(254,252,248,.1)}
 .kk-outer.cal-samurai .sh-shelf-lbl{color:rgba(254,252,248,.38)}
 .kk-outer.cal-samurai .wk-sealed{color:rgba(254,252,248,.65)}
@@ -1614,6 +1702,119 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer.cal-samurai .hg-cell.hg-miss::after{border-color:rgba(254,252,248,.2)}
 .kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(254,252,248,.08)}
 .kk-outer.cal-samurai .ycal-cell.ycal-today{outline-color:rgba(254,252,248,.7)}
+
+/* ══════════ THE RED SCROLL AT NIGHT: NEON (James, 12 November, both decks
+   updated to carry it) ══════════
+     paper #160A0C, mount #2A0A0E, ebony rods #2E2723
+     marks and done days #FF5A5A, glowing
+     day headers, the back arrow and empty days #C2484A
+     a faint red light around the whole scroll
+     measured on the paper: marks 6.3:1, headers 4.0:1
+
+   Until now the Red scroll was the same scroll at midnight as at noon: there was no
+   body.dark rule for it anywhere in the file. The day scroll is untouched by this
+   block, as ruled.
+
+   THE GLOW IS ONE VALUE, declared once. "Done dots take the same glow as box-shadow"
+   is literally the same list, so it is a token and not a copy: a text-shadow and a
+   box-shadow accept the same syntax.
+
+   THE MOUNT IS THE FIRST INSET LAYER, 22px, which is the body's own vertical padding,
+   so the band sits exactly in the margin the writing already leaves and never runs
+   under a mark. An inset shadow paints OVER the background and over the inset shadows
+   listed after it, so the ring is opaque and exact where the depth shadows are not.
+   THERE IS NO MOUNT ELEMENT IN THIS BUILD: the decks draw White on cedar rods with a
+   #E2D8C6 mount and Red on cherry, and the scroll here is rods plus one body. If the
+   drawing wants the paper floating inside a wider mount, that is a change to the
+   scroll's structure for every ink and belongs in its own commit.
+
+   THE ONE VALUE NOT IN THE RULING is the cell wash. By day a cell is ten percent
+   black on #B52016, a visible step; the same ten percent on #160A0C is nothing, and
+   the month would read as numbers floating on black with no grid under them. It is a
+   three and a half percent light wash at night instead, which is the smallest step
+   the night palette uses elsewhere. */
+body.dark .kk-outer.cal-samurai{--neon:#FF5A5A;--neon-quiet:#C2484A;
+  --neon-glow:0 0 6px rgba(255,70,70,.75),0 0 14px rgba(255,40,40,.35);
+  --neon-glow-soft:0 0 5px rgba(255,70,70,.3),0 0 11px rgba(255,40,40,.14);
+  filter:drop-shadow(0 0 18px rgba(255,40,40,.28))}
+body.dark .kk-outer.cal-samurai .kk-body{background-color:#160A0C;
+  box-shadow:inset 0 0 0 22px #2A0A0E,
+    inset 8px 0 22px rgba(0,0,0,.45),inset -4px 0 14px rgba(0,0,0,.3),
+    0 10px 34px rgba(0,0,0,.5)}
+/* EBONY, built on the stops the rod already uses, with #2E2723 at the lit face. One
+   hex cannot describe a cylinder: the ramp around it is the existing rod's shape. */
+/* THE CHARCOAL SCROLL SHARES THEM. The token slide says Charcoal is on ebony and
+   White on cedar; the build has one rod for every ink, a dark cherry. Charcoal takes
+   the ebony here because it is the scroll a White user now meets after dark, and the
+   ruling names the rods. Cedar for White is not drawn yet. */
+body.dark .kk-outer.cal-samurai .kk-rod,
+.kk-outer.cal-shinobi .kk-rod{
+  background:linear-gradient(to bottom,#120F0E 0%,#231E1C 16%,#2E2723 38%,#231E1C 66%,#120F0E 100%)}
+body.dark .kk-outer.cal-samurai .kk-rod::before,
+body.dark .kk-outer.cal-samurai .kk-rod::after,
+.kk-outer.cal-shinobi .kk-rod::before,
+.kk-outer.cal-shinobi .kk-rod::after{
+  background:linear-gradient(to bottom,#15110F 0%,#272220 18%,#3B3430 40%,#231E1C 68%,#15110F 100%)}
+
+/* EVERYTHING ON THIS SCROLL GLOWS A LITTLE (James, 12 November: "night mode for red
+   everything should glow slightly"). The marks and the finished days keep the full
+   glow below; every other mark on the paper takes a softer one, under half its
+   strength, so the scroll reads as one lit surface rather than bright marks on a dead
+   ground.
+
+   IT IS WRITTEN ONCE, FOR EVERY DESCENDANT, and it has to be: a list of selectors is
+   a list of the places somebody remembered, and this file's history is of marks that
+   were missed because they were added later. :where() carries no specificity, so this
+   rule and the neon rules below tie, and the one written later wins: the full glow
+   reaches the marks it names and the soft one covers the rest. Text the person is
+   typing is left alone. */
+body.dark .kk-outer.cal-samurai .kk-body *:where(:not(input,textarea)){
+  text-shadow:var(--neon-glow-soft)}
+body.dark .kk-outer.cal-samurai .mcal-dot,
+body.dark .kk-outer.cal-samurai .hg-cell.hg-miss::after,
+body.dark .kk-outer.cal-samurai .hg-cell.hg-done:not(.hg-today-col)::after{
+  box-shadow:var(--neon-glow-soft)}
+
+/* the marks and the finished days: neon, glowing */
+body.dark .kk-outer.cal-samurai .mcal-note-mark,
+body.dark .kk-outer.cal-samurai .mcal-title,
+body.dark .kk-outer.cal-samurai .kk-date-text,
+body.dark .kk-outer.cal-samurai .kk-streak-whisper,
+body.dark .kk-outer.cal-samurai .hg-week-label,
+body.dark .kk-outer.cal-samurai .sh-shelf-lbl,
+body.dark .kk-outer.cal-samurai .ycal-year-label,
+body.dark .kk-outer.cal-samurai .ik-arc-label-sm,
+body.dark .kk-outer.cal-samurai .wk-sealed,
+body.dark .kk-outer.cal-samurai .wk-sealed-prev,
+body.dark .kk-outer.cal-samurai .mcal-cell.mcal-today .mcal-num,
+body.dark .kk-outer.cal-samurai .hg-day-head.hg-col-complete{
+  color:var(--neon);text-shadow:var(--neon-glow)}
+/* A HOVER RULE IS A CLASS MORE SPECIFIC than the rule it sits beside, so each of the
+   day's hovers needs its night answer or the mark turns white under the finger. */
+body.dark .kk-outer.cal-samurai .wk-sealed:hover,
+body.dark .kk-outer.cal-samurai .wk-sealed.is-open,
+body.dark .kk-outer.cal-samurai .wk-sealed-prev:hover{color:#FFD7D7;text-shadow:var(--neon-glow)}
+body.dark .kk-outer.cal-samurai .mcal-dot{background:var(--neon)}
+body.dark .kk-outer.cal-samurai .mcal-dots.all-done .mcal-dot{background:var(--neon);box-shadow:var(--neon-glow)}
+body.dark .kk-outer.cal-samurai .hg-cell.hg-done::after{background:var(--neon);box-shadow:var(--neon-glow)}
+body.dark .kk-outer.cal-samurai .hg-cell.hg-done.hg-col-complete::after{box-shadow:var(--neon-glow)}
+@media (hover:hover){body.dark .kk-outer.cal-samurai .hg-cell.hg-done:hover::after{background:#FFD7D7}}
+
+/* the quieter red: the headers, the way back, a day with nothing on it */
+body.dark .kk-outer.cal-samurai .mcal-dh,
+body.dark .kk-outer.cal-samurai .mcal-nav-btn,
+body.dark .kk-outer.cal-samurai .mcal-num,
+body.dark .kk-outer.cal-samurai .hg-day-head,
+body.dark .kk-outer.cal-samurai .hg-nav-btn{color:var(--neon-quiet)}
+body.dark .kk-outer.cal-samurai .mcal-nav-btn:hover,
+body.dark .kk-outer.cal-samurai .hg-nav-btn:hover{color:var(--neon)}
+body.dark .kk-outer.cal-samurai .mcal-cell{background:rgba(255,255,255,.035)}
+body.dark .kk-outer.cal-samurai .mcal-cell.mcal-empty{background:transparent}
+body.dark .kk-outer.cal-samurai .mcal-cell.mcal-today{outline-color:rgba(255,90,90,.7)}
+body.dark .kk-outer.cal-samurai .ycal-cell.ycal-today{outline-color:rgba(255,90,90,.7)}
+body.dark .kk-outer.cal-samurai .hg-cell.hg-miss::after{border-color:rgba(194,72,74,.5)}
+body.dark .kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(194,72,74,.2)}
+@media (hover:hover){body.dark .kk-outer.cal-samurai .hg-cell.hg-miss:hover::after{border-color:var(--neon-quiet)}}
 /* Shinobi calendar theme */
 .kk-outer.cal-shinobi .kk-body{background-color:#1a1a2e;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.4),inset -4px 0 14px rgba(0,0,0,.3),0 12px 40px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.25)}
 .kk-outer.cal-shinobi .kk-body::before{display:none}
@@ -1676,6 +1877,14 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .kk-outer .ik-arc-label-sm{font-family:'Noto Serif JP',serif;font-weight:700;font-size:16px;text-transform:none;letter-spacing:.5px}
 .kk-outer .ycal-year-label{font-family:'Noto Serif JP',serif;font-weight:700;font-size:14px;text-transform:none;letter-spacing:2px}
 /* Navy (default) — white, no glow */
+/* THE NAVY SCROLL'S OWN MARKS, MEASURED FOR THE FIRST TIME (12 November). It has
+   been unreachable since Navy retired, so nothing here had been checked against the
+   tokens as they stand. Its day headers inherited the base .22, which is 2.02:1 on
+   #1B2A4A, and today's number inherited the seal red, 2.78:1. The base rules are
+   left alone on purpose: they also feed the Red scroll, which James holds up as the
+   one that looks right and has not ruled on yet. */
+.kk-outer:not([class*="cal-"]) .mcal-dh{color:rgba(255,255,255,.4)}
+.kk-outer:not([class*="cal-"]) .mcal-cell.mcal-today .mcal-num{color:var(--red-light)}
 .kk-outer:not([class*="cal-"]) .kk-date-text{color:rgba(255,255,255,.75)}
 .kk-outer:not([class*="cal-"]) .hg-week-label{color:rgba(255,255,255,.55)}
 .kk-outer:not([class*="cal-"]) .mcal-title{color:rgba(255,255,255,.65)}
@@ -1982,6 +2191,44 @@ body.dark .opt-c-switch select{border-bottom-color:rgba(255,255,255,.1)}
 .greeting-bar{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;
   color:var(--ink-faint);margin-bottom:28px;letter-spacing:.5px;opacity:.55;min-height:16px}
 
+/* ══════════ THE THREAD (mobile deck slide 47) ══════════
+   "On tick a 2px line in the strand colour climbs from the check to three chips:
+   this month, goal, strand. Each chip is labelled and fades in as the line reaches
+   it (200ms apart); the strand chip glows once; everything fades after 1.2s. Total
+   about 1.8s and it never blocks the next tick. With reduced motion only the tick
+   animates."
+
+   IT CANNOT BLOCK THE NEXT TICK, so it takes no pointer events at all and is drawn
+   inside the row it belongs to rather than over the page: nothing about it has to
+   know where anything else is, and a second tick two rows down draws its own. */
+.th-flash{position:absolute;left:0;top:0;bottom:0;width:100%;pointer-events:none;z-index:3}
+.th-line{position:absolute;left:13px;bottom:16px;width:2px;height:0;background:var(--th,#888);
+  border-radius:1px;animation:thClimb .6s cubic-bezier(.22,1,.36,1) forwards,thGo .5s ease 1.2s forwards}
+.th-chip{position:absolute;left:30px;display:flex;align-items:baseline;gap:7px;opacity:0;
+  font-family:'Noto Serif JP',serif;font-size:11px;color:var(--ink);
+  background:var(--scroll);border:1px solid var(--edge);border-radius:2px;
+  padding:4px 9px;max-width:min(300px,70%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  animation:thIn .28s ease forwards var(--d),thGo .5s ease 1.2s forwards}
+.th-chip em{font-family:'Noto Sans JP',sans-serif;font-style:normal;font-size:8px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);opacity:.7;flex:none}
+.th-chip[data-n="0"]{bottom:30px}
+.th-chip[data-n="1"]{bottom:62px}
+.th-chip[data-n="2"]{bottom:94px;border-color:var(--th,#888);color:var(--th,#888)}
+.th-chip[data-n="2"]{animation:thIn .28s ease forwards var(--d),thGlow .9s ease .64s 1,thGo .5s ease 1.2s forwards}
+@keyframes thClimb{from{height:0}to{height:104px}}
+@keyframes thIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+@keyframes thGo{to{opacity:0}}
+@keyframes thGlow{0%{box-shadow:none}35%{box-shadow:0 0 12px var(--th,#888)}100%{box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.th-flash{display:none}}
+/* The thread as a sheet, from a long press. Read-only: the deck asks whether each
+   node should be tappable and that is James's to answer. */
+.th-sheet-node{display:flex;align-items:baseline;gap:10px;padding:13px 0;border-bottom:1px solid var(--edge)}
+.th-sheet-node:last-child{border-bottom:0}
+.th-sheet-lbl{font-family:'Noto Sans JP',sans-serif;font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-faint);opacity:.7;flex:none;width:76px}
+.th-sheet-text{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--ink);line-height:1.5}
+.th-sheet-node.is-strand .th-sheet-text{color:var(--th,var(--ink))}
+
 /* Origami check animation */
 @keyframes origamiCheck{
   0%  {transform:scale(1);background:transparent;border-color:rgba(26,26,26,.4);opacity:.4;box-shadow:none}
@@ -2013,7 +2260,7 @@ li.goal.drag-over{box-shadow:0 -2px 0 var(--red)}
 .btn-edit-mode.active{background:var(--ink);border-color:var(--ink);color:var(--scroll);letter-spacing:2px}
 .edit-mode-bar{display:none;align-items:center;justify-content:center;gap:8px;
   padding:6px 16px;
-  margin:0 -48px;
+  margin:0 calc(var(--gutter,48px) * -1);
   background:rgba(26,26,26,.04);border-bottom:1px solid rgba(26,26,26,.06);
   font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2.5px;
   text-transform:uppercase;color:var(--ink-faint)}
@@ -2453,7 +2700,7 @@ body.edit-mode .edit-mode-bar{display:flex}
 #ink-wash.active{display:flex;animation:inkBleed 5.5s ease forwards}
 .wash-inner{text-align:center;animation:washContent 5.5s ease forwards}
 @media(max-width:640px){
-  .scroll{padding:40px 24px 80px}.scroll::before{left:12px}.scroll::after{right:12px}
+  .scroll{--gutter:24px;padding:40px var(--gutter) 80px}.scroll::before{left:12px}.scroll::after{right:12px}
   .title{font-size:36px;letter-spacing:12px}.form-row{flex-direction:column;gap:8px}
   .modal{padding:32px 24px}
 }
@@ -2484,6 +2731,18 @@ body.dark{
   --scroll:#24201C;--edge:#1B1815;--ink:#EDE8DE;--ink-light:#CFC8BB;
   --ink-faint:#ADA393;--marks:#7E776C;--red:#E0574B;--red-rgb:224,87,75;
   --white:#24201C;--shadow:rgba(0,0,0,.4);--grid-bg:#0D0B08;
+  /* THE SAME FIVE, LIFTED IN LIGHTNESS ONLY, which is the rule the deck sets for the
+     dojo colours and the only honest way to keep a hue the same colour. Muted hues
+     chosen for cream paper are nearly invisible on #24201C: Capital measured 1.53:1,
+     Faith and family 1.66:1, Ancient wisdom 1.87:1. Hue and saturation are held and
+     the lightness raised until each clears 3:1, the floor this build holds every mark
+     to. Creative craft already cleared it at 3.35:1 and is unchanged; it is written
+     out all the same, so the night palette can be read in one place. */
+  --s0:#4C67B4;   /* 志  Capital            1.53 -> 3.01:1 */
+  --s1:#AB4F38;   /* 史  Ancient wisdom     1.87 -> 3.01:1 */
+  --s2:#427467;   /* 鍛  Warrior body       2.67 -> 3.02:1 */
+  --s3:#8A6E2F;   /* 匠  Creative craft     3.35:1, unchanged */
+  --s4:#746390;   /* 愛  Faith and family   1.66 -> 3.03:1 */
 }
 /* R8 — kaizen "this week" separator: restore coreproject's dark-mode red-glow accent (class dropped on consolidation port) */
 body.dark .this-week-label{color:var(--red);text-shadow:0 0 8px rgba(var(--red-rgb),.6),0 0 22px rgba(var(--red-rgb),.25)}
@@ -2491,6 +2750,21 @@ body.dark .scroll{
   background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.01) 39px,rgba(255,255,255,.01) 40px);
   transition:background-color .5s}
 body.dark .scroll::before,body.dark .scroll::after{background:rgba(255,255,255,.04)}
+/* ══════════ THE ACCOUNT BAR AT NIGHT (James, 12 November) ══════════
+   The bar was declared once, as a 30 percent white band. On #F9F4EA paper that is a
+   lift; on #24201C paper it is a grey slab. Measured: the band a person received at
+   night was #666360, sixty-six points lighter than the paper it sat on and lighter
+   than the night's own secondary ink, which left the account name at 2.40:1 on it.
+
+   FOUR PERCENT, BECAUSE THAT IS WHAT THE ROOM LIFTS BY. The step from the night
+   paper #1B1815 to the night raised surface #24201C is nine points, and white at
+   four percent over #24201C is nine points again, so the bar is one surface further
+   up a stair the rest of the app already climbs. The name reads 5.79:1 on it.
+
+   AND ITS HAIRLINE TURNS ROUND. Black at five percent is a line on cream paper and
+   nothing at all on #24201C: the line under the bar simply was not there at night. */
+body.dark .account-bar{background:rgba(255,255,255,.04);
+  border-bottom-color:rgba(255,255,255,.07)}
 body.dark .goal{border-bottom-color:rgba(255,255,255,.05)}
 body.dark .goal:hover{background:rgba(255,255,255,.02)}
 body.dark .check{border-color:rgba(255,255,255,.3)}
@@ -2518,10 +2792,15 @@ body.dark .hanko{border-color:var(--seal)}
    ═══════════════════════════════════════════════════════ */
 
 /* Account bar — bleeds to scroll edges */
+/* ITS PADDING AND ITS BLEED ARE THE GUTTER, not a copy of it. The bar is meant to
+   bleed to the paper's edges and then stand its name back ON the gutter, so the name
+   sits in the same column as the practice underneath it. Both numbers were written as
+   48 with a 24 override for the phone, which is the gutter said three times in three
+   places: at 390 the name stood at 48 above a practice at 24. */
 .account-bar{
   display:flex;justify-content:space-between;align-items:center;
-  padding:12px 48px;
-  margin:0 -48px -1px;
+  padding:12px var(--gutter,48px);
+  margin:0 calc(var(--gutter,48px) * -1) -1px;
   margin-top:-60px;
   border-bottom:1px solid rgba(0,0,0,.05);
   background:rgba(255,255,255,.3);
@@ -2995,13 +3274,11 @@ body.dark .clan-reflect-strip{border-top-color:rgba(255,255,255,.06)}
    Target: ≤640px (tablets/phones) and ≤480px (small phones)
    ════════════════════════════════════════════════════════════════════ */
 
-/* ── ≤640px: sync negative-margin bleeds with mobile padding ─────────
-   .scroll padding shrinks from 48px → 24px at 640px.
-   Any element using margin:0 -48px bleeds out too far — reset to -24px. */
+/* ── ≤640px ───────────────────────────────────────────────────────────
+   THE THREE BLEED RESETS ARE GONE, not moved. They existed because the bleeds were
+   written as -48px and the gutter shrinks to 24px here, so each one had to be said
+   again at this width. They now read --gutter and follow it on their own. */
 @media(max-width:640px){
-  .primary-nav  { margin-left:-24px; margin-right:-24px }
-  .account-bar  { margin-left:-24px; margin-right:-24px }
-  .edit-mode-bar{ margin-left:-24px; margin-right:-24px }
 
   /* Primary nav — touch-friendly tap targets (≥44px tall) */
   .primary-tab{ padding:16px 10px 14px; gap:4px }
@@ -3220,6 +3497,8 @@ li.goal.hd-open .habit-detail{display:block}
 .hd-ta{width:100%;font-family:'Noto Serif JP',serif;font-style:italic;font-size:12px;color:var(--ink-light);line-height:1.65;border:1px solid var(--edge);border-radius:2px;background:transparent;padding:7px 9px;outline:none;resize:none;min-height:50px;margin-bottom:8px}
 .hd-save-btn{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--white);background:var(--red);border:1px solid var(--red);padding:3px 12px;cursor:pointer;border-radius:1px;margin-top:10px;transition:opacity .15s;font-family:'Noto Sans JP',sans-serif}
 .hd-save-btn:hover{opacity:.85}
+.hd-cadence{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.hd-cadence-v{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--ink-light)}
 /* ── User Autonomy (Phase 1): cascade lineage + schedule picker ── */
 .ua-lineage{font-family:'Noto Serif JP',serif;font-style:italic;font-size:11px;margin-bottom:10px;line-height:1.6;display:flex;flex-wrap:wrap;align-items:center;gap:3px;color:var(--ink-faint)}
 .ua-lin-kanji{font-style:normal;color:var(--ink-light);opacity:.85;margin-right:5px}
@@ -3317,8 +3596,12 @@ li.goal.hd-open .habit-detail{display:block}
   font-family:'Noto Serif JP',serif;font-size:6px;opacity:.7;
   line-height:1;margin-top:1px;display:block;
 }
-.kk-outer:not([class*="cal-"]) .mcal-cell.has-note .mcal-note-mark,
+/* THE CLAN SCROLL IS LIGHT PAPER AND TAKES THE RED MARK. THE UNCLASSED ONE IS NAVY
+   AND CANNOT: red on #1B2A4A is 2.29:1. It takes a light mark, as the other two dark
+   papers do. This only became measurable on 12 November, when the navy scroll stopped
+   being unreachable and became the travel calendar. */
 .kk-outer.cal-clan .mcal-cell.has-note .mcal-note-mark{ color:rgba(var(--red-rgb),.85); opacity:1; }
+.kk-outer:not([class*="cal-"]) .mcal-cell.has-note .mcal-note-mark{ color:rgba(254,252,248,.62); opacity:1; }
 /* and the ink rules are no longer fighting the base rule, so they are given the
    opacity they always meant to have */
 .kk-outer.cal-white .mcal-cell.has-note .mcal-note-mark{ opacity:1 }
@@ -4431,6 +4714,12 @@ body.dark .sr-phase-dot {
 .kk-outer.cal-samurai .hg-cell.hg-done:not(.hg-today-col)::after {
   background: rgba(254,252,248,.55) !important;
 }
+/* ITS NIGHT ANSWER LIVES HERE AND NOT IN THE NEON BLOCK, because it has to carry the
+   !important above to reach the screen at all. A past finished day is the same neon as
+   a present one, a shade down, so the week still reads from left to right. */
+body.dark .kk-outer.cal-samurai .hg-cell.hg-done:not(.hg-today-col)::after {
+  background: rgba(255,90,90,.72) !important;
+}
 /* Shinobi theme: past done dots slightly muted */
 .kk-outer.cal-shinobi .hg-cell.hg-done:not(.hg-today-col)::after {
   background: rgba(var(--red-rgb),.45) !important;
@@ -4666,6 +4955,12 @@ try {
   <button class="br-tab" data-dest="you" onclick="betaNav('you')" aria-label="You">
     <span class="br-kanji">人</span><span class="br-label">You</span></button>
 </nav>
+
+<!-- ══════════ RETURNING AFTER A LONG ABSENCE (mobile deck slide 51) ══════════
+     "After seven or more missed days, the app opens on the proverb 七転び八起き and
+     offers to begin with a single practice." One moment before the list, not a card
+     over it, and never on a day it has already been answered. -->
+<div id="beta-return" class="rt-overlay" style="display:none"></div>
 
 <div class="scroll" id="app" style="display:none">
 
@@ -5180,7 +5475,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 stage 1 · James only · 2026-11-12';
+const BUILD_ID = 'v2 stage 1 · James only · 2026-11-13';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -5399,6 +5694,14 @@ const DEFAULT_STATE = {
   yearStartDate: null,          // set on first onboarding completion, used for anniversary mode
   travelMode: { active: false, since: null }, // ✈︎ anchor {active, since} — was a bare boolean; normalizeTravelState() migrates a legacy true/false
   travelDays: {},               // day-keyed set {'YYYY-MM-DD':true} — SAME shape as completionLog; MERGEABLE (monotonic-add union, no tombstone)
+  completeDays: {},             // {'YYYY-MM-DD':{c:1|0,ts}} — a day's completeness STORED when its last
+                                // scheduled practice is ticked, cleared when one is un-ticked, and never
+                                // recomputed afterwards (desktop deck slide 10). MERGEABLE: newest ts wins,
+                                // which is the dailyNotes pattern — a CLEAR is c:0 with a fresh ts, so it
+                                // sticks across a reload and a second tab without a tombstone map.
+  completeDaysFilled: 0,        // ts of the one-time backfill from the tick log; 0 = never run
+  returnSeen: null,             // 'YYYY-MM-DD' — the day the return-after-an-absence moment was answered
+  beginWithOne: null,           // {since:'YYYY-MM-DD', chosen:<habitId>} — the list narrows, one practice comes back a day
   projects: [],                 // Special Projects — a commission a craft takes on (parentShok, like a habit). MERGEABLE: recursive id-union + per-entity updatedAt CAS (Finding #1, widened to a nested, MUTABLE object)
   projectRemovals: {},          // {entityId:true} tombstones across ALL project levels (project/branch/sub-task ids are globally unique) — persisted so a delete is never resurrected by the union
 };
@@ -5430,6 +5733,10 @@ let state = {
   srSnoozeUntil: '2026-05-31',
   nextId: 100,
   travelMode: { active: false, since: null },  // ✈︎ anchor — normalizeTravelState() migrates a legacy boolean on load
+  completeDays: {},                            // see DEFAULT_STATE: a day's completeness, stored not recomputed
+  completeDaysFilled: 0,
+  returnSeen: null,
+  beginWithOne: null,
   travelDays: {},                              // day-keyed travel history {'YYYY-MM-DD':true} — MERGEABLE union net
   projects: [],                                // Special Projects — commissions a craft takes on; MERGEABLE (recursive id-union + per-entity CAS)
   projectRemovals: {},                         // {entityId:true} delete tombstones across all project levels
@@ -5940,6 +6247,236 @@ function finishOnboarding(){
 // Recompute a habit's streak from completionLog (single source of truth).
 // Walks back through scheduled days, counting consecutive completions.
 // Allows grace if today is scheduled but not yet done.
+/* The Monday of whatever week a date falls in. getWeekStart takes an offset from
+   TODAY, which is the wrong question when walking backwards through a log. */
+function getWeekStartOf(d){
+  const x=new Date(d); x.setHours(0,0,0,0);
+  x.setDate(x.getDate()-((x.getDay()+6)%7));
+  return x;
+}
+/* ══════════ REST, AND RETURNING ══════════ */
+function isRestDay(habitId, dateStr){
+  const k=(state.kaizen||[]).find(h=>h.id===habitId);
+  return !!(k && Array.isArray(k.restDays) && k.restDays.includes(dateStr));
+}
+/* How many days in a row, up to yesterday, carried nothing at all: no practice
+   ticked anywhere. Scheduled days only, so a person whose practices are Monday to
+   Friday is not told they vanished over a bank holiday weekend. */
+function missedDayRun(){
+  const log=state.completionLog||{};
+  let run=0;
+  const cur=new Date(); cur.setHours(0,0,0,0);
+  cur.setDate(cur.getDate()-1);                       // today is not missed until it is over
+  for(let i=0;i<400;i++){
+    const ds=getDateStr(cur);
+    if(scheduledOnDate(ds).length){
+      if((log[ds]||[]).length) break;
+      run++;
+    }
+    cur.setDate(cur.getDate()-1);
+  }
+  return run;
+}
+function restOrMissedLine(){
+  const log=state.completionLog||{};
+  const y=new Date(); y.setHours(0,0,0,0); y.setDate(y.getDate()-1);
+  const ds=getDateStr(y);
+  const sched=scheduledOnDate(ds);
+  if(!sched.length) return '';                        // nothing was asked of yesterday
+  const done=(log[ds]||[]).filter(id=>sched.some(k=>k.id===id));
+  if(done.length===sched.length) return '';           // yesterday was kept
+  /* REST OR MISSED, NEVER "UNSEALED" (slide 51). Rest is what one missed day in a
+     week is called; a second one in the same week is missed. */
+  const rest=sched.some(k=>isRestDay(k.id, ds));
+  return '<div class="kk-rest-line">'+(rest?'Yesterday was rest.':'Yesterday was missed. Begin again today.')+'</div>';
+}
+
+/* ══════════ RETURNING AFTER A LONG ABSENCE (mobile deck slide 51) ══════════
+   "After seven or more missed days, the app opens on the proverb 七転び八起き (fall
+   seven times, rise eight) and offers to begin with a single practice."
+
+   THE DECK ASKS THREE QUESTIONS HERE AND THEY ARE NOT ANSWERED BY GUESSING. Seven
+   days is the threshold it states; one rest day a week is the rule it states; and it
+   asks whether the app should SUGGEST which practice to begin with, so it does not:
+   the person chooses from their own list. All three are in the report for James. */
+const RETURN_AFTER_DAYS = 7;
+function betaShouldShowReturn(){
+  if(!state || !Array.isArray(state.kaizen) || !state.kaizen.length) return false;
+  if(state.returnSeen === getDateStr()) return false;     // answered today
+  if(state.beginWithOne) return false;                    // already returning
+  return missedDayRun() >= RETURN_AFTER_DAYS;
+}
+/* WHICH PRACTICES ARE VISIBLE WHILE RETURNING, or null when the whole list is.
+   Day 0 is the chosen one alone; each day after that brings one more back, in the
+   order they already sit in, and when they are all back the anchor clears itself so
+   nobody has to remember to. */
+function betaBeginWithOneVisible(){
+  const b = state && state.beginWithOne;
+  if(!b || !b.since) return null;
+  const since = new Date(b.since + 'T12:00:00');
+  if(isNaN(since)) return null;
+  const today = new Date(getDateStr() + 'T12:00:00');
+  const days = Math.max(0, Math.round((today - since) / 86400000));
+  const rest = (state.kaizen||[]).filter(k => k.id !== b.chosen).map(k => k.id);
+  if(days >= rest.length){ state.beginWithOne = null; saveState(); return null; }
+  return new Set([b.chosen, ...rest.slice(0, days)]);
+}
+function betaBeginWithOne(id){
+  const k = (state.kaizen||[]).find(h => h.id === Number(id));
+  if(!k) return;
+  state.beginWithOne = { since: getDateStr(), chosen: k.id };
+  state.returnSeen = getDateStr();
+  saveState();
+  betaCloseReturn();
+  renderGoals();
+}
+function betaReturnToAll(){
+  state.returnSeen = getDateStr();
+  state.beginWithOne = null;
+  saveState();
+  betaCloseReturn();
+  renderGoals();
+}
+function betaCloseReturn(){
+  const el = document.getElementById('beta-return');
+  if(el){ el.style.display = 'none'; document.body.style.overflow = ''; }
+}
+/* ONE MOMENT FIRST, THE LIST ONLY IF IT IS ASKED FOR. The first cut put every
+   practice on the opening screen as a picker. On a plan with twenty of them the
+   proverb had scrolled off the top before a person could read it, which is the
+   opposite of what the deck asks for: "the app opens on one moment before the list.
+   Actions: Begin with one · return to all." Choosing WHICH is the step after. */
+function betaOpenReturn(){
+  const el = document.getElementById('beta-return');
+  if(!el) return;
+  const days = missedDayRun();
+  el.innerHTML =
+    '<div class="rt-inner">' +
+      '<div class="rt-kanji">七転び八起き</div>' +
+      '<div class="rt-romaji">nana korobi ya oki</div>' +
+      '<div class="rt-gloss">Fall seven times, rise eight.</div>' +
+      '<div class="rt-line">' + days + ' days have passed. Nothing is lost. ' +
+        'Begin with one practice, and the rest come back a day at a time.</div>' +
+      '<div class="rt-acts">' +
+        '<button class="rt-go" onclick="betaReturnPick()">begin with one</button>' +
+        '<button class="rt-all" onclick="betaReturnToAll()">return to all of them</button>' +
+      '</div>' +
+    '</div>';
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+/* THE SECOND STEP. The list scrolls inside its own column so the question stays
+   above it however many practices a person keeps. */
+function betaReturnPick(){
+  const el = document.getElementById('beta-return');
+  if(!el) return;
+  const list = (state.kaizen||[]).map(k =>
+    '<button class="rt-pick" onclick="betaBeginWithOne(' + k.id + ')">' +
+      escapeHtml(k.text || '') + '</button>').join('');
+  el.innerHTML =
+    '<div class="rt-inner rt-step2">' +
+      '<div class="rt-gloss">Which one will you begin with?</div>' +
+      '<div class="rt-line">The others come back a day at a time, in the order they sit in.</div>' +
+      '<div class="rt-picks">' + list + '</div>' +
+      '<button class="rt-all" onclick="betaOpenReturn()">back</button>' +
+    '</div>';
+}
+
+/* ══════════ THE THREAD (mobile deck slide 47) ══════════
+   The line a practice feeds: this month's craft, the goal above it, the strand above
+   that. Returns null when a practice is not joined to anything, because a thread to
+   nowhere is worse than none. */
+function betaThreadNodes(habitId){
+  const k=(state.kaizen||[]).find(h=>h.id===Number(habitId));
+  if(!k) return null;
+  const craft=(state.shokunin||[]).find(c=>String(c.id)===String(k.parentShok));
+  if(!craft) return null;
+  const goal=(state.annualGoals||[]).find(g=>String(g.id)===String(craft.parentAnnual));
+  let si=null;
+  if(goal && goal.parentMs!=null && goal.parentMs!==''){
+    const num=Number(goal.parentMs);
+    if(Number.isInteger(num)&&num>=0&&num<5) si=num;
+  }
+  const strand=si!=null?(state.strands||[])[si]:null;
+  return { month: craft.text||'', goal: goal?(goal.text||''):'',
+           strandName: si!=null?(strandName(strand)||''):'', strandKanji: si!=null?strandKanji(strand,si):'',
+           colour: si!=null?strandColour(strand,si):'var(--ink-faint)', si };
+}
+let _thTimer=null;
+function betaThreadFlash(habitId){
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  }catch(e){}
+  const li=document.querySelector('[data-kaizen-id="'+habitId+'"]');
+  const t=betaThreadNodes(habitId);
+  if(!li||!t||!t.goal) return;
+  /* ONE AT A TIME. A second tick while the first is still climbing replaces it
+     rather than stacking, and neither one ever waits for the other. */
+  document.querySelectorAll('.th-flash').forEach(e=>e.remove());
+  clearTimeout(_thTimer);
+  const chip=(nth,label,text)=>'<span class="th-chip" data-n="'+nth+'" style="--d:'+(0.2+nth*0.2)+'s">'+
+    '<em>'+label+'</em>'+escapeHtml(text)+'</span>';
+  const el=document.createElement('div');
+  el.className='th-flash';
+  el.style.setProperty('--th', t.colour);
+  el.innerHTML='<span class="th-line"></span>'+
+    chip(0,'This month',t.month)+chip(1,'Goal',t.goal)+
+    (t.strandName?chip(2,'Strand',t.strandKanji+' '+t.strandName):'');
+  if(getComputedStyle(li).position==='static') li.style.position='relative';
+  li.appendChild(el);
+  _thTimer=setTimeout(()=>{ el.remove(); }, 1800);
+}
+/* LONG-PRESS OPENS THE WHOLE THREAD (slide 47). Read-only: the deck's own open
+   question is whether each node should be tappable, and that is James's to answer. */
+function betaThreadSheet(habitId){
+  const k=(state.kaizen||[]).find(h=>h.id===Number(habitId));
+  const t=betaThreadNodes(habitId);
+  if(!k) return;
+  const row=(lbl,text,cls)=>'<div class="th-sheet-node'+(cls||'')+'"><span class="th-sheet-lbl">'+lbl+'</span>'+
+    '<span class="th-sheet-text">'+escapeHtml(text)+'</span></div>';
+  let body;
+  if(!t||!t.goal){
+    body=row('Practice',k.text||'')+
+      '<div class="rf-note" style="margin-top:14px">This practice is not joined to a craft and a goal yet, '+
+      'so there is no thread to follow. Open it and choose where it belongs.</div>';
+  } else {
+    body='<div style="--th:'+t.colour+'">'+
+      row('Practice',k.text||'')+row('This month',t.month)+row('Goal',t.goal)+
+      (t.strandName?row('Strand',t.strandKanji+'  '+t.strandName,' is-strand'):'')+
+      '</div>';
+  }
+  betaPanelOpen('the thread', body);
+}
+/* The press itself. 420ms, cancelled by a move of more than 8px or by letting go,
+   and it suppresses the click that would otherwise open the detail underneath. */
+function betaThreadBindPress(){
+  const list=document.getElementById('goals-list');
+  if(!list||list.__thBound) return;
+  list.__thBound=true;
+  let timer=null,sx=0,sy=0,fired=false,id=null;
+  const start=e=>{
+    const row=e.target.closest('li.goal[data-kaizen-id]');
+    if(!row||e.target.closest('.check')||e.target.closest('.goal-actions')) return;
+    id=row.getAttribute('data-kaizen-id'); fired=false;
+    const p=e.touches?e.touches[0]:e; sx=p.clientX; sy=p.clientY;
+    clearTimeout(timer);
+    timer=setTimeout(()=>{ fired=true; betaThreadSheet(id); }, 420);
+  };
+  const move=e=>{
+    if(!timer) return;
+    const p=e.touches?e.touches[0]:e;
+    if(Math.abs(p.clientX-sx)>8||Math.abs(p.clientY-sy)>8){ clearTimeout(timer); timer=null; }
+  };
+  const end=()=>{ clearTimeout(timer); timer=null; };
+  list.addEventListener('pointerdown',start);
+  list.addEventListener('pointermove',move,{passive:true});
+  list.addEventListener('pointerup',end);
+  list.addEventListener('pointercancel',end);
+  /* The long press must not also open the detail. */
+  list.addEventListener('click',e=>{ if(fired){ e.stopPropagation(); e.preventDefault(); fired=false; } },true);
+  list.addEventListener('contextmenu',e=>{ if(e.target.closest('li.goal[data-kaizen-id]')) e.preventDefault(); });
+}
+
 function recomputeStreak(habitId){
   const k=state.kaizen.find(h=>h.id===habitId);
   if(!k) return;
@@ -5961,7 +6498,21 @@ function recomputeStreak(habitId){
   if(todayScheduled && !todayDone){
     cursor.setDate(cursor.getDate()-1);
   }
+  /* ══════════ WATER, NOT FIRE (mobile deck slide 51) ══════════
+     "A missed day never resets a streak to zero in front of the person. One missed
+     day per week counts as rest (shown dashed in the week strip)."
+
+     Walking back, the FIRST missed scheduled day in any given week is rest and the
+     walk carries on; a second miss in that same week ends the streak. Rest does not
+     ADD to the count, because nothing was done that day: it simply does not break it.
+     The week is the Monday-to-Sunday one the rest of the app uses, so "one a week"
+     means what a person means by it rather than "one in any seven days".
+
+     THE DAYS THAT WERE REST ARE RECORDED on the habit as it walks, because the week
+     strip has to draw them dashed and a second pass would have to repeat all of this
+     to find them again. */
   let streak=0, safety=0;
+  const restTaken={}, restDays=[];
   while(safety++<1000){
     if(k.startDate){
       const s=new Date(k.startDate); s.setHours(0,0,0,0);
@@ -5971,10 +6522,15 @@ function recomputeStreak(habitId){
     const dStr=getDateStr(cursor);
     if(habitOnDay(k,dayIdx,cursor)){
       if((log[dStr]||[]).includes(habitId)) streak++;
-      else break;
+      else {
+        const wk=getDateStr(getWeekStartOf(cursor));
+        if(restTaken[wk]) break;          // a second miss that week is the end of it
+        restTaken[wk]=dStr; restDays.push(dStr);
+      }
     }
     cursor.setDate(cursor.getDate()-1);
   }
+  k.restDays=restDays;
   k.streak=streak;
   if(streak>(k.bestStreak||0)) k.bestStreak=streak;
 }
@@ -5986,6 +6542,8 @@ function checkDailyReset(){
   // while the app was closed. Runs on load (renderDashboard) AND each daily reset. Monotonic —
   // a backfill that grows travelDays folds into `changed` so the new days persist + sync.
   if(syncTravelHistory()) changed=true;
+  // Deck slide 10: write down which past days were complete, once, from the tick log.
+  if(backfillCompleteDaysOnce()) changed=true;
   state.kaizen.forEach(k=>{
     // REPAIR a never-firing day-mask. days:[] matches NO day — habitOnDay does days.includes(idx),
     // always false — so the habit is invisible in "show up today" forever while still sitting in
@@ -6027,13 +6585,30 @@ function getWeekStart(offset){
 }
 
 function navigateWeek(delta){weekOffset+=delta;renderGoals();}
+/* ══════════ THE RECORD REDRAWS ITSELF WHEN IT IS THE THING ON SCREEN ══════════
+   The month scroll is drawn in two places: under the practice on My Bushido, by
+   renderGoals, and as the record on Reflect, by betaRenderReflect. Its arrows and
+   its 月 seal called renderGoals and nothing else, so inside Reflect the back arrow
+   did nothing at all: the month changed in the variable and the page kept the old
+   picture. This redraws the RECORD only, never the whole page, because the day's
+   note sits beside it and a person may be in the middle of writing in it. */
+function betaRedrawRecord(){
+  if(typeof BETA_NAV === 'undefined' || BETA_NAV !== 'reflect') return false;
+  const host = document.getElementById('rf-record');
+  if(!host) return false;
+  host.innerHTML = buildMonthCal(false);
+  return true;
+}
 let _monthReflectExpanded=false;
 function toggleMonthReflect(e){
   e.stopPropagation();
   _monthReflectExpanded=!_monthReflectExpanded;
+  if(betaRedrawRecord()) return;
   renderGoals();
 }
-function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;_expandedSknDay=null;_monthReflectExpanded=false;renderGoals();}
+function navigateMonth(delta){calMonthOffset+=delta;_expandedWeek=null;_expandedSknDay=null;_monthReflectExpanded=false;
+  if(betaRedrawRecord()) return;
+  renderGoals();}
 var _dayNoteOpen=null;
 function openDayNote(dateStr){
   betaHomeOverlays();   // idempotent; see BETA_BODY_OVERLAYS
@@ -6115,8 +6690,11 @@ function _surgicalToggleUpdate(habitId,dateStr,nowDone){
   // 2) column-complete glow — recompute this column from the live cells (scheduled, non-future = done|miss)
   const col=cell.getAttribute('data-col');
   const colCells=[].slice.call(grid.querySelectorAll('.hg-cell[data-col="'+col+'"]'));
-  const active=colCells.filter(c=>c.classList.contains('hg-done')||c.classList.contains('hg-miss'));
-  const complete=active.length>0&&active.every(c=>c.classList.contains('hg-done'));
+  /* THE GLOW READS THE SAME STORED FACT THE RENDER DOES. This used to re-derive the
+     column from whatever cells happened to be on screen, which is a third opinion
+     about a day's completeness beside the week's and the month's. setCompleteDay has
+     already run for this date by the time we are here. */
+  const complete=dayStoredComplete(dateStr);
   const head=grid.querySelector('.hg-day-head[data-col="'+col+'"]');
   if(head) head.classList.toggle('hg-col-complete',complete);
   colCells.forEach(c=>c.classList.toggle('hg-col-complete',complete&&c.classList.contains('hg-done')));
@@ -6142,6 +6720,96 @@ function _surgicalToggleUpdate(habitId,dateStr,nowDone){
      the list it sits above is worse than no count. Hooked HERE rather than in toggleKaizen so
      every path that ticks a practice is covered, not just the one I happened to read. */
   if(typeof betaRenderCount === 'function') betaRenderCount();
+  /* THE THREAD, on a tick and never on an un-tick: it is the line the practice
+     feeds, and nothing is fed by undoing one. */
+  if(nowDone && typeof betaThreadFlash === 'function') betaThreadFlash(habitId);
+}
+
+/* ══════════ A COMPLETE DAY IS A FACT, NOT A SUM (desktop deck slide 10) ══════════
+   "Today nothing is stored: the glow is worked out on each render from the tick log
+   against the CURRENT practice list, so deleting a practice or changing its days can
+   make an old day start or stop glowing, and on the week scroll a practice added
+   midweek counts against the earlier days. v2 keeps the look and stores the fact."
+
+   So the day's completeness is decided ONCE, at the moment the last scheduled
+   practice of that day is ticked, and written down. Un-ticking one of that day's
+   practices clears it. Adding, retiring or rescheduling practices afterwards never
+   changes it, because nothing recomputes it.
+
+   THE SHAPE IS {c:1|0, ts}, NOT {date:true}. A day-keyed set of true, like
+   travelDays, cannot be cleared across two devices: a union would resurrect a day the
+   other client had just un-ticked. A value with a timestamp merges the way dailyNotes
+   already does — a CLEAR is c:0 with a fresh ts, and the newest write wins — which is
+   this file's own answer to exactly this problem and needs no tombstone map.
+
+   A DAY WITH NOTHING SCHEDULED NEVER GLOWS, and is never written at all: absence
+   means "not complete", so the map stays small and says only what happened. */
+function scheduledOnDate(dateStr, st){
+  st = st || state;
+  const d = new Date(dateStr + 'T12:00:00');
+  if(isNaN(d)) return [];
+  const idx = (d.getDay() + 6) % 7;
+  return (st.kaizen || []).filter(k => {
+    if(k.startDate){
+      const start = new Date(k.startDate); start.setHours(0,0,0,0);
+      const day = new Date(d); day.setHours(0,0,0,0);
+      if(day < start) return false;              // a practice cannot have been missed before it existed
+    }
+    return habitOnDay(k, idx, d);
+  });
+}
+/* THE NAME IS dayStoredComplete AND NOT isDayComplete, DELIBERATELY. There is already
+   an isDayComplete in this file, at the celebrations, and it is the recomputing kind:
+   it asks the CURRENT practice list and answers TRUE for a day with nothing scheduled
+   ("rest day — can't fail it"). Declared later in the same script, it shadows anything
+   of the same name, so the first cut of this feature wrote the fact down correctly and
+   then read it through the old function, and the whole thing behaved exactly as before
+   while looking right. Two different questions deserve two names: did this day glow,
+   and did you fail today. */
+function dayStoredComplete(dateStr, st){
+  const e = (((st || state).completeDays) || {})[dateStr];
+  return !!(e && (e.c === 1 || e.c === true));
+}
+/* Called from the ONE place a tick happens. nowDone=false short-circuits: un-ticking
+   anything on a day can only break it, whatever else is on that day. */
+function setCompleteDay(dateStr, nowDone){
+  if(!state.completeDays) state.completeDays = {};
+  const had = state.completeDays[dateStr];
+  const wasComplete = dayStoredComplete(dateStr);
+  let now = false;
+  if(nowDone){
+    const sched = scheduledOnDate(dateStr);
+    now = sched.length > 0 && sched.every(k => isHabitDoneOnDate(k.id, dateStr));
+  }
+  if(now === wasComplete && (had !== undefined || now === false)) return false;
+  state.completeDays[dateStr] = { c: now ? 1 : 0, ts: Date.now() };
+  return true;
+}
+/* THE BACKFILL, ONCE. Reads the tick log that already exists and writes down which of
+   those days were complete, honouring each practice's start date. It is the only time
+   the fact is derived rather than observed, and after it runs the flag stops it ever
+   running again: a second pass against a later practice list would produce different
+   answers for the same days, which is the thing this whole feature exists to stop.
+
+   IT ONLY EVER WRITES c:1. A day that was not complete is simply absent, so a backfill
+   can never erase a day a person has since ticked on another device. */
+function backfillCompleteDaysOnce(){
+  if(state.completeDaysFilled) return false;
+  if(!state.completeDays) state.completeDays = {};
+  const log = state.completionLog || {};
+  const ts = Date.now();
+  let wrote = 0;
+  Object.keys(log).forEach(dateStr => {
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return;
+    if(state.completeDays[dateStr] !== undefined) return;   // a live tick already said so
+    const sched = scheduledOnDate(dateStr);
+    if(!sched.length) return;
+    if(!sched.every(k => isHabitDoneOnDate(k.id, dateStr))) return;
+    state.completeDays[dateStr] = { c: 1, ts };
+    wrote++;
+  });
+  state.completeDaysFilled = ts;
+  return true;    // the flag alone is a change worth persisting, even at wrote === 0
 }
 
 function toggleHabitOnDate(habitId,dateStr){
@@ -6152,6 +6820,7 @@ function toggleHabitOnDate(habitId,dateStr){
   if(nowDone)arr.push(habitId);else arr.splice(idx,1);
   state.completionLog[dateStr]=arr;
   recordCompletionToggle(dateStr, habitId, nowDone);  // P6-1 — so an un-tick isn't unioned back on save
+  setCompleteDay(dateStr, nowDone);                  // deck slide 10 — the day's completeness, written down
   // Recompute streak from completionLog — handles retroactive fills correctly
   recomputeStreak(habitId);
   // If today, sync k.done + animation + cascade
@@ -6189,19 +6858,21 @@ function buildKaizenGrid(){
   // Date header — native to the scroll
   const maxSt=state.kaizen.length?Math.max(...state.kaizen.map(k=>k.streak||0)):0;
   const nowDateStr=new Date().toLocaleDateString('en-GB',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  /* "A missed day reads as rest, in one quiet line on the paper under the date,
+     never a card" (slide 51). Under the date, because the phone has no date line of
+     its own and this is where the day is named. */
   const dateHeaderHtml=`<div class="kk-date-header">
     <span class="kk-date-text">${nowDateStr}</span>
     ${maxSt>1?`<span class="kk-streak-whisper">\u00b7 day ${maxSt}</span>`:''}
+    ${restOrMissedLine()}
   </div>`;
 
   const _calThemeCls_kz=(()=>{const _t=_effectiveCalTheme(state.calThemeKaizen);return _t==='default'?'':('cal-'+_t);})();
-  const completeDays=days.map((d,i)=>{
-    const dStr=getDateStr(d);
-    if(dStr>todayStr)return false;
-    const scheduled=habits.filter(k=>habitOnDay(k,i,d));
-    if(!scheduled.length)return false;
-    return scheduled.every(k=>isHabitDoneOnDate(k.id,dStr));
-  });
+  /* READ, DO NOT RECOMPUTE (deck slide 10). What stood here asked the CURRENT
+     practice list whether an old day was complete, and it did not even honour a
+     practice's start date, so a practice added on Thursday counted against Monday and
+     the glow moved around under old weeks. */
+  const completeDays=days.map(d=>dayStoredComplete(getDateStr(d)));
   let html=`<div class="hg-wrap">
     <div class="kk-outer ${_calThemeCls_kz}">
       <div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div>
@@ -6236,7 +6907,11 @@ function buildKaizenGrid(){
             if(!scheduled){cls+=' hg-off';}
             else if(isFuture){cls+=' hg-future';}
             else if(done){cls+=' hg-done';if(completeDays[i])cls+=' hg-col-complete';}
-            else{cls+=' hg-miss';}
+            /* REST IS DRAWN DASHED, NOT AS A MISS (slide 51). One missed day in a
+               week is rest and the streak holds through it, so the strip has to say
+               which kind of gap it is or the person is told their streak survived a
+               miss with nothing to show why. */
+            else{cls+=' hg-miss';if(isRestDay(k.id,dStr))cls+=' hg-rest';}
             if(isT&&scheduled)cls+=' hg-today-col';
             const clickable=scheduled&&!isFuture;
             return `<div class="${cls}" data-habit="${k.id}" data-date="${dStr}" data-col="${i}"${clickable?` onpointerup="event.preventDefault();toggleHabitOnDate(${k.id},'${dStr}')"`:''} ></div>`;
@@ -6433,7 +7108,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
       if(isFuture) cls+=' mcal-future';
 
       // N dots = habits done that day
-      const allDone=scheduled.length>0&&done.length===scheduled.length;
+      const allDone=dayStoredComplete(cell.dateStr);   // deck slide 10 — stored, not recomputed
       const dotHtml=done.length?`<div class="mcal-dots${allDone?' all-done':''}">${done.map(()=>'<div class="mcal-dot"></div>').join('')}</div>`:'';
       const hasNote=!isFuture&&!!((state.dailyNotes||{})[cell.dateStr]);
       if(hasNote) cls+=' has-note';
@@ -6938,23 +7613,43 @@ function habitOnDay(k, d, dateObj){
 // to the 9 duplicated local copies (all verified === ['志','史','鍛','匠','愛']) they route
 // through. The positional fallback is retired in Phase 4, once every strand is an object.
 var _STRAND_KANJI_FALLBACK  = ['志','史','鍛','匠','愛'];
-var _STRAND_COLOUR_FALLBACK = ['#2C5282','#7A5C1E','#276749','#553C9A','#922B21'];
+/* ══════════ ONE PLACE A STRAND'S COLOUR COMES FROM (mobile deck slide 76) ══════════
+   There were four. --s0..--s4 on the root, read by the strand arms and the clan cards
+   and undeclared, so both fell to grey. _UA_STRAND_COLOR, a hardcoded set in the
+   cascade lineage with no callers at all. And this fallback, a fifth set of hexes,
+   none of them the deck's. They are one token set now, declared at :root and lifted
+   at night, and this reads them. A strand that carries its OWN colour still wins:
+   that is the person's choice, not a default. */
+var _STRAND_HUE_FALLBACK = ['#2D3D6B','#7A3828','#3D6B5F','#8A6E2F','#4A3F5C'];
+/* READ FROM THE BODY, NOT FROM :root. The night values are declared on body.dark, so
+   a read of document.documentElement returns the DAY hue at midnight: the variables
+   resolve on the element they are declared on and the elements under it. Both places
+   that read these before read the root, which is a second reason they were never
+   going to see a night palette even once the variables existed. */
+function strandHue(si){
+  try{
+    const el = document.body || document.documentElement;
+    const v = getComputedStyle(el).getPropertyValue('--s' + si).trim();
+    if(v) return v;
+  }catch(e){}
+  return _STRAND_HUE_FALLBACK[si] || '#888';
+}
 function strandName(s){ return (s && typeof s === 'object') ? (s.name != null ? s.name : '') : s; }
 function strandKanji(s, i){ return (s && typeof s === 'object' && s.kanji) ? s.kanji : _STRAND_KANJI_FALLBACK[i]; }
-function strandColour(s, i){ return (s && typeof s === 'object' && s.colour) ? s.colour : _STRAND_COLOUR_FALLBACK[i]; }
+function strandColour(s, i){ return (s && typeof s === 'object' && s.colour) ? s.colour : strandHue(i); }
 
 // ── STRAND ARMS ──────────────────────────────────────────────────────────────
 function renderStrandArms(){
   var el=document.getElementById('strand-arms-strip');
   if(!el) return;
   var KANJI=['志','史','鍛','匠','愛'];
-  var CSS_V=['--s0','--s1','--s2','--s3','--s4'];
   var SEEDS=[0.30,-0.40,0.25,-0.35,0.45,-0.28,0.38,-0.42];
   var CX=29,CY=29,SEAL_R=10,ARM_FROM=12,ARM_MAX=16,ARM_MIN=2,MAX_STK=30;
-  var cs=getComputedStyle(document.documentElement);
-  var colors=CSS_V.map(function(v){return cs.getPropertyValue(v).trim();});
   el.innerHTML=(state.strands||[]).map(function(name,si){
-    var color=colors[si]||'#888';
+    /* THROUGH strandColour, so a strand that carries its own colour keeps it and
+       everything else takes the token. This read --s0..--s4 off the root directly,
+       and they did not exist: every arm was '#888'. */
+    var color=strandColour(name,si);
     var kanji=strandKanji(name,si)||'';
     var goalIds=new Set((state.annualGoals||[]).filter(function(g){return Number(g.parentMs)===si;}).map(function(g){return g.id;}));
     var shokIds=new Set((state.shokunin||[]).filter(function(s){return goalIds.has(Number(s.parentAnnual));}).map(function(s){return s.id;}));
@@ -6998,6 +7693,10 @@ function renderStrandArms(){
 // /STRAND ARMS ─────────────────────────────────────────────────────────────────
 function renderDashboard(){
   checkDailyReset();
+  /* THE APP OPENS ON IT (slide 51), so this runs before the list is drawn rather
+     than as a card over it afterwards. betaShouldShowReturn answers false on any day
+     it has already been answered, so it is a moment and not a wall. */
+  try{ if(betaShouldShowReturn()) betaOpenReturn(); }catch(e){}
   // Guarded because this block (ends :10733) can run BEFORE the block that declares
   // srInitBanner (:12603). Normal path: the Firebase SDK loads, auth resolves async,
   // showDashboard() runs long after every block has parsed, and this call fires as
@@ -7074,9 +7773,16 @@ function renderGoals(){
       <span>✈︎ &nbsp;Travelling — ${coreCount} of ${state.kaizen.length} practices</span>
       <a onclick="openTravelSetup(true)">Edit core practices</a>
     </div>`:'';
+    /* BEGIN WITH ONE (slide 51): after a long absence the list narrows to one chosen
+       practice and "the rest come back one a day". The narrowing is a READ of
+       beginWithOne, never a write to the practices themselves: nothing is retired,
+       nothing is rescheduled, and clearing the anchor brings the whole list back in
+       one step. */
+    const _bw1 = betaBeginWithOneVisible();
     const todayItems=state.kaizen.filter(k=>{
       if(!habitOnDay(k,todayIdx2,new Date()))return false;
       if(isTravelling()&&k.core!==true)return false;
+      if(_bw1 && !_bw1.has(k.id))return false;
       return true;
     });
     // Compute strand-linked IDs for glow (no filtering — all habits stay visible)
@@ -7100,9 +7806,21 @@ function renderGoals(){
          twice fifty pixels apart. Removing the duplicate is what puts a second
          practice above the fold at 390x844. */
       checklistHtml+=``+
+        /* ══════════ THE DAY'S ROW IS THE PRACTICE AND NOTHING ELSE (James,
+           12 November: "why the 28 days etc on the daily ticks? why do they say
+           daily and have the arrow to the thing REMOVE ALL OF THAT ... in the day
+           section") ══════════
+           Three things came off the row: the streak badge, the cadence word and the
+           arrow to the craft above it. This REVERSES part of deck item 2, which put
+           the streak at the end of the row and kept the schedule and the craft under
+           the title; it holds for the month and the year rows, which are untouched.
+
+           Nothing is lost by it. The cadence and the craft are both in the practice's
+           own detail, a tap away, and since this afternoon the craft, the goal and
+           the strand all climb out of the check on a tick and open as a sheet on a
+           long press. The row was saying permanently, in small grey type, what the
+           thread now says when it is asked. */
         todayItems.map((g,i)=>{
-          const parent=state.shokunin.find(s=>s.id==g.parentShok);
-          const freq=cadenceLabel(g);
           const anim=_animatingIds.has(g.id);if(anim)_animatingIds.delete(g.id);
           const strandCls=strandLinkedIds!==null?(strandLinkedIds.has(g.id)?' strand-glow':' strand-faint'):'';
           const hdBullets=buildHabitDetailHtml(g);
@@ -7111,12 +7829,7 @@ function renderGoals(){
             <div class="check ${g.done?'done':''}${anim?' origami-fill':''}" onpointerup="event.preventDefault();toggleKaizen(${g.id})"></div>
             <div class="goal-content" onclick="if(!document.body.classList.contains('edit-mode'))toggleHabitDetail(${g.id})">
               <div class="goal-title" data-edit-id="${g.id}">${g.text}<span class="hd-hint">&#9660;</span></div>
-              <div class="goal-meta">
-                <span class="goal-tf">${freq}</span>
-                ${parent?`<span class="goal-parent">\u2192 ${parent.text.substring(0,30)}</span>`:''}
-              </div>
             </div>
-            ${betaStreakHtml(g)}
             <div class="goal-actions">
               <button class="goal-act" onclick="event.stopPropagation();editHabit(${g.id})">✎</button>
               <button class="goal-act goal-del" onclick="confirmDelete('kaizen',${g.id})">×</button>
@@ -7520,6 +8233,39 @@ function senseiLetter(context){
    is a second version of something that exists: a second daily note would drift from
    the first, and a note that reads differently depending on how you reached it is a
    note you cannot trust. */
+/* THE DAY THE PERSON JOINED. yearStartDate is written at onboarding, but a plan
+   seeded or imported from elsewhere may not carry one, so the earliest mark in the
+   document is the fallback: a record cannot start later than the first thing in it. */
+function betaJoinDate(){
+  const cands = [];
+  if(state.yearStartDate) cands.push(String(state.yearStartDate).slice(0,10));
+  const push = o => Object.keys(o||{}).forEach(k=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(k)) cands.push(k); });
+  push(state.completionLog); push(state.dailyNotes); push(state.completeDays); push(state.travelDays);
+  (state.reflections||[]).forEach(r=>{ if(r && typeof r.date==='string') cands.push(r.date.slice(0,10)); });
+  if(!cands.length) return getDateStr();
+  return cands.sort()[0];
+}
+/* THE RECORD, FROM THE JOIN MONTH TO LAST MONTH, newest first. buildMonthCal reads
+   the global calMonthOffset, so the offset is moved and PUT BACK: the month above
+   this stack is the one the person was already looking at, and a record that quietly
+   changed which month that was would be worse than no record. Capped at ten years so
+   a corrupt date cannot render forever. */
+function betaRecordSinceJoining(){
+  const join = new Date(betaJoinDate() + 'T12:00:00');
+  if(isNaN(join)) return '';
+  const now = new Date();
+  const months = (now.getFullYear()-join.getFullYear())*12 + (now.getMonth()-join.getMonth());
+  const back = Math.max(0, Math.min(months, 120));
+  if(!back) return '';
+  const saved = calMonthOffset;
+  let html = '';
+  try{
+    for(let off = -1; off >= -back; off--){ calMonthOffset = off; html += buildMonthCal(false); }
+  } finally { calMonthOffset = saved; }
+  return '<div class="rf-history-label">since you began</div>' +
+         '<div class="rf-history" id="rf-history">' + html + '</div>';
+}
+
 function betaRenderReflect(){
   const host = document.getElementById('reflect-body');
   if(!host) return;
@@ -7532,9 +8278,15 @@ function betaRenderReflect(){
     '<div class="rf-head"><span class="rf-kanji">省</span>' +
       '<span class="rf-title">Reflect</span></div>' +
 
+    /* TWO COLUMNS ON THE DESK (slide 15), one below 1200. The DOM order is the
+       phone's order, so the fold is the absence of the grid and nothing else. */
+    '<div class="rf-grid">' +
+    '<div class="rf-col-left">' +
     '<div class="rf-sec-label">today</div>' +
     betaDailyNoteHtml() +
+    '</div>' +
 
+    '<div class="rf-col-right">' +
     betaWeekRuleHtml() +
     '<div class="rf-launchers">' +
       '<span id="weekly-btn-slot"></span>' +
@@ -7558,13 +8310,14 @@ function betaRenderReflect(){
     '<div class="rf-record" id="rf-record">' + buildMonthCal(false) + '</div>' +
     '<div class="rf-note">Every day you wrote on carries 省, every sealed week 週, the month 月 and ' +
       'a season 季. Tap any mark to read what you wrote.</div>' +
+    betaRecordSinceJoining() +
 
     /* THE SENSEI IS HIDDEN IN STAGE 1 (build_v2_stage1.mjs). Its letter is fixed
        sample text until the API exists, and an app that prints sample text under a
        sensei's name is telling its reader something nobody said. betaSenseiCardHtml,
        senseiSay, the guard and the crisis path are all still here and still tested;
-       only the card is withheld. */
-    '';
+       only the card is withheld. The two columns still have to be closed. */
+    '</div></div>';
 
   try{ renderWeeklyBtn(); renderMonthlyBtn(); }catch(e){}
   const ta = document.getElementById('daily-note-ta');
@@ -7830,7 +8583,7 @@ function youPanelHtml(){
 function youTogglePeace(){ state.showPeaceBar = !(state.showPeaceBar === true); saveState(); betaRenderYou(); try{ renderGoals(); }catch(e){} }
 function youToggleSenseiNote(){ state.senseiReadsDayNote = !(state.senseiReadsDayNote === true); saveState(); betaRenderYou(); }
 function youSetInk(v){ state.calThemeKaizen = v; state.calThemeShokunin = v; state.calThemeIkigai = v;
-  saveState(); betaRenderYou(); try{ renderGoals(); }catch(e){} }
+  saveState(); betaRenderYou(); betaRedrawScrolls(); }
 function youSetNight(v){ state.nightMode = v; saveState(); betaRenderYou();
   try{ updateDarkMode(); }catch(e){} }
 function youSetVis(v){ try{ setVis(v); }catch(e){ state.visMode = v; saveState(); } betaRenderYou(); }
@@ -8025,9 +8778,14 @@ function _cadenceFrom(k){
 // Read-only cascade lineage. James's ask (Aug 1): render the FULL named chain so it reaches
 // the strand — habit → craft → Ikigai goal → Ryughi strand — not just a bare kanji. The
 // strand is a NAMED node with its own colour, reusing Cascade Pulse's four-level vocabulary
-// (per-strand colour + kanji). `--s0..--s4` CSS vars don't exist in this file, so the colours
-// are a hardcoded map of the Cascade Pulse hexes.
-const _UA_STRAND_COLOR = ['#2C5282','#7A5C1E','#276749','#553C9A','#922B21']; // 志 史 鍛 匠 愛
+// (per-strand colour + kanji).
+/* THE NOTE THAT USED TO SIT HERE SAID `--s0..--s4` DO NOT EXIST IN THIS FILE, and it
+   was right: two other places read them anyway and got grey. They exist now, so this
+   reads them like everything else rather than carrying a fifth opinion about what
+   colour a strand is. The old hardcoded set (#2C5282 #7A5C1E #276749 #553C9A #922B21)
+   was none of the deck's five, and nothing read it: the const had no callers at all.
+   It is gone rather than repointed. strandHue, beside the other strand helpers,
+   is the one place a strand's colour comes from now. */
 function _uaKanjiForGoal(goal){                          // still used by the Shokunin craft card
   if(!goal || goal.parentMs==null || goal.parentMs==='') return '';
   const si = Number(goal.parentMs);
@@ -8309,7 +9067,17 @@ function buildHabitDetailHtml(g){
   const whyHtml = why
     ? `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text">${why}</div>`
     : `<div class="hd-divider"></div><div class="hd-why-label">why</div><div class="hd-why-text hd-placeholder">Why does this practice exist in your life?</div>`;
-  return _uaLineageHtml('kaizen', g) + bulletsHtml + whyHtml +
+  /* THE CADENCE CAME OFF THE ROW, SO IT HAS TO LAND SOMEWHERE (James, 12 November).
+     He asked for the schedule word off the day's row, not for a practice's schedule
+     to become unfindable. With it gone the only places the words still reached a
+     person were the travel picker and the Frequency button inside the EDITOR, two
+     taps away and behind a control that invites a change. It reads here, in the
+     detail, one tap from the practice and alongside its parts and its why. */
+  const cadence = (typeof cadenceLabel === 'function') ? cadenceLabel(g) : '';
+  const cadenceHtml = cadence
+    ? `<div class="hd-cadence"><span class="hd-why-label">when</span><span class="hd-cadence-v">${escapeHtml(cadence)}</span></div>`
+    : '';
+  return _uaLineageHtml('kaizen', g) + cadenceHtml + bulletsHtml + whyHtml +
     `<button class="hd-edit-btn" onclick="event.stopPropagation();openHabitEdit(${g.id})">edit</button>`;
 }
 
@@ -10712,7 +11480,21 @@ function saveReflection(type){
     entry.weakCraft=card?+(card.dataset.craftId||0):0;
     entry.whatGotInWay=c.querySelector('#opt-c-q1')?.value.trim()||'';
     entry.showingUp=c.querySelector('#opt-c-q2')?.value.trim()||'';
-    entry.notes=c.querySelector('.reflect-textarea')?.value||'';
+    /* ══════════ THE WEEK IN ONE THOUGHT WAS BEING THROWN AWAY ══════════
+       This read the FIRST .reflect-textarea in the card. When a craft is under 80
+       percent the card opens with the deficit pair above the free write, and
+       #opt-c-q1 is a .reflect-textarea too, so the first one is "what got in the
+       way": entry.notes was saved as a copy of entry.whatGotInWay and the thought
+       the person actually wrote was dropped on seal. It only behaved when every
+       craft was over 80 percent and the pair was absent, which is the minority of
+       weeks. The free write is addressed by name now.
+
+       entry.notes is the one weekly field the rest of the app reads: the month
+       calendar's day expansion, the cascade of weeklies inside the monthly, and the
+       year timeline. All three have been showing the deficit answer. Weeks already
+       sealed carry the copy and are not rewritten; the review (#rev-notes) always
+       read and wrote the right field, so an old week can be corrected by opening it. */
+    entry.notes=c.querySelector('#weekly-thought')?.value||'';
     entry.intention=c.querySelector('#weekly-intention')?.value.trim()||'';
     entry.travel=isTravelWeek(_saveDate);   // (b): stamp the travel-week framing at seal — the timeline reads this flag, never a live recompute
   } else if(type==='monthly'){
@@ -10815,7 +11597,7 @@ function showReflection(type){
       })()}
       <div class="reflect-q">
         <div class="reflect-label">the week in one thought</div>
-        <textarea class="reflect-textarea" placeholder="Write freely..."></textarea>
+        <textarea class="reflect-textarea" id="weekly-thought" placeholder="Write freely..."></textarea>
       </div>
       <div class="reflect-q" style="margin-top:32px;padding-top:28px;border-top:1px solid rgba(0,0,0,.06)">
         <div class="reflect-label">one intention for the week ahead</div>
@@ -12298,11 +13080,49 @@ function importState(e){
 // State is never mutated; this is display-layer only.
 function _effectiveCalTheme(t){
   const v = t || 'default';
-  /* NAVY RETIRED (slide 11). 'default' used to mean navy; it now means White, so every
-     stored document changes its ink on the next load without a write. The three the
-     settings offer are 'white', 'samurai' (Red) and 'shinobi' (Charcoal). */
-  if(v === 'default' || v === 'navy') return 'white';
-  return v === 'clan' && document.body.classList.contains('dark') ? 'shinobi' : v;
+  /* ══════════ NAVY IS THE TRAVEL SCROLL NOW (James, 12 November) ══════════
+     "In travel mode let's use our redacted navy calendar, that will be the travel
+     mode cal."
+
+     Navy was retired as a CHOICE on slide 11 and was never deleted: the note left
+     then said it survives in the sheet, unreachable. It is reachable again, not as a
+     fourth pill but as a state, so the scroll itself says you are away without a
+     banner or a badge. It also already was travel's colour everywhere else: the
+     travel toggle, the travel sheet's kanji and its chosen rows are all var(--navy).
+
+     WHY THIS RETURNS 'default' RATHER THAN 'navy'. Navy is not a cal- class and never
+     was. It is the BASE .kk-body, and fourteen further rules are written against
+     .kk-outer:not([class*="cal-"]) to carry its date, its labels, its seals and its
+     glows. The three places that build the class all read 'default' as "add no
+     class", which is exactly how the navy scroll is reached. Returning 'navy' would
+     emit cal-navy, match nothing, and leave an unstyled scroll. Do not "tidy" this
+     into 'navy' without first giving that class all fifteen rules.
+
+     It is the whole scroll family, so the week, the month and the year all travel
+     together, and it follows isTravelling(), not the day: a travel period reads as
+     one period. The person's own ink is untouched in their document and comes back
+     the moment travel ends. */
+  if(typeof isTravelling === 'function' && isTravelling()) return 'default';
+  /* NAVY RETIRED AS A CHOICE (slide 11). 'default' used to mean navy; a stored
+     'default' or 'navy' now means White, so every stored document changes its ink on
+     the next load without a write. The three the settings offer are 'white',
+     'samurai' (Red) and 'shinobi' (Charcoal). */
+  let out = (v === 'default' || v === 'navy') ? 'white' : v;
+  /* ══════════ WHITE WEARS CHARCOAL AFTER DARK (James, 12 November) ══════════
+     "The White calendar at night switches to the Charcoal ink on ebony rods, as both
+     decks say, rather than darkening its paper." The build darkened White's own paper
+     to #201c18 and flipped thirteen of its rules to light ink; the decks have one
+     night scroll, Charcoal, "which fades in at night".
+
+     THE CHOICE IS NOT WRITTEN OVER. This resolves, it does not store: the document
+     still says White, the Settings pill still shows White, and morning brings the
+     white paper back. Red is a choice that holds all day and all night, and has its
+     own neon night of its own.
+
+     CLAN JOINS WHITE HERE rather than keeping its own line: it is the other light
+     paper and it was already doing exactly this. */
+  if((out === 'white' || out === 'clan') && document.body.classList.contains('dark')) return 'shinobi';
+  return out;
 }
 
 // Night is 21:00–06:00, the one rule for dark mode AND the Hokuto opening screen.
@@ -12347,13 +13167,37 @@ function isNightHours(d){
   return h >= 20 || h < 6;
 }
 
+/* ══════════ WHO REDRAWS THE SCROLL ══════════
+   The hanging scroll is built by My Bushido (the week and the month under the
+   practice) and again by Reflect (the record). Every caller that changes which ink
+   the scroll should wear called renderGoals and nothing else, which redraws one of
+   the two: change the ink while standing in Reflect and the record kept the old
+   scroll until something else caused a render. One helper, so the next caller cannot
+   get it half right. renderGoals is called either way, so My Bushido is correct
+   before you walk back into it. */
+function betaRedrawScrolls(){
+  try{ if(typeof renderGoals === 'function') renderGoals(); }catch(e){}
+  try{ if(typeof BETA_NAV !== 'undefined' && BETA_NAV === 'reflect' &&
+           typeof betaRenderReflect === 'function') betaRenderReflect(); }catch(e){}
+}
+
 function updateDarkMode(){
+  /* ══════════ THE SCROLL IS REDRAWN WHEN THE ROOM CHANGES ITS INK ══════════
+     The ink is resolved when the scroll is drawn, so a change of room has to redraw
+     it. This used to ask whether a CLAN ink was chosen, because clan was the only ink
+     that changed at night on the day the line was written. The moment White began
+     wearing Charcoal after dark, that test was the wrong question: a White user would
+     have kept the white paper on screen until something else happened to cause a
+     render. It asks the resolver instead, so an ink added later needs nobody to
+     remember this line. */
+  const KEYS=['calThemeShokunin','calThemeKaizen','calThemeIkigai'];
+  const before=KEYS.map(k=>_effectiveCalTheme(state[k]));
   const isDark=isNightHours();
   const wasDark=document.body.classList.contains('dark');
   document.body.classList.toggle('dark',isDark);
   if(isDark!==wasDark){
-    const clanActive=['calThemeShokunin','calThemeKaizen','calThemeIkigai'].some(k=>(state[k]||'default')==='clan');
-    if(clanActive&&typeof renderGoals==='function') renderGoals();
+    const after=KEYS.map(k=>_effectiveCalTheme(state[k]));
+    if(after.some((t,i)=>t!==before[i])) betaRedrawScrolls();
   }
   checkDailyNudge();
 }
@@ -12363,8 +13207,20 @@ let _touchStartX=0,_touchStartY=0;
 let _wheelAccumX=0,_wheelCooldown=false,_wheelReset=null;
 
 function initGridSwipe(){
-  const list=document.getElementById('goals-list');
-  if(!list) return;
+  try{ betaThreadBindPress(); }catch(e){}
+  /* ══════════ THE SWIPE WAS LISTENING IN THE WRONG ROOM (James, 12 November:
+     "including swipe between weeks") ══════════
+     Every one of these was attached to #goals-list and then filtered by
+     e.target.closest('.hg-wrap'), which was right when the week grid sat inside the
+     practice list. The v2 layout moved the grid into .bd-side, the column beside the
+     practice, so the filter could never match: the code was all present, correct and
+     unreachable, and the week would not move under a finger or a trackpad.
+
+     IT LISTENS ON THE DOCUMENT NOW, with the same .hg-wrap filter it always had. The
+     filter was always the real test of "is this the grid", and the host was only ever
+     a guess about where the grid would live; on the document that guess cannot be
+     wrong again, and it survives every re-render of the grid without re-binding. */
+  const list=document;
 
   // Touch: record start position
   list.addEventListener('touchstart',e=>{
@@ -13438,7 +14294,7 @@ function mergeCompletionLogs(local, cloud, untickMap){ return applyPendingUntick
 // exact ties (strict >) so all clients converge. Missing timestamps (legacy) = 0 = oldest → any real edit
 // wins, no migration. PLAN fields are NOT merged here (3b adds CAS). Reflection DELETE has no UI today;
 // if one is added, mirror the note pattern (a '' sentinel or a per-reflKey tombstone) — documented, not built.
-const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals','travelDays','projects','projectRemovals'];
+const MERGEABLE_KEYS = ['completionLog','reflections','dailyNotes','dailyNotesMeta','milestoneStamps','practiceStamps','eoySeals','seasonalReflections','clanMilestones','clanObligations','clanRemovals','travelDays','completeDays','projects','projectRemovals'];
 
 function _mondayOf(dateStr){ // Monday of dateStr's ISO week — the Mon–Sun bucket saveReflection dedups on
   const d = new Date((dateStr || '') + 'T12:00:00');
@@ -13490,6 +14346,21 @@ function mergeSealed(local, cloud, tsField){
   return out;
 }
 const unionKeys = (local, cloud) => Object.assign({}, cloud||{}, local||{}); // monotonic {k:true} stamps
+/* completeDays is NOT a monotonic set: a day can be un-ticked, so a key-union would
+   resurrect a day the other device has just cleared. Newest write per day wins, cloud
+   takes an exact tie so every client converges, and a missing ts counts as 0 so any
+   real write beats a legacy value without a migration. This is the dailyNotes rule,
+   applied to a day instead of a note. */
+const mergeCompleteDays = (local, cloud) => {
+  const out = {}, L = local || {}, C = cloud || {};
+  Object.keys(C).forEach(k => { out[k] = C[k]; });
+  Object.keys(L).forEach(k => {
+    const l = L[k], c = C[k];
+    if(c === undefined){ out[k] = l; return; }
+    out[k] = ((l && l.ts) || 0) > ((c && c.ts) || 0) ? l : c;
+  });
+  return out;
+};
 // ── Finding #1 (audit 2026-07-29) — clanMilestones/clanObligations merge ─────────────────────────────
 // These two USER-AUTHORED arrays were in NEITHER net (not MERGEABLE, not PLAN — see PLAN_KEYS note), so a
 // stale second writer clobbered them: an ADD on device A was lost when device B saved (the incident's own
@@ -13560,6 +14431,7 @@ function mergeMergeableFields(local, cloud, untickMap){
     clanObligations:     mergeClanEntries(local.clanObligations, cloud.clanObligations, clanRemovals), // id-union − removals (Finding #1)
     clanRemovals:        clanRemovals,
     travelDays:          unionKeys(local.travelDays, cloud.travelDays),   // day-keyed travel history — monotonic-add key-union, no tombstone (Travel Mode a)
+    completeDays:        mergeCompleteDays(local.completeDays, cloud.completeDays), // newest write per day wins, so a CLEAR sticks (deck slide 10)
     // KEPT DELIBERATELY, though nothing writes state.projects any more (the tree moved to
     // clanProjects/{clanId}). It now guards FROZEN rollback data: if the move is reverted,
     // this net is what the old client needs, and removing it would make the rollback a code
@@ -13960,9 +14832,24 @@ function betaRailGlow(){
     b.classList.toggle('lit', !!lit);
     b.classList.toggle('lit-bright', !!(lit && bright));
   };
+  /* ══════════ ONE LIGHT AT A TIME (deck slide 76; James, 12 November) ══════════
+     "Gold is a glow only and one lit thing at a time." Each of these was set from its
+     own predicate and neither knew about the other, so a person with a reflection
+     owed and the clan out of reach saw two gold tabs and no way to tell which one the
+     app meant.
+
+     THE SYNC PROBLEM TAKES IT, as ruled where the decks give no order, and the reason
+     holds: a reflection waits as long as you like and its window is days wide, while
+     a sync problem is work not reaching the cloud and gets worse the longer it sits.
+
+     THE OBLIGATION IS NOT TOUCHED, only the lamp. betaReflectWaiting still answers
+     true, the weekly button is still open to be pressed, and a reflection that was
+     put off comes back BRIGHT rather than merely lit when sync is well again: the
+     state is read fresh here every time, never stored. */
   const r = betaReflectWaiting();
-  set('reflect', r.any, r.deferred);
-  set('you', !!_betaSyncTrouble, false);
+  const trouble = !!_betaSyncTrouble;
+  set('you', trouble, false);
+  set('reflect', !trouble && r.any, !trouble && r.deferred);
 }
 /* The rail shows exactly when the app does. Four separate places set #app's display,
    and a fifth will appear the moment someone adds a route; watching the element is
@@ -14831,7 +15718,7 @@ function setCalTheme(cal, theme){
     state.calThemeIkigai=theme;
   }
   saveState();
-  renderGoals();
+  betaRedrawScrolls();
   _syncCalThemePills();
 }
 
