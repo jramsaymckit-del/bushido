@@ -349,6 +349,20 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--edge);min-height:100
   background:var(--scroll);border-right:1px solid rgba(0,0,0,.07);
   flex-direction:column;align-items:center;padding:22px 0 24px;gap:6px}
 body.app-on .beta-rail{display:flex}
+/* ══════════ AND NEVER OVER THE OPENING (13 November) ══════════
+   The deck: the rail "stays put on every page except onboarding and the landing
+   page." It did not. The Hokuto stage is a body-level layer and #app is displayed
+   underneath it, so app-on was on and the bottom bar drew over the ritual. At
+   390x844 the stage's buttons cleared it; at 375x667 they did not, and "I am ready"
+   could not be tapped at all: a new person on a small phone could not get past step
+   zero. Found by the live app's own deploy tier, which is the one gate v2 failed. */
+body.hk-open .beta-rail{display:none}
+/* AND NEITHER DOES THE SYNC INDICATOR. It is pinned 32px off the bottom at z-index
+   312, above everything, and on a 375x667 phone that is exactly where the opening
+   screen's buttons sit: with no network it drew over "I am ready" and a new person
+   could not get past step zero. There is nothing to sync during the opening, so it
+   has nothing to say there, and it comes back the moment the stage goes. */
+body.hk-open .cloud-sync-indicator{display:none}
 body.app-on #app{padding-left:140px}
 .br-seal{width:44px;height:44px;border-radius:3px;background:var(--seal);color:var(--white);
   font-family:'Noto Serif JP',serif;font-size:24px;line-height:44px;text-align:center;
@@ -723,6 +737,8 @@ body.dark .you-row{border-bottom-color:rgba(255,255,255,.08)}
 .you-row-t{font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink)}
 .you-row-s{font-size:11px;font-style:italic;color:var(--ink-light);margin-top:3px}
 .you-row-c{color:var(--ink-faint);font-size:15px;opacity:.5}
+.you-pills-wrap{flex-wrap:wrap;gap:6px}
+.you-pill-m{min-width:52px;text-align:center}
 .you-foot{display:flex;justify-content:space-between;align-items:center;padding:18px 4px 0 14px}
 .you-foot button{background:none;border:0;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
   font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);padding:6px 0}
@@ -1736,7 +1752,11 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 body.dark .kk-outer.cal-samurai{--neon:#FF5A5A;--neon-quiet:#C2484A;
   --neon-glow:0 0 6px rgba(255,70,70,.75),0 0 14px rgba(255,40,40,.35);
   --neon-glow-soft:0 0 5px rgba(255,70,70,.3),0 0 11px rgba(255,40,40,.14);
-  filter:drop-shadow(0 0 18px rgba(255,40,40,.28))}
+  /* LIT FROM BEHIND (James, 13 November): "Replace the scroll's edge glow with a
+     soft red glow behind it that spills onto the wall." One tight ring became two
+     shadows, the second wide and faint enough to reach past the scroll's own edge
+     onto the paper around it. Night only, Red only. */
+  filter:drop-shadow(0 0 26px rgba(255,40,40,.40)) drop-shadow(0 0 70px rgba(255,30,30,.22))}
 body.dark .kk-outer.cal-samurai .kk-body{background-color:#160A0C;
   box-shadow:inset 0 0 0 22px #2A0A0E,
     inset 8px 0 22px rgba(0,0,0,.45),inset -4px 0 14px rgba(0,0,0,.3),
@@ -1816,7 +1836,11 @@ body.dark .kk-outer.cal-samurai .hg-cell.hg-miss::after{border-color:rgba(194,72
 body.dark .kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(194,72,74,.2)}
 @media (hover:hover){body.dark .kk-outer.cal-samurai .hg-cell.hg-miss:hover::after{border-color:var(--neon-quiet)}}
 /* Shinobi calendar theme */
-.kk-outer.cal-shinobi .kk-body{background-color:#1a1a2e;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.4),inset -4px 0 14px rgba(0,0,0,.3),0 12px 40px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.25)}
+/* THE CHARCOAL PAPER IS #1E1A16 (James, 13 November: "as the token slide says").
+   It was #1a1a2e, a blue-black, and the slide has always said a warm near-black.
+   It mattered more from the day White began resolving to Charcoal after dark: beside
+   the neon Red's #160A0C the blue read as a different family of scroll. */
+.kk-outer.cal-shinobi .kk-body{background-color:#1E1A16;background-image:none;box-shadow:inset 8px 0 22px rgba(0,0,0,.4),inset -4px 0 14px rgba(0,0,0,.3),0 12px 40px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.25)}
 .kk-outer.cal-shinobi .kk-body::before{display:none}
 .kk-outer.cal-shinobi .mcal-nav-btn{color:rgba(254,252,248,.35)}
 .kk-outer.cal-shinobi .mcal-nav-btn:hover{color:rgba(254,252,248,.85)}
@@ -3734,7 +3758,7 @@ li.goal.hd-open .habit-detail{display:block}
 .cs-cal-pill[data-theme="samurai"].active{background:#B52016;border-color:#B52016;color:#FEFCF8}
 .cs-cal-pill[data-theme="shinobi"]{background:rgba(26,26,46,.25);border-color:rgba(100,100,160,.22);color:rgba(180,180,220,.4)}
 .cs-cal-pill[data-theme="shinobi"]:hover{background:rgba(26,26,46,.5);border-color:rgba(100,100,160,.4);color:rgba(220,220,255,.8)}
-.cs-cal-pill[data-theme="shinobi"].active{background:#1a1a2e;border-color:rgba(100,100,160,.45);color:#FEFCF8}
+.cs-cal-pill[data-theme="shinobi"].active{background:#1E1A16;border-color:rgba(160,150,135,.45);color:#FEFCF8}
 .cs-btn.connect{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:2px;text-transform:none;
   padding:14px 32px;background:var(--white);border:1.5px solid var(--ink);color:var(--ink);display:inline-flex;align-items:center;gap:10px}
 .cs-btn.connect:hover{background:var(--ink);color:var(--scroll)}
@@ -5679,7 +5703,9 @@ const DEFAULT_STATE = {
   srSnoozeUntil: null,
   nextId: 100,
   yearEndMode: 'calendar',      // 'calendar' | 'anniversary'
-  yearEndMonth: 12,             // 1-12, the month the year-end review fires
+  yearEndMonth: null,           // 1-12, the month the year ends; null = the month the person joined
+                                // (James, 13 Nov). Set in You, never at onboarding. A document that
+                                // already carries a number keeps it: that was the person's answer.
   calThemeShokunin: 'default',  // 'default' | 'clan' | 'samurai'
   calThemeIkigai: 'default',    // 'default' | 'clan' | 'samurai'
   calThemeKaizen: 'default',    // 'default' | 'clan' | 'samurai'
@@ -5979,10 +6005,16 @@ function hkShow(){
   const st=document.getElementById('hk-stage');
   if(!st) return;
   st.hidden=false;
+  document.body.classList.add('hk-open');   // the rail comes off the opening (13 Nov)
   const app=document.getElementById('app'); if(app) app.inert=true;   // nothing beneath is reachable
   hkStart();
 }
 function hkHide(){
+  /* THE CLASS COMES OFF FIRST AND UNCONDITIONALLY. hkHide returns early when the
+     stage is absent, and an already-onboarded person's showDashboard calls it on
+     every load: if the class were cleared after that return, a document without the
+     stage would never get its rail back. */
+  document.body.classList.remove('hk-open');
   const st=document.getElementById('hk-stage');
   if(!st) return;
   st.hidden=true;
@@ -6300,7 +6332,14 @@ function restOrMissedLine(){
    asks whether the app should SUGGEST which practice to begin with, so it does not:
    the person chooses from their own list. All three are in the report for James. */
 const RETURN_AFTER_DAYS = 7;
+/* ANSWERED IS ANSWERED, FOR THIS SITTING, whatever the cloud has caught up with.
+   returnSeen is the durable record and it is written the moment either button is
+   pressed, but a save is a round trip and a render can happen before it lands: the
+   screen came back over a person who had just dismissed it. This flag is read first
+   and is deliberately NOT persisted — tomorrow is a new day and a new judgement. */
+let _betaReturnAnswered = false;
 function betaShouldShowReturn(){
+  if(_betaReturnAnswered) return false;
   if(!state || !Array.isArray(state.kaizen) || !state.kaizen.length) return false;
   if(state.returnSeen === getDateStr()) return false;     // answered today
   if(state.beginWithOne) return false;                    // already returning
@@ -6324,6 +6363,7 @@ function betaBeginWithOneVisible(){
 function betaBeginWithOne(id){
   const k = (state.kaizen||[]).find(h => h.id === Number(id));
   if(!k) return;
+  _betaReturnAnswered = true;
   state.beginWithOne = { since: getDateStr(), chosen: k.id };
   state.returnSeen = getDateStr();
   saveState();
@@ -6331,6 +6371,7 @@ function betaBeginWithOne(id){
   renderGoals();
 }
 function betaReturnToAll(){
+  _betaReturnAnswered = true;
   state.returnSeen = getDateStr();
   state.beginWithOne = null;
   saveState();
@@ -8266,6 +8307,26 @@ function betaRecordSinceJoining(){
          '<div class="rf-history" id="rf-history">' + html + '</div>';
 }
 
+/* ══════════ ONE YEARLY REVIEW, TWO STEPS (James, 13 November) ══════════
+   Step one closes the year: the two questions about the strands and what the year
+   taught, sealed. Step two opens the next: the year's record read back, rated, and
+   next year planned from it. The button goes to whichever step is in front of you,
+   and sealing the first leads into the second rather than leaving a disabled button
+   on a page for a person to come back to. */
+function betaOpenYearly(){
+  const closed = (typeof hasCompletedAnnualReflection === 'function') && hasCompletedAnnualReflection();
+  if(closed){ if(typeof openEOYReview === 'function') openEOYReview(); return; }
+  showReflection('annual');
+}
+/* THE MONTH IT FALLS IN, in words, for the button's title. */
+function betaYearlyWhen(){
+  const m = getYearEndMonth();
+  const name = new Date(2000, m, 1).toLocaleDateString('en-GB', { month: 'long' });
+  return yearEndMonthIsDefault()
+    ? 'Your year ends in ' + name + ', the month you began. Change it under You.'
+    : 'Your year ends in ' + name + '. Change it under You.';
+}
+
 function betaRenderReflect(){
   const host = document.getElementById('reflect-body');
   if(!host) return;
@@ -8293,15 +8354,22 @@ function betaRenderReflect(){
       '<span id="monthly-btn-slot"></span>' +
     '</div>' +
 
+    /* ══════════ FOUR BUTTONS, AND ONE YEAR (James, 13 November) ══════════
+       "One Yearly review in two steps, close the year, then open the next. Reflect
+       shows four buttons: Weekly, Monthly, Seasonal, Yearly."
+
+       年 Yearly was two launchers, Annual and Year-end, the second disabled until
+       the first was sealed. They were never two occasions: one closes the year and
+       the other opens the next, which is one review with a seal in the middle. The
+       button says which step is in front of you and betaOpenYearly takes you to it.
+       Nothing is deleted: both halves are the screens they always were. */
     '<div class="rf-sec-label">the season and the year</div>' +
     '<div class="rf-launchers">' +
       '<button class="btn btn-ghost rf-btn' + (sr ? ' rf-btn-due' : '') + '"' +
         (seasonDone && !sr ? ' disabled title="sealed this season"' : ' onclick="srOpenModal()"') + '>' +
         '季 &nbsp;' + (sr ? 'Seasonal review' : seasonDone ? 'Season sealed' : 'Seasonal review') + '</button>' +
-      '<button class="btn btn-ghost rf-btn" onclick="showReflection(\'annual\')">年 &nbsp;Annual</button>' +
-      '<button class="btn btn-ghost rf-btn"' +
-        (annualSealed ? ' onclick="openEOYReview()"' : ' disabled title="the annual reflection unlocks it"') +
-        '>年末 &nbsp;Year-end</button>' +
+      '<button class="btn btn-ghost rf-btn" id="yearly-btn" onclick="betaOpenYearly()" title="' +
+        betaYearlyWhen() + '">年 &nbsp;' + (annualSealed ? 'Yearly · open the next' : 'Yearly') + '</button>' +
     '</div>' +
     (BETA_HIYOKU_SIDE && betaInRelationship()
       ? '<div class="rf-note">比翼 &nbsp;Hiyoku is part of your year-end.</div>' : '') +
@@ -8537,6 +8605,10 @@ function youPanelHtml(){
   const inkNow = (ink === 'default' || ink === 'navy') ? 'white' : ink;
   const night = youNightMode();
   const vis = (typeof _visMode !== 'undefined' && _visMode) ? _visMode : (state.visMode || 'samurai');
+  const joinedMonth = state.yearStartDate
+    ? new Date(String(state.yearStartDate).slice(0,10) + 'T12:00:00')
+        .toLocaleDateString('en-GB', { month: 'long' })
+    : '';
   return '<h3 class="you-panel-h">Settings</h3>' +
 
     '<div class="you-sec">the practice</div>' +
@@ -8562,6 +8634,18 @@ function youPanelHtml(){
                night, 'youSetNight') +
     '</div>' +
 
+    /* ══════════ WHEN YOUR YEAR ENDS (James, 13 November) ══════════
+       "The year date becomes a setting in You, defaulting to the day the person
+       joined." It was written once at onboarding and could not be reached again;
+       James's own plan said December and nothing in the app could change it. */
+    '<div class="you-sec">the year</div>' +
+    '<div class="you-item"><div class="you-item-t">When your year ends</div>' +
+      '<div class="you-item-s">Your Yearly review opens in this month: one review in two ' +
+      'steps, closing the year and then opening the next. It begins as the month you ' +
+      'joined' + (joinedMonth ? ', ' + joinedMonth : '') + '.</div>' +
+      youYearPicker() +
+    '</div>' +
+
     '<div class="you-sec">the clan</div>' +
     '<div class="you-item"><div class="you-item-t">How the clan sees you</div>' +
       '<div class="you-item-s">Samurai shows your mark and your week; Shinobi a plain mark.</div>' +
@@ -8582,6 +8666,27 @@ function youPanelHtml(){
 
 function youTogglePeace(){ state.showPeaceBar = !(state.showPeaceBar === true); saveState(); betaRenderYou(); try{ renderGoals(); }catch(e){} }
 function youToggleSenseiNote(){ state.senseiReadsDayNote = !(state.senseiReadsDayNote === true); saveState(); betaRenderYou(); }
+/* TWELVE MONTHS, AND A WAY BACK TO THE DEFAULT. The chosen month is shown as chosen
+   even when it is the default, so a person can always see which month their year
+   ends in; "the month I joined" is how they give the choice back. */
+function youYearPicker(){
+  const cur = getYearEndMonth();
+  const isDefault = yearEndMonthIsDefault();
+  const names = [...Array(12).keys()].map(i =>
+    new Date(2000, i, 1).toLocaleDateString('en-GB', { month: 'short' }));
+  const btns = names.map((nm, i) =>
+    '<button class="you-pill you-pill-m' + (i === cur ? ' on' : '') +
+    '" onclick="youSetYearEnd(' + (i + 1) + ')">' + nm + '</button>').join('');
+  return '<div class="you-pills you-pills-wrap">' + btns + '</div>' +
+    (isDefault ? '' :
+      '<div class="you-pills" style="margin-top:6px">' +
+      '<button class="you-pill" onclick="youSetYearEnd(null)">the month I joined</button></div>');
+}
+function youSetYearEnd(m){
+  state.yearEndMonth = (m === null || m === undefined) ? null : Number(m);
+  saveState(); betaRenderYou();
+  try{ betaRailGlow(); }catch(e){}
+}
 function youSetInk(v){ state.calThemeKaizen = v; state.calThemeShokunin = v; state.calThemeIkigai = v;
   saveState(); betaRenderYou(); betaRedrawScrolls(); }
 function youSetNight(v){ state.nightMode = v; saveState(); betaRenderYou();
@@ -10698,16 +10803,32 @@ function needsMonthlyReflection(){
   );
 }
 
+/* ══════════ WHEN A PERSON'S YEAR ENDS (James, 13 November) ══════════
+   "The year date becomes a setting in You, defaulting to the day the person joined."
+
+   It used to be yearEndMode, a choice between 'calendar' and 'anniversary' made once
+   at onboarding with no control anywhere afterwards: James's own plan said December
+   and nothing in the app could change it. There is one value now, the month, and it
+   is set in You.
+
+   THE DEFAULT IS THE MONTH YOU JOINED, and it is a default rather than a write: a
+   document that has never been asked carries no month, and this answers with the
+   month of yearStartDate. Documents that WERE asked, at onboarding, keep the answer
+   they gave; it is the person's choice and not a default to be overridden. The app's
+   year windows are months wide, so the setting is a month, which is why James's "my
+   year ends 31 December" is December here.
+
+   yearEndMode is no longer read. It stays in the document and in the sync lists so a
+   rollback finds it, and nothing writes it any more. */
 function getYearEndMonth(){
-  // Returns the 0-indexed month (0=Jan) when the user's year ends
-  if((state.yearEndMode||'calendar')==='anniversary'&&state.yearStartDate){
-    const start=new Date(state.yearStartDate);
-    const anniv=new Date(start);
-    anniv.setFullYear(anniv.getFullYear()+Math.ceil((new Date()-start)/(1000*60*60*24*365)));
-    return anniv.getMonth();
+  if(state.yearEndMonth) return state.yearEndMonth-1;   // 1-12 as stored, 0-indexed out
+  if(state.yearStartDate){
+    const d=new Date(String(state.yearStartDate).slice(0,10)+'T12:00:00');
+    if(!isNaN(d)) return d.getMonth();
   }
-  return (state.yearEndMonth||12)-1; // calendar mode — stored as 1-12, convert to 0-indexed
+  return 11;                                            // December, for a plan with no beginning
 }
+function yearEndMonthIsDefault(){ return !state.yearEndMonth; }
 
 function getYearEndYear(){
   const today=new Date();
@@ -11534,10 +11655,10 @@ function saveReflection(type){
       <div style="font-family:'Noto Serif JP',serif;font-size:18px;color:var(--ink);margin-bottom:8px;letter-spacing:2px">sealed.</div>
       <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:32px">your reflection has been kept</div>
       <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);margin:0 0 28px"></div>
-      <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);margin-bottom:24px;line-height:1.8">The Year-End Review is now open.<br>Your year of data is waiting.</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);margin-bottom:24px;line-height:1.8">The year is closed.<br>Now open the next one.</div>
       <div style="display:flex;gap:12px;justify-content:center">
         <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border:none;background:none;color:var(--ink-faint);cursor:pointer" onclick="closeReflection()">later</button>
-        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="closeReflection();openEOYReview()">Enter the Review →</button>
+        <button style="font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;border:1.5px solid var(--red);background:none;color:var(--red);cursor:pointer" onclick="closeReflection();openEOYReview()">Open the next year →</button>
       </div>
     </div>`;
   } else {
@@ -11630,9 +11751,9 @@ function showReflection(type){
       <div class="reflect-q"><div class="reflect-label">What did this year teach you?</div>
         <textarea class="reflect-textarea" style="min-height:120px" placeholder="The lessons of this cycle, written honestly..."></textarea></div>
       <div style="margin-top:8px;padding:14px 16px;border-left:2px solid rgba(204,53,41,.15);font-family:'Noto Serif JP',serif;font-size:11px;font-style:italic;color:var(--ink-faint);line-height:1.8">
-        Sealing this reflection will unlock your Year-End Review — where your year's data becomes the ground for setting new goals.
+        This is the first step of your Yearly review: it closes the year. The second opens the next, with the year you have just closed as the ground to set it on.
       </div>
-      <div class="form-actions"><button class="btn btn-red" onclick="saveReflection('annual')">Seal and begin anew</button></div>`;
+      <div class="form-actions"><button class="btn btn-red" onclick="saveReflection('annual')">Seal, and open the next year</button></div>`;
   }
   rfCardBack();   // after the branch that filled the card, never before
 }
