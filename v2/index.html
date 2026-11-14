@@ -4986,6 +4986,8 @@ body.dark .cn-wd.ahead{background:rgba(255,255,255,.08)}
   .cn-mark-name{font-size:13px}
 }
 
+.cn-mark.is-open .cn-hanko{box-shadow:0 0 0 2px var(--scroll,#F9F4EA),0 0 0 3px var(--red),0 2px 7px rgba(0,0,0,.22)}
+#cn-detail{margin-top:22px}
 .cn-detail-back{display:block;background:none;border:0;padding:18px 0 14px;cursor:pointer;
   font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;
   color:var(--ink-faint)}
@@ -14476,9 +14478,15 @@ function cnOpenMember(uid){
     if(mine) found = true;
   });
   if(!found) return;
+  /* THE SAME MARK AGAIN PUTS THE CARD AWAY. */
+  if(_cnOpenUid === uid && detail.style.display !== 'none'){ cnCloseMember(true); return; }
   _cnOpenUid = uid;
   detail.style.display = 'block';
-  detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('#cn-marks .cn-mark').forEach(function(m){
+    m.classList.toggle('is-open', (m.getAttribute('onclick') || '').indexOf("'" + uid + "'") !== -1); });
+  /* It is under the marks now, so the page moves only as far as it must to show it,
+     and not at all when it is already in view. */
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 /* THE CARDS ARE REDRAWN ON EVERY SAVE, all of them. If one is open, the others are
    put away again afterwards, or a tick anywhere in the app would bring the whole
@@ -14649,12 +14657,13 @@ function cnToggleYear(force){
     if(head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
-function cnCloseMember(){
+function cnCloseMember(stay){
   _cnOpenUid = null;
   var detail = document.getElementById('cn-detail');
   if(detail) detail.style.display = 'none';
-  var head = document.getElementById('cn-head');
-  if(head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('#cn-marks .cn-mark.is-open').forEach(function(m){ m.classList.remove('is-open'); });
+  /* The card closes where you are. It no longer throws the page back to the top:
+     it sits under the marks, so there is nowhere to be returned from. */
 }
 function renderClanRows(){
   var wrap=document.getElementById('clan-exp-members');
@@ -16106,6 +16115,18 @@ function setupNavSquish(){
         <div class="cn-marks" id="cn-marks"></div>
       </div>
       <!-- ══════════ /THE PEOPLE ══════════ -->
+      <!-- ══════════ A MARK OPENS THAT MEMBER'S CARD ══════════
+           One card, the tapped member's, which answers the mobile deck's open
+           question "What does tapping a member show?".
+           IT OPENS RIGHT UNDER THE MARKS (James, 14 November): it used to sit at the
+           foot of the page and the tap scrolled you all the way down to it. -->
+      <div id="cn-detail" style="display:none">
+      <button class="cn-detail-back" id="cn-detail-back" onclick="cnCloseMember()">&times; &nbsp;close</button>
+
+      <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
+      <div id="clan-active-warriors"></div>
+
+      </div><!-- /cn-detail -->
       <!-- ══════════ THE CLAN'S AGGREGATE CARD (James, 14 November) ══════════
            Back, as it stands in v1: "the clan section is missing the clan aggregate
            card that lives on the current v1 version of the app." The week's completion
@@ -16230,16 +16251,6 @@ function setupNavSquish(){
            that used to BE the Clan page are what a mark opens. cnOpenMember shows
            this and brings that member's card to the top of the screen. -->
 
-      <!-- ══════════ A MARK OPENS THAT MEMBER'S CARD ══════════
-           One card, the tapped member's, which answers the mobile deck's open
-           question "What does tapping a member show?". -->
-      <div id="cn-detail" style="display:none">
-      <button class="cn-detail-back" id="cn-detail-back" onclick="cnCloseMember()">&#8249; &nbsp;the hall</button>
-
-      <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
-      <div id="clan-active-warriors"></div>
-
-      </div><!-- /cn-detail -->
 
       <!-- The clan calendar hangs in the hall's right-hand column now (#clan-calendar-mount
            above), unchanged inside: "the clan's week, good as is". -->
