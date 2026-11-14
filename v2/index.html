@@ -478,6 +478,19 @@ body.dark .bd-alcove{background:rgba(255,255,255,.035);border-bottom-color:rgba(
 .bd-alcove #ryughi-tagline{margin-top:12px !important}
 .bd-alcove .meditation{margin-top:2px}
 
+/* THE OPEN DRAWER TAKES THE PHONE'S WIDTH (mobile slide 5). Below 900 the dojo names
+   stand inside the alcove's side padding, which left the vision a column a hundred
+   and sixty pixels wide. While it is open they are put away and the padding goes. */
+@media(max-width:899px){
+  /* The alcove bleeds past the paper's gutter by --alcove-bleed on each side, so the
+     drawer's own margin has to account for it, or the text runs off both edges. */
+  /* Measured, not reasoned: at 390 and 360 the alcove's edge sits 24px off-screen
+     (its 48px bleed over a 24px gutter), so a padding of the bleed less 4 lands the
+     drawer 20px in from each edge of the screen. */
+  .bd-alcove.rv-open{padding-left:calc(var(--alcove-bleed) - 4px);padding-right:calc(var(--alcove-bleed) - 4px)}
+  .bd-alcove.rv-open #alcove-dojos{display:none !important}
+}
+
 /* #beta-split is now the alcove's two pinned columns rather than a bar of its own.
    The id and the .beta-side children are unchanged on purpose: every gate that asks
    "#beta-split .beta-side[data-side=…]" is asking the right question still. */
@@ -600,6 +613,23 @@ body.dark .bd-panel{border-left-color:rgba(255,255,255,.1)}
 .bd-scrim[hidden]{display:none}
 @media(max-width:899px){ .bd-panel{width:100%;max-width:100%} }
 
+/* ── an empty dojo ── */
+.bd-empty-dojo{padding:34px 4px 30px;text-align:left}
+.bde-lead{font-family:'Noto Serif JP',serif;font-size:21px;color:var(--ink);margin:0 0 10px;line-height:1.35}
+.bde-body{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);
+  margin:0 0 22px;line-height:1.8}
+.bde-btn{background:none;border:1px solid var(--ink);padding:13px 30px;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink)}
+.bde-btn:hover{border-color:var(--red);color:var(--red)}
+.bdg-note{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);margin:0 0 14px;line-height:1.8}
+.bdg-list{border-top:1px solid rgba(0,0,0,.1)}
+.bdg-row{display:flex;align-items:baseline;gap:12px;width:100%;padding:14px 2px;background:none;border:0;
+  border-bottom:1px solid rgba(0,0,0,.1);text-align:left;cursor:pointer;font-family:inherit;color:var(--ink)}
+.bdg-text{flex:1;font-family:'Noto Serif JP',serif;font-size:13px;line-height:1.6}
+.bdg-where{flex:none;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
+.bdg-row.is-here .bdg-where{color:var(--red)}
+body.dark .bdg-list,body.dark .bdg-row{border-color:rgba(255,255,255,.12)}
+
 /* THE FUSUMA (deck slide 10): entering a dojo slides My Bushido aside rather than
    swapping it. The page it reveals is the same page, which is the point. */
 .bd-alcove.bd-slide-out{animation:bdFusumaOut .15s cubic-bezier(0.4,0,1,1) forwards}
@@ -667,6 +697,20 @@ body.dark .rf-launchers,body.dark .rf-row{border-color:rgba(255,255,255,.12)}
 .rf-btn[disabled]{cursor:default}
 .rf-note{text-align:center;font-size:10px;line-height:1.9;color:var(--ink-faint);opacity:.7;margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto}
 .rf-record{margin-top:6px}
+/* ══════════ THE REFLECT CALENDAR SHOWS WHAT WAS WRITTEN (James, 14 November) ══════════
+   "The Reflect calendar shows rows of small red dots under each date, not the 省 mark
+   the caption describes. Make it match: 省 on each day written on, 週 on each sealed
+   week, last month's 月 at the top."
+
+   The dots are the practices kept that day. They belong to the month on My Bushido,
+   which is the same builder; on Reflect they buried the one mark this calendar is
+   for, an 8px 省 under a row of ten dots. Here the dots are not drawn, and 省 is set
+   at a size that reads as the day's mark. The weeks' 週 and the month's 月 were
+   already drawn by the builder whenever a week or a month has been sealed. */
+.rf-record .mcal-dots{display:none}
+.rf-record .mcal-cell.has-note .mcal-note-mark{position:static;display:block;font-size:15px;
+  line-height:1;margin-top:5px;letter-spacing:0}
+.rf-record .wk-sealed{font-size:15px;opacity:1}
 /* ══════════ REFLECT, ONE CENTRED COLUMN AT EVERY WIDTH (James, 13 November) ══════════
    It was two columns on the desk, from desktop deck slide 15. This ruling overrides
    that slide and both decks are updated. One measure, centred, at 390 and at 1440
@@ -1278,6 +1322,24 @@ body.dark{
    the two can be in effect at a time. The washed row is the same in both, because in
    both it means the same thing. */
 #goals-list[data-lens] .goal.strand-glow .beta-side-mark{color:var(--red)}
+/* ══════════ THE FIRST CLICK LIGHTS IN THE DOJO'S OWN COLOUR (James, 14 November) ══════════
+   "The first click on Ikigai and Shokunin should highlight their stuff in their
+   respective dojo colours."
+
+   This reverses the correction of 12 November, which kept the dojo colour inside the
+   room and lit the rows in red from outside it. From outside, red said "something is
+   lit" but not which dojo; with two dojos a tap apart, the colour is the answer.
+
+   What takes the colour: each lit row's wash, its edge and its side mark. What does
+   not: the dojo's NAME, which stays red when lit as the decks lock it ("sides are ink
+   and turn red when lit"), and every row that is not lit. The strand filter still
+   lights in red, so the two filters can still be told apart. */
+#goals-list[data-lens="shokunin"] .goal.strand-glow{background:var(--side-shokunin-row-wash);border-left-color:var(--side-shokunin-row-edge)}
+#goals-list[data-lens="shokunin"] .goal.strand-glow .beta-side-mark{color:var(--side-shokunin-text)}
+#goals-list[data-lens="ikigai"] .goal.strand-glow{background:var(--side-ikigai-row-wash);border-left-color:var(--side-ikigai-row-edge)}
+#goals-list[data-lens="ikigai"] .goal.strand-glow .beta-side-mark{color:var(--side-ikigai-text)}
+#goals-list[data-lens="hiyoku"] .goal.strand-glow{background:var(--side-hiyoku-row-wash);border-left-color:var(--side-hiyoku-row-edge)}
+#goals-list[data-lens="hiyoku"] .goal.strand-glow .beta-side-mark{color:var(--side-hiyoku-text)}
 /* ═══ THE DOOR (dojos design, step 1 · reshaped 3 Nov) ══════════════
    IT WAS A SECOND HEADER STACKED ON THE FIRST. A washed box with its own kanji,
    its own back button, a vision, a five-year line, five strand rows and a note,
@@ -1475,6 +1537,22 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 @media (hover:hover){.check:hover{opacity:.7;border-color:var(--red)}}
 .check.done{background:var(--red);border-color:var(--red);opacity:1}
 .check.done::after{content:'';width:8px;height:8px;background:var(--scroll);border-radius:50%}
+/* ══════════ THE BRUSH, PRESSED DOWN (James, 14 November) ══════════
+   On the day's list a kept practice is a dab of the brush, not a printed disc. The
+   ink pools darker at the centre, the shape is a little out of round, and the filter
+   declared at the top of <body> tears the edge and drags dry streaks through it.
+   The neat paper dot at the centre goes: a pressed brush does not leave one.
+   Three seeds by position, so neighbours differ.
+
+   Only on #goals-list. The week grid's small dots and every other tick in the app
+   keep the plain disc, where 5px of noise would turn a dot into a smudge. */
+#goals-list .check.done{
+  background:radial-gradient(circle at 46% 44%, #A92219 0%, var(--red) 46%, #D2473B 100%);
+  border-color:var(--red);border-radius:49% 51% 47% 53% / 53% 48% 52% 47%;
+  filter:url(#brushDab1)}
+#goals-list li.goal:nth-child(3n+2) .check.done{filter:url(#brushDab2);border-radius:52% 48% 53% 47% / 47% 53% 48% 52%}
+#goals-list li.goal:nth-child(3n) .check.done{filter:url(#brushDab3);border-radius:47% 53% 50% 50% / 51% 47% 53% 49%}
+#goals-list .check.done::after{display:none}
 
 .goal-content{flex:1}
 .goal-title{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;color:var(--ink);line-height:1.5}
@@ -1612,6 +1690,7 @@ body.on-dashboard #primary-bushido > header.header + .divider{display:none}
 .hg-day-head{text-align:center;padding:8px 2px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);line-height:1.7}
 .hg-day-head.is-today{color:var(--red)}
 .hg-date-num{font-size:10px;font-weight:700;display:block}
+.hg-day-pip{display:block;width:5px;height:5px;border-radius:50%;margin:3px auto 0}
 .hg-label{padding:8px 10px;font-size:10px;color:rgba(255,255,255,.55);line-height:1.4;display:flex;align-items:center}
 .hg-cell{height:32px;display:flex;align-items:center;justify-content:center;position:relative;touch-action:manipulation}
 .hg-cell.hg-today-col:not(.hg-off){background:transparent}
@@ -2191,14 +2270,17 @@ body.dark .kk-outer.cal-samurai .hg-cell.hg-future::after{border-color:rgba(194,
    drawn by a repeating gradient whose period is the line-height, offset so each
    rule falls under its line rather than through it. */
 .daily-note{width:100%;font-family:'Noto Serif JP',serif;font-size:14px;font-weight:400;
-  color:var(--ink);border:1px solid rgba(0,0,0,.09);
-  background-color:var(--paper-raised,rgba(255,255,255,.34));
+  color:var(--ink);border:0;background-color:transparent;
   background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,
     rgba(0,0,0,.07) 27px,rgba(0,0,0,.07) 28px);
   background-position:0 11px;background-repeat:repeat;
-  padding:10px 15px 14px;outline:none;resize:none;min-height:150px;line-height:28px;
-  transition:border-color .2s;display:block}
-.daily-note:focus{border-color:rgba(0,0,0,.2)}
+  padding:10px 2px 14px;outline:none;resize:none;min-height:150px;line-height:28px;
+  display:block}
+/* NO BOX (James, 14 November): "get rid of the box edges so it is more seamless and
+   integrated." The decks draw the note on a bordered card of raised paper; James saw
+   it built and took the card away. The note is written straight onto the page: the
+   ruled lines stay, the border and the raised ground go, and the writing starts at
+   the same left edge as the date above it and the rows below. */
 /* 日 AND THE DATE, with the label held to the right, as both decks draw it. It was
    a grey 省 beside a stacked "daily reflection" over an italic date. */
 .daily-note-label{display:flex;align-items:baseline;gap:10px;margin-bottom:11px}
@@ -2881,11 +2963,8 @@ body.dark .stats-row{border-bottom-color:rgba(255,255,255,.04)}
 body.dark .stats-cols{border-bottom-color:rgba(255,255,255,.08)}
 /* THE SHEET AFTER DARK: the card and its rules in white rather than black, or the
    border would vanish into the paper and the rules would not be there at all. */
-body.dark .daily-note{border-color:rgba(255,255,255,.1);
-  background-color:rgba(255,255,255,.035);
-  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,
+body.dark .daily-note{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,
     rgba(255,255,255,.07) 27px,rgba(255,255,255,.07) 28px)}
-body.dark .daily-note:focus{border-color:rgba(255,255,255,.22)}
 body.dark .reflect-nudge{border-color:rgba(var(--red-rgb),.25);border-left-color:var(--red)}
 body.dark .reflect-nudge.review-card{border-color:rgba(var(--red-rgb),.12);border-left-color:rgba(var(--red-rgb),.4)}
 body.dark .add-trigger:hover{opacity:.5}
@@ -4567,8 +4646,16 @@ html.beta-cold .beta-splash{display:flex}
    so it reads as a grey OUTLINE around the brush rather than ink soaking outward. */
 .bsp-bleed{stroke-width:34;opacity:.11;stroke-dasharray:950;stroke-dashoffset:950;filter:blur(3px)}
 .bsp-tail{stroke-width:5;opacity:0;stroke-dasharray:90;stroke-dashoffset:90}
-.bsp-kanji{position:relative;font-family:'Noto Serif JP',serif;font-size:92px;font-weight:200;
-  letter-spacing:2px;color:#1A1A1A;opacity:0;filter:blur(6px);user-select:none}
+.bsp-kanji{position:absolute;right:max(34px,14%);bottom:max(84px,17%);display:flex;flex-direction:column;
+  align-items:center;gap:30px;color:#1A1A1A;opacity:0;filter:blur(6px);user-select:none}
+.bsp-words{writing-mode:vertical-rl;text-orientation:upright;font-family:'Noto Serif JP',serif;
+  font-size:15px;font-weight:400;letter-spacing:7px;line-height:1}
+.bsp-seal{width:34px;height:34px;background:var(--mark-dao) center/contain no-repeat}
+/* THE ENSO SITS ABOVE THE MIDDLE, as the deck draws it, leaving the lower right to
+   the inscription. On a wide window the words stay beside the stroke rather than
+   out at the far edge of the glass. */
+.bsp-stage{margin-bottom:11vh}
+@media(min-width:900px){ .bsp-kanji{right:calc(50% - 290px)} }
 .beta-splash.night .bsp-kanji{color:#EDE8DE}
 .bsp-sync{position:absolute;bottom:17%;font-size:9px;letter-spacing:3px;text-transform:uppercase;
   color:#8A8578;opacity:0;transition:opacity .4s ease}
@@ -4904,6 +4991,35 @@ body.dark .cn-wd.ahead{background:rgba(255,255,255,.08)}
   color:var(--ink-faint)}
 .cn-detail-back:hover{color:var(--red)}
 
+.cn-year-link{display:block;margin:12px 0 0 auto;background:none;border:0;padding:4px 0;cursor:pointer;
+  font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint)}
+.cn-year-link:hover{color:var(--red)}
+
+/* ── the clan's calendar: a month on a scroll ── */
+.cn-month .kk-body{padding:16px 18px 18px}
+.cnm-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cnm-title{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:600;color:rgba(26,18,16,.6)}
+.cnm-btn{background:none;border:0;cursor:pointer;font-size:17px;line-height:1;padding:2px 8px;color:rgba(26,18,16,.5)}
+.cnm-btn:hover{color:var(--red)}
+.cnm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cnm-dh{font-size:8px;letter-spacing:1px;text-transform:uppercase;text-align:center;color:rgba(26,18,16,.5);padding-bottom:5px}
+.cnm-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:rgba(26,18,16,.035);border-radius:3px;border:1px solid transparent;font-size:11px;color:rgba(26,18,16,.62);padding:0}
+.cnm-cell.is-empty{background:none}
+.cnm-cell.is-today{border-color:var(--red);color:var(--red);font-weight:700}
+button.cnm-cell{cursor:pointer;font-family:inherit}
+.cnm-cell.has-ev{color:rgba(26,18,16,.9)}
+.cnm-pip{width:5px;height:5px;border-radius:50%;background:var(--red)}
+.cnm-pips{display:flex;gap:2px;justify-content:center;min-height:5px}
+.cnm-ms-who{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;flex:none;font-weight:700}
+.cnm-day{margin-top:12px;padding-top:10px;border-top:1px solid rgba(26,18,16,.1);min-height:20px}
+.cnm-day-row{display:flex;gap:12px;align-items:baseline;padding:3px 0}
+.cnm-day-date{font-family:'Noto Serif JP',serif;font-size:12px;color:var(--red);flex:none}
+.cnm-day-title{font-family:'Noto Serif JP',serif;font-size:13px;color:rgba(26,18,16,.85)}
+.cnm-none{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:rgba(26,18,16,.5)}
+
+.cn-aggregate{margin-top:34px}
+
 /* ── two columns on a desk (desktop slide 19) ─────────────────────────────── */
 .cn-right-label{margin-top:34px}
 @media(min-width:1100px){
@@ -5142,6 +5258,46 @@ try {
 </script>
 </head>
 <body>
+<!-- ══════════ THE BRUSH, PRESSED DOWN (James, 14 November) ══════════
+     "When one ticks a box, can we make it look more rough, like a brush pushed down
+     onto the paper?" Three filters, the same recipe with a different seed, so three
+     ticks in a row are three different dabs and not one stamp repeated.
+
+       the edge   fractal noise pushes the disc's outline about, so it is torn where
+                  the bristles lifted and not a compass circle;
+       the ink    a second, stretched noise is cut out of it in a few thin streaks,
+                  the dry drag at the edge of a loaded brush. A FEW: the first pass
+                  cut the noise at its midpoint and the dab came out striped like a
+                  barcode. The cut now takes only the top of the noise, so the mark
+                  is solid ink with two or three dry gaps in it. (And the second
+                  pass had the sign backwards and cut everything BUT the streaks.)
+     Nothing here is an image and nothing is drawn per tick: it is the same red disc
+     the row always filled, seen through the filter. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="brushDab1" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.11" numOctaves="2" seed="3" result="edge"/>
+      <feDisplacementMap in="SourceGraphic" in2="edge" scale="5.5" xChannelSelector="R" yChannelSelector="G" result="torn"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.3" numOctaves="1" seed="11" result="bristle"/>
+      <feColorMatrix in="bristle" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 16 -10.1" result="streaks"/>
+      <feComposite in="torn" in2="streaks" operator="out"/>
+    </filter>
+    <filter id="brushDab2" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="2" seed="17" result="edge"/>
+      <feDisplacementMap in="SourceGraphic" in2="edge" scale="6" xChannelSelector="G" yChannelSelector="R" result="torn"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.3 0.02" numOctaves="1" seed="29" result="bristle"/>
+      <feColorMatrix in="bristle" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 16 -10.3" result="streaks"/>
+      <feComposite in="torn" in2="streaks" operator="out"/>
+    </filter>
+    <filter id="brushDab3" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="41" result="edge"/>
+      <feDisplacementMap in="SourceGraphic" in2="edge" scale="5" xChannelSelector="R" yChannelSelector="B" result="torn"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.025 0.28" numOctaves="1" seed="53" result="bristle"/>
+      <feColorMatrix in="bristle" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 16 -10.0" result="streaks"/>
+      <feComposite in="torn" in2="streaks" operator="out"/>
+    </filter>
+  </defs>
+</svg>
 <!-- ═══ 2.0 STEP 8: THE LOADING SCREEN ═════════════════════════════════════
      Body level, outside .scroll, for the clip-path reason in the CSS above. The
      ensō path is the seasonal review's, byte for byte, so the two gestures cannot
@@ -5154,8 +5310,13 @@ try {
       <path class="bsp-tail"  d="M 168,56 C 176,49 182,44 188,40"/>
     </svg>
     <div class="bsp-mark" aria-hidden="true"></div>
-    <div class="bsp-kanji">道</div>
   </div>
+  <!-- THE INSCRIPTION AND THE SEAL, low at the right (James, 14 November; mobile deck,
+       "The ensō is the loading screen"). 道 was typeset at 92px inside the ensō. The
+       deck's note: "the large typeset 道 is gone", "the seal small in a corner".
+       別無工夫 stands vertically and the painted 道 seal is pressed under it. The
+       class is kept because it carries the settle the stroke is timed against. -->
+  <div class="bsp-kanji"><span class="bsp-words">別無工夫</span><span class="bsp-seal" role="img" aria-label="道"></span></div>
   <div class="bsp-sync">syncing</div>
 </div>
 
@@ -5757,7 +5918,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 stage 1 · James only · 2026-11-13';
+const BUILD_ID = 'v2 stage 1 · James only · 2026-11-14';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -6596,11 +6757,20 @@ const RETURN_AFTER_DAYS = 7;
    screen came back over a person who had just dismissed it. This flag is read first
    and is deliberately NOT persisted — tomorrow is a new day and a new judgement. */
 let _betaReturnAnswered = false;
+function betaHasEverTicked(){
+  const log = (state && state.completionLog) || {};
+  return Object.keys(log).some(function(d){ return Array.isArray(log[d]) && log[d].length > 0; });
+}
 function betaShouldShowReturn(){
   if(_betaReturnAnswered) return false;
   if(!state || !Array.isArray(state.kaizen) || !state.kaizen.length) return false;
   if(state.returnSeen === getDateStr()) return false;     // answered today
   if(state.beginWithOne) return false;                    // already returning
+  /* IT WAITS FOR A FIRST TICK (James, 14 November). "Fall seven times, rise eight" is
+     the wrong sentence for someone who has not begun: they did not fall. Two of the
+     ten live plans are complete and have never been ticked, and would have met the
+     proverb the first time v2 opened. */
+  if(!betaHasEverTicked()) return false;
   return missedDayRun() >= RETURN_AFTER_DAYS;
 }
 /* WHICH PRACTICES ARE VISIBLE WHILE RETURNING, or null when the whole list is.
@@ -6724,6 +6894,8 @@ function betaThreadFlash(habitId){
   if(getComputedStyle(li).position==='static') li.style.position='relative';
   li.appendChild(el);
   _thTimer=setTimeout(()=>{ el.remove(); }, 1800);
+  /* A ceremony earned by this same tick waits until the thread has gone. */
+  if(typeof _animThreadUntil !== 'undefined') _animThreadUntil=Date.now()+1800;
 }
 /* LONG-PRESS OPENS THE WHOLE THREAD (slide 47). Read-only: the deck's own open
    question is whether each node should be tappable, and that is James's to answer. */
@@ -7188,7 +7360,13 @@ function buildKaizenGrid(){
         <div class="hg-label-cell"></div>
         ${days.map((d,i)=>{
           const isT=isCurrentWeek&&i===todayDayIdx;
-          return `<div class="hg-day-head${isT?' is-today':''}${completeDays[i]?' hg-col-complete':''}" data-col="${i}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span></div>`;
+          /* A DAY THAT CARRIES A DATE SAYS SO ON THE WEEK (James, 14 November): a
+             milestone of your own, or something the clan agreed to. The month and the
+             year already marked them; the week, where the day is actually lived, did
+             not. One pip under the date, named on hover and to a screen reader. */
+          const _wkMils=(typeof ipcMilestonesOnDay==='function')?ipcMilestonesOnDay(getDateStr(d)):[];
+          const _wkPip=_wkMils.length?`<span class="hg-day-pip" style="background:${(typeof ipcKindColour==='function')?ipcKindColour(ipcDayDotKind(_wkMils)):'var(--red)'}" title="${_wkMils.map(x=>ipcEsc(x.ms.text||'')).join(', ')}"></span>`:'';
+          return `<div class="hg-day-head${isT?' is-today':''}${completeDays[i]?' hg-col-complete':''}${_wkMils.length?' has-date':''}" data-col="${i}">${DAYS[i]}<span class="hg-date-num">${d.getDate()}</span>${_wkPip}</div>`;
         }).join('')}
       </div>
       ${habits.map(k=>{
@@ -7444,6 +7622,7 @@ let html=`<div class="kk-outer ${_calThemeCls}">
     // Expansion panel — only rendered when reflection exists
     if(reflection){
       const fields=[];
+      if(reflection.intentionReview) fields.push(`<div class="exp-field"><div class="exp-label">on the week before's intention</div><div class="exp-text">${escapeHtml(reflection.intentionReview)}</div></div>`);
       if(reflection.notes) fields.push(`<div class="exp-field"><div class="exp-label">reflection</div><div class="exp-text">${reflection.notes}</div></div>`);
       if(reflection.whatGotInWay) fields.push(`<div class="exp-field"><div class="exp-label">${reflection.travel?'what you enjoyed':'what got in the way'}</div><div class="exp-text">${reflection.whatGotInWay}</div></div>`);
       if(reflection.showingUp) fields.push(`<div class="exp-field"><div class="exp-label">where I showed up</div><div class="exp-text">${reflection.showingUp}</div></div>`);
@@ -7650,6 +7829,48 @@ function ipcMilestonesOnDay(dStr){
   });
   (state.clanObligations||[]).forEach(function(ob){
     if(ipcOnDay(ob,dStr)) out.push({ ms:ob, goal:null });
+  });
+  betaAcceptedClanDates(dStr).forEach(function(d){ out.push({ ms:d, goal:null }); });
+  return out;
+}
+/* ══════════ WHAT THE CLAN AGREED TO IS IN YOUR OWN CALENDAR (James, 14 November) ══════════
+   "The clan's accepted obligations and events will end up in people's personal yearly
+   calendar, and will be shown on the monthly and weekly calendars."
+
+   A clan date reached a person's own calendar only if, after accepting it, they also
+   chose "add to your year" and picked a kind. Accepting is the commitment; the second
+   step was a place to forget it. An accepted date now shows on the year, the month
+   and the week by being READ from the clan's calendar, not copied into the plan:
+
+     nothing is written, so there is nothing to go stale. Change the date in the clan
+       and it moves here; decline it, or have it removed, and it is gone;
+     a date the person already added by hand is not shown twice (matched by the
+       clan event it came from), and keeps the kind they gave it;
+     a recurring date falls on its day in whichever year is being looked at;
+     each clan's dates are read from that clan's own calendar, which only its members
+       can read, so a clan's dates are visible only to its members by construction.
+
+   It is drawn as an obligation, in the gold the calendars already use for one. */
+function betaAcceptedClanDates(dStr){
+  if(typeof cnCalCurrentEvents !== 'function' || typeof cnCalMyRsvp !== 'function') return [];
+  var evs; try { evs = cnCalCurrentEvents() || []; } catch(e) { return []; }
+  if(!evs.length) return [];
+  var added = {};
+  (state.clanMilestones||[]).concat(state.clanObligations||[]).forEach(function(x){ if(x && x.clanEventId) added[x.clanEventId] = 1; });
+  var out = [];
+  evs.forEach(function(ev){
+    if(!ev || added[ev.id]) return;
+    var mine; try { mine = cnCalMyRsvp(ev.id); } catch(e) { mine = null; }
+    if(mine !== 'accepted') return;
+    var due, end;
+    if(ev.type === 'recurring' && ev.startMd){
+      due = dStr.slice(0,4) + '-' + ev.startMd; end = ev.endMd ? dStr.slice(0,4) + '-' + ev.endMd : null;
+    } else { due = ev.startDate; end = ev.endDate || null; }
+    if(!due) return;
+    var d = { id:'cev_' + ev.id, text: ev.title || '', due: due, done:false, source:'clan',
+              clanEventId: ev.id, kind:'obligation', derived:true };
+    if(end && end !== due) d.endDate = end;
+    if(ipcOnDay(d, dStr)) out.push(d);
   });
   return out;
 }
@@ -8569,6 +8790,12 @@ function betaYearlyWhen(){
 
    `cls` carries any classes the suites or the page already look for (rf-btn on the
    season and the year, which is how two of them are counted). */
+/* THE WORDS FOLLOW THE SENSEI (James, 14 November). "While the Sensei is hidden, drop
+   'with the Sensei' from the four Reflect rows; bring the words back when the Sensei
+   returns." One switch, so a row can never promise a Sensei the page does not show.
+   The stage builds set it to false in the same step that withholds the card. */
+const BETA_SENSEI_SHOWN = false;   // the stage build withholds the Sensei (build_v2_stage1.mjs)
+function betaSenseiWords(){ return BETA_SENSEI_SHOWN ? 'with the Sensei' : ''; }
 function betaReflectRowHtml(o){
   const attrs = (o.disabled ? ' disabled' : (o.onclick ? ' onclick="' + o.onclick + '"' : '')) +
                 (o.id ? ' id="' + o.id + '"' : '') +
@@ -8647,13 +8874,13 @@ function betaRenderReflect(){
        button says which step is in front of you and betaOpenYearly takes you to it.
        Nothing is deleted: both halves are the screens they always were. */
       betaReflectRowHtml({
-        k: '季', name: 'Seasonal', sub: 'with the Sensei', cls: 'rf-btn' + (sr ? ' rf-btn-due' : ''),
+        k: '季', name: 'Seasonal', sub: betaSenseiWords(), cls: 'rf-btn' + (sr ? ' rf-btn-due' : ''),
         due: sr, disabled: (seasonDone && !sr),
         onclick: 'srOpenModal()',
         title: (seasonDone && !sr) ? 'sealed this season' : '',
         when: sr ? 'open now' : seasonDone ? 'sealed' : 'in ' + srDaysToNextSeason() + ' days' }) +
       betaReflectRowHtml({
-        k: '年', name: 'Yearly', sub: 'with the Sensei', cls: 'rf-btn', id: 'yearly-btn',
+        k: '年', name: 'Yearly', sub: betaSenseiWords(), cls: 'rf-btn', id: 'yearly-btn',
         onclick: 'betaOpenYearly()', title: betaYearlyWhen(),
         when: annualSealed ? 'open the next'
             : new Date(2000, getYearEndMonth(), 1).toLocaleDateString('en-GB', { month: 'long' }) }) +
@@ -10288,6 +10515,66 @@ function betaApplyDoor(){
   betaRenderDoor(shown, rows.length);
   betaMarkSides();
   betaRenderCount();
+  betaRenderEmptyDojo();
+}
+/* ══════════ AN EMPTY DOJO (James, 14 November; desktop deck, "Before there is
+   anything to show") ══════════
+   "Nothing lives in this dojo yet. Give a goal the Ikigai door, and everything under
+   it follows it here." with one action, to choose the goals.
+
+   Nine of the ten live plans carry no dojo on anything, so for nine people this is
+   the first thing either door shows. It says one quiet thing and offers one door,
+   as the deck rules, and it writes nothing until the person chooses.
+
+   EMPTY MEANS NOTHING BELONGS HERE, not that nothing is on today's list: a dojo with
+   three goals and a rest day is not empty, and telling its owner nothing lives in it
+   would be false. So this asks the plan, not the rows on the screen. */
+function betaDojoIsEmpty(side){
+  if(side !== 'ikigai' && side !== 'shokunin' && side !== 'hiyoku') return false;
+  const has = (kind) => betaCollection(kind).some(it => it && betaPillarOf(kind, it) === side);
+  return !has('kaizen') && !has('shokunin') && !has('annual');
+}
+function betaRenderEmptyDojo(){
+  const list = document.getElementById('goals-list');
+  if(!list || !list.parentNode) return;
+  let el = document.getElementById('bd-empty-dojo');
+  const on = BETA_DOOR !== null && BETA_DOOR !== 'both' && betaDojoIsEmpty(BETA_DOOR);
+  if(!on){ if(el) el.remove(); return; }
+  const name = (BETA_SIDES[BETA_DOOR] || {}).name || '';
+  if(!el){ el = document.createElement('div'); el.id = 'bd-empty-dojo'; el.className = 'bd-empty-dojo';
+    list.parentNode.insertBefore(el, list); }
+  el.setAttribute('data-side', BETA_DOOR);
+  const goals = (state.annualGoals || []).length;
+  el.innerHTML =
+    '<p class="bde-lead">Nothing lives in this dojo yet.</p>' +
+    '<p class="bde-body">Give a goal the ' + name + ' door, and everything under it follows it here.</p>' +
+    (goals
+      ? '<button class="bde-btn" id="bde-btn" onclick="betaChooseDojoGoals(\'' + BETA_DOOR + '\')">Choose goals for ' + name + '</button>'
+      : '<p class="bde-body">There are no goals in the plan yet to give it.</p>');
+}
+/* THE ONE DOOR IN: the plan's goals, each a row that says where it lives. A tap gives
+   the goal to this dojo, a second tap takes it home again. A goal that lives in the
+   other dojo says so and moves on a tap, because a goal has one door. */
+function betaChooseDojoGoals(side){
+  const name = (BETA_SIDES[side] || {}).name || '';
+  const rows = (state.annualGoals || []).map(function(g){
+    const cur = betaPillarOf('annual', g);
+    const where = cur === side ? 'lives here' : cur ? 'in ' + ((BETA_SIDES[cur] || {}).name || cur) : 'at home';
+    return '<button class="bdg-row' + (cur === side ? ' is-here' : '') + '" data-goal="' + g.id + '"' +
+      ' onclick="betaGiveGoal(' + JSON.stringify(g.id).replace(/"/g, '&quot;') + ',\'' + side + '\')">' +
+      '<span class="bdg-text">' + escapeHtml(g.text || '') + '</span>' +
+      '<span class="bdg-where">' + where + '</span></button>';
+  }).join('');
+  betaPanelOpen('goals for ' + name,
+    '<p class="bdg-note">Tap a goal to give it the ' + name + ' door. Its crafts and practices follow it.</p>' +
+    '<div class="bdg-list">' + rows + '</div>');
+}
+function betaGiveGoal(id, side){
+  const g = (state.annualGoals || []).find(x => x && x.id == id);
+  if(!g) return;
+  betaSetPillar('annual', id, betaPillarOf('annual', g) === side ? null : side);
+  betaApplyDoor();
+  betaChooseDojoGoals(side);     // redraw the sheet so each row says where it lives now
 }
 /* THE DOOR IS MY RYUGHI, WEARING THIS DOJO'S NAME. Same element, same place on the
    page, same drawer: the label is the dojo, the kanji is the dojo's, and the one
@@ -10982,11 +11269,11 @@ function renderMonthlyBtn(){
   /* THE ROW, as above: the same four branches, drawn as mobile slide 32 draws them.
      The quiet open-dot rides on the row now rather than on a ghost button. */
   if(status==='sealed'){
-    slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:'with the Sensei',when:'sealed',
+    slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:betaSenseiWords(),when:'sealed',
       onclick:'showMonthlyReflectionReview()',title:'review this month&#39;s sealed reflection'});
   } else if(status==='in-window'){
     // Active all window long, with the quiet open-dot — the persistent, non-demanding "reflection open" marker.
-    slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:'with the Sensei',when:'open now',
+    slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:betaSenseiWords(),when:'open now',
       due:true,dot:true,onclick:"showReflection('monthly')"});
   } else {
     const today=new Date();
@@ -10996,11 +11283,11 @@ function renderMonthlyBtn(){
     // In the gap (last month sealed, this month's window not yet open) keep the just-sealed
     // prior-month reflection reviewable read-only; else the disabled "Opens [date]" button.
     if(getReviewableMonthlyReflection()){
-      slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:'with the Sensei',when:'sealed',
+      slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:betaSenseiWords(),when:'sealed',
         onclick:'showMonthlyReflectionReview()',
         title:`review last month&#39;s sealed reflection — next monthly opens ${openLabel}`});
     } else {
-      slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:'with the Sensei',
+      slot.innerHTML=betaReflectRowHtml({k:'月',name:'Monthly',sub:betaSenseiWords(),
         when:`opens ${openLabel}`,disabled:true,title:`Opens ${openLabel}`});
     }
   }
@@ -11930,6 +12217,11 @@ function saveReflection(type){
        read and wrote the right field, so an old week can be corrected by opening it. */
     entry.notes=c.querySelector('#weekly-thought')?.value||'';
     entry.intention=c.querySelector('#weekly-intention')?.value.trim()||'';
+    /* THE LOOK BACK, and the intention it was looking back at, kept together: next
+       week's intention replaces "last week's", so the answer alone would lose what it
+       answered. Absent when there was no intention to review. */
+    const _rv=c.querySelector('#weekly-intention-review');
+    if(_rv){ entry.intentionReview=_rv.value.trim(); entry.reviewedIntention=getLastWeekIntention()||''; }
     entry.travel=isTravelWeek(_saveDate);   // (b): stamp the travel-week framing at seal — the timeline reads this flag, never a live recompute
   } else if(type==='monthly'){
     const areas=c.querySelectorAll('.reflect-textarea');
@@ -11997,6 +12289,14 @@ function showReflection(type){
       <div style="margin-bottom:28px;padding:14px 18px;border-left:2px solid rgba(204,53,41,.2)">
         <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.45;margin-bottom:7px">last week you intended</div>
         <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:1.7;opacity:.7">${lastIntention}</div>
+      </div>
+      <!-- LOOKING BACK AT IT IS A QUESTION NOW (James, 14 November): "one where you
+           review your intention from the past week." The intention was shown and then
+           left behind: a person read it and moved on to this week. It is answered
+           first, before anything about the week ahead. Only when there is one. -->
+      <div class="reflect-q" id="weekly-intention-review-q" style="margin-top:-12px">
+        <div class="reflect-label">how did it go?</div>
+        <textarea class="reflect-textarea" id="weekly-intention-review" placeholder="Kept, half kept, or let go, and why..."></textarea>
       </div>`:'';
     c.innerHTML=`
       <div class="modal-kanji">職人</div>
@@ -12125,6 +12425,15 @@ function showReflectionReview(editable){
     <div class="modal-title">Weekly Reflection</div>
     <div class="modal-sub">${range}</div>
     <div class="reflect-review-badge">${editable?'sealed · edit and re-seal until next week':'past week · sealed'}</div>
+    ${entry.intentionReview!==undefined?`
+    <div style="margin-bottom:14px;padding:14px 18px;border-left:2px solid rgba(204,53,41,.2)">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);opacity:.45;margin-bottom:7px">the week before, you intended</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint);line-height:1.7;opacity:.7">${escapeHtml(entry.reviewedIntention||'')}</div>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">how did it go?</div>
+      <textarea class="reflect-textarea${roClass}" id="rev-intention-review" ${ro}>${escapeHtml(entry.intentionReview||'')}</textarea>
+    </div>`:''}
     ${craftEl}
     ${entry.whatGotInWay!==undefined?`
     <div class="reflect-q">
@@ -12164,6 +12473,7 @@ function resealReflection(date,ts){
   if(c.querySelector('#rev-q2'))  entry.showingUp=c.querySelector('#rev-q2').value.trim();
   if(c.querySelector('#rev-notes')) entry.notes=c.querySelector('#rev-notes').value;
   if(c.querySelector('#rev-intention')) entry.intention=c.querySelector('#rev-intention').value.trim();
+  if(c.querySelector('#rev-intention-review')) entry.intentionReview=c.querySelector('#rev-intention-review').value.trim();
   entry.travel=isTravelWeek(date);   // re-stamp travel framing from CURRENT travelDays (parity w/ save + resealMonthlyReflection) — a Re-seal after a travel backfill picks up the framing, never leaves a stale flag
   entry.ts=Date.now(); // P2-1 3a: an in-place reseal must bump ts so the sync merge picks this edit as newest
   saveState();
@@ -12279,6 +12589,14 @@ function renderEssenceDrawer(){
    strand's colour. Only when there is one milestone to a strand, which is how the
    onboarding writes them; a plan with a different count keeps the number, because a
    kanji beside the wrong milestone would be a claim the plan does not make. */
+/* WHILE THE DRAWER IS OPEN ON A PHONE IT HAS THE FULL WIDTH (James, 14 November;
+   mobile slide 5), and the dojo names step aside. Closed, the home page is exactly
+   as it was: the class is the only thing that changes, and it is taken off on every
+   way the drawer closes. */
+function betaAlcoveDrawer(open){
+  const a=document.getElementById('beta-alcove');
+  if(a) a.classList.toggle('rv-open', !!open);
+}
 function _rvMsMark(i){
   const st=state.strands||[], ms=state.milestones5yr||[];
   if(st.length && st.length===ms.length){
@@ -12321,9 +12639,11 @@ function toggleVisionDrawer(e){
       </div>`;
     if(typeof renderRyughiConstellation==='function') renderRyughiConstellation();
     drawer.classList.add('open');
+    betaAlcoveDrawer(true);
     _visionGlanceShow(false);   // drawer open → hide the glance line (the vision shows once, not twice)
   } else {
     drawer.classList.remove('open');
+    betaAlcoveDrawer(false);
     _visionGlanceShow(true);    // drawer closed → restore the glance line
     setTimeout(function(){ inner.innerHTML=''; },700);
   }
@@ -12334,6 +12654,7 @@ document.addEventListener('click',function(){
   var drawer=document.getElementById('ryughiDrawer');
   var inner=document.getElementById('ryughiDrawerInner');
   if(drawer) drawer.classList.remove('open');
+  betaAlcoveDrawer(false);
   _visionGlanceShow(true);      // restore the glance line when the drawer closes via an outside click
   _visionDrawerOpen=false;
   if(inner) setTimeout(function(){ inner.innerHTML=''; },700);
@@ -12512,12 +12833,31 @@ const _psLand   ={};  // {`ps-days`: true} — plays land pop animation once
 const _animQueue=[];
 let   _animRunning=false;
 function enqueueAnim(fn){_animQueue.push(fn);drainAnimQueue();}
+/* ONE AT A TIME, IN THE ORDER THEY WERE EARNED (James, 14 November). "If multiple
+   animations are triggered, they need to run sequentially, not at the same time."
+
+   The stamps and the day's seal already waited their turn here. Three things did not:
+     the weekly proverb and the monthly ink wash were started on fixed timers (4.4s
+       and 8.2s) that assumed only the seal stood before them. With a milestone stamp
+       ahead of the seal, or the stamps holding two seconds longer, they came up on
+       top of whatever was still playing;
+     the thread, which draws on the row the moment it is ticked, played underneath a
+       full-screen stamp earned by the same tick, where nobody could see it.
+   The proverb and the ink wash now join the queue. A ceremony waits for the thread
+   to finish before it starts; the thread itself still never blocks a tick. */
+let _animThreadUntil=0, _animDrainTimer=null;
 function drainAnimQueue(){
   if(_animRunning||_animQueue.length===0)return;
+  const wait=_animThreadUntil-Date.now();
+  if(wait>0){
+    if(!_animDrainTimer) _animDrainTimer=setTimeout(()=>{_animDrainTimer=null;drainAnimQueue();},wait+40);
+    return;
+  }
   _animRunning=true;
+  window._animNowPlaying=(window._animNowPlaying||0)+1;
   _animQueue.shift()();
 }
-function animDone(){_animRunning=false;drainAnimQueue();}
+function animDone(){_animRunning=false;window._animNowPlaying=Math.max(0,(window._animNowPlaying||1)-1);drainAnimQueue();}
 
 // ============ AVATAR DROPDOWN ============
 function toggleAvatarDropdown(e){
@@ -12986,6 +13326,12 @@ function triggerSeal(){
   },4600);
 }
 
+/* THE MILESTONE STAMPS HOLD TWO SECONDS LONGER (James, 14 November). "When the stamps
+   of completion come up, the milestones of completion, their animation should hold
+   for 2 full seconds longer than current." One number, added to the hold of both
+   ceremonies: a practice's own stamp, and the rungs of continuance. Nothing about
+   how the stamp arrives or leaves has changed, only how long it stays. */
+const STAMP_HOLD_EXTRA_MS = 2000;
 function earnStamp(habit,milestone){
   const k=`${habit.id}-${milestone.days}`;
   if(!state.milestoneStamps) state.milestoneStamps={};
@@ -13023,7 +13369,7 @@ function earnStamp(habit,milestone){
     copyEl.style.animation ='copyFadeIn .5s ease forwards';
   },550);
 
-  const DISPLAY_MS=4100, FLY_MS=850, LARGE_PX=100, SMALL_PX=24;
+  const DISPLAY_MS=4100+STAMP_HOLD_EXTRA_MS, FLY_MS=850, LARGE_PX=100, SMALL_PX=24;
   setTimeout(()=>{
     const destEl  =document.getElementById(`ms-${habit.id}-${milestone.days}`);
     const destRect=destEl?destEl.getBoundingClientRect():null;
@@ -13142,7 +13488,7 @@ function earnPracticeStamp(milestone){
 
   // Pomp escalates with milestone rank
   const rank=PRACTICE_MILESTONES.findIndex(m=>m.days===milestone.days);
-  const DISPLAY_MS=4100+rank*350; // 4100ms → 6200ms across 7 ranks
+  const DISPLAY_MS=4100+rank*350+STAMP_HOLD_EXTRA_MS; // 6100ms → 8200ms across 7 ranks
 
   setTimeout(()=>{
     if(titleEl) titleEl.style.animation='copyFadeOut .4s ease forwards';
@@ -13232,8 +13578,10 @@ function fireCelebrations(list){
   const daily=list.includes('daily')||weekly;
   // Seal queues after any milestone stamps already enqueued by checkMilestoneStamps
   if(daily){enqueueAnim(()=>triggerSeal());}
-  if(weekly){setTimeout(showProverb,4400);}   // fires after seal (~3.9s) clears
-  if(monthly){setTimeout(()=>showInkWash(getMonthCompletionRate()),8200);}
+  /* IN THE QUEUE, behind the seal and anything earned before it, not on a timer that
+     guesses how long those take. Each holds its own 5.6s and then hands on. */
+  if(weekly){enqueueAnim(()=>{showProverb();setTimeout(animDone,5700);});}
+  if(monthly){enqueueAnim(()=>{showInkWash(getMonthCompletionRate());setTimeout(animDone,5700);});}
 }
 
 function checkCelebrations(){
@@ -14110,18 +14458,199 @@ function betaRenderClanHall(){
     '</button>';
   }).join('');
   if(people) people.style.display = 'block';
+  cnMonthRender();        // draws the month and levels the week with the scroll
 }
 
-/* A MARK OPENS THE PERSON. The cards and the numbers are the ones that were the
-   Clan page until today; they are one tap in rather than all of them at once. */
+/* A MARK OPENS THE PERSON: that member's card and no one else's. */
 function cnOpenMember(uid){
   var detail = document.getElementById('cn-detail');
   if(!detail) return;
+  /* ONLY THE ONE WHOSE MARK WAS TAPPED. The cards are still drawn together by
+     renderClanCards; the others are put away here rather than never drawn, so the
+     card a mark opens is always the current one. */
+  var cards = document.querySelectorAll('#clan-active-warriors .clan-card');
+  var found = false;
+  cards.forEach(function(c){
+    var mine = c.getAttribute('data-clan-uid') === uid;
+    c.style.display = mine ? '' : 'none';
+    if(mine) found = true;
+  });
+  if(!found) return;
+  _cnOpenUid = uid;
   detail.style.display = 'block';
-  var card = document.querySelector('#clan-active-warriors [data-clan-uid="' + uid + '"]');
-  (card || detail).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+/* THE CARDS ARE REDRAWN ON EVERY SAVE, all of them. If one is open, the others are
+   put away again afterwards, or a tick anywhere in the app would bring the whole
+   stack back under the member being read. */
+var _cnOpenUid = null;
+function cnApplyOpenMember(){
+  if(!_cnOpenUid) return;
+  document.querySelectorAll('#clan-active-warriors .clan-card').forEach(function(c){
+    c.style.display = c.getAttribute('data-clan-uid') === _cnOpenUid ? '' : 'none';
+  });
+}
+/* ══════════ THE CLAN'S CALENDAR, BENEATH ITS WEEK (James, 14 November) ══════════
+   "There should be a clan calendar beneath the clan's week." A month on the app's
+   own scroll, paged month by month, with every shared date on its day. It reads the
+   same events the week above it lists and the year behind it draws, so the three
+   cannot disagree; it writes nothing.
+
+   A one-off sits on its date, or on each day of its span. A recurring date (a
+   birthday) sits on its month and day every year. A day with something on it is a
+   button that names what is on it underneath; the others are not. */
+var _cnMonthOffset = 0, _cnMonthDay = null;
+function cnMonthEventsFor(year, month){
+  var by = {};
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  var add = function(ds, ev){ (by[ds] = by[ds] || []).push(ev); };
+  var evs = (typeof cnCalCurrentEvents === 'function') ? cnCalCurrentEvents() : [];
+  evs.forEach(function(ev){
+    if(!ev) return;
+    var start, end;
+    if(ev.type === 'recurring' && ev.startMd){
+      start = year + '-' + ev.startMd; end = year + '-' + (ev.endMd || ev.startMd);
+    } else if(ev.startDate){
+      start = ev.startDate; end = ev.endDate || ev.startDate;
+    } else return;
+    var cur = new Date(start + 'T12:00:00'), last = new Date(end + 'T12:00:00'), guard = 0;
+    if(isNaN(cur) || isNaN(last)) return;
+    while(cur <= last && guard++ < 62){
+      if(cur.getFullYear() === year && cur.getMonth() === month)
+        add(year + '-' + pad(month + 1) + '-' + pad(cur.getDate()), ev);
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+  return by;
+}
+/* EACH MEMBER'S IKIGAI MILESTONES, ON THE CLAN'S CALENDAR, FOR ACCOUNTABILITY
+   (James, 14 November). The same milestones the Clan Year draws: the person's own
+   from their live plan, the others' from the summary each member already publishes.
+   A member who keeps Shinobi is not shown: Shinobi withholds what a person is working
+   toward, and a dated milestone is exactly that. */
+function cnMonthMilestonesFor(year, month){
+  var by = {}, ym = year + '-' + (month < 9 ? '0' : '') + (month + 1);
+  var add = function(uid, name, list){
+    (list || []).forEach(function(ms){
+      if(!ms || !ms.due || !ms.text || String(ms.due).slice(0,7) !== ym) return;
+      (by[ms.due] = by[ms.due] || []).push({ uid: uid, name: name, text: ms.text });
+    });
+  };
+  var mine = (typeof buildOwnClanData === 'function') ? buildOwnClanData() : null;
+  var myUid = (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.uid) || 'me';
+  if(mine) add(myUid, mine.name || 'You', mine.annualMilestones);
+  Object.keys(_clanCache || {}).forEach(function(uid){
+    var d = _clanCache[uid]; if(!d || d.shinobi) return;
+    add(uid, d.name || 'Warrior', d.annualMilestones);
+  });
+  return by;
+}
+function cnMonthNav(d){ _cnMonthOffset += d; _cnMonthDay = null; cnMonthRender(); }
+function cnMonthPick(ds){ _cnMonthDay = (_cnMonthDay === ds) ? null : ds; cnMonthRender(); }
+function cnMonthRender(){
+  var host = document.getElementById('cn-month-cal');
+  if(!host) return;
+  var now = new Date();
+  var ref = new Date(now.getFullYear(), now.getMonth() + _cnMonthOffset, 1);
+  var y = ref.getFullYear(), m = ref.getMonth();
+  var by = cnMonthEventsFor(y, m);
+  var ms = cnMonthMilestonesFor(y, m);
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  var todayStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  var lead = (ref.getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+  var cells = '';
+  ['M','T','W','T','F','S','S'].forEach(function(d){ cells += '<div class="cnm-dh">' + d + '</div>'; });
+  for(var i = 0; i < lead; i++) cells += '<div class="cnm-cell is-empty"></div>';
+  for(var d = 1; d <= days; d++){
+    var ds = y + '-' + pad(m + 1) + '-' + pad(d), hasEv = !!by[ds], hasMs = !!ms[ds], has = hasEv || hasMs;
+    var cls = 'cnm-cell' + (ds === todayStr ? ' is-today' : '') + (hasEv ? ' has-ev' : '') + (hasMs ? ' has-ms' : '');
+    /* One red pip for what the clan shares, then one pip per member with a milestone
+       that day, in the colour the Clan Year already gives that member. */
+    var pips = (hasEv ? '<span class="cnm-pip"></span>' : '') +
+      (ms[ds] || []).map(function(x){ return '<span class="cnm-pip cnm-pip-ms" style="background:' + cnYearColour(x.uid) + '"></span>'; }).join('');
+    var tip = (by[ds] || []).map(function(e){ return cnCalEsc(e.title || ''); })
+      .concat((ms[ds] || []).map(function(x){ return cnCalEsc(x.name + ': ' + x.text); })).join(', ');
+    cells += has
+      ? '<button class="' + cls + '" data-day="' + ds + '" onclick="cnMonthPick(\'' + ds + '\')" title="' + tip + '">' +
+          d + '<span class="cnm-pips">' + pips + '</span></button>'
+      : '<div class="' + cls + '" data-day="' + ds + '">' + d + '</div>';
+  }
+  /* WHAT IS ON THE DAY THAT WAS TAPPED, or on the month when none is. */
+  var keys = Object.keys(by).sort();
+  var show = (_cnMonthDay && by[_cnMonthDay]) ? [_cnMonthDay] : (_cnMonthDay ? [] : keys);
+  var fmt = function(ds){ return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+  var seen = {}, list = '';
+  show.forEach(function(ds){ by[ds].forEach(function(e){
+    var k = e.id + '|' + (_cnMonthDay ? ds : '');
+    if(seen[k]) return; seen[k] = 1;
+    list += '<div class="cnm-day-row"><span class="cnm-day-date">' + fmt(_cnMonthDay ? ds : (e.startDate && e.type !== 'recurring' ? e.startDate : ds)) +
+      '</span><span class="cnm-day-title">' + cnCalEsc(e.title || '') + '</span></div>';
+  }); });
+  /* THE MEMBERS' MILESTONES, under the shared dates: whose, and what. */
+  var msKeys = (_cnMonthDay ? (ms[_cnMonthDay] ? [_cnMonthDay] : []) : Object.keys(ms).sort());
+  msKeys.forEach(function(ds){ ms[ds].forEach(function(x){
+    list += '<div class="cnm-day-row cnm-ms-row"><span class="cnm-day-date">' + fmt(ds) + '</span>' +
+      '<span class="cnm-ms-who" style="color:' + cnYearColour(x.uid) + '">' + cnCalEsc(x.name) + '</span>' +
+      '<span class="cnm-day-title">' + cnCalEsc(x.text) + '</span></div>';
+  }); });
+  host.innerHTML =
+    '<div class="kk-outer cal-white cn-month">' +
+      '<div class="kk-cord"><div class="kk-loop"></div><div class="kk-cord-line"></div></div><div class="kk-rod"></div>' +
+      '<div class="kk-body">' +
+        '<div class="cnm-nav"><button class="cnm-btn" onclick="cnMonthNav(-1)" aria-label="previous month">&#8249;</button>' +
+          '<span class="cnm-title" id="cnm-title">' + ref.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) + '</span>' +
+          '<button class="cnm-btn" onclick="cnMonthNav(1)" aria-label="next month">&#8250;</button></div>' +
+        '<div class="cnm-grid">' + cells + '</div>' +
+        '<div class="cnm-day" id="cnm-day">' + (list || '<span class="cnm-none">Nothing shared this month.</span>') + '</div>' +
+      '</div>' +
+    '</div>';
+  cnAlignWeek();
+}
+/* THE CLAN'S WEEK STARTS LEVEL WITH THE HANGING SCROLL (James, 14 November). On a
+   desk the right-hand column began at the top of the page, beside the clan's name,
+   and the week sat a hundred and fifty pixels above the word it belongs beside. It
+   is measured, because what stands above the scroll (the name, the count, the works
+   pill) is not a fixed height. Below 1100 the columns stack and nothing is moved. */
+function cnAlignWeek(){
+  var right = document.querySelector('#primary-clan .cn-col-right');
+  var mount = document.getElementById('clan-calendar-mount');
+  var rod = document.querySelector('#clan-dayword .kk-rod');
+  if(!right || !mount) return;
+  right.style.paddingTop = '';
+  if(window.innerWidth < 1100 || !rod || rod.getBoundingClientRect().height === 0) return;
+  var want = rod.getBoundingClientRect().top - mount.getBoundingClientRect().top;
+  if(want > 0) right.style.paddingTop = Math.round(want) + 'px';
+}
+window.addEventListener('resize', function(){ if(typeof cnAlignWeek === 'function') cnAlignWeek(); });
+/* The word's card changes height when it is answered, edited or folded to its pill,
+   and the works pill comes and goes above it: each moves the rod the week is levelled
+   with, so the band is watched rather than every writer being told to call back. */
+(function(){
+  if(typeof ResizeObserver === 'undefined') return;
+  var start = function(){
+    var band = document.getElementById('clan-dayword'), head = document.getElementById('cn-head');
+    if(!band) return;
+    var ro = new ResizeObserver(function(){ cnAlignWeek(); });
+    ro.observe(band); if(head) ro.observe(head);
+  };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+/* THE CLAN'S YEAR, one tap behind the week. */
+function cnToggleYear(force){
+  var w = document.getElementById('cn-year-wrap');
+  if(!w) return;
+  var open = (force === undefined) ? w.style.display === 'none' : !!force;
+  w.style.display = open ? 'block' : 'none';
+  if(open){
+    if(typeof cnYearCalBuild === 'function') cnYearCalBuild();
+    w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    var head = document.getElementById('cn-head');
+    if(head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 function cnCloseMember(){
+  _cnOpenUid = null;
   var detail = document.getElementById('cn-detail');
   if(detail) detail.style.display = 'none';
   var head = document.getElementById('cn-head');
@@ -14389,6 +14918,7 @@ function renderClanCards(){
   }).join('');
   // 共作 witness band RETIRED 2026-09-14 — the clan's whole tree now renders inside the clan SCP
   // button's overlay (sprRenderWorksList), so the separate band beneath the strip is redundant.
+  if(typeof cnApplyOpenMember === 'function') cnApplyOpenMember();   // keep the one open card the only one
 }
 
 // ── SHARED WORK band (共作) — the witness band ──────────────────────────────
@@ -15576,26 +16106,16 @@ function setupNavSquish(){
         <div class="cn-marks" id="cn-marks"></div>
       </div>
       <!-- ══════════ /THE PEOPLE ══════════ -->
-      </div><!-- /cn-col-left -->
+      <!-- ══════════ THE CLAN'S AGGREGATE CARD (James, 14 November) ══════════
+           Back, as it stands in v1: "the clan section is missing the clan aggregate
+           card that lives on the current v1 version of the app." The week's completion
+           rate, today's score, the seven-day aggregate and each member's row.
 
-      <!-- THE RIGHT-HAND COLUMN on a desk (desktop slide 19): the clan's week, as it
-           is, and every clan the person belongs to. Below 1100 it simply follows. -->
-      <div class="cn-col-right">
-        <div class="clan-section-label cn-right-label">The clan&rsquo;s week</div>
-        <div id="clan-calendar-mount"></div>
-        <div class="clan-section-label cn-right-label" id="cn-clans-label">Your clans</div>
-        <div class="cn-clans" id="cn-clans"></div>
-      </div>
-      </div><!-- /cn-cols -->
-
-
-      <!-- ══════════ THE DETAIL, ONE TAP AWAY (James, 14 November) ══════════
-           Nothing below is deleted. The hall is the room; the numbers and the cards
-           that used to BE the Clan page are what a mark opens. cnOpenMember shows
-           this and brings that member's card to the top of the screen. -->
-      <div id="cn-detail" style="display:none">
-      <button class="cn-detail-back" id="cn-detail-back" onclick="cnCloseMember()">&#8249; &nbsp;the hall</button>
-
+           It was put out of reach earlier the same day, on "the old dashboard goes",
+           which I read too widely: what goes is the stack of red member cards on the
+           hall, which a mark now opens one at a time. This card is the clan's own
+           number and stays, under the people it counts. -->
+      <div id="cn-aggregate" class="cn-aggregate">
       <!-- Clan Momentum — header absorbed, toggle inline on James's row -->
       <div class="clan-momentum-block">
         <div class="clan-exp-wrap" style="padding:18px 16px 16px">
@@ -15686,8 +16206,35 @@ function setupNavSquish(){
       <!-- SHARED WORK band RETIRED 2026-09-14 — the clan's tree now renders inside the clan SCP
            button's overlay (sprRenderWorksList). No band host needed. -->
 
-      <div class="divider"></div>
-      <div class="clan-section-label" id="cn-detail-label">Active Warriors</div>
+      </div><!-- /cn-aggregate -->
+      </div><!-- /cn-col-left -->
+
+      <!-- THE RIGHT-HAND COLUMN on a desk (desktop slide 19): the clan's week, as it
+           is, and every clan the person belongs to. Below 1100 it simply follows. -->
+      <div class="cn-col-right">
+        <div class="clan-section-label cn-right-label">The clan&rsquo;s week</div>
+        <div id="clan-calendar-mount"></div>
+        <!-- THE CLAN'S CALENDAR, beneath its week (James, 14 November): the month on a
+             scroll, each shared date marked on its day. The year stays one tap behind. -->
+        <div class="clan-section-label cn-right-label" id="cn-month-label">The clan&rsquo;s calendar</div>
+        <div id="cn-month-cal"></div>
+        <button class="cn-year-link" id="cn-year-link" onclick="cnToggleYear()">the clan&rsquo;s year &rsaquo;</button>
+        <div class="clan-section-label cn-right-label" id="cn-clans-label">Your clans</div>
+        <div class="cn-clans" id="cn-clans"></div>
+      </div>
+      </div><!-- /cn-cols -->
+
+
+      <!-- ══════════ THE DETAIL, ONE TAP AWAY (James, 14 November) ══════════
+           Nothing below is deleted. The hall is the room; the numbers and the cards
+           that used to BE the Clan page are what a mark opens. cnOpenMember shows
+           this and brings that member's card to the top of the screen. -->
+
+      <!-- ══════════ A MARK OPENS THAT MEMBER'S CARD ══════════
+           One card, the tapped member's, which answers the mobile deck's open
+           question "What does tapping a member show?". -->
+      <div id="cn-detail" style="display:none">
+      <button class="cn-detail-back" id="cn-detail-back" onclick="cnCloseMember()">&#8249; &nbsp;the hall</button>
 
       <!-- Dynamic Active Warriors cards — rendered by renderClanCards() from Firestore /clan -->
       <div id="clan-active-warriors"></div>
@@ -15697,10 +16244,14 @@ function setupNavSquish(){
       <!-- The clan calendar hangs in the hall's right-hand column now (#clan-calendar-mount
            above), unchanged inside: "the clan's week, good as is". -->
 
-      <!-- ══════════ CLAN YEAR CALENDAR ══════════ -->
-      <div class="divider"></div>
-      <div class="clan-section-label">Clan Year</div>
-      <div id="cn-year-cal-mount"></div>
+      <!-- ══════════ CLAN YEAR CALENDAR ══════════
+           OUT OF THE HALL, one tap behind the clan's week (James, 14 November). Neither
+           hall drawing has it. "the clan's year" under the week opens and closes it. -->
+      <div id="cn-year-wrap" style="display:none">
+        <button class="cn-detail-back" onclick="cnToggleYear(false)">&#8249; &nbsp;the hall</button>
+        <div class="clan-section-label">Clan Year</div>
+        <div id="cn-year-cal-mount"></div>
+      </div>
       <!-- ══════════ /CLAN YEAR CALENDAR ══════════ -->
 
       <!-- CLAN CLOSED NOTE -->
@@ -18120,8 +18671,18 @@ document.getElementById('srBackdrop').addEventListener('click',function(e){
       inn+='<text x="'+cx.toFixed(1)+'" y="'+(cy+fs*0.36).toFixed(1)+'" text-anchor="middle"'+
            ' font-family="Noto Serif JP,serif" font-size="'+fs+'" fill="'+col+'" opacity="'+op+'"'+ga+'>'+st.kanji+'</text>';
       var ly=cy+fs*0.5+14;
-      inn+='<text x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
-           ' font-family="Noto Sans JP,sans-serif" font-size="8.5" fill="var(--ink-light)" letter-spacing="0.6" opacity="'+(selected?'1':'0.8')+'">'+st.name+'</text>';
+      /* A LONG NAME TAKES TWO LINES (James, 14 November: "The Body and the Hours" ran
+         into the ensō at 1440). Broken at the space nearest its middle, so the label
+         stays under its own star and well clear of the stroke. */
+      var nm=String(st.name||''), lines=[nm];
+      if(nm.length>13 && nm.indexOf(' ')>0){
+        var mid=nm.length/2, cut=-1, bestD=1e9;
+        for(var ci=0;ci<nm.length;ci++){ if(nm.charAt(ci)===' ' && Math.abs(ci-mid)<bestD){ bestD=Math.abs(ci-mid); cut=ci; } }
+        if(cut>0) lines=[nm.slice(0,cut), nm.slice(cut+1)];
+      }
+      inn+='<text class="rcStarName" x="'+cx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle"'+
+           ' font-family="Noto Sans JP,sans-serif" font-size="8.5" fill="var(--ink-light)" letter-spacing="0.6" opacity="'+(selected?'1':'0.8')+'">'+
+           lines.map(function(t,li){ return '<tspan x="'+cx.toFixed(1)+'" dy="'+(li?10:0)+'">'+escapeHtml(t)+'</tspan>'; }).join('')+'</text>';
       inn+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="26" fill="transparent" style="cursor:pointer;"/>';
     }
 
@@ -20328,6 +20889,7 @@ function cnCalRender(){
     html += '<div class="cn-cal-empty">No dates yet. Add a birthday the clan should hold — '
           + 'or propose something to gather for.</div></div>';
     mount.innerHTML = html;
+  if(typeof cnMonthRender === 'function') cnMonthRender();   // the month beneath reads the same dates
     return;
   }
 
@@ -20335,7 +20897,7 @@ function cnCalRender(){
   if(soonest <= 30){
     const w = soonest < 0 ? 'now' : soonest === 0 ? 'today'
             : soonest === 1 ? 'tomorrow' : 'in ' + soonest + ' days';
-    html += '<div class="cn-cal-nudge"><strong>' + cnCalEsc(events[0].title) + '</strong> — ' + w + '.</div>';
+    html += '<div class="cn-cal-nudge"><strong>' + cnCalEsc(events[0].title) + '</strong>, ' + w + '.</div>';   // a comma, never an em dash, in app copy (James, 14 Nov)
   }
 
   events.forEach(ev => { html += cnCalRenderLine(ev, me); });
@@ -20346,6 +20908,7 @@ function cnCalRender(){
   }
   html += '</div>';
   mount.innerHTML = html;
+  if(typeof cnMonthRender === 'function') cnMonthRender();   // the month beneath reads the same dates
 }
 
 function cnCalRenderLine(ev, me){
@@ -20766,6 +21329,9 @@ function cnYcBuildByDate(year){
 function cnCalScrollToYear(){
   const mount = document.getElementById('cn-year-cal-mount');
   if(!mount) return;
+  /* The year is one tap behind the week now, so it is opened before it is scrolled to. */
+  const yw = document.getElementById('cn-year-wrap');
+  if(yw && yw.style.display === 'none' && typeof cnToggleYear === 'function') cnToggleYear(true);
   mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
   // Brief highlight pulse on the scroll wrapper
   const wrap = mount.querySelector('.cnyc-wrap');
