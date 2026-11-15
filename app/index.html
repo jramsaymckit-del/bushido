@@ -6008,7 +6008,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-15 · You page sync message and cleanup';
+const BUILD_ID = 'v2 · everyone · 2026-11-15 · Plain welcome wording';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -15628,23 +15628,28 @@ function betaWelcomeDraw(){
       '<div><b>年</b><span>this year</span></div></div>' +
       '<h1>Three horizons.</h1>' +
       '<p class="bw-p">Your day holds the practices. The month holds what they build. The year holds what it serves.</p>' +
-      '<p class="bw-p last">The old names for these layers are gone. Nothing you put in them has moved.</p>';
+      '<p class="bw-p last">The old layer names are gone, and nothing you put in them has moved. Two of them, Ikigai and Shokunin, now mean something new, explained on the next page.</p>';
     acts = next(3);
   } else if(p === 3){
-    main = '<h1>' + (hi ? 'Ikigai and Shokunin are dojos now, and Hiyoku joins them.' : 'Ikigai and Shokunin are dojos now.') + '</h1>' +
+    /* Plain words (15 November): the first version left a reader asking "relationship to
+       what?", counted two dojos where three were drawn, and never said where the choice
+       is made. Definitions are James's: Ikigai personal, Shokunin work, Hiyoku partner.
+       Hiyoku is private to each person in the app, so the page says so. */
+    main = '<h1>Your goals can now be sorted by area.</h1>' +
+      '<p class="bw-p">Each area is called a dojo. There are ' + (hi ? 'three' : 'two') + ':</p>' +
       '<div class="bw-dojos">' +
-        dojo('iki', '生', 'IKIGAI', 'The dojo of purpose: what your life is for.') +
-        dojo('sho', '職', 'SHOKUNIN', 'The dojo of craft: your work, and the way you do it.') +
-        (hi ? dojo('hiy', '比', 'HIYOKU', 'The dojo of your relationship, written from your side.') : '') +
+        dojo('iki', '生', 'IKIGAI', 'Personal: your own aspirations, such as keeping bees or learning Spanish.') +
+        dojo('sho', '職', 'SHOKUNIN', 'Work: your craft, your work goals and your ambitions there.') +
+        (hi ? dojo('hiy', '比', 'HIYOKU', 'Your partner: goals for your relationship, and the ones you and your partner set together. Each of you keeps your own list; your partner does not see yours.') : '') +
       '</div>' +
-      '<p class="bw-p">Each of this year\'s goals belongs to one of them, or to neither; those stay on My Bushido.</p>' +
-      '<p class="bw-p last">Tag a goal once and every practice that serves it follows. Tap a dojo\'s name to see only what lives there.</p>';
+      '<p class="bw-p">You place each of this year\'s goals in one dojo, or in none. A goal in no dojo stays on the main page, My Bushido.</p>' +
+      '<p class="bw-p last">You do this on the next page, with the Sort my goals button. The daily practices linked to a goal move with it.</p>';
     acts = next(4);
   } else if(p === 4){
-    main = '<h1>Give each goal its place.</h1>' +
-      '<p class="bw-p last">Your dojos stay empty until your goals are tagged. A few minutes is enough: ' +
-      (hi ? 'purpose, craft, your relationship, or neither.' : 'purpose, craft, or neither.') + '</p>';
-    acts = '<button type="button" class="bw-act red" onclick="betaWelcomeTag()">Tag my goals</button>' + next(5);
+    main = '<h1>Sort your goals.</h1>' +
+      '<p class="bw-p last">The dojos stay empty until you do. It takes a few minutes: for each goal, choose ' +
+      (hi ? 'personal, work, partner, or none.' : 'personal, work, or none.') + '</p>';
+    acts = '<button type="button" class="bw-act red" onclick="betaWelcomeTag()">Sort my goals</button>' + next(5);
   } else if(p === 5){
     main = '<h1>Or walk it with James.</h1>' +
       '<p class="bw-p">If you would rather not sort it alone, James will sit down with you and the Sensei: your vision, your dojos and your goals, set again in your own words.</p>' +
@@ -15688,12 +15693,12 @@ function betaWelcomeTag(){
   betaTagGoalsOpen();
 }
 /* THIS YEAR'S GOALS, READY TO TAG. One row a goal, and the choice the welcome named:
-   purpose, craft, or neither. A tap writes the tag and the row says where the goal
+   personal, work, or none. A tap writes the tag and the row says where the goal
    lives now; the goal's crafts and practices follow it, as they do everywhere else. */
 function betaTagGoalsOpen(){
   const hi = (typeof BETA_HIYOKU_SIDE !== 'undefined' && BETA_HIYOKU_SIDE === true);
-  const opts = [['ikigai', '生 purpose'], ['shokunin', '職 craft']]
-    .concat(hi ? [['hiyoku', '比 your relationship']] : []).concat([['', 'neither']]);
+  const opts = [['ikigai', '生 personal'], ['shokunin', '職 work']]
+    .concat(hi ? [['hiyoku', '比 partner']] : []).concat([['', 'none']]);
   const goals = (state.annualGoals || []).filter(g => g);
   const rows = goals.map(function(g){
     const raw = betaPillarRaw(g);
@@ -15707,9 +15712,9 @@ function betaTagGoalsOpen(){
   }).join('');
   betaPanelOpen('this year\'s goals',
     goals.length
-      ? '<p class="bdg-note">Give each goal its place: ' + (hi ? 'purpose, craft, your relationship, or neither.' : 'purpose, craft, or neither.') +
-        ' Its crafts and practices follow it.</p><div class="bdg-list">' + rows + '</div>'
-      : '<p class="bdg-note">There are no goals in the plan yet to tag.</p>');
+      ? '<p class="bdg-note">For each goal, choose ' + (hi ? 'personal, work, partner, or none.' : 'personal, work, or none.') +
+        ' The daily practices linked to it move with it.</p><div class="bdg-list">' + rows + '</div>'
+      : '<p class="bdg-note">There are no goals in the plan yet to sort.</p>');
 }
 function betaTagGoal(id, v){
   betaSetPillar('annual', id, v || null);
