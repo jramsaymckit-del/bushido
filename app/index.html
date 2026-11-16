@@ -4625,6 +4625,15 @@ html.beta-cold .beta-splash{display:flex}
 body.dark .btg-row{border-color:rgba(255,255,255,.12)}
 .btg-text{font-family:'Noto Serif JP',serif;font-size:13px;line-height:1.6;color:var(--ink)}
 .btg-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+/* the opening ritual's relationship question and dojo step (16 November) */
+.ob-rel{max-width:380px;margin:-12px auto 36px;text-align:left}
+.ob-rel-q{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:2px;opacity:.6}
+.ob-dojo-list{text-align:left;max-width:480px;margin:0 auto}
+.ob-dojo-lines{max-width:480px;margin:22px auto 0;text-align:left}
+.ob-dojo-line{font-family:'Noto Serif JP',serif;font-size:12.5px;line-height:1.8;color:var(--ink-light);margin:0 0 6px}
+.ob-dojo-line b{font-weight:500;color:var(--ink)}
+.ob-dojo-none{font-family:'Noto Serif JP',serif;font-size:13px;font-style:italic;color:var(--ink-faint)}
+.ob-dojo-msg{max-width:480px;margin:18px auto 0;font-size:12px;line-height:1.7;color:var(--red);font-style:italic}
 .btg-opt{font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:.08em;min-height:36px;padding:8px 12px;background:none;
   border:1px solid rgba(0,0,0,.18);border-radius:2px;color:var(--ink-light);cursor:pointer}
 body.dark .btg-opt{border-color:rgba(255,255,255,.2)}
@@ -5457,6 +5466,15 @@ try {
         <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;opacity:.6">before we begin, what shall I call you?</div>
         <input class="ob-input" id="ob-name" placeholder="Your name...">
       </div>
+      <!-- THE RELATIONSHIP QUESTION (James, 16 November): a yes gives the Hiyoku dojo,
+           with no special explanation; it is simply another dojo. -->
+      <div class="ob-rel" id="ob-rel">
+        <div class="ob-rel-q">are you in a relationship?</div>
+        <div class="btg-opts" role="group" aria-label="Are you in a relationship?">
+          <button type="button" class="btg-opt" data-rel="yes" aria-pressed="false" onclick="obSetRelationship(true)">yes</button>
+          <button type="button" class="btg-opt" data-rel="no" aria-pressed="false" onclick="obSetRelationship(false)">no</button>
+        </div>
+      </div>
       <div class="ob-nav"><div></div><button class="btn" onclick="obNext()">Walk the path</button></div>
     </div>
 
@@ -5571,8 +5589,24 @@ try {
       </div>
     </div>
 
-    <!-- Step 9: Seal -->
+    <!-- Step 9: every goal in a dojo (James, 16 November). The person chooses each
+         goal's dojo; a plan the Sensei already sorted arrives sorted, and any choice can
+         be changed here. Continue refuses while a goal has none. -->
     <div class="onboard-step" data-step="9">
+      <div class="ob-kanji">道場</div>
+      <div class="ob-question">Every goal belongs to a dojo.</div>
+      <div class="ob-sub">choose one for each goal. you can change any of them</div>
+      <div id="ob-dojo-list" class="ob-dojo-list"></div>
+      <div id="ob-dojo-lines" class="ob-dojo-lines"></div>
+      <div id="ob-dojo-msg" class="ob-dojo-msg" style="display:none"></div>
+      <div class="ob-nav">
+        <button class="btn-ghost btn" onclick="obBack()">Back</button>
+        <button class="btn" onclick="obDojosNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 10: Seal -->
+    <div class="onboard-step" data-step="10">
       <div class="ob-kanji" style="font-size:80px;opacity:.25"><span class="in-mark" role="img" aria-label="印"></span></div>
       <div class="ob-question">Your path is set.<br>The scroll is written. Now walk it, one day at a time.</div>
       <div class="ob-sub">every stroke of ink began with stillness</div>
@@ -5899,7 +5933,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-16 · Hiyoku for everyone in a relationship';
+const BUILD_ID = 'v2 · everyone · 2026-11-16 · Every goal gets its dojo at onboarding';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -6449,7 +6483,7 @@ function showOnboarding(){
 
 // ============ ONBOARDING ============
 let obStep = 0;
-const OB_STEPS = 10;
+const OB_STEPS = 11;   // 9 is the dojos (16 November), 10 the seal
 
 function renderObProgress(){
   const c = document.getElementById('ob-progress');
@@ -6475,6 +6509,8 @@ function showObStep(){
   if(obStep===5) initAnnual();
   if(obStep===6) initShok();
   if(obStep===7) initKaizenOb();
+  if(obStep===1) obDrawRelationship();
+  if(obStep===9) obDrawDojos();
   if(obStep===0) hkShow(); else hkHide();   // the Hokuto opening screen belongs to step 0 only
 }
 
@@ -6631,6 +6667,61 @@ function appendKaizenOb(c){
     <div class="ob-link-section"><div class="ob-link-label">feeds which craft?</div>
     <select class="ob-link-select"><option value="">select</option>${opts}</select></div>`;
   c.appendChild(d);
+}
+
+/* ── THE RELATIONSHIP QUESTION AND THE DOJO STEP (James, 16 November) ──
+   state.inRelationship is the answer, written as a strict boolean the moment it is
+   given and absent until then (never in DEFAULT_STATE). A yes opens the Hiyoku door at
+   once, so the dojo step can offer it; the door is the list OR this answer. */
+function obSetRelationship(v){
+  state.inRelationship = (v === true);
+  BETA_HIYOKU_SIDE = _betaHiyokuListed || state.inRelationship === true;
+  obDrawRelationship();
+}
+function obDrawRelationship(){
+  const cur = state.inRelationship === true ? 'yes' : state.inRelationship === false ? 'no' : '';
+  document.querySelectorAll('#ob-rel .btg-opt').forEach(b => {
+    const on = b.getAttribute('data-rel') === cur;
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+  });
+}
+const OB_DOJO_LINES = {
+  ikigai:   ['生', 'Ikigai', 'personal: your own aspirations, such as keeping bees or learning Spanish.'],
+  shokunin: ['職', 'Shokunin', 'work: your craft, your work goals and your ambitions there.'],
+  hiyoku:   ['比', 'Hiyoku', 'partner: for your relationship, whether or not your partner uses BUSHIDO; private, written from your side.'],
+};
+function obDojoChoices(){ return ['ikigai', 'shokunin'].concat(BETA_HIYOKU_SIDE ? ['hiyoku'] : []); }
+function obDojoOf(g){ const v = g && g.pillar; return obDojoChoices().includes(v) ? v : ''; }
+function obDrawDojos(){
+  const list = document.getElementById('ob-dojo-list'), lines = document.getElementById('ob-dojo-lines');
+  if(!list) return;
+  const goals = (state.annualGoals || []).filter(g => g && g.text);
+  const ch = obDojoChoices();
+  const label = { ikigai: '生 personal', shokunin: '職 work', hiyoku: '比 partner' };
+  list.innerHTML = goals.length ? goals.map(g => {
+    const cur = obDojoOf(g);
+    return '<div class="btg-row" data-goal="' + g.id + '"><div class="btg-text">' + escapeHtml(g.text) + '</div>' +
+      '<div class="btg-opts">' + ch.map(v => '<button type="button" class="btg-opt' + (cur === v ? ' on' : '') + '" data-v="' + v + '"' +
+        ' aria-pressed="' + (cur === v) + '" onclick="obPickDojo(' + JSON.stringify(g.id).replace(/"/g, '&quot;') + ',\'' + v + '\')">' + label[v] + '</button>').join('') +
+      '</div></div>';
+  }).join('') : '<p class="ob-dojo-none">There are no goals for this year yet.</p>';
+  if(lines) lines.innerHTML = ch.map(v => '<p class="ob-dojo-line"><b>' + OB_DOJO_LINES[v][0] + ' ' + OB_DOJO_LINES[v][1] + '</b> · ' + OB_DOJO_LINES[v][2] + '</p>').join('');
+}
+function obPickDojo(id, v){
+  const g = (state.annualGoals || []).find(x => x && x.id == id);
+  if(!g || !obDojoChoices().includes(v)) return;
+  g.pillar = v;
+  const m = document.getElementById('ob-dojo-msg'); if(m) m.style.display = 'none';
+  obDrawDojos();
+}
+function obDojosNext(){
+  const open = (state.annualGoals || []).filter(g => g && g.text && !obDojoOf(g));
+  if(open.length){
+    const m = document.getElementById('ob-dojo-msg');
+    if(m){ m.textContent = 'Choose a dojo for each goal: ' + (open.length === 1 ? 'one is' : open.length + ' are') + ' still without one.'; m.style.display = 'block'; }
+    return;
+  }
+  obNext();
 }
 
 let _obYearEndMode='calendar';
@@ -10312,14 +10403,20 @@ const BETA_HIYOKU_UID_HASHES = [
   'ba2ae9a6cb6f94393628822ae242512879ff4ee71afdda54195c0429de677501',
   'fffe5bc2bdcca1d15cf9f336636ff344d5d79145ff7f80aba68391010fab5bfa',
 ];
+/* AND ANYONE WHO SAYS YES (James, 16 November). The opening ritual asks "are you in a
+   relationship?", and the Sensei asks the same in a session; a yes is written to the
+   person's own record as inRelationship:true and opens the door. The list stays for the
+   five who had it before there was a question to answer. */
+let _betaHiyokuListed = false;
 async function betaHiyokuResolve(uid){
-  BETA_HIYOKU_SIDE = false;
+  BETA_HIYOKU_SIDE = false; _betaHiyokuListed = false;
   if(!uid) return false;
   try{
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(uid));
     const hex = [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
-    BETA_HIYOKU_SIDE = BETA_HIYOKU_UID_HASHES.includes(hex);
-  }catch(e){ BETA_HIYOKU_SIDE = false; }
+    _betaHiyokuListed = BETA_HIYOKU_UID_HASHES.includes(hex);
+  }catch(e){ _betaHiyokuListed = false; }
+  BETA_HIYOKU_SIDE = _betaHiyokuListed || (typeof state !== 'undefined' && !!state && state.inRelationship === true);
   return BETA_HIYOKU_SIDE;
 }
 /* A TAG THE PERSON CANNOT SEE IS NOT THEIRS TO LOSE BY ACCIDENT. With no Hiyoku door a
@@ -15854,6 +15951,10 @@ function mergeMergeableFields(local, cloud, untickMap){
   if(_sr) out.sessionRequests = _sr;
   const _ws = local.updateWelcomeSeen || cloud.updateWelcomeSeen;
   if(_ws) out.updateWelcomeSeen = _ws;
+  /* The relationship answer (16 November): a yes on either side holds, so a stale device
+     cannot close a door the person opened; absent on both stays absent. */
+  if(local.inRelationship === true || cloud.inRelationship === true) out.inRelationship = true;
+  else if(local.inRelationship === false || cloud.inRelationship === false) out.inRelationship = false;
   return out;
 }
 function unionSessionRequests(a, b){
