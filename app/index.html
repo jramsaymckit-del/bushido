@@ -600,6 +600,15 @@ body.dark .bd-panel{border-left-color:rgba(255,255,255,.1)}
   color:var(--ink-faint);padding:2px 6px}
 .bd-panel-body{flex:1;min-height:0;overflow-y:auto;padding:20px 24px 40px}
 .bd-panel-body .add-form{display:block;max-height:none;opacity:1;overflow:visible;margin:0}
+.bda{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(26,18,16,.32)}
+.bda[hidden]{display:none}
+.bda-card{width:360px;max-width:100%;box-sizing:border-box;background:var(--scroll);border:1px solid var(--edge);padding:26px 24px 20px;text-align:center}
+.bda-q{margin:0 0 22px;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.5;color:var(--ink)}
+.bda-acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.bda-acts button{min-height:44px;padding:0 20px;font-family:'Noto Sans JP',sans-serif;font-size:12px;letter-spacing:.08em;cursor:pointer;background:none}
+.bda-keep{border:1px solid var(--ink);color:var(--ink)}
+.bda-yes{border:1px solid var(--red);color:var(--red)}
+body.dark .bda{background:rgba(0,0,0,.5)}
 .bd-scrim{position:fixed;inset:0;z-index:94;background:rgba(26,18,16,.14);
   opacity:0;transition:opacity .42s;pointer-events:none}
 .bd-scrim.open{opacity:1;pointer-events:auto}
@@ -5939,7 +5948,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-16 · The cascade walkthrough for new people';
+const BUILD_ID = 'v2 · everyone · 2026-11-16 · Deleting a habit asks first';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -8662,7 +8671,7 @@ function renderGoals(){
             </div>
             <div class="goal-actions">
               <button class="goal-act" onclick="event.stopPropagation();editHabit(${g.id})">✎</button>
-              <button class="goal-act goal-del" onclick="confirmDelete('kaizen',${g.id})">×</button>
+              <button class="goal-act goal-del" onclick="betaAskDeleteHabit(${g.id})">×</button>
             </div>
             <div class="habit-detail" id="hd-${g.id}">${hdBullets}</div>
             </li>`;
@@ -13280,7 +13289,7 @@ function toggleEditMode(){
 }
 function _editModeOutsideHandler(e){
   if(!editMode) return;
-  if(e.target.closest('.goal-act,.btn-edit-mode,.edit-mode-bar,.drag-handle,.modal,#delete-confirm')) return;
+  if(e.target.closest('.goal-act,.btn-edit-mode,.edit-mode-bar,.drag-handle,.modal,#delete-confirm,#beta-del-ask')) return;   // the habit's "are you sure" keeps edit mode open
   toggleEditMode();
 }
 let _dragId=null;
@@ -13384,6 +13393,36 @@ function betaUndoRowHtml(){
     '<span class="beta-undo-text">Deleted · ' + name + '</span>' +
     '<button class="beta-undo-btn" onclick="betaUndoDelete()">Undo</button></li>';
 }
+
+/* A HABIT IS NEVER DELETED ON ONE TAP (James, 16 November): he lost one that way. The ×
+   asks first; "No, keep" closes with nothing changed; "Yes, destroy" deletes it through
+   the same path as before, undo row included. Only habits: James asked for nothing else. */
+let _betaDelAsk = null;
+function betaAskDeleteHabit(id){
+  if(!(state.kaizen || []).some(k => k && k.id === id)) return;
+  _betaDelAsk = id;
+  let el = document.getElementById('beta-del-ask');
+  if(!el){
+    el = document.createElement('div'); el.id = 'beta-del-ask'; el.className = 'bda';
+    el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'bda-q');
+    el.innerHTML = '<div class="bda-card"><p class="bda-q" id="bda-q">Are you sure you want to delete?</p>' +
+      '<div class="bda-acts"><button type="button" class="bda-keep" id="bda-keep" onclick="betaDeleteKeep()">No, keep</button>' +
+      '<button type="button" class="bda-yes" id="bda-yes" onclick="betaDeleteDestroy()">Yes, destroy</button></div></div>';
+    el.addEventListener('click', e => { if(e.target === el) betaDeleteKeep(); });   // a tap outside keeps it
+    document.body.appendChild(el);
+  }
+  el.hidden = false;
+  const k = document.getElementById('bda-keep'); if(k) k.focus();               // the safe choice has focus
+}
+function betaDeleteKeep(){
+  _betaDelAsk = null;
+  const el = document.getElementById('beta-del-ask'); if(el) el.hidden = true;
+}
+function betaDeleteDestroy(){
+  const id = _betaDelAsk; betaDeleteKeep();
+  if(id !== null && id !== undefined) confirmDelete('kaizen', id);
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && _betaDelAsk !== null){ const el = document.getElementById('beta-del-ask'); if(el && !el.hidden) betaDeleteKeep(); } });
 
 function executeDelete(){
   if(!_deleteTarget) return;
