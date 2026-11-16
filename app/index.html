@@ -5899,7 +5899,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-16 · Every goal belongs to a dojo';
+const BUILD_ID = 'v2 · everyone · 2026-11-16 · Hiyoku for everyone in a relationship';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -10288,13 +10288,16 @@ const BETA_SIDES = {
    with no Hiyoku door they show on My Bushido, and they show WITHOUT the 比 mark,
    because a mark for a door that is not there is a label pointing at nothing. */
 let BETA_HIYOKU_SIDE = false;
-/* ══════════ HIYOKU, FOR TWO PEOPLE FOR NOW (James, 15 November) ══════════
+/* ══════════ HIYOKU, FOR EVERYONE IN A RELATIONSHIP (James, 15 November) ══════════
+   Five people: the two first given it, and the three James named the same day. No
+   record holds a relationship answer, so the list is James's to keep; a partner need
+   not use BUSHIDO.
    The flag above is now decided per person, at sign-in, from this short list. Each line
    is sha256(uid), never the uid: this file is served from a public repository, and the
    stage 1 gate made the same choice for the same reason. Adding a person is one line.
 
-   NOTHING IS WRITTEN TO ANYONE'S RECORD. A person on the list gets the Hiyoku door, the
-   Hiyoku page in the welcome and the Hiyoku choice when tagging; it is their own and is
+   NOTHING IS WRITTEN TO ANYONE'S RECORD. A person on the list gets the Hiyoku door and
+   the Hiyoku choice when sorting (the welcome is gone, 16 November); it is their own and is
    linked to nobody. Everyone else has two dojos. Whatever Hiyoku tag or text their
    record already holds stays there, hidden and untouched: a goal tagged Hiyoku shows on
    My Bushido as untagged, and no control here can remove a tag the person cannot see.
@@ -10305,6 +10308,9 @@ let BETA_HIYOKU_SIDE = false;
 const BETA_HIYOKU_UID_HASHES = [
   '7eda4d24e1164abb70002193e159b32af380ae643569d3c89df7933a6ce86324',
   '32cde42dee0c5d96550da1639190ccebceb65626d9868c8627511e7e7a6c6a91',
+  'a6bb5c4940631b8946ca37a683ba62aacb71c454d1b328772b7021f8373f1e88',
+  'ba2ae9a6cb6f94393628822ae242512879ff4ee71afdda54195c0429de677501',
+  'fffe5bc2bdcca1d15cf9f336636ff344d5d79145ff7f80aba68391010fab5bfa',
 ];
 async function betaHiyokuResolve(uid){
   BETA_HIYOKU_SIDE = false;
@@ -15517,7 +15523,9 @@ function betaTagGoalsOpen(){
   betaPanelOpen('this year\'s goals',
     goals.length
       ? '<p class="bdg-note">For each goal, choose ' + (hi ? 'personal, work or partner.' : 'personal or work.') +
-        ' The daily practices linked to it move with it.</p><div class="bdg-list">' + rows + '</div>'
+        ' The daily practices linked to it move with it.</p>' +
+        (hi ? '<p class="bdg-note">比 Partner: for your relationship, whether or not your partner uses BUSHIDO; private, written from your side.</p>' : '') +
+        '<div class="bdg-list">' + rows + '</div>'
       : '<p class="bdg-note">There are no goals in the plan yet to sort.</p>');
 }
 function betaTagGoal(id, v){
