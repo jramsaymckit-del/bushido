@@ -614,6 +614,9 @@ body.dark .bd-panel{border-left-color:rgba(255,255,255,.1)}
 .bde-btn{background:none;border:1px solid var(--ink);padding:13px 30px;cursor:pointer;
   font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink)}
 .bde-btn:hover{border-color:var(--red);color:var(--red)}
+.bde-sort{margin:18px 0 0}
+.bde-link{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-style:normal;color:var(--ink);border-bottom:1px solid currentColor}
+.bde-link:hover{color:var(--red)}
 .bdg-note{font-family:'Noto Serif JP',serif;font-size:12px;font-style:italic;color:var(--ink-faint);margin:0 0 14px;line-height:1.8}
 .bdg-list{border-top:1px solid rgba(0,0,0,.1)}
 .bdg-row{display:flex;align-items:baseline;gap:12px;width:100%;padding:14px 2px;background:none;border:0;
@@ -4617,119 +4620,7 @@ html.beta-cold .beta-splash{display:flex}
   background:var(--mark-in) center/contain no-repeat;flex:none}
 /* the clan's works keep their ring (James, 15 November): the painted mark sits inside it
    at the size the typed character had. */
-/* ══════════ THE UPDATE WELCOME (James, 15 November) ══════════
-   Shown once to a person who was already here when BUSHIDO was rebuilt, after sign-in
-   and before My Bushido. Built from the final boards ("Update welcome"): the sizes are
-   the boards' sizes, desktop and phone, day and night. The ensō and the 道 seal are the
-   painted marks the rest of the app uses. */
-.bw{position:fixed;inset:0;z-index:9000;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  --bw-bg:#F5F0E8;--bw-ink:#1A1A1A;--bw-mute:#66615A;--bw-dot:#857E72;--bw-line:#E8DFD0;--bw-red:#CC3529;
-  --bw-iki:#7C56D7;--bw-sho:#2E7DA6;--bw-hiy:#308572;
-  background:var(--bw-bg);color:var(--bw-ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased}
-.bw.night{--bw-bg:#1B1815;--bw-ink:#EDE8DE;--bw-mute:#ADA393;--bw-dot:#6B6257;--bw-line:#332D27;--bw-red:#E0574B;
-  --bw-iki:#9068EB;--bw-sho:#3D89B2;--bw-hiy:#3B8F7B}
-.bw-page{position:relative;min-height:max(100%,720px);box-sizing:border-box}
-.bw-dots{position:absolute;top:52px;left:0;right:0;display:flex;justify-content:center;gap:12px}
-.bw-dots span{width:7px;height:7px;box-sizing:border-box;border-radius:50%;border:1.2px solid var(--bw-dot)}
-.bw-dots span.on{background:var(--bw-ink);border:0}
-.bw button{font-family:'Noto Sans JP',sans-serif;font-style:normal;text-transform:none;background:none;border:0;border-radius:0;cursor:pointer;margin:0;box-shadow:none}
-.bw-skip{position:absolute;top:40px;right:56px;font-size:13px;letter-spacing:0;color:var(--bw-mute);padding:8px;z-index:1}
-.bw-main{position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:620px;max-width:100%;box-sizing:border-box;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:110px}
-.bw-pg3 .bw-main{width:680px}
-.bw-pg3.bw-hi .bw-main{width:800px}
-.bw h1{margin:0 0 22px;font-family:'Noto Serif JP',serif;font-size:32px;font-weight:500;font-style:normal;line-height:1.25;letter-spacing:0;text-transform:none;color:var(--bw-ink)}
-.bw-p{margin:0 0 10px;width:520px;max-width:100%;font-family:'Noto Sans JP',sans-serif;font-size:15.5px;font-style:normal;line-height:26px;letter-spacing:0;color:var(--bw-mute)}
-.bw-p.last{margin-bottom:0}
-.bw-enso{width:120px;height:120px;margin-bottom:34px;background:var(--mark-enso) center/contain no-repeat}
-.bw.night .bw-enso{filter:invert(1)}
-.bw-pg1 .bw-p.last{margin-bottom:32px}
-.bw-places{display:flex;gap:48px}
-.bw-places div,.bw-hz div{display:flex;flex-direction:column;align-items:center}
-.bw-places div{gap:6px}
-.bw-places b{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:400;line-height:1;color:var(--bw-ink)}
-.bw-places span{font-size:10px;letter-spacing:.08em;color:var(--bw-mute)}
-.bw-hz{display:flex;gap:80px;margin-bottom:38px}
-.bw-hz div{gap:12px}
-.bw-hz b{font-family:'Noto Serif JP',serif;font-size:44px;font-weight:400;line-height:1;color:var(--bw-ink)}
-.bw-hz span{font-size:11px;letter-spacing:.08em;color:var(--bw-mute)}
-.bw-pg2 h1{margin-bottom:20px}
-.bw-pg2 .bw-p{width:500px}
-.bw-pg3 h1{margin-bottom:34px}
-.bw-pg3 .bw-p{width:560px}
-.bw-dojos{display:flex;gap:96px;margin-bottom:32px}
-.bw-hi .bw-dojos{gap:56px}
-.bw-dojo{width:250px;display:flex;flex-direction:column;align-items:center;gap:9px}
-.bw-hi .bw-dojo{width:220px}
-.bw-dojo b{font-family:'Noto Serif JP',serif;font-size:26px;font-weight:400;line-height:1}
-.bw-dojo i{font-style:normal;font-size:11px;letter-spacing:.25em;font-weight:500}
-.bw-dojo span{font-size:14px;line-height:22px;color:var(--bw-mute)}
-.bw-dojo.iki b,.bw-dojo.iki i{color:var(--bw-iki)}
-.bw-dojo.sho b,.bw-dojo.sho i{color:var(--bw-sho)}
-.bw-dojo.hiy b,.bw-dojo.hiy i{color:var(--bw-hiy)}
-.bw-pg5 .bw-p{width:540px;margin-bottom:34px}
-.bw-dao{width:38px;height:38px;background:var(--mark-dao) center/contain no-repeat;transform:rotate(-2deg)}
-.bw-pgnote h1,.bw-pgsent h1{margin-bottom:18px}
-.bw-pgnote .bw-p{margin-bottom:36px}
-.bw-pgsent .bw-p{width:480px}
-.bw textarea.bw-note{width:520px;max-width:100%;height:92px;box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid var(--bw-line);
-  border-radius:0;outline:0;resize:none;padding:0 2px 12px;margin:0;font-family:'Noto Serif JP',serif;font-size:17px;font-style:normal;line-height:34px;
-  letter-spacing:0;color:var(--bw-ink);text-align:left;box-shadow:none}
-.bw-acts{position:absolute;bottom:88px;left:0;right:0;display:flex;justify-content:center;align-items:baseline;gap:48px}
-.bw-pg4 .bw-acts,.bw-pg5 .bw-acts,.bw-pgnote .bw-acts{gap:56px}
-.bw button.bw-act{font-size:14px;letter-spacing:.12em;color:var(--bw-ink);border-bottom:1.5px solid var(--bw-ink);padding:12px 4px}
-.bw button.bw-act.red{color:var(--bw-red);border-bottom-color:var(--bw-red)}
-.bw button.bw-quiet{font-size:13px;letter-spacing:.1em;color:var(--bw-mute);padding:12px 4px}
-.bw-foot{position:absolute;bottom:42px;left:0;right:0;margin:0;text-align:center;font-size:12px;font-style:normal;letter-spacing:0;color:var(--bw-mute)}
-@media(max-width:700px){
-  .bw-page{min-height:max(100%,700px)}
-  .bw-dots{top:46px;gap:10px}
-  .bw-dots span{width:6px;height:6px}
-  .bw-skip{top:34px;right:20px}
-  .bw-main,.bw-pg3 .bw-main,.bw-pg3.bw-hi .bw-main{left:30px;right:30px;width:auto;transform:none;padding-bottom:96px}
-  .bw-pg3 .bw-main{padding-bottom:90px}
-  .bw-pg3.bw-hi .bw-main{padding-bottom:84px}
-  .bw h1{font-size:26px;line-height:34px;margin-bottom:16px}
-  .bw-p,.bw-pg2 .bw-p,.bw-pg3 .bw-p,.bw-pg5 .bw-p,.bw-pgsent .bw-p{width:auto;font-size:14.5px;line-height:24px;margin-bottom:8px}
-  .bw-p.last{margin-bottom:0}
-  .bw-enso{width:92px;height:92px;margin-bottom:28px}
-  .bw-pg1 .bw-p.last{margin-bottom:26px}
-  .bw-places{gap:22px}
-  .bw-places div{gap:5px}
-  .bw-places b{font-size:19px}
-  .bw-places span{font-size:8.5px;letter-spacing:.05em}
-  .bw-hz{gap:42px;margin-bottom:30px}
-  .bw-hz div{gap:10px}
-  .bw-hz b{font-size:34px}
-  .bw-hz span{font-size:10px;letter-spacing:.06em}
-  .bw-pg2 h1{margin-bottom:16px}
-  .bw-pg3 h1{margin-bottom:24px}
-  .bw-pg3.bw-hi h1{margin-bottom:20px}
-  .bw-dojos,.bw-hi .bw-dojos{flex-direction:column;gap:22px;margin-bottom:26px}
-  .bw-hi .bw-dojos{gap:16px;margin-bottom:22px}
-  .bw-dojo,.bw-hi .bw-dojo{width:300px;max-width:100%;gap:7px}
-  .bw-hi .bw-dojo{gap:6px}
-  .bw-dojo b{font-size:22px}
-  .bw-dojo i{font-size:10px}
-  .bw-dojo span{font-size:13.5px;line-height:21px}
-  .bw-hi .bw-dojo span{font-size:13px;line-height:20px}
-  .bw-pg3.bw-hi .bw-p{font-size:14px;line-height:23px}
-  .bw-pg5 .bw-p{margin-bottom:26px}
-  .bw-dao{width:36px;height:36px}
-  .bw-pgnote h1,.bw-pgsent h1{margin-bottom:14px}
-  .bw-pgnote .bw-p{margin-bottom:30px}
-  .bw textarea.bw-note{width:330px;height:104px;font-size:16px;line-height:30px;padding-bottom:10px}
-  .bw-acts{bottom:60px;gap:36px}
-  .bw-pg3.bw-hi .bw-acts{bottom:56px}
-  .bw-pg4 .bw-acts{gap:34px}
-  .bw-pg5 .bw-acts{gap:30px}
-  .bw-pgnote .bw-acts{gap:40px}
-  .bw-pg4 button.bw-act.red{letter-spacing:.1em}
-  .bw-pg5 button.bw-act.red{letter-spacing:.08em;padding:12px 2px}
-  .bw button.bw-quiet{letter-spacing:.08em}
-  .bw-foot{bottom:30px;left:20px;right:20px;font-size:11.5px}
-}
-/* THIS YEAR'S GOALS, READY TO TAG: the sheet "Tag my goals" opens. */
+/* THIS YEAR'S GOALS, READY TO SORT: the sheet "Sort my goals" opens. */
 .btg-row{padding:14px 2px;border-bottom:1px solid rgba(0,0,0,.1)}
 body.dark .btg-row{border-color:rgba(255,255,255,.12)}
 .btg-text{font-family:'Noto Serif JP',serif;font-size:13px;line-height:1.6;color:var(--ink)}
@@ -6008,7 +5899,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-15 · Plain welcome wording';
+const BUILD_ID = 'v2 · everyone · 2026-11-16 · Every goal belongs to a dojo';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -6774,7 +6665,7 @@ function finishOnboarding(){
     return;
   }
   state.onboarded=true;
-  state.updateWelcomeSeen=getDateStr();   // whoever walks the opening ritual is never shown the update welcome
+  state.updateWelcomeSeen=getDateStr();   // the update welcome is removed (16 November); kept so a rollback to the build before it never shows it to a new person
   state.yearEndMode=_obYearEndMode;
   state.yearEndMonth=_obYearEndMonth;
   state.yearStartDate=getDateStr(); // record when they began
@@ -9257,11 +9148,13 @@ const YOU_PAGES = [
   { k:'reminders', t:'Reminders',         s:'Alerts through calendar sync, not a bell of its own' },
   { k:'calendar',  t:'Calendar sync',     s:'Google · writes to BUSHIDO’s own calendar' },
   { k:'data',      t:'Your data',         s:'Export or restore a backup' },
-  { k:'changed',   t:'What changed',      s:'The welcome to the rebuilt BUSHIDO, again' },
+  /* SORT MY GOALS (James, 16 November): What changed is gone with the update welcome;
+     this row keeps the sorting list one tap away for anyone, at any time. */
+  { k:'sort',      t:'Sort my goals',     s:'Choose the dojo each of this year\u2019s goals belongs to' },
   { k:'manifesto', t:'Read the manifesto', s:'' },
 ];
 function youOpen(k){
-  if(k === 'changed'){ betaWelcomeOpen(); return; }   // not a panel: the welcome itself, opened again
+  if(k === 'sort'){ betaTagGoalsOpen(); return; }   // not a panel: the sorting list itself
   YOU_PAGE = k; betaRenderYou();
 }
 
@@ -9560,6 +9453,11 @@ function betaPanelOpen(title, html){
   const p = document.getElementById('bd-panel'), s = document.getElementById('bd-scrim'),
         b = document.getElementById('bd-panel-body'), h = document.getElementById('bd-panel-title');
   if(!p || !b) return;
+  /* THE SHEET LIVES ON THE BODY (16 November). It was drawn inside My Bushido, so opened
+     from You (Sort my goals) it was "open" with no size at all: a fixed element still
+     vanishes with a hidden ancestor. Moved once, on first open; no rule reaches it
+     through My Bushido, so it looks the same wherever it is opened. */
+  if(p.parentNode !== document.body){ if(s) document.body.appendChild(s); document.body.appendChild(p); }
   b.innerHTML = html;
   if(h) h.textContent = title;
   p.hidden = false; if(s) s.hidden = false;
@@ -10827,17 +10725,20 @@ function betaRenderEmptyDojo(){
     '<p class="bde-lead">Nothing lives in this dojo yet.</p>' +
     '<p class="bde-body">Give a goal the ' + name + ' door, and everything under it follows it here.</p>' +
     (goals
-      ? '<button class="bde-btn" id="bde-btn" onclick="betaChooseDojoGoals(\'' + BETA_DOOR + '\')">Choose goals for ' + name + '</button>'
+      ? '<button class="bde-btn" id="bde-btn" onclick="betaChooseDojoGoals(\'' + BETA_DOOR + '\')">Choose goals for ' + name + '</button>' +
+        '<p class="bde-body bde-sort"><button class="bde-link" id="bde-sort" onclick="betaTagGoalsOpen()">Sort my goals</button>: choose the dojo for every goal at once.</p>'
       : '<p class="bde-body">There are no goals in the plan yet to give it.</p>');
 }
 /* THE ONE DOOR IN: the plan's goals, each a row that says where it lives. A tap gives
-   the goal to this dojo, a second tap takes it home again. A goal that lives in the
-   other dojo says so and moves on a tap, because a goal has one door. */
+   the goal to this dojo. A goal that lives in another dojo says so and moves on a tap,
+   because a goal has one door. NO NEITHER (James, 15 November): a second tap used to
+   take the goal out of every dojo; now a goal that lives here stays here, and moves
+   only by being given to another dojo. */
 function betaChooseDojoGoals(side){
   const name = (BETA_SIDES[side] || {}).name || '';
   const rows = (state.annualGoals || []).map(function(g){
     const cur = betaPillarOf('annual', g);
-    const where = cur === side ? 'lives here' : cur ? 'in ' + ((BETA_SIDES[cur] || {}).name || cur) : 'at home';
+    const where = cur === side ? 'lives here' : cur ? 'in ' + ((BETA_SIDES[cur] || {}).name || cur) : 'not yet sorted';
     return '<button class="bdg-row' + (cur === side ? ' is-here' : '') + '" data-goal="' + g.id + '"' +
       ' onclick="betaGiveGoal(' + JSON.stringify(g.id).replace(/"/g, '&quot;') + ',\'' + side + '\')">' +
       '<span class="bdg-text">' + escapeHtml(g.text || '') + '</span>' +
@@ -10850,7 +10751,8 @@ function betaChooseDojoGoals(side){
 function betaGiveGoal(id, side){
   const g = (state.annualGoals || []).find(x => x && x.id == id);
   if(!g) return;
-  betaSetPillar('annual', id, betaPillarOf('annual', g) === side ? null : side);
+  if(betaPillarOf('annual', g) === side) return;   // already here: never back to no dojo
+  betaSetPillar('annual', id, side);
   betaApplyDoor();
   betaChooseDojoGoals(side);     // redraw the sheet so each row says where it lives now
 }
@@ -11006,15 +10908,17 @@ function betaPillarPickerHtml(kind, id, cur){
   if(shown === 'hiyoku' && !BETA_HIYOKU_SIDE) shown = '';     // a hidden tag reads as untagged
   const fn = (kind === 'kaizen') ? 'betaPickDraft' : 'betaSetPillar';
   const opt = (v, label) =>
-    '<button type="button" class="beta-pill-opt' + (shown === v || (!shown && v === '') ? ' on' : '') + '"' +
+    '<button type="button" class="beta-pill-opt' + (shown === v ? ' on' : '') + '"' +
     ' onmousedown="event.preventDefault();event.stopPropagation();"' +
     ' onclick="event.stopPropagation();' + fn + '(' +
       (kind === 'kaizen' ? '' : '\'' + kind + '\',') + id + ',\'' + v + '\')">' + label + '</button>';
   /* THE FLAG IS THE GATE. With it off, Hiyoku is not offered, so no live user can
      tag an item to a side their app does not have a door for. */
-  return '<div class="beta-pill-row"><span class="beta-pill-label">pillar</span>' +
+  /* NO "none" (James, 15 November): every item belongs to a dojo. An item not yet
+     sorted shows no choice lit; a choice moves it, nothing takes it out. */
+  return '<div class="beta-pill-row"><span class="beta-pill-label">dojo</span>' +
          opt('ikigai','Ikigai') + (BETA_HIYOKU_SIDE ? opt('hiyoku','Hiyoku') : '') +
-         opt('shokunin','Shokunin') + opt('','none') + '</div>';
+         opt('shokunin','Shokunin') + '</div>';
 }
 function betaPickDraft(id, v){
   _betaPillarDraft[id] = (v === 'ikigai' || v === 'shokunin' || (v === 'hiyoku' && BETA_HIYOKU_SIDE)) ? v : null;
@@ -11237,8 +11141,24 @@ function showAdd(){
       <select id="tf-select"><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option></select>`;
   } else {
     const opts=state.milestones5yr.slice(0,(state.strands||[]).length).map((m,i)=>`<option value="${i}">${m.substring(0,40)}</option>`).join('');   // #13 Tier 1(b): only offer milestones with a matching strand
-    ex.innerHTML=`<select id="link-select"><option value="">serves which 5-year milestone?</option>${opts}</select>`;
+    /* A NEW GOAL CHOOSES ITS DOJO (James, 15 November: every goal belongs to one). Added
+       inside an open dojo, that dojo is chosen already; Commit refuses until one is. */
+    _addDojo = (BETA_DOOR === 'ikigai' || BETA_DOOR === 'shokunin' || (BETA_DOOR === 'hiyoku' && BETA_HIYOKU_SIDE)) ? BETA_DOOR : null;
+    ex.innerHTML=`<select id="link-select"><option value="">serves which 5-year milestone?</option>${opts}</select>` + betaAddDojoRowHtml();
   }
+}
+let _addDojo = null;
+function betaAddDojoRowHtml(){
+  const opt = (v, label) => '<button type="button" class="beta-pill-opt' + (_addDojo === v ? ' on' : '') + '" data-v="' + v + '"' +
+    ' onmousedown="event.preventDefault();" onclick="betaAddDojo(\'' + v + '\')">' + label + '</button>';
+  return '<div class="beta-pill-row" id="add-dojo-row"><span class="beta-pill-label">dojo</span>' +
+    opt('ikigai', '生 personal') + opt('shokunin', '職 work') + (BETA_HIYOKU_SIDE ? opt('hiyoku', '比 partner') : '') + '</div>';
+}
+function betaAddDojo(v){
+  if(!(v === 'ikigai' || v === 'shokunin' || (v === 'hiyoku' && BETA_HIYOKU_SIDE))) return;
+  _addDojo = v;
+  const row = document.getElementById('add-dojo-row'); if(row) row.outerHTML = betaAddDojoRowHtml();
+  const err = document.getElementById('add-form-error'); if(err && err.dataset.why === 'dojo'){ err.style.display = 'none'; err.textContent = ''; delete err.dataset.why; }
 }
 // Add-form cascade preview — renders craft → goal → strand once a craft is chosen (Kaizen add).
 function _uaAddChainPreview(){
@@ -11256,6 +11176,7 @@ function hideAdd(){
   betaPanelClose();
   _uaCasc.open=false; _uaCasc.landed=null; _uaCasc.ctx=null;   // 2a — clear add-flow browser choice
   if(_uaEditId==='add'){ _uaDraft=null; _uaEditId=null; _uaFreqOpen=false; }   // and the cadence draft
+  _addDojo=null;                                                 // and the new goal's dojo
 }
 // C1-root — the single gate that stops orphaned cascade items. Both the in-app add-flow
 // (addGoal) and onboarding save (saveObStep) route every parent link through this, so no
@@ -11313,7 +11234,13 @@ function addGoal(){
       const tf=document.getElementById('tf-select')?.value||'monthly';
       state.shokunin.push({id:state.nextId++,text,parentAnnual:res.value,progress:0,timeframe:tf,done:false,userAdded:true});
     } else {
-      state.annualGoals.push({id:state.nextId++,text,parentMs:res.value,progress:0,done:false,userAdded:true});
+      if(!_addDojo){                                   // every goal belongs to a dojo: block visibly, never guess one
+        const el=document.getElementById('add-form-error');
+        if(el){ el.textContent='Choose the dojo this goal belongs to: ' + (BETA_HIYOKU_SIDE ? 'personal, work or partner.' : 'personal or work.'); el.dataset.why='dojo'; el.style.display='block'; }
+        const row=document.getElementById('add-dojo-row'); if(row){ row.classList.add('shake'); setTimeout(()=>row.classList.remove('shake'),350); }
+        return;
+      }
+      state.annualGoals.push({id:state.nextId++,text,parentMs:res.value,progress:0,done:false,userAdded:true,pillar:_addDojo});
     }
   }
   saveState();hideAdd();renderTab();
@@ -15514,7 +15441,6 @@ async function loadFirestoreState(user){
   await betaHiyokuResolve(user.uid);   // who has the Hiyoku door: decided before anything is drawn (15 November)
   if(state.onboarded){
     showDashboard();
-    betaMaybeWelcome();        // the update welcome: once, to a person who was already here (15 November)
     maybeShowClansWelcome();   // C3b — §5 Option B overlay; no-op unless all 5 predicate conditions hold (clanless on-branch → never fires)
   } else {
     showOnboarding();
@@ -15561,144 +15487,22 @@ function showDashboard(){
   });
 }
 
-// ── The update welcome (James, 15 November · the final boards, "Update welcome") ──
-// Shown ONCE to a person who was already here when BUSHIDO was rebuilt: after sign-in,
-// before My Bushido. Never to a new person and never to anyone meeting the opening
-// ritual: the ritual's last step writes the same seen-flag, so whoever walks it has
-// already been told what this place is.
-//
-// THE SEEN-FLAG is state.updateWelcomeSeen, the date it was closed. Like
-// clansWelcomeSeen it is NEVER in DEFAULT_STATE: it is absent until written, so a
-// person's record gains exactly one key from this and nothing else. Skip, Later, Done
-// and "Tag my goals" all write it. "What changed" in You opens the same pages again and
-// writes nothing.
-//
-// A NOTE TO JAMES is appended to state.sessionRequests, in the person's own record:
-//   { id: 'sr_<milliseconds>', at: <milliseconds>, note: '<their words>' }
-// which is the shape ~/.bushido-admin/session_requests.mjs reads. Both keys ride the
-// merge net (mergeMergeableFields), so a stale device can neither lose a note nor show
-// the welcome a second time.
-let _bwPage = 1, _bwNote = '';
-function betaWelcomeDue(){
-  if(typeof _currentUser === 'undefined' || !_currentUser) return false;
-  if(typeof _docFetchSucceeded !== 'undefined' && !_docFetchSucceeded) return false;   // never over an unloaded record
-  if(state.onboarded !== true) return false;      // the opening ritual comes instead
-  if(state.updateWelcomeSeen) return false;
-  return true;
-}
-function betaMaybeWelcome(){ if(betaWelcomeDue()) betaWelcomeOpen(); }
-function betaWelcomeOpen(){
-  _bwPage = 1; _bwNote = '';
-  let el = document.getElementById('beta-welcome');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'beta-welcome'; el.className = 'bw';
-    el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'What changed');
-    document.body.appendChild(el);
-  }
-  el.classList.toggle('night', typeof isNightHours === 'function' ? isNightHours() : false);
-  betaWelcomeDraw();
-}
-function betaWelcomeGo(p){
-  const ta = document.getElementById('bw-note');
-  if(ta) _bwNote = ta.value;                      // Back keeps what was typed
-  _bwPage = p; betaWelcomeDraw();
-}
-function betaWelcomeDraw(){
-  const el = document.getElementById('beta-welcome');
-  if(!el) return;
-  const p = _bwPage, hi = (typeof BETA_HIYOKU_SIDE !== 'undefined' && BETA_HIYOKU_SIDE === true);
-  const numbered = typeof p === 'number';
-  const dots = numbered ? '<div class="bw-dots" aria-hidden="true">' +
-    [1,2,3,4,5].map(i => '<span' + (i <= p ? ' class="on"' : '') + '></span>').join('') + '</div>' : '';
-  const skip = (numbered && p < 5) ? '<button type="button" class="bw-skip" onclick="betaWelcomeClose()">Skip</button>' : '';
-  const next = n => '<button type="button" class="bw-act" onclick="betaWelcomeGo(' + n + ')">Next</button>';
-  const dojo = (cls, k, name, gloss) => '<div class="bw-dojo ' + cls + '"><b>' + k + '</b><i>' + name + '</i><span>' + gloss + '</span></div>';
-  let main = '', acts = '', foot = '';
-  if(p === 1){
-    main = '<div class="bw-enso" aria-hidden="true"></div>' +
-      '<h1>Welcome back.</h1>' +
-      '<p class="bw-p">BUSHIDO has been rebuilt. Everything you wrote is kept: your plan, your days, your streaks, your reflections.</p>' +
-      '<p class="bw-p last">There are now four places, on one rail.</p>' +
-      '<div class="bw-places"><div><b>道</b><span>My Bushido</span></div><div><b>省</b><span>Reflect</span></div>' +
-      '<div><b>氏</b><span>Clan</span></div><div><b>人</b><span>You</span></div></div>';
-    acts = next(2);
-  } else if(p === 2){
-    main = '<div class="bw-hz"><div><b>日</b><span>today</span></div><div><b>月</b><span>this month</span></div>' +
-      '<div><b>年</b><span>this year</span></div></div>' +
-      '<h1>Three horizons.</h1>' +
-      '<p class="bw-p">Your day holds the practices. The month holds what they build. The year holds what it serves.</p>' +
-      '<p class="bw-p last">The old layer names are gone, and nothing you put in them has moved. Two of them, Ikigai and Shokunin, now mean something new, explained on the next page.</p>';
-    acts = next(3);
-  } else if(p === 3){
-    /* Plain words (15 November): the first version left a reader asking "relationship to
-       what?", counted two dojos where three were drawn, and never said where the choice
-       is made. Definitions are James's: Ikigai personal, Shokunin work, Hiyoku partner.
-       Hiyoku is private to each person in the app, so the page says so. */
-    main = '<h1>Your goals can now be sorted by area.</h1>' +
-      '<p class="bw-p">Each area is called a dojo. There are ' + (hi ? 'three' : 'two') + ':</p>' +
-      '<div class="bw-dojos">' +
-        dojo('iki', '生', 'IKIGAI', 'Personal: your own aspirations, such as keeping bees or learning Spanish.') +
-        dojo('sho', '職', 'SHOKUNIN', 'Work: your craft, your work goals and your ambitions there.') +
-        (hi ? dojo('hiy', '比', 'HIYOKU', 'Your partner: goals for your relationship, and the ones you and your partner set together. Each of you keeps your own list; your partner does not see yours.') : '') +
-      '</div>' +
-      '<p class="bw-p">You place each of this year\'s goals in one dojo, or in none. A goal in no dojo stays on the main page, My Bushido.</p>' +
-      '<p class="bw-p last">You do this on the next page, with the Sort my goals button. The daily practices linked to a goal move with it.</p>';
-    acts = next(4);
-  } else if(p === 4){
-    main = '<h1>Sort your goals.</h1>' +
-      '<p class="bw-p last">The dojos stay empty until you do. It takes a few minutes: for each goal, choose ' +
-      (hi ? 'personal, work, partner, or none.' : 'personal, work, or none.') + '</p>';
-    acts = '<button type="button" class="bw-act red" onclick="betaWelcomeTag()">Sort my goals</button>' + next(5);
-  } else if(p === 5){
-    main = '<h1>Or walk it with James.</h1>' +
-      '<p class="bw-p">If you would rather not sort it alone, James will sit down with you and the Sensei: your vision, your dojos and your goals, set again in your own words.</p>' +
-      '<div class="bw-dao" aria-hidden="true"></div>';
-    acts = '<button type="button" class="bw-act red" onclick="betaWelcomeGo(\'note\')">Ask James for a session</button>' +
-           '<button type="button" class="bw-quiet" onclick="betaWelcomeClose()">Later</button>';
-    foot = '<p class="bw-foot">This welcome stays in 人 You, under What changed.</p>';
-  } else if(p === 'note'){
-    main = '<h1>A note to James.</h1>' +
-      '<p class="bw-p">Two lines is plenty: where you are with it, and the times that suit you.</p>' +
-      '<textarea class="bw-note" id="bw-note" aria-label="Your note to James"></textarea>';
-    acts = '<button type="button" class="bw-act red" onclick="betaWelcomeSend()">Send</button>' +
-           '<button type="button" class="bw-quiet" onclick="betaWelcomeGo(5)">Back</button>';
-  } else {
-    main = '<h1>Sent.</h1>' +
-      '<p class="bw-p last">Your note is saved to your own record, and James reads it there.</p>';
-    acts = '<button type="button" class="bw-act" onclick="betaWelcomeClose()">Done</button>';
-  }
-  el.innerHTML = '<div class="bw-page bw-pg' + p + (hi ? ' bw-hi' : '') + '">' + dots + skip +
-    '<div class="bw-main">' + main + '</div><div class="bw-acts">' + acts + '</div>' + foot + '</div>';
-  el.scrollTop = 0;
-  const ta = document.getElementById('bw-note');
-  if(ta){ ta.value = _bwNote; }                   // set as a value, never as markup: it is the person's own text
-}
-function betaWelcomeSend(){
-  const ta = document.getElementById('bw-note');
-  const note = String(ta ? ta.value : _bwNote).trim();
-  if(!Array.isArray(state.sessionRequests)) state.sessionRequests = [];
-  const at = Date.now();
-  state.sessionRequests.push({ id: 'sr_' + at, at: at, note: note });
-  saveState();
-  _bwNote = ''; _bwPage = 'sent'; betaWelcomeDraw();
-}
-function betaWelcomeClose(){
-  if(!state.updateWelcomeSeen){ state.updateWelcomeSeen = getDateStr(); saveState(); }
-  const el = document.getElementById('beta-welcome');
-  if(el && el.parentNode) el.parentNode.removeChild(el);
-}
-function betaWelcomeTag(){
-  betaWelcomeClose();
-  betaTagGoalsOpen();
-}
-/* THIS YEAR'S GOALS, READY TO TAG. One row a goal, and the choice the welcome named:
-   personal, work, or none. A tap writes the tag and the row says where the goal
+// ── The update welcome: REMOVED (James, 16 November) ──
+// It was shown once to a person who was already here when BUSHIDO was rebuilt. James
+// removed it entirely: it never shows, What changed has left You, and the note-to-James
+// page went with it. NOTHING IS DELETED FROM ANYONE'S RECORD: updateWelcomeSeen and
+// sessionRequests stay in the merge net below, so a record that carries them keeps
+// them, and ~/.bushido-admin/session_requests.mjs can still read any note already sent.
+// Sort my goals stays reachable from an empty dojo and from its own row in You.
+/* THIS YEAR'S GOALS, READY TO SORT. One row a goal, and the choice the welcome named:
+   personal, work or partner. A tap writes the tag and the row says where the goal
    lives now; the goal's crafts and practices follow it, as they do everywhere else. */
 function betaTagGoalsOpen(){
   const hi = (typeof BETA_HIYOKU_SIDE !== 'undefined' && BETA_HIYOKU_SIDE === true);
+  /* No "none" (James, 15 November): a goal is in a dojo, or not yet sorted, in which
+     case no choice is lit. A choice moves it; nothing here takes a goal out again. */
   const opts = [['ikigai', '生 personal'], ['shokunin', '職 work']]
-    .concat(hi ? [['hiyoku', '比 partner']] : []).concat([['', 'none']]);
+    .concat(hi ? [['hiyoku', '比 partner']] : []);
   const goals = (state.annualGoals || []).filter(g => g);
   const rows = goals.map(function(g){
     const raw = betaPillarRaw(g);
@@ -15712,7 +15516,7 @@ function betaTagGoalsOpen(){
   }).join('');
   betaPanelOpen('this year\'s goals',
     goals.length
-      ? '<p class="bdg-note">For each goal, choose ' + (hi ? 'personal, work, partner, or none.' : 'personal, work, or none.') +
+      ? '<p class="bdg-note">For each goal, choose ' + (hi ? 'personal, work or partner.' : 'personal or work.') +
         ' The daily practices linked to it move with it.</p><div class="bdg-list">' + rows + '</div>'
       : '<p class="bdg-note">There are no goals in the plan yet to sort.</p>');
 }
