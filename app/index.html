@@ -5948,7 +5948,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-16 · Deleting a habit asks first';
+const BUILD_ID = 'v2 · everyone · 2026-11-17 · Clan dates reach the week without a reload';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -21261,6 +21261,7 @@ function cnCalSubscribe(){
       cnCalRsvps[cid]   = norm.rsvps;
       cnCalRemReq[cid]  = norm.removalRequests;
       cnCalRender();
+      cnCalRedrawOwnCalendars();
       if(typeof cnYearCalBuild === 'function') cnYearCalBuild();   // year view must reflect clan events as they LOAD/change — loadClanData builds it before the first snapshot arrives
     },
     function(err){ console.warn('Clan calendar listener failed:', err); }
@@ -21315,9 +21316,21 @@ function cnCalSaveToFirestore(){
     }).then(function(){}, fail);
   }catch(e){ fail(e); }
 }
+/* AN ANSWER TO A CLAN DATE CHANGES THE PERSON'S OWN CALENDARS TOO (16 November). An
+   accepted date is drawn on the week, the month and the year of My Bushido, and those
+   were drawn before the answer. The month and the year redraw when opened; the week did
+   not, so an accepted date was missing from it until something else redrew the page.
+   Redrawn here whenever the clan's calendar changes, here or on another device, unless
+   the person is typing: a redraw under a cursor loses what they were writing. */
+function cnCalRedrawOwnCalendars(){
+  var el = document.activeElement, tag = el && el.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || (el && el.isContentEditable)) return;
+  try { if(typeof renderTab === 'function') renderTab(); } catch(e) { console.warn('Calendar redraw after a clan date failed:', e); }
+}
 // Mutations call this: render optimistically, then persist.
 function cnCalCommit(){
   cnCalRender();
+  cnCalRedrawOwnCalendars();
   cnCalSaveToFirestore();
 }
 
