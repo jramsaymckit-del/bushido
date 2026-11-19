@@ -448,8 +448,6 @@ body.app-on #app{padding-left:140px}
 @media(max-width:899px){
   body:has(.firebase-emulator-warning) .beta-rail{bottom:46px}
 }
-/* 書 LIBRARY is a desktop tab only: on a phone the Library stays a section of You. */
-@media(max-width:899px){ .br-tab.br-lib{display:none} }
 
 
 /* The placeholder rooms behind 省 and 人 until steps 3 and 4 build them. They say
@@ -830,10 +828,6 @@ body.dark .rf-sensei-card{border-color:rgba(255,255,255,.1);background:rgba(255,
    the right. Below 1200 the list stacks above the page, as everything else does. */
 .you-page{display:block;padding:26px 0 60px}
 .you-head{display:flex;align-items:center;gap:20px;margin-bottom:30px}
-/* THE LIBRARY: its own page on a desktop, a section of You on a phone (18 November) */
-.lib-title{margin-bottom:22px}
-.lib-list{max-width:420px}
-@media(min-width:900px){ .you-lib{display:none} }
 .you-sync-detail:not(:empty){margin:0 0 22px}
 .you-hanko{width:68px;height:68px;flex:none;background:var(--seal);color:var(--white);
   border-radius:4px;display:flex;align-items:center;justify-content:center;
@@ -5419,8 +5413,6 @@ try {
     <span class="br-kanji">省</span><span class="br-label">Reflect</span></button>
   <button class="br-tab" data-dest="clan" onclick="betaNav('clan')" aria-label="Clan">
     <span class="br-kanji">氏</span><span class="br-label">Clan</span></button>
-  <button class="br-tab br-lib" data-dest="library" onclick="betaNav('library')" aria-label="Library">
-    <span class="br-kanji">書</span><span class="br-label">Library</span></button>
   <button class="br-tab" data-dest="you" onclick="betaNav('you')" aria-label="You">
     <span class="br-kanji">人</span><span class="br-label">You</span></button>
 </nav>
@@ -5968,7 +5960,7 @@ try {
 // localhost dev server `python -m http.server` sends no Cache-Control, so a soft reload can serve an OLD
 // cached HTML — that caused several false "the fix doesn't work" rounds on a build that was actually fixed.)
 // If the console stamp below is not the build you expect, you're on a cached build → hard-reload (Cmd+Shift+R).
-const BUILD_ID = 'v2 · everyone · 2026-11-18 · The Library: the manifesto first, and its own tab on desktop';
+const BUILD_ID = 'v2 · everyone · 2026-11-19 · The Library goes back into You on desktop';
 try{ console.log('%cBUSHIDO build:%c ' + BUILD_ID, 'font-weight:bold;color:#8b1a1a', 'color:inherit'); }catch(e){}
 // ============ PERSISTENCE ============
 // Canvas has its own isolated key — never reads or writes to any real user's data
@@ -6590,7 +6582,7 @@ function cascadeDraw(){
        and no Next on the last board, where there is nothing further to read. */
     const last = _ccAt === _ccSeq.length - 1;
     next = '<button type="button" class="cc-next cc-back" style="' + CC_NEXT[key].replace('right:', 'left:') +
-           '" onclick="cascadeClose()">' + (BETA_NAV === 'library' ? 'Back to Library' : 'Back to You') + '</button>' + (last ? '' : next);
+           '" onclick="cascadeClose()">Back to You</button>' + (last ? '' : next);
   }
   board = board.replace(/<\/div>\s*$/, next + '</div>');
   el.innerHTML = '<div class="cc-fit" style="width:' + Math.round(w * sc) + 'px;height:' + Math.round(h * sc) + 'px">' +
@@ -6611,11 +6603,6 @@ function cascadeClose(){
 /* THE LIBRARY'S WAY IN. The same boards as the walkthrough, split in two: the four
    words, and the cascade (the chart on a desktop, the three cards on a phone). It
    never calls cascadeMarkSeen, so reading it changes no one's seen date. */
-/* a window narrowed to phone width while on the Library page goes to You, where the
-   phone keeps the Library */
-window.addEventListener('resize', function(){
-  if(BETA_NAV === 'library' && cascadeIsPhone()) betaNav('you');
-});
 function cascadeLibrary(k){
   const ph = cascadeIsPhone();
   const seq = k === 'words' ? [ph ? 'words_m' : 'words_d'] : (ph ? ['card1', 'card2', 'card3'] : ['chart']);
@@ -9401,14 +9388,6 @@ function libraryRows(){
 function libraryOpen(k){
   if(k === 'manifesto'){ openManifesto(); return; }
   cascadeLibrary(k);
-}
-/* THE LIBRARY PAGE (James, 18 November). On a desktop the Library is a tab of its own,
-   書, just before You, and You no longer carries it; on a phone nothing moves and it
-   stays a section of You. */
-function betaRenderLibrary(){
-  const host = document.getElementById('library-page');
-  if(!host) return;
-  host.innerHTML = '<h2 class="you-name lib-title">Library</h2><div class="lib-list">' + libraryRows() + '</div>';
 }
 function youOpen(k){
   if(k === 'sort'){ betaTagGoalsOpen(); return; }   // not a panel: the sorting list itself
@@ -16570,11 +16549,9 @@ function enterDemoMode(){
    an alias is cheaper to read than a rename across a 17,000-line file. */
 let BETA_NAV = 'bushido';
 const BETA_NAV_VIEWS = {bushido:'primary-bushido', reflect:'primary-reflect',
-                        clan:'primary-clan',       you:'primary-you',
-                        library:'primary-library'};
+                        clan:'primary-clan',       you:'primary-you'};
 function betaNav(dest){
   if(!BETA_NAV_VIEWS[dest]) dest = 'bushido';
-  if(dest === 'library' && cascadeIsPhone()) dest = 'you';   // on a phone the Library lives in You
   BETA_NAV = dest;
   document.querySelectorAll('.br-tab').forEach(b =>
     b.classList.toggle('active', b.getAttribute('data-dest') === dest));
@@ -16590,7 +16567,6 @@ function betaNav(dest){
      well as on renderTab: a person can reach Reflect without My Bushido rendering. */
   if(dest === 'reflect') betaRenderReflect();
   if(dest === 'you') betaRenderYou();
-  if(dest === 'library') betaRenderLibrary();
   betaRailGlow();
   window.scrollTo({top:0, behavior:'instant'});
 }
@@ -16927,10 +16903,6 @@ function setVis(force, opts){
        be a banner over the practice. -->
   <div id="primary-reflect" style="display:none">
     <div class="rf-page" id="reflect-body"></div>
-  </div>
-
-  <div id="primary-library" style="display:none">
-    <div class="you-page lib-page" id="library-page"></div>
   </div>
 
   <div id="primary-you" style="display:none">
